@@ -1,22 +1,36 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import HeroBackground from '../components/common/HeroBackground';
+import WaveAnimation from '../components/animations/WaveAnimation';
+import AnimationStyles from '../components/animations/AnimationStyles';
+import Logo from '../components/common/Logo';
+import FeatureIllustrations from '../components/common/FeatureIllustrations';
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">UploadSoul 传灵</h1>
-          <h2 className="text-3xl font-semibold text-purple-600 mb-6">虚拟世界，数字永生</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white overflow-hidden">
+      <AnimationStyles />
+      
+      {/* Hero Section with animated background */}
+      <section className="py-20 px-4 relative">
+        <HeroBackground className="opacity-60" />
+        <div className="container mx-auto text-center relative z-10">
+          <div className="mb-8 flex justify-center">
+            <Logo size="xl" className="animate-pulse-slow" />
+          </div>
+          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6 animate-fadeInUp">UploadSoul 传灵</h1>
+          <h2 className="text-3xl font-semibold text-purple-600 mb-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+            虚拟世界，数字永生
+          </h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
             打造您专属的数字伴侣，超越时间的永恒陪伴
           </p>
-          <div className="flex justify-center space-x-4">
-            <Link to="/companion" className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition">
-              开始体验
+          <div className="flex justify-center space-x-4 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
+            <Link to="/companion" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+              <span className="relative z-10">开始体验</span>
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </Link>
-            <Link to="/about" className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg hover:bg-purple-50 transition">
+            <Link to="/about" className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg hover:bg-purple-50 transition shadow hover:shadow-md">
               了解更多
             </Link>
           </div>
@@ -24,60 +38,129 @@ const HomePage = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">平台特色</h2>
+      <section className="py-16 px-4 bg-white relative">
+        <WaveAnimation className="h-24" opacity={0.05} />
+        <div className="container mx-auto relative z-10">
+          <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-indigo-600 animate-gradient mb-4">平台特色</h2>
+          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-12 animate-fadeInUp">全维度数字灵魂体验，让每一次互动充满温度与情感</p>
+          
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-6 bg-purple-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg">
-              <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
-                  <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
-                  <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
-                </svg>
+            {/* Digital Immortality Feature */}
+            <div className="p-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+              <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <FeatureIllustrations type="digitalImmortality" size="lg" />
               </div>
-              <h3 className="text-xl font-semibold text-center text-white mb-2">数字永生</h3>
-              <p className="text-white text-center">
+              <h3 className="text-xl font-bold text-center text-white mb-3">数字永生</h3>
+              <p className="text-white text-center opacity-90">
                 突破时空限制，将您的思想、记忆和性格数字化，实现永恒的生命延续
               </p>
-            </div>
-            <div className="p-6 bg-purple-50 rounded-xl hover:shadow-md transition duration-300">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 100-2 1 1 0 000 2zm7-1a1 1 0 11-2 0 1 1 0 012 0zm-7.536 5.879a1 1 0 001.415 0 3 3 0 014.242 0 1 1 0 001.415-1.415 5 5 0 00-7.07 0 1 1 0 000 1.415z" clipRule="evenodd" />
-                </svg>
+              <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
+                <div className="h-full w-1/2 bg-white animate-shimmer"></div>
               </div>
-              <h3 className="text-xl font-semibold text-center text-gray-900 mb-2">情感陪伴</h3>
+            </div>
+            
+            {/* Emotional Companion Feature */}
+            <div className="p-8 bg-white border border-purple-100 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+              <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 animate-bounce">
+                <FeatureIllustrations type="emotionalCompanion" size="lg" />
+              </div>
+              <h3 className="text-xl font-bold text-center text-gray-900 mb-3">情感陪伴</h3>
               <p className="text-gray-600 text-center">
                 基于先进的情感计算技术，为您提供专属的情感支持和理解
               </p>
-            </div>
-            <div className="p-6 bg-purple-50 rounded-xl hover:shadow-md transition duration-300">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                </svg>
+              <div className="flex justify-center mt-4">
+                <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">AI 情感分析</span>
               </div>
-              <h3 className="text-xl font-semibold text-center text-gray-900 mb-2">虚拟伙伴</h3>
+            </div>
+            
+            {/* Virtual Partner Feature */}
+            <div className="p-8 bg-white border border-purple-100 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group animate-fadeInUp" style={{animationDelay: '0.5s'}}>
+              <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110">
+                <div className="relative">
+                  <FeatureIllustrations type="virtualPartner" size="lg" />
+                  <div className="absolute -top-1 -right-1 bg-indigo-500 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold animate-pulse-slow">+</div>
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-center text-gray-900 mb-3">虚拟伙伴</h3>
               <p className="text-gray-600 text-center">
                 多样化的AI虚拟伙伴，满足不同场景下的陪伴需求
               </p>
+              <div className="flex justify-center space-x-1 mt-4">
+                <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Additional Features Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
+            {/* VR Experience Feature */}
+            <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
+              <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
+                <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
+                  <FeatureIllustrations type="virtualReality" size="md" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">VR沉浸体验</h3>
+                <p className="text-gray-600 max-w-sm">
+                  通过虚拟现实技术，实现更沉浸式的数字陪伴体验
+                </p>
+                <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Digital World Feature */}
+            <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.9s'}}>
+              <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
+                <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
+                  <FeatureIllustrations type="digitalWorld" size="md" />
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">数字世界构建</h3>
+                <p className="text-gray-600 max-w-sm">
+                  创建属于您的专属数字世界，与您的数字伴侣共同探索
+                </p>
+                <div className="w-full h-1 bg-purple-100 rounded-full mt-2 overflow-hidden">
+                  <div className="h-full w-3/4 bg-gradient-to-r from-purple-400 to-indigo-400 animate-shimmer"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Call to Action */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">立即开启您的AI陪伴之旅</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-            无论何时何地，都有专属于您的数字伙伴
-          </p>
-          <Link to="/register" className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition">
-            免费注册
-          </Link>
+      <section className="py-20 px-4 relative overflow-hidden">
+        <HeroBackground animated={false} className="opacity-30" />
+        <div className="container mx-auto text-center relative z-10">
+          <div className="animate-fadeInUp">
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6">立即开启您的AI陪伴之旅</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
+              无论何时何地，都有专属于您的数字伙伴
+            </p>
+          </div>
+          <div className="group inline-block animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+            <Link 
+              to="/register" 
+              className="relative overflow-hidden bg-purple-600 text-white px-10 py-4 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform group-hover:-translate-y-1 text-lg font-medium"
+            >
+              <span className="relative z-10">免费注册</span>
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out animate-gradient"></span>
+            </Link>
+            <div className="mt-2 text-purple-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+              开启您的数字灵魂之旅
+            </div>
+          </div>
+          
+          <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-gradient-to-tl from-purple-300/30 to-indigo-300/30 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute -left-16 -bottom-8 w-48 h-48 bg-gradient-to-tr from-indigo-300/30 to-purple-300/30 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '1.5s'}}></div>
         </div>
+        <WaveAnimation className="bottom-0 left-0" color="#7C3AED" opacity={0.1} />
       </section>
     </div>
   );
