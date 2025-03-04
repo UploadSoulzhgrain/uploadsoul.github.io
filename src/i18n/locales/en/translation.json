@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "UploadSoul - Virtual World, Digital Immortality",
+    "description": "UploadSoul - Holographic emotional companion, virtual pet, digital immortality and other services"
+  },
+  "header": {
+    "home": "Home",
+    "explore": "Explore",
+    "companions": "Companions",
+    "about": "About",
+    "login": "Login",
+    "signup": "Sign Up",
+    "language": "Language"
+  },
+  "footer": {
+    "aboutUs": "About Us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contactUs": "Contact Us",
+    "copyright": "All rights reserved.",
+    "services": "Our Services",
+    "aboutCompany": "Company Introduction",
+    "team": "Our Team",
+    "contact": "Contact Us",
+    "joinUs": "Join Us",
+    "contactMethods": "Contact Information",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "addressDetails": "Vancouver, Canada",
+    "platformName": "Virtual World, Digital Immortality"
+  },
+  "home": {
+    "hero": {
+      "title": "Your Digital Emotional Companion",
+      "subtitle": "Experience the future of emotional companionship with advanced AI technology",
+      "cta": "Try Now"
+    },
+    "features": {
+      "title": "Platform Features",
+      "emotionalCompanion": {
+        "title": "Holographic Emotional Companion",
+        "description": "Create your personalized AI companion with unique personality traits"
+      },
+      "virtualPet": {
+        "title": "Virtual Pet",
+        "description": "Adopt and nurture digital pets with advanced AI behaviors"
+      },
+      "digitalImmortality": {
+        "title": "Digital Immortality",
+        "description": "Preserve your memories and personality in a digital form"
+      }
+    },
+    "testimonials": {
+      "title": "User Testimonials",
+      "seeMore": "See More"
+    }
+  },
+  "companion": {
+    "selectCompanion": "Select Your AI Companion",
+    "startConversation": "Start a conversation with",
+    "sendMessage": "Send",
+    "inputPlaceholder": "Enter message...",
+    "record": "Record",
+    "uploadImage": "Upload Image",
+    "addEmoji": "Add Emoji"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "orContinueWith": "Or continue with"
+  },
+  "languages": {
+    "en": "English",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}

@@ -1,0 +1,82 @@
+{
+  "app": {
+    "title": "UploadSoul 传灵 虚拟世界，数字永生",
+    "description": "UploadSoul 传灵 - 全息情感陪伴、虚拟宠物、数字永生等服务"
+  },
+  "header": {
+    "home": "首页",
+    "explore": "探索",
+    "companions": "伴侣",
+    "about": "关于",
+    "login": "登录",
+    "signup": "注册",
+    "language": "语言"
+  },
+  "footer": {
+    "aboutUs": "关于我们",
+    "privacyPolicy": "隐私政策",
+    "termsOfService": "服务条款",
+    "contactUs": "联系我们",
+    "copyright": "版权所有。",
+    "services": "产品服务",
+    "aboutCompany": "公司介绍",
+    "team": "团队成员",
+    "contact": "联系我们",
+    "joinUs": "加入我们",
+    "contactMethods": "联系方式",
+    "email": "邮箱",
+    "phone": "电话",
+    "address": "地址",
+    "addressDetails": "加拿大温哥华",
+    "platformName": "传灵 虚拟世界，数字永生"
+  },
+  "home": {
+    "hero": {
+      "title": "您的数字情感伴侣",
+      "subtitle": "通过先进的AI技术体验情感陪伴的未来",
+      "cta": "立即体验"
+    },
+    "features": {
+      "title": "平台特色",
+      "emotionalCompanion": {
+        "title": "全息情感陪伴",
+        "description": "创建您的个性化AI伴侣，拥有独特的性格特点"
+      },
+      "virtualPet": {
+        "title": "虚拟宠物",
+        "description": "领养并培养具有高级AI行为的数字宠物"
+      },
+      "digitalImmortality": {
+        "title": "数字永生",
+        "description": "以数字形式保存您的记忆和个性"
+      }
+    },
+    "testimonials": {
+      "title": "用户评价",
+      "seeMore": "查看更多"
+    }
+  },
+  "companion": {
+    "selectCompanion": "选择您的AI伙伴",
+    "startConversation": "开始与以下对象的对话",
+    "sendMessage": "发送",
+    "inputPlaceholder": "输入消息...",
+    "record": "录音",
+    "uploadImage": "上传图片",
+    "addEmoji": "添加表情"
+  },
+  "auth": {
+    "login": "登录",
+    "signup": "注册",
+    "email": "电子邮件",
+    "password": "密码",
+    "forgotPassword": "忘记密码？",
+    "orContinueWith": "或继续使用"
+  },
+  "languages": {
+    "en": "English",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}
