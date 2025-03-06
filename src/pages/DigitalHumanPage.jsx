@@ -1,35 +1,50 @@
 // pages/DigitalHumanPage.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import CreateDigitalHuman from '../components/digitalHuman/CreateDigitalHuman';
+import VoiceChat from '../components/digitalHuman/VoiceChat';
+import digitalHumanService from '../services/digitalHumanService';
 
 const DigitalHumanPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [digitalHumans, setDigitalHumans] = useState([
-    {
-      id: '1',
-      name: '张伯父',
-      relationship: '祖父',
-      avatar: '/assets/digital-humans/grandpa.jpg',
-      memories: 15,
-      createdAt: '2023-11-10',
-      voiceModel: true,
-      mediaFiles: 23
-    },
-    {
-      id: '2',
-      name: '李奶奶',
-      relationship: '外婆',
-      avatar: '/assets/digital-humans/grandma.jpg',
-      memories: 7,
-      createdAt: '2023-12-05',
-      voiceModel: false,
-      mediaFiles: 16
+  const [digitalHumans, setDigitalHumans] = useState([]);
+  
+  // Load digital humans from service
+  useEffect(() => {
+    const loadedHumans = digitalHumanService.getAll();
+    if (loadedHumans && loadedHumans.length > 0) {
+      setDigitalHumans(loadedHumans);
+    } else {
+      // Use sample data if none exists
+      setDigitalHumans([
+        {
+          id: '1',
+          name: '张伯父',
+          relationship: '祖父',
+          avatar: '/assets/digital-humans/grandpa.jpg',
+          memories: 15,
+          createdAt: '2023-11-10',
+          voiceModel: true,
+          mediaFiles: 23
+        },
+        {
+          id: '2',
+          name: '李奶奶',
+          relationship: '外婆',
+          avatar: '/assets/digital-humans/grandma.jpg',
+          memories: 7,
+          createdAt: '2023-12-05',
+          voiceModel: false,
+          mediaFiles: 16
+        }
+      ]);
     }
-  ]);
+  }, []);
   const [selectedHuman, setSelectedHuman] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showVoiceChat, setShowVoiceChat] = useState(false);
   const [activeTab, setActiveTab] = useState('memories'); // memories, conversation, media, tree
   const [newMemory, setNewMemory] = useState('');
   
@@ -109,9 +124,45 @@ const DigitalHumanPage = () => {
   const handleAddMemory = () => {
     if (!newMemory.trim()) return;
     
-    // In a real app, you'd send this to the backend
-    alert(`已添加新记忆: ${newMemory}`);
-    setNewMemory('');
+    if (selectedHuman) {
+      digitalHumanService.addMemory(selectedHuman.id, {
+        type: 'text',
+        content: newMemory,
+        tags: ['手动添加']
+      });
+      
+      alert(t('digitalHuman.memories.added'));
+      setNewMemory('');
+    }
+  };
+  
+  // Create a new digital human
+  const handleCreateDigitalHuman = (formData) => {
+    try {
+      const newHuman = digitalHumanService.create({
+        name: formData.name,
+        relationship: formData.relationship,
+        avatar: formData.photo ? URL.createObjectURL(formData.photo) : '/assets/digital-humans/default-avatar.jpg',
+        description: formData.description,
+        createdAt: new Date().toISOString().split('T')[0],
+        voiceModel: formData.voiceFiles && formData.voiceFiles.length > 0,
+        mediaFiles: (formData.photoFiles?.length || 0) + (formData.videoFiles?.length || 0)
+      });
+      
+      setDigitalHumans([...digitalHumans, newHuman]);
+      setSelectedHuman(newHuman);
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error('Error creating digital human:', error);
+      alert(t('digitalHuman.creation.error'));
+    }
+  };
+  
+  // Start voice chat with the selected digital human
+  const startVoiceChat = () => {
+    if (selectedHuman) {
+      setShowVoiceChat(true);
+    }
   };
   
   // Render file thumbnail
@@ -356,10 +407,22 @@ const DigitalHumanPage = () => {
 
                   {activeTab === 'conversation' && (
                     <div className="mb-6">
-                      <div className="mb-4 bg-purple-50 rounded-lg p-3">
+                      <div className="mb-4 bg-purple-50 rounded-lg p-3 flex justify-between items-center">
                         <p className="text-sm text-purple-700">
-                          您可以与数字人进行对话，探索珍贵记忆，感受他们的性格和思想。
+                          {t('digitalHuman.conversation.intro')}
                         </p>
+                        
+                        {selectedHuman.voiceModel && (
+                          <button
+                            onClick={startVoiceChat}
+                            className="flex items-center gap-1 bg-purple-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-purple-700 transition"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                            </svg>
+                            {t('digitalHuman.conversation.startVoiceChat')}
+                          </button>
+                        )}
                       </div>
 
                       <div className="space-y-4 mb-4">
@@ -453,65 +516,14 @@ const DigitalHumanPage = () => {
         </div>
       </div>
 
-      {/* Create Digital Human Modal - Simplified version */}
+      {/* Create Digital Human Modal - Using the advanced CreateDigitalHuman component */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">创建数字人</h3>
-              <p className="text-gray-600 mb-4">填写基本信息以创建一个数字人形象。之后您可以添加记忆、上传照片和声音样本。</p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-gray-700 mb-1">名称</label>
-                  <input
-                    type="text"
-                    placeholder="数字人的名字"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-gray-700 mb-1">关系</label>
-                  <select className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <option value="">选择关系</option>
-                    <option value="father">父亲</option>
-                    <option value="mother">母亲</option>
-                    <option value="grandfather">祖父</option>
-                    <option value="grandmother">祖母</option>
-                    <option value="other">其他</option>
-                  </select>
-                </div>
-                
-                <div>
-                  <label className="block text-gray-700 mb-1">上传照片</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-purple-500">
-                    <div className="text-gray-500 mb-2">点击或拖放照片</div>
-                    <div className="text-xs text-gray-400">支持 JPG, PNG 格式</div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-                >
-                  取消
-                </button>
-                <button
-                  onClick={() => {
-                    alert('此功能仅作演示，实际创建需要更复杂的上传和训练流程');
-                    setShowCreateModal(false);
-                  }}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-                >
-                  创建
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CreateDigitalHuman onClose={() => setShowCreateModal(false)} onSubmit={handleCreateDigitalHuman} />
+      )}
+      
+      {/* Voice Chat Modal */}
+      {showVoiceChat && selectedHuman && (
+        <VoiceChat digitalHuman={selectedHuman} onClose={() => setShowVoiceChat(false)} />
       )}
     </div>
   );

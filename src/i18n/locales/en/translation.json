@@ -3,6 +3,88 @@
     "title": "UploadSoul - Virtual World, Digital Immortality",
     "description": "UploadSoul - Holographic emotional companion, virtual pet, digital immortality and other services"
   },
+  "digitalHuman": {
+    "title": "Digital Humans",
+    "description": "Create and interact with digital versions of your loved ones",
+    "createButton": "Create Digital Human",
+    "familyTree": "Family Tree",
+    "visualTree": "View Visual Family Tree",
+    "creation": {
+      "title": "Create Digital Human",
+      "description": "By uploading photos, voice, videos and precious memories, create a digital version of your loved ones to preserve these memories forever.",
+      "previous": "Previous",
+      "next": "Next",
+      "createButton": "Create Digital Human",
+      "step1Title": "Basic Information",
+      "step2Title": "Upload Photos",
+      "step3Title": "Upload Voice Samples",
+      "step4Title": "Upload Videos",
+      "step5Title": "Add Memories",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter name",
+      "relationshipLabel": "Relationship",
+      "selectRelationship": "Select relationship",
+      "photoUploadLabel": "Upload Main Photo",
+      "photoUploadInstruction": "Click or drag and drop photo",
+      "photoUploadFormats": "Supports JPG, PNG formats",
+      "additionalPhotosLabel": "Upload Additional Photos",
+      "voiceUploadLabel": "Upload Voice Samples",
+      "voiceUploadInstruction": "Upload clear voice recordings for better voice model training",
+      "voiceUploadFormats": "Supports MP3, WAV formats",
+      "recordVoice": "Record Voice",
+      "videoUploadLabel": "Upload Videos",
+      "videoUploadInstruction": "Videos help create more realistic digital humans",
+      "videoUploadFormats": "Supports MP4, MOV formats",
+      "memoryLabel": "Add Memories",
+      "memoryPlaceholder": "Share memories, stories, or characteristics...",
+      "privacyNote": "Your data is securely stored and will only be used to create your digital human.",
+      "files": "files selected",
+      "relationships": {
+        "parent": "Parent",
+        "child": "Child",
+        "sibling": "Sibling",
+        "grandparent": "Grandparent",
+        "grandchild": "Grandchild",
+        "friend": "Friend",
+        "spouse": "Spouse",
+        "other": "Other"
+      }
+    },
+    "voiceChat": {
+      "welcome": "Hello! I'm {{name}}. How can I talk with you today?",
+      "defaultName": "Digital Human",
+      "companion": "AI Companion",
+      "userAudioMessage": "Voice message sent",
+      "thinking": "Thinking...",
+      "tapToTalk": "Tap to talk",
+      "tapToStop": "Tap to stop",
+      "play": "Play audio",
+      "pause": "Pause audio",
+      "microphoneError": "Error accessing microphone. Please check your permissions.",
+      "responses": {
+        "howAreYou": "It's so good to hear your voice. How have you been?",
+        "goodMemories": "I was just thinking about the good times we had together.",
+        "missYou": "I've missed our conversations. Tell me what's new with you.",
+        "loveTalking": "I love talking with you. It brings back so many memories.",
+        "rememberWhen": "Do you remember when we used to spend hours talking about life?"
+      }
+    },
+    "conversation": {
+      "intro": "You can converse with the digital human, explore precious memories, and experience their personality and thoughts.",
+      "startVoiceChat": "Start Voice Chat"
+    },
+    "memories": {
+      "title": "Memory Library",
+      "addNew": "Add New Memory",
+      "added": "Memory added successfully",
+      "placeholder": "Record a precious memory about this person...",
+      "save": "Save"
+    },
+    "reunionFeatures": {
+      "title": "Family Reunion",
+      "description": "Explore your family connections and preserve your family history through our interactive family tree."
+    }
+  },
   "header": {
     "home": "Home",
     "explore": "Explore",
