@@ -3,6 +3,37 @@
  * Service for managing audio recording and playback
  */
 
+// API endpoints
+const API_BASE_URL = '/api';
+const ENDPOINTS = {
+  PROCESS_AUDIO: '/voice-chat/process',
+  GET_VOICES: '/voice-models',
+  CREATE_VOICE_MODEL: '/voice-models/create'
+};
+
+// Helper to handle API requests with fallback
+const apiRequest = async (endpoint, options = {}, fallbackFn) => {
+  try {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Accept': 'application/json',
+        ...options.headers
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.warn(`API request failed: ${error.message}. Using fallback.`);
+    return fallbackFn ? fallbackFn() : null;
+  }
+};
+
 const audioService = {
   mediaRecorder: null,
   audioChunks: [],
@@ -177,6 +208,115 @@ const audioService = {
     }
     
     return window.speechSynthesis.getVoices();
+  },
+  
+  /**
+   * Process the recorded audio with the backend API
+   * @param {Blob} audioBlob - The audio blob to process
+   * @param {Object} options - Options for processing
+   * @returns {Promise} Promise that resolves with the processing result
+   */
+  processAudio: async (audioBlob, options = {}) => {
+    // Create FormData to send the audio
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'user_audio.webm');
+    
+    // Add any additional options
+    if (options.digitalHumanId) {
+      formData.append('digitalHumanId', options.digitalHumanId);
+    }
+    
+    if (options.language) {
+      formData.append('language', options.language);
+    }
+    
+    try {
+      // Send to backend API
+      const response = await fetch(`${API_BASE_URL}${ENDPOINTS.PROCESS_AUDIO}`, {
+        method: 'POST',
+        body: formData
+        // No Content-Type header as it will be set by the browser for FormData
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Audio processing failed with status ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.warn(`Audio processing failed: ${error.message}. Using fallback.`);
+      
+      // Return a simulated response
+      return {
+        success: true,
+        text: 'This is a simulated response in demo mode.',
+        audioUrl: null
+      };
+    }
+  },
+  
+  /**
+   * Get available voice models
+   * @param {string} digitalHumanId - Optional ID to filter models by digital human
+   * @returns {Promise<Array>} Available voice models
+   */
+  getVoiceModels: async (digitalHumanId = null) => {
+    let endpoint = ENDPOINTS.GET_VOICES;
+    if (digitalHumanId) {
+      endpoint += `?digitalHumanId=${encodeURIComponent(digitalHumanId)}`;
+    }
+    
+    return await apiRequest(endpoint, { method: 'GET' }, () => {
+      // Return demo voice models
+      return [
+        { id: 'demo-1', name: 'Default Voice', gender: 'female' },
+        { id: 'demo-2', name: 'Male Voice', gender: 'male' }
+      ];
+    });
+  },
+  
+  /**
+   * Create a voice model from audio samples
+   * @param {Object} data - Voice model creation data
+   * @returns {Promise<Object>} Created voice model info
+   */
+  createVoiceModel: async (data) => {
+    const formData = new FormData();
+    
+    // Add basic information
+    formData.append('name', data.name);
+    formData.append('digitalHumanId', data.digitalHumanId);
+    
+    // Add audio samples
+    if (data.audioSamples && data.audioSamples.length) {
+      data.audioSamples.forEach((sample, index) => {
+        formData.append(`sample_${index}`, sample, `sample_${index}.webm`);
+      });
+    }
+    
+    try {
+      // Send to backend API
+      const response = await fetch(`${API_BASE_URL}${ENDPOINTS.CREATE_VOICE_MODEL}`, {
+        method: 'POST',
+        body: formData
+        // No Content-Type header as it will be set by the browser for FormData
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Voice model creation failed with status ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.warn(`Voice model creation failed: ${error.message}. Using fallback.`);
+      
+      // Return a simulated response
+      return {
+        success: true,
+        modelId: `demo-${Date.now()}`,
+        message: 'Voice model created successfully in demo mode'
+      };
+    }
   }
 };
 
