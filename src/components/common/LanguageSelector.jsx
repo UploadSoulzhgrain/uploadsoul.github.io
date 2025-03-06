@@ -10,7 +10,8 @@ const LanguageSelector = () => {
     { code: 'en', name: 'English' },
     { code: 'zh-CN', name: '简体中文' },
     { code: 'zh-TW', name: '繁體中文' },
-    { code: 'ja', name: '日本語' }
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' }
   ];
 
   // Get current language

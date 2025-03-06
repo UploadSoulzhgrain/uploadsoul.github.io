@@ -1,7 +1,11 @@
 // pages/DigitalHumanPage.jsx
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const DigitalHumanPage = () => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const [digitalHumans, setDigitalHumans] = useState([
     {
       id: '1',
@@ -173,12 +177,15 @@ const DigitalHumanPage = () => {
       <div className="container mx-auto">
         {/* Page Header */}
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">数字永生</h1>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t('digitalHuman.title')}</h1>
+            <p className="text-gray-600 mt-1">{t('digitalHuman.description')}</p>
+          </div>
           <button 
             onClick={() => setShowCreateModal(true)}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
           >
-            创建数字人
+            {t('digitalHuman.createButton')}
           </button>
         </div>
 
@@ -416,8 +423,27 @@ const DigitalHumanPage = () => {
 
                   {activeTab === 'tree' && (
                     <div className="mb-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">家族树</h3>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-medium text-gray-900">{t('digitalHuman.familyTree')}</h3>
+                        <button
+                          onClick={() => navigate(`/digital-human/family-tree/${selectedHuman.id}`)}
+                          className="text-sm bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+                        >
+                          {t('digitalHuman.reunionFeatures.title')}
+                        </button>
+                      </div>
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-5">
+                        <p className="text-purple-700">{t('digitalHuman.reunionFeatures.description')}</p>
+                      </div>
                       <FamilyTreeNode node={familyTreeData} />
+                      <div className="mt-6 text-center">
+                        <Link 
+                          to={`/digital-human/family-tree/${selectedHuman.id}`}
+                          className="text-purple-600 hover:text-purple-800 transition font-medium"
+                        >
+                          {t('digitalHuman.visualTree')} →
+                        </Link>
+                      </div>
                     </div>
                   )}
                 </div>
