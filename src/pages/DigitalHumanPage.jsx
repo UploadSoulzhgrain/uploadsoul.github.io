@@ -11,37 +11,71 @@ const DigitalHumanPage = () => {
   const navigate = useNavigate();
   const [digitalHumans, setDigitalHumans] = useState([]);
   
+  // State for loading and error handling
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  
   // Load digital humans from service
   useEffect(() => {
-    const loadedHumans = digitalHumanService.getAll();
-    if (loadedHumans && loadedHumans.length > 0) {
-      setDigitalHumans(loadedHumans);
-    } else {
-      // Use sample data if none exists
-      setDigitalHumans([
-        {
-          id: '1',
-          name: '张伯父',
-          relationship: '祖父',
-          avatar: '/assets/digital-humans/grandpa.jpg',
-          memories: 15,
-          createdAt: '2023-11-10',
-          voiceModel: true,
-          mediaFiles: 23
-        },
-        {
-          id: '2',
-          name: '李奶奶',
-          relationship: '外婆',
-          avatar: '/assets/digital-humans/grandma.jpg',
-          memories: 7,
-          createdAt: '2023-12-05',
-          voiceModel: false,
-          mediaFiles: 16
+    async function fetchDigitalHumans() {
+      try {
+        setIsLoading(true);
+        setLoadError(null);
+        
+        // Try to get digital humans from API
+        const humans = await digitalHumanService.getAll();
+        
+        if (humans && humans.length > 0) {
+          setDigitalHumans(humans);
+        } else {
+          // Use sample data if none exists
+          setDigitalHumans([
+            {
+              id: '1',
+              name: '张伯父',
+              relationship: '祖父',
+              avatar: '/assets/digital-humans/grandpa.jpg',
+              memories: 15,
+              createdAt: '2023-11-10',
+              voiceModel: true,
+              mediaFiles: 23
+            },
+            {
+              id: '2',
+              name: '李奶奶',
+              relationship: '外婆',
+              avatar: '/assets/digital-humans/grandma.jpg',
+              memories: 7,
+              createdAt: '2023-12-05',
+              voiceModel: false,
+              mediaFiles: 16
+            }
+          ]);
         }
-      ]);
+      } catch (error) {
+        console.error('Error loading digital humans:', error);
+        setLoadError(t('digitalHuman.errors.loadFailed'));
+        
+        // Fall back to sample data on error
+        setDigitalHumans([
+          {
+            id: '1',
+            name: '张伯父',
+            relationship: '祖父',
+            avatar: '/assets/digital-humans/grandpa.jpg',
+            memories: 15,
+            createdAt: '2023-11-10',
+            voiceModel: true,
+            mediaFiles: 23
+          }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }, []);
+    
+    fetchDigitalHumans();
+  }, [t]);
   const [selectedHuman, setSelectedHuman] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showVoiceChat, setShowVoiceChat] = useState(false);
@@ -137,24 +171,23 @@ const DigitalHumanPage = () => {
   };
   
   // Create a new digital human
-  const handleCreateDigitalHuman = (formData) => {
+  const handleCreateDigitalHuman = async (digitalHumanId) => {
     try {
-      const newHuman = digitalHumanService.create({
-        name: formData.name,
-        relationship: formData.relationship,
-        avatar: formData.photo ? URL.createObjectURL(formData.photo) : '/assets/digital-humans/default-avatar.jpg',
-        description: formData.description,
-        createdAt: new Date().toISOString().split('T')[0],
-        voiceModel: formData.voiceFiles && formData.voiceFiles.length > 0,
-        mediaFiles: (formData.photoFiles?.length || 0) + (formData.videoFiles?.length || 0)
-      });
+      // Get details of the newly created digital human
+      const newHuman = await digitalHumanService.getById(digitalHumanId);
       
-      setDigitalHumans([...digitalHumans, newHuman]);
-      setSelectedHuman(newHuman);
-      setShowCreateModal(false);
+      if (newHuman) {
+        // Add to the list
+        setDigitalHumans(prevHumans => [...prevHumans, newHuman]);
+        setSelectedHuman(newHuman);
+        setShowCreateModal(false);
+      } else {
+        throw new Error('Failed to load created digital human');
+      }
     } catch (error) {
-      console.error('Error creating digital human:', error);
+      console.error('Error processing created digital human:', error);
       alert(t('digitalHuman.creation.error'));
+      setShowCreateModal(false);
     }
   };
   
