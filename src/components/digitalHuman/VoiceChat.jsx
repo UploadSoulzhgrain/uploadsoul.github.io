@@ -75,38 +75,85 @@ const VoiceChat = ({ digitalHuman, onClose }) => {
   const processAIResponse = async (audioBlob, userMessageId) => {
     setIsAIResponding(true);
     
-    // In a real implementation, we would send the audio to the backend for processing
-    // For demonstration, we'll use a simulated response after a delay
-    
-    setTimeout(() => {
-      // Choose a random response
-      const responses = [
-        t('digitalHuman.voiceChat.responses.howAreYou'),
-        t('digitalHuman.voiceChat.responses.goodMemories'),
-        t('digitalHuman.voiceChat.responses.missYou'),
-        t('digitalHuman.voiceChat.responses.loveTalking'),
-        t('digitalHuman.voiceChat.responses.rememberWhen')
-      ];
+    try {
+      // Process the audio using the audioService
+      const data = await audioService.processAudio(audioBlob, {
+        digitalHumanId: digitalHuman?.id || 'default',
+        language: 'en-US' // Use language from user preferences if available
+      });
       
-      const responseText = responses[Math.floor(Math.random() * responses.length)];
+      // Get the response text and audio URL
+      const responseText = data.text;
+      const audioUrl = data.audioUrl;
       
-      // Simulate receiving audio response
+      // Add the AI response to messages
       const aiResponse = {
         id: Date.now(),
         sender: 'ai',
         content: responseText,
-        audioUrl: null // In a real implementation, this would be the URL of the audio file
+        audioUrl: audioUrl
       };
       
       setMessages(prevMessages => [...prevMessages, aiResponse]);
       setIsAIResponding(false);
       
-      // In a real implementation, we would play the received audio
-      // For now, we'll use browser's speech synthesis as a placeholder
-      const utterance = new SpeechSynthesisUtterance(responseText);
-      utterance.lang = 'en-US';
-      speechSynthesis.speak(utterance);
-    }, 2000);
+      // Play the audio response if available
+      if (audioUrl) {
+        if (audioRef.current) {
+          audioRef.current.src = audioUrl;
+          audioRef.current.play();
+          setAudioPlaying(true);
+        }
+      } else {
+        // Fallback to speech synthesis if no audio URL
+        const utterance = new SpeechSynthesisUtterance(responseText);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+      }
+    } catch (error) {
+      console.error('Error processing AI response:', error);
+      setError(t('digitalHuman.voiceChat.processingError'));
+      setIsAIResponding(false);
+      
+      // Add error message
+      const errorMessage = {
+        id: Date.now(),
+        sender: 'ai',
+        content: t('digitalHuman.voiceChat.serverError'),
+        isError: true
+      };
+      
+      setMessages(prevMessages => [...prevMessages, errorMessage]);
+      
+      // Fallback to demo mode if API fails
+      setTimeout(() => {
+        // Choose a random response
+        const responses = [
+          t('digitalHuman.voiceChat.responses.howAreYou'),
+          t('digitalHuman.voiceChat.responses.goodMemories'),
+          t('digitalHuman.voiceChat.responses.missYou'),
+          t('digitalHuman.voiceChat.responses.loveTalking'),
+          t('digitalHuman.voiceChat.responses.rememberWhen')
+        ];
+        
+        const responseText = responses[Math.floor(Math.random() * responses.length)];
+        
+        // Add fallback message
+        const fallbackResponse = {
+          id: Date.now(),
+          sender: 'ai',
+          content: `${t('digitalHuman.voiceChat.fallbackMessage')} ${responseText}`,
+          audioUrl: null
+        };
+        
+        setMessages(prevMessages => [...prevMessages, fallbackResponse]);
+        
+        // Use speech synthesis for fallback
+        const utterance = new SpeechSynthesisUtterance(responseText);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+      }, 1000);
+    }
   };
 
   // Play audio message

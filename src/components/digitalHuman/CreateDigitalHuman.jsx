@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-hot-toast';
+import digitalHumanService from '../../services/digitalHumanService';
+import audioService from '../../services/audioService';
 
 const CreateDigitalHuman = ({ onClose, onSubmit }) => {
   const { t } = useTranslation();
@@ -79,9 +82,100 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
   };
   
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    // Loading state
+    const loadingToast = toast.loading(t('digitalHuman.creation.processing'));
+    
+    try {
+      // Format basic data for API submission
+      const digitalHumanData = {
+        name: formData.name,
+        relationship: formData.relationship,
+        description: formData.description,
+        // Additional metadata
+        memories: formData.memories.length
+      };
+      
+      // Create the digital human in the backend
+      const digitalHuman = await digitalHumanService.create(digitalHumanData);
+      
+      if (digitalHuman && digitalHuman.id) {
+        // Upload main photo if exists
+        if (formData.photo) {
+          const photosFormData = new FormData();
+          photosFormData.append('main_photo', formData.photo, 'main_photo.jpg');
+          await digitalHumanService.uploadFiles(digitalHuman.id, photosFormData);
+        }
+        
+        // Upload additional photos if any
+        if (formData.photoFiles.length) {
+          const photosFormData = new FormData();
+          formData.photoFiles.forEach((photo, index) => {
+            photosFormData.append(`photo_${index}`, photo, `photo_${index}.jpg`);
+          });
+          await digitalHumanService.uploadFiles(digitalHuman.id, photosFormData);
+        }
+        
+        // Upload videos if any
+        if (formData.videoFiles.length) {
+          const videoFormData = new FormData();
+          formData.videoFiles.forEach((video, index) => {
+            videoFormData.append(`video_${index}`, video, `video_${index}.mp4`);
+          });
+          await digitalHumanService.uploadFiles(digitalHuman.id, videoFormData);
+        }
+        
+        // Create voice model if there are voice recordings
+        if (formData.voiceFiles.length) {
+          await audioService.createVoiceModel({
+            name: `${formData.name}'s Voice`,
+            digitalHumanId: digitalHuman.id,
+            audioSamples: formData.voiceFiles
+          });
+          
+          // Update digital human with voice model flag
+          await digitalHumanService.update(digitalHuman.id, {
+            voiceModel: true
+          });
+        }
+        
+        // Add memories if any
+        if (formData.memories.length) {
+          for (const memoryContent of formData.memories) {
+            await digitalHumanService.addMemory(digitalHuman.id, {
+              content: memoryContent,
+              type: 'text'
+            });
+          }
+        }
+        
+        // Update media files count
+        let mediaFilesCount = 0;
+        if (formData.photo) mediaFilesCount += 1;
+        if (formData.photoFiles.length) mediaFilesCount += formData.photoFiles.length;
+        if (formData.videoFiles.length) mediaFilesCount += formData.videoFiles.length;
+        if (formData.voiceFiles.length) mediaFilesCount += formData.voiceFiles.length;
+        
+        await digitalHumanService.update(digitalHuman.id, {
+          mediaFiles: mediaFilesCount,
+          avatar: formData.photo ? true : false
+        });
+        
+        toast.success(t('digitalHuman.creation.success'));
+        toast.dismiss(loadingToast);
+        
+        // Pass the created digital human ID back to parent
+        onSubmit(digitalHuman.id);
+      } else {
+        throw new Error('Failed to create digital human');
+      }
+    } catch (error) {
+      console.error('Error creating digital human:', error);
+      toast.error(t('digitalHuman.creation.error'));
+      toast.dismiss(loadingToast);
+    }
   };
   
   // Navigate between steps
