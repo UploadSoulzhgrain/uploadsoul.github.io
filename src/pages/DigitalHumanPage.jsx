@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import CreateDigitalHuman from '../components/digitalHuman/CreateDigitalHuman';
-import VoiceChat from '../components/digitalHuman/VoiceChat';
+import VoiceChat from '../components/digitalHuman/EnhancedVoiceChat';
 import digitalHumanService from '../services/digitalHumanService';
 
 const DigitalHumanPage = () => {
