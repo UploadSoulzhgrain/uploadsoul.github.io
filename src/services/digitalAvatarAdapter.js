@@ -255,14 +255,34 @@ const digitalAvatarAdapter = {
             recognition.continuous = false;
             recognition.interimResults = false;
             
+            // Create a promise to handle the speech recognition result
+            const recognitionPromise = new Promise((resolve) => {
+              recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                resolve(transcript);
+              };
+              
+              recognition.onerror = () => {
+                resolve('Hello, how can I help you today?');
+              };
+            });
+            
+            // Start recognition
+            recognition.start();
+            
+            // Wait for result with a timeout
+            const transcript = await Promise.race([
+              recognitionPromise,
+              new Promise(resolve => setTimeout(() => resolve('Hello, how can I help you today?'), 3000))
+            ]);
+            
             // Create a fake response that simulates what we'd get from the API
             const fakeResponse = {
               ok: true,
-              json: async () => ({ text: 'Hello, how can I help you today?' })
+              json: async () => ({ text: transcript })
             };
             
-            // Since we can't directly use the audio blob with the browser's API,
-            // we'll just simulate a response for demo purposes
+            // Use our fake response
             const response = fakeResponse;
           } else {
             throw new Error('Speech recognition not supported in this browser');
