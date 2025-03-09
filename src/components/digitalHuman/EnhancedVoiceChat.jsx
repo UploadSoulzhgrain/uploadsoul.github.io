@@ -80,12 +80,33 @@ const EnhancedVoiceChat = ({ digitalHuman, onClose }) => {
   // Start recording
   const startRecording = async () => {
     try {
+      // Check if MediaRecorder is available
+      if (typeof MediaRecorder === 'undefined') {
+        throw new Error('MediaRecorder not supported in this browser');
+      }
+      
       await audioService.startRecording();
       setIsRecording(true);
       setError(null);
     } catch (err) {
       console.error('Failed to start recording:', err);
       setError(t('digitalHuman.voiceChat.microphoneError'));
+      
+      // Fallback to text-based interaction when voice recording fails
+      // Inform the user about the fallback
+      setTimeout(() => {
+        setMessages(prevMessages => [
+          ...prevMessages,
+          {
+            id: Date.now(),
+            sender: 'ai',
+            content: t('digitalHuman.voiceChat.fallbackToText', 
+              { defaultValue: 'Voice recording is not available. Please use text chat instead.' }),
+            isError: false
+          }
+        ]);
+        setError(null);
+      }, 2000);
     }
   };
 
