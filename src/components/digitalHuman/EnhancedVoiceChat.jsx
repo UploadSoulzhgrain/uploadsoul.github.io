@@ -125,10 +125,13 @@ const EnhancedVoiceChat = ({ digitalHuman, onClose }) => {
       // Use digital avatar adapter if initialized, otherwise fall back to standard audioService
       const service = adapterInitialized ? digitalAvatarAdapter : audioService;
       
-      // Process the audio
+      // Get user's preferred language from the digital human config or i18next
+      const currentLang = digitalHuman?.language || t('common:languageCode', { defaultValue: 'en-US' });
+      
+      // Process the audio with appropriate language setting
       const data = await service.processAudio(audioBlob, {
         digitalHumanId: digitalHuman?.id || 'default',
-        language: digitalHuman?.language || 'en-US'
+        language: currentLang
       });
       
       // Retrieve transcription if available (only from adapter)
