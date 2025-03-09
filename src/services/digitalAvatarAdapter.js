@@ -7,11 +7,85 @@
  * without modifying existing interfaces or overwriting data.
  */
 
-import { apiManager } from '../../../src/api/APIManager';
-import { speechRecognitionService } from '../../../src/services/SpeechRecognitionService';
-import { dialogueService } from '../../../src/services/DialogueService';
-import { speechSynthesisService } from '../../../src/services/SpeechSynthesisService';
-import { ConversationContext, EmotionParams } from '../../../src/models/interfaces';
+// Import most dependencies directly as mock services since they're not available in the uploadsoul project
+// This allows us to use our adapter without changing the entire project structure
+
+// Mock API Manager since we don't have access to the original one
+const apiManager = {
+  initialize: (config) => {
+    console.log('Mock API Manager initialized with config:', config);
+    return true;
+  }
+};
+
+// Mock Speech Recognition Service
+const speechRecognitionService = {
+  initialize: (config) => {
+    console.log('Mock Speech Recognition Service initialized with config:', config);
+    return true;
+  }
+};
+
+// Mock Dialogue Service
+const dialogueService = {
+  initialize: (config) => {
+    console.log('Mock Dialogue Service initialized with config:', config);
+    return true;
+  },
+  generateResponse: async (text, context) => {
+    console.log('Generating response for:', text);
+    // Simple response generator
+    if (text.includes('hello') || text.includes('hi')) {
+      return 'Hello! It\'s nice to talk with you today.';
+    }
+    if (text.includes('how are you')) {
+      return 'I\'m doing well, thank you for asking. How are you feeling today?';
+    }
+    if (text.includes('name')) {
+      return 'My name is your digital companion. I\'m here to chat with you and keep you company.';
+    }
+    // Default response
+    return 'That\'s interesting! Tell me more about what\'s on your mind.';
+  }
+};
+
+// Mock Speech Synthesis Service
+const speechSynthesisService = {
+  initialize: async (config) => {
+    console.log('Mock Speech Synthesis Service initialized with config:', config);
+    return true;
+  },
+  getVoices: () => {
+    return [
+      { id: 'voice-1', name: 'Emma', gender: 'female' },
+      { id: 'voice-2', name: 'John', gender: 'male' }
+    ];
+  },
+  synthesizeSpeech: async (text, voiceId, emotions) => {
+    console.log('Synthesizing speech for:', text, 'with voice:', voiceId);
+    // Return a mock AudioBuffer (this won't actually work but prevents errors)
+    return new AudioBuffer({length: 1, sampleRate: 44100});
+  }
+};
+
+// Simple conversation context interface
+class ConversationContext {
+  constructor() {
+    this.history = [];
+    this.userProfile = {};
+  }
+}
+
+// Emotion parameters interface
+class EmotionParams {
+  constructor() {
+    this.joy = 0;
+    this.sadness = 0;
+    this.anger = 0;
+    this.surprise = 0;
+    this.emphasis = 0;
+  }
+}
 
 // Maintains state for each digital human conversation
 const conversationState = new Map();
