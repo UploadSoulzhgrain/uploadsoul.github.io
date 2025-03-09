@@ -297,7 +297,7 @@ const digitalAvatarAdapter = {
         const voiceId = voices.length > 0 ? voices[0].id : null;
         
         // Set appropriate emotion based on content
-        const emotions = detectEmotionsFromText(dialogueResponse);
+        const emotions = digitalAvatarAdapter.detectEmotionsFromText(dialogueResponse);
         
         if (voiceId) {
           // Generate speech using our service
