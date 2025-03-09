@@ -20,7 +20,28 @@ const EnhancedVoiceChat = ({ digitalHuman, onClose }) => {
   useEffect(() => {
     const initAdapter = async () => {
       try {
-        const success = await digitalAvatarAdapter.initialize();
+        // Check if browser supports needed APIs
+        const webAudioSupported = typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined';
+        const mediaRecorderSupported = typeof MediaRecorder !== 'undefined';
+        
+        if (!webAudioSupported || !mediaRecorderSupported) {
+          console.warn('Browser does not support required audio APIs');
+          setAdapterFailed(true);
+          return;
+        }
+        
+        // Try initializing the adapter with a timeout to prevent hanging
+        const initPromise = digitalAvatarAdapter.initialize();
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Initialization timeout')), 5000)
+        );
+        
+        const success = await Promise.race([initPromise, timeoutPromise])
+          .catch(err => {
+            console.error('Adapter initialization error or timeout:', err);
+            return false;
+          });
+          
         setAdapterInitialized(success);
         setAdapterFailed(!success);
         
