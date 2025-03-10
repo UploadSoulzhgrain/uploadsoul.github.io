@@ -331,13 +331,13 @@ const DigitalHumanPage = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">创建数字人</h2>
-                <p className="text-gray-600 mb-6">通过录入照片、声音、视频和珍贵记忆，创建您爱的人的数字形象，永远珍藏这些记忆。</p>
+                <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('digitalHuman.createButton')}</h2>
+                <p className="text-gray-600 mb-6">{t('digitalHuman.createDescription')}</p>
                 <button 
                   onClick={() => setShowCreateModal(true)}
                   className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
                 >
-                  开始创建数字人
+                  {t('digitalHuman.startCreating')}
                 </button>
               </div>
             ) : (
