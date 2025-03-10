@@ -7,14 +7,47 @@
  * without modifying existing interfaces or overwriting data.
  */
 
-// Import most dependencies directly as mock services since they're not available in the uploadsoul project
-// This allows us to use our adapter without changing the entire project structure
+// Import dependencies needed for API integration
 
-// Mock API Manager since we don't have access to the original one
+// API Manager handles authentication and API key management
 const apiManager = {
+  config: {
+    keys: {
+      openai: '',
+      elevenlabs: ''
+    },
+    endpoints: {
+      openai: 'https://api.openai.com/v1',
+      elevenlabs: 'https://api.elevenlabs.io/v1'
+    },
+    timeouts: {
+      openai: 60000,
+      elevenlabs: 30000
+    }
+  },
   initialize: (config) => {
-    console.log('Mock API Manager initialized with config:', config);
+    apiManager.config = {
+      ...apiManager.config,
+      ...config
+    };
+    console.log('API Manager initialized with config');
     return true;
+  },
+  getAuthHeaders: (service) => {
+    switch(service) {
+      case 'openai':
+        return {
+          'Authorization': `Bearer ${apiManager.config.keys.openai}`,
+          'Content-Type': 'application/json'
+        };
+      case 'elevenlabs':
+        return {
+          'xi-api-key': apiManager.config.keys.elevenlabs,
+          'Content-Type': 'application/json'
+        };
+      default:
+        return {'Content-Type': 'application/json'};
+    }
   }
 };
 
