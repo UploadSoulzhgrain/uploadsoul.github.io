@@ -360,7 +360,7 @@ const DigitalHumanPage = () => {
                   <div className="text-center mb-6">
                     <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{selectedHuman.name}</h2>
                     <p className="text-gray-500">
-                      {selectedHuman.relationship} · 创建于 {selectedHuman.createdAt}
+                      {selectedHuman.relationship} · {t('digitalHuman.created')} {selectedHuman.createdAt}
                     </p>
                   </div>
 
