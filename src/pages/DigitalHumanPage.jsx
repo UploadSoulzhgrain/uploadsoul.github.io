@@ -309,12 +309,12 @@ const DigitalHumanPage = () => {
                 ))}
                 {digitalHumans.length === 0 && (
                   <div className="text-center py-10">
-                    <p className="text-gray-500">您还没有创建数字人</p>
+                    <p className="text-gray-500">{t('digitalHuman.noDigitalHumans')}</p>
                     <button 
                       onClick={() => setShowCreateModal(true)}
                       className="mt-3 text-purple-600 hover:text-purple-800 transition"
                     >
-                      创建数字人
+                      {t('digitalHuman.createNew')}
                     </button>
                   </div>
                 )}
