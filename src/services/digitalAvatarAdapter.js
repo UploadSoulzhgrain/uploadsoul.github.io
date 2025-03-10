@@ -127,7 +127,7 @@ const speechRecognitionService = {
 // Dialogue Service with OpenAI GPT integration
 const dialogueService = {
   config: {
-    primaryModel: 'gpt-4',
+    primaryModel: 'gpt-4o-mini',
     fallbackModel: 'gpt-3.5-turbo',
     systemPrompt: 'You are a helpful digital avatar assistant representing a specific person. Keep responses concise, engaging, and in character with your assigned personality. Respond with empathy and personal warmth.',
     temperature: 0.7,
