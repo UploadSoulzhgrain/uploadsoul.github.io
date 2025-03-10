@@ -398,12 +398,12 @@ const DigitalHumanPage = () => {
                   {activeTab === 'memories' && (
                     <div className="mb-6">
                       <div className="mb-6">
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">添加新记忆</h3>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">{t('digitalHuman.memories.addNew')}</h3>
                         <div className="flex">
                           <textarea
                             value={newMemory}
                             onChange={(e) => setNewMemory(e.target.value)}
-                            placeholder="记录一个关于此人的珍贵记忆..."
+                            placeholder={t('digitalHuman.memories.placeholder')}
                             className="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                             rows="2"
                           ></textarea>
@@ -411,13 +411,13 @@ const DigitalHumanPage = () => {
                             onClick={handleAddMemory}
                             className="bg-purple-600 text-white px-4 py-2 rounded-r-lg hover:bg-purple-700 transition"
                           >
-                            保存
+                            {t('digitalHuman.memories.save')}
                           </button>
                         </div>
-                        <div className="mt-2 text-sm text-gray-500">这些记忆将用于训练数字人，让其更好地呈现真实的人格特征。</div>
+                        <div className="mt-2 text-sm text-gray-500">{t('digitalHuman.memories.description')}</div>
                       </div>
 
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">记忆库</h3>
+                      <h3 className="text-lg font-medium text-gray-900 mb-4">{t('digitalHuman.memories.title')}</h3>
                       <div className="space-y-4">
                         {memories.map((memory) => (
                           <div key={memory.id} className="bg-gray-50 rounded-lg p-4">
