@@ -541,39 +541,9 @@ const digitalAvatarAdapter = {
       // Step 1: Transcribe audio using our advanced speech recognition
       let transcription = '';
       try {
-        // Convert to File for passing to SpeechRecognitionService
-        const audioFile = new File([audioBlob], 'user_recording.webm', { 
-          type: 'audio/webm' 
-        });
-        
-        // Use FormData to simulate what our service expects
-        const formData = new FormData();
-        formData.append('file', audioFile);
-        formData.append('model', 'whisper-1');
-        
-        if (language && language !== 'auto') {
-          formData.append('language', language);
-        }
-        
-        // For demo purposes, we'll use the browser's speech recognition instead of OpenAI Whisper API
-        // This ensures the feature works without requiring API keys
-        // Simpler approach: just use a predefined response
-        const response = {
-          ok: true,
-          json: async () => ({
-            text: 'I heard you say something. How can I help you today?'
-          })
-        };
-        
-        // For real-world implementation, we'd utilize the Web Speech API properly
-        // or implement a full integration with the Whisper API
-
-        if (!response.ok) {
-          throw new Error(`Whisper API error: ${response.status}`);
-        }
-
-        const data = await response.json();
-        transcription = data.text || '';
+        // Transcribe audio using the enhanced speech recognition service
+        transcription = await speechRecognitionService.transcribeAudio(audioBlob, language);
+        console.log('Transcription result:', transcription);
       } catch (error) {
         console.error('Error in speech recognition:', error);
         transcription = 'I couldn\'t understand what you said.';
@@ -590,6 +560,7 @@ const digitalAvatarAdapter = {
         
         // Generate response using our dialogue service
         dialogueResponse = await dialogueService.generateResponse(transcription, context);
+        console.log('Dialogue response:', dialogueResponse);
         
         // Add AI response to history
         updateConversationHistory(digitalHumanId, 'assistant', dialogueResponse);
@@ -602,10 +573,19 @@ const digitalAvatarAdapter = {
       let audioUrl = null;
       try {
         // Get available voices
-        const voices = speechSynthesisService.getVoices();
+        const voices = await speechSynthesisService.getVoices();
         
-        // Use the first available voice or fallback to browser TTS
-        const voiceId = voices.length > 0 ? voices[0].id : null;
+        // Try to find a voice matching the digital human's preferences
+        let voiceId = null;
+        const context = getConversationContext(digitalHumanId);
+        
+        if (context?.avatarPersonality?.voiceId) {
+          // If the digital human has a preferred voice, use it
+          voiceId = context.avatarPersonality.voiceId;
+        } else {
+          // Otherwise use the first available voice
+          voiceId = voices.length > 0 ? voices[0].id : null;
+        }
         
         // Set appropriate emotion based on content
         const emotions = digitalAvatarAdapter.detectEmotionsFromText(dialogueResponse);
@@ -643,7 +623,7 @@ const digitalAvatarAdapter = {
             };
             
             mediaRecorder.start();
-            setTimeout(() => mediaRecorder.stop(), (dialogueResponse.length * 100)); // Estimate duration
+            setTimeout(() => mediaRecorder.stop(), Math.max(1500, dialogueResponse.length * 80)); // Estimate duration
           });
           
           // Create URL for playback
@@ -658,6 +638,7 @@ const digitalAvatarAdapter = {
       return {
         success: true,
         text: dialogueResponse,
+        transcription: transcription, // Include transcription for showing what the user said
         audioUrl: audioUrl
       };
     } catch (error) {
