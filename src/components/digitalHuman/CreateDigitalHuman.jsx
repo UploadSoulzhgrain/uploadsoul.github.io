@@ -368,12 +368,12 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
             {t('digitalHuman.creation.voiceUploadFormats')}
           </p>
           <div className="mt-2 border-t border-purple-100 pt-2">
-            <p className="text-xs text-purple-800 font-medium">Tips for best results:</p>
+            <p className="text-xs text-purple-800 font-medium">{t('digitalHuman.creation.voiceTipsTitle', {defaultValue: 'Tips for best results:'})}</p>
             <ul className="text-xs text-purple-700 list-disc ml-4 mt-1 space-y-1">
-              <li>Upload at least 3 audio samples of the person speaking</li>
-              <li>Each clip should be 5-30 seconds in length</li>
-              <li>Clear audio without background noise works best</li>
-              <li>Samples should capture the person's natural speaking voice</li>
+              <li>{t('digitalHuman.creation.voiceTip1', {defaultValue: 'Upload at least 3 audio samples of the person speaking'})}</li>
+              <li>{t('digitalHuman.creation.voiceTip2', {defaultValue: 'Each clip should be 5-30 seconds in length'})}</li>
+              <li>{t('digitalHuman.creation.voiceTip3', {defaultValue: 'Clear audio without background noise works best'})}</li>
+              <li>{t('digitalHuman.creation.voiceTip4', {defaultValue: 'Samples should capture the person\'s natural speaking voice'})}</li>
             </ul>
           </div>
         </div>
