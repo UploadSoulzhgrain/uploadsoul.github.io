@@ -318,7 +318,14 @@ const EnhancedVoiceChat = ({ digitalHuman, onClose }) => {
                       : 'bg-gray-100 text-gray-800 rounded-bl-none'
                 }`}
               >
-                <p className="text-sm">{message.content}</p>
+                {message.transcription ? (
+                  <>
+                    <p className="text-xs text-purple-300 mb-1">{t('digitalHuman.voiceChat.transcription', {defaultValue: 'Transcription'})}</p>
+                    <p className="text-sm">{message.content}</p>
+                  </>
+                ) : (
+                  <p className="text-sm">{message.content}</p>
+                )}
                 
                 {message.audioUrl && (
                   <button
