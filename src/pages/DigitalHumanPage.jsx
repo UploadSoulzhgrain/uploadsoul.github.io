@@ -241,7 +241,7 @@ const DigitalHumanPage = () => {
           </div>
           <div>
             <h4 className={`font-medium ${node.current ? 'text-purple-700' : 'text-gray-900'}`}>{node.name}</h4>
-            {node.spouse && <p className="text-xs text-gray-500">配偶: {node.spouse}</p>}
+            {node.spouse && <p className="text-xs text-gray-500">{t('digitalHuman.familyTree.spouse')}: {node.spouse}</p>}
           </div>
         </div>
         
