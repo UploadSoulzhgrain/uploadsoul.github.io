@@ -9,12 +9,21 @@ import zhTWTranslation from './locales/zh-TW/translation.json';
 import jaTranslation from './locales/ja/translation.json';
 import koTranslation from './locales/ko/translation.json';
 
+// Also import legacy translations for backward compatibility
+import legacyEnTranslations from '../core/i18n/en';
+import legacyZhTranslations from '../core/i18n/zh';
+
+// Merge legacy and new translations with precedence to new ones
+const mergeTranslations = (newTranslations, legacyTranslations) => {
+  return { ...legacyTranslations, ...newTranslations };
+};
+
 const resources = {
   en: {
-    translation: enTranslation
+    translation: mergeTranslations(enTranslation, legacyEnTranslations)
   },
   'zh-CN': {
-    translation: zhCNTranslation
+    translation: mergeTranslations(zhCNTranslation, legacyZhTranslations)
   },
   'zh-TW': {
     translation: zhTWTranslation
@@ -24,21 +33,26 @@ const resources = {
   },
   ko: {
     translation: koTranslation
+  },
+  // Add legacy mappings for backward compatibility
+  zh: {
+    translation: mergeTranslations(zhCNTranslation, legacyZhTranslations)
   }
 };
 
+// Initialize i18next
 i18n
-  // detect user language
+  // Detect user language
   .use(LanguageDetector)
-  // pass the i18n instance to react-i18next
+  // Pass the i18n instance to react-i18next
   .use(initReactI18next)
-  // init i18next
+  // Initialize configuration
   .init({
     resources,
     fallbackLng: 'zh-CN',
     debug: false, // Set to false for production
     interpolation: {
-      escapeValue: false // not needed for react as it escapes by default
+      escapeValue: false // Not needed for React as it escapes by default
     },
     detection: {
       order: ['querystring', 'cookie', 'localStorage', 'navigator'],
@@ -46,7 +60,48 @@ i18n
       lookupCookie: 'i18next',
       lookupLocalStorage: 'i18nextLng',
       caches: ['localStorage', 'cookie']
+    },
+    react: {
+      useSuspense: true, // Use React Suspense for lazy loading
+      wait: true // Wait for translations to be loaded
     }
   });
+
+/**
+ * Change the current language
+ * @param {string} language - Language code ('zh-CN', 'en', etc.)
+ * @returns {Promise<void>}
+ */
+export const changeLanguage = async (language) => {
+  if (language) {
+    // Handle legacy language codes
+    const normalizedLang = language === 'zh' ? 'zh-CN' : language;
+    await i18n.changeLanguage(normalizedLang);
+    localStorage.setItem('i18nextLng', normalizedLang);
+    console.log(`Language changed to: ${normalizedLang}`);
+  }
+};
+
+/**
+ * Get the current language
+ * @returns {string} Current language code
+ */
+export const getCurrentLanguage = () => {
+  return i18n.language || 'zh-CN';
+};
+
+/**
+ * Get the list of supported languages
+ * @returns {Array} List of supported languages
+ */
+export const getSupportedLanguages = () => {
+  return [
+    { code: 'zh-CN', name: '中文 (简体)' },
+    { code: 'zh-TW', name: '中文 (繁體)' },
+    { code: 'en', name: 'English' },
+    { code: 'ja', name: '日本語' },
+    { code: 'ko', name: '한국어' }
+  ];
+};
 
 export default i18n;
