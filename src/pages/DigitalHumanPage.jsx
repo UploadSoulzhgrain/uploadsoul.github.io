@@ -485,13 +485,13 @@ const DigitalHumanPage = () => {
                       <div className="flex">
                         <input
                           type="text"
-                          placeholder="输入消息..."
+                          placeholder={t('digitalHuman.conversation.inputPlaceholder')}
                           className="flex-1 border border-gray-300 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
                         />
                         <button
                           className="bg-purple-600 text-white px-4 py-2 rounded-r-lg hover:bg-purple-700 transition"
                         >
-                          发送
+                          {t('digitalHuman.conversation.send')}
                         </button>
                       </div>
                     </div>
