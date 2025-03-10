@@ -239,22 +239,143 @@ const dialogueService = {
   }
 };
 
-// Mock Speech Synthesis Service
+// Speech Synthesis Service with ElevenLabs API integration
 const speechSynthesisService = {
+  config: {
+    defaultVoiceId: 'premade/adam',
+    stability: 0.5,
+    similarityBoost: 0.75,
+    style: 0,
+    useSpeakerBoost: true
+  },
+  cachedVoices: null,
   initialize: async (config) => {
-    console.log('Mock Speech Synthesis Service initialized with config:', config);
+    speechSynthesisService.config = {
+      ...speechSynthesisService.config,
+      ...config
+    };
+    console.log('Speech Synthesis Service initialized');
     return true;
   },
-  getVoices: () => {
-    return [
-      { id: 'voice-1', name: 'Emma', gender: 'female' },
-      { id: 'voice-2', name: 'John', gender: 'male' }
-    ];
+  getVoices: async (forceRefresh = false) => {
+    try {
+      // Return cached voices if available and not forcing refresh
+      if (speechSynthesisService.cachedVoices && !forceRefresh) {
+        return speechSynthesisService.cachedVoices;
+      }
+      
+      // If we have a valid ElevenLabs API key
+      if (apiManager.config.keys.elevenlabs) {
+        // Fetch voices from ElevenLabs API
+        const response = await fetch(`${apiManager.config.endpoints.elevenlabs}/voices`, {
+          method: 'GET',
+          headers: apiManager.getAuthHeaders('elevenlabs'),
+          signal: AbortSignal.timeout(apiManager.config.timeouts.elevenlabs)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`ElevenLabs API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Format and cache the voices
+        const voices = data.voices.map(voice => ({
+          id: voice.voice_id,
+          name: voice.name,
+          gender: voice.labels?.gender || 'neutral',
+          preview: voice.preview_url
+        }));
+        
+        speechSynthesisService.cachedVoices = voices;
+        return voices;
+      } else {
+        // Return default voices if no API key
+        const defaultVoices = [
+          { id: 'premade/adam', name: 'Adam', gender: 'male' },
+          { id: 'premade/rachel', name: 'Rachel', gender: 'female' },
+          { id: 'premade/antoni', name: 'Antoni', gender: 'male' },
+          { id: 'premade/elli', name: 'Elli', gender: 'female' }
+        ];
+        speechSynthesisService.cachedVoices = defaultVoices;
+        return defaultVoices;
+      }
+    } catch (error) {
+      console.error('Error getting voices:', error);
+      return [
+        { id: 'premade/adam', name: 'Adam', gender: 'male' },
+        { id: 'premade/rachel', name: 'Rachel', gender: 'female' }
+      ];
+    }
   },
-  synthesizeSpeech: async (text, voiceId, emotions) => {
-    console.log('Synthesizing speech for:', text, 'with voice:', voiceId);
-    // Return a mock AudioBuffer (this won't actually work but prevents errors)
-    return new AudioBuffer({length: 1, sampleRate: 44100});
+  synthesizeSpeech: async (text, voiceId, emotions = {}) => {
+    try {
+      // If we have a valid ElevenLabs API key
+      if (apiManager.config.keys.elevenlabs && text) {
+        const voice = voiceId || speechSynthesisService.config.defaultVoiceId;
+        
+        // Apply emotion settings to voice parameters
+        let stability = speechSynthesisService.config.stability;
+        let similarityBoost = speechSynthesisService.config.similarityBoost;
+        
+        if (emotions) {
+          // Adjust parameters based on emotions
+          if (emotions.emphasis > 0.5) stability -= 0.1;
+          if (emotions.joy > 0.5) similarityBoost += 0.1;
+          if (emotions.sadness > 0.5) stability += 0.1;
+          
+          // Keep values in valid range
+          stability = Math.max(0, Math.min(1, stability));
+          similarityBoost = Math.max(0, Math.min(1, similarityBoost));
+        }
+        
+        // Prepare request body
+        const requestBody = {
+          text: text,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: stability,
+            similarity_boost: similarityBoost,
+            style: speechSynthesisService.config.style,
+            use_speaker_boost: speechSynthesisService.config.useSpeakerBoost
+          }
+        };
+        
+        // Make request to ElevenLabs API
+        const response = await fetch(`${apiManager.config.endpoints.elevenlabs}/text-to-speech/${voice}`, {
+          method: 'POST',
+          headers: apiManager.getAuthHeaders('elevenlabs'),
+          body: JSON.stringify(requestBody),
+          signal: AbortSignal.timeout(apiManager.config.timeouts.elevenlabs)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`ElevenLabs API error: ${response.status}`);
+        }
+        
+        // Get audio data
+        const audioArrayBuffer = await response.arrayBuffer();
+        
+        // Convert to audio buffer for processing
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioBuffer = await audioContext.decodeAudioData(audioArrayBuffer);
+        
+        return audioBuffer;
+      } else {
+        // Use browser's speech synthesis as fallback
+        console.warn('No ElevenLabs API key. Using browser speech synthesis.');
+        
+        // Return simple empty buffer to trigger browser TTS fallback
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        return audioContext.createBuffer(1, 1, 22050);
+      }
+    } catch (error) {
+      console.error('Error synthesizing speech:', error);
+      
+      // Return empty buffer to trigger fallback
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      return audioContext.createBuffer(1, 1, 22050);
+    }
   }
 };
 
