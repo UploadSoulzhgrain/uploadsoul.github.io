@@ -300,7 +300,7 @@ const DigitalHumanPage = () => {
                       <div className="mt-1 flex items-center">
                         {human.voiceModel && (
                           <span className="text-xs bg-green-100 text-green-800 px-1.5 py-0.5 rounded">
-                            声音模型
+                            {t('digitalHuman.voiceModel')}
                           </span>
                         )}
                       </div>
