@@ -367,24 +367,45 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
           <p className="text-xs text-purple-600">
             {t('digitalHuman.creation.voiceUploadFormats')}
           </p>
+          <div className="mt-2 border-t border-purple-100 pt-2">
+            <p className="text-xs text-purple-800 font-medium">Tips for best results:</p>
+            <ul className="text-xs text-purple-700 list-disc ml-4 mt-1 space-y-1">
+              <li>Upload at least 3 audio samples of the person speaking</li>
+              <li>Each clip should be 5-30 seconds in length</li>
+              <li>Clear audio without background noise works best</li>
+              <li>Samples should capture the person's natural speaking voice</li>
+            </ul>
+          </div>
         </div>
         
-        <div 
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-purple-500 transition-all"
-          onClick={() => document.getElementById('voiceFiles').click()}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-          </svg>
-          <div className="text-gray-500">{t('digitalHuman.creation.recordVoice')}</div>
-          <input
-            id="voiceFiles"
-            type="file"
-            multiple
-            accept="audio/mpeg,audio/wav"
-            onChange={(e) => handleFileChange(e, 'voiceFiles')}
-            className="hidden"
-          />
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+          <div 
+            className="flex-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-purple-500 transition-all"
+            onClick={() => document.getElementById('voiceFiles').click()}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-gray-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            <div className="text-gray-500">{t('digitalHuman.creation.uploadVoiceSamples', {defaultValue: 'Upload Voice Samples'})}</div>
+            <p className="text-xs text-gray-400 mt-1">Select MP3, WAV, or M4A files</p>
+            <input
+              id="voiceFiles"
+              type="file"
+              multiple
+              accept="audio/mpeg,audio/wav,audio/mp4"
+              onChange={(e) => handleFileChange(e, 'voiceFiles')}
+              className="hidden"
+            />
+          </div>
+          
+          <div className="flex-1 border-2 border-gray-200 rounded-lg p-6 text-center relative">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto text-purple-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+            <div className="text-gray-700">{t('digitalHuman.creation.recordVoice')}</div>
+            <p className="text-xs text-gray-500 mt-1">Coming soon</p>
+            <div className="absolute top-2 right-2 bg-gray-200 text-gray-600 text-xs px-2 py-1 rounded">Beta</div>
+          </div>
         </div>
         
         {formData.voiceFiles.length > 0 && (
