@@ -371,25 +371,25 @@ const DigitalHumanPage = () => {
                         onClick={() => setActiveTab('memories')}
                         className={`py-3 border-b-2 font-medium text-sm ${activeTab === 'memories' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       >
-                        记忆库
+                        {t('digitalHuman.memories.title')}
                       </button>
                       <button
                         onClick={() => setActiveTab('conversation')}
                         className={`py-3 border-b-2 font-medium text-sm ${activeTab === 'conversation' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       >
-                        对话
+                        {t('digitalHuman.conversation')}
                       </button>
                       <button
                         onClick={() => setActiveTab('media')}
                         className={`py-3 border-b-2 font-medium text-sm ${activeTab === 'media' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       >
-                        媒体文件
+                        {t('digitalHuman.mediaFiles')}
                       </button>
                       <button
                         onClick={() => setActiveTab('tree')}
                         className={`py-3 border-b-2 font-medium text-sm ${activeTab === 'tree' ? 'border-purple-500 text-purple-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
                       >
-                        家族树
+                        {t('digitalHuman.familyTree')}
                       </button>
                     </nav>
                   </div>
