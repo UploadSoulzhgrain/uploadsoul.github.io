@@ -287,14 +287,67 @@ const audioService = {
     formData.append('name', data.name);
     formData.append('digitalHumanId', data.digitalHumanId);
     
+    // Track if we have suitable audio samples
+    let validSamplesCount = 0;
+    let totalDuration = 0;
+    
     // Add audio samples
     if (data.audioSamples && data.audioSamples.length) {
-      data.audioSamples.forEach((sample, index) => {
-        formData.append(`sample_${index}`, sample, `sample_${index}.webm`);
-      });
+      console.log(`Processing ${data.audioSamples.length} audio samples for voice model creation`);
+      
+      // Process each audio sample
+      await Promise.all(data.audioSamples.map(async (sample, index) => {
+        // Get file extension from the sample name or default to .wav
+        const fileExtension = sample.name ? sample.name.split('.').pop() : 'wav';
+        
+        // Append with proper extension
+        const fileName = `sample_${index}.${fileExtension}`;
+        formData.append(`sample_${index}`, sample, fileName);
+        
+        // Count valid samples by checking type and size
+        if (sample.size > 10000 && sample.type.includes('audio')) {
+          validSamplesCount++;
+          
+          try {
+            // Try to get audio duration (not always possible in all browsers)
+            const url = URL.createObjectURL(sample);
+            const audio = new Audio();
+            audio.src = url;
+            
+            await new Promise(resolve => {
+              audio.onloadedmetadata = () => {
+                totalDuration += audio.duration;
+                URL.revokeObjectURL(url);
+                resolve();
+              };
+              audio.onerror = () => resolve(); // Skip on error
+            });
+          } catch (e) {
+            console.log('Could not determine audio duration:', e);
+          }
+        }
+      }));
+    }
+    
+    console.log(`Valid samples: ${validSamplesCount}, Total duration: ${Math.round(totalDuration)}s`);
+    
+    // Check if we have enough audio samples
+    if (validSamplesCount < 3) {
+      console.warn('Not enough valid audio samples for voice cloning. Minimum required: 3');
     }
     
     try {
+      // Try to use digitalAvatarAdapter if it's been initialized
+      if (window.digitalAvatarAdapterInitialized === true) {
+        const digitalAvatarAdapter = await import('./digitalAvatarAdapter').then(module => module.default);
+        
+        if (digitalAvatarAdapter && typeof digitalAvatarAdapter.createVoiceModel === 'function') {
+          console.log('Using digitalAvatarAdapter for voice model creation');
+          return await digitalAvatarAdapter.createVoiceModel(data);
+        }
+      }
+      
+      // Fallback to direct API call
       // Send to backend API
       const response = await fetch(`${API_BASE_URL}${ENDPOINTS.CREATE_VOICE_MODEL}`, {
         method: 'POST',
@@ -314,7 +367,9 @@ const audioService = {
       return {
         success: true,
         modelId: `demo-${Date.now()}`,
-        message: 'Voice model created successfully in demo mode'
+        message: validSamplesCount >= 3 ? 
+          'Voice model created successfully in demo mode' : 
+          'Voice model created in demo mode. For best results, provide at least 3 clear audio samples.'
       };
     }
   }
