@@ -295,7 +295,7 @@ const DigitalHumanPage = () => {
                     <div>
                       <h3 className="font-medium text-gray-900">{human.name}</h3>
                       <div className="text-xs text-gray-500">
-                        {human.relationship} · {human.memories} 记忆 · {human.mediaFiles} 媒体文件
+                        {human.relationship} · {human.memories} {t('digitalHuman.memories.title')} · {human.mediaFiles} {t('digitalHuman.mediaFiles')}
                       </div>
                       <div className="mt-1 flex items-center">
                         {human.voiceModel && (
