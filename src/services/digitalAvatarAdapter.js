@@ -124,26 +124,118 @@ const speechRecognitionService = {
   }
 };
 
-// Mock Dialogue Service
+// Dialogue Service with OpenAI GPT integration
 const dialogueService = {
+  config: {
+    primaryModel: 'gpt-4',
+    fallbackModel: 'gpt-3.5-turbo',
+    systemPrompt: 'You are a helpful digital avatar assistant representing a specific person. Keep responses concise, engaging, and in character with your assigned personality. Respond with empathy and personal warmth.',
+    temperature: 0.7,
+    maxTokens: 512
+  },
   initialize: (config) => {
-    console.log('Mock Dialogue Service initialized with config:', config);
+    dialogueService.config = {
+      ...dialogueService.config,
+      ...config
+    };
+    console.log('Dialogue Service initialized');
     return true;
   },
   generateResponse: async (text, context) => {
-    console.log('Generating response for:', text);
-    // Simple response generator
-    if (text.includes('hello') || text.includes('hi')) {
-      return 'Hello! It\'s nice to talk with you today.';
+    try {
+      // If we have a valid OpenAI API key
+      if (apiManager.config.keys.openai) {
+        // Format conversation history for context
+        const messages = [];
+        
+        // Add system prompt with personality if available
+        let systemPrompt = dialogueService.config.systemPrompt;
+        if (context?.avatarPersonality?.background) {
+          systemPrompt += ` Your background: ${context.avatarPersonality.background}`;
+        }
+        messages.push({ role: 'system', content: systemPrompt });
+        
+        // Add conversation history if available (last 10 messages for context)
+        if (context?.history && Array.isArray(context.history)) {
+          context.history.slice(-10).forEach(msg => {
+            messages.push({
+              role: msg.role === 'user' ? 'user' : 'assistant',
+              content: msg.content
+            });
+          });
+        } else {
+          // If no history, just add the current message
+          messages.push({ role: 'user', content: text });
+        }
+        
+        // If not already included in history, add the current message
+        if (context?.history && context.history.length > 0 && 
+            context.history[context.history.length - 1].role !== 'user') {
+          messages.push({ role: 'user', content: text });
+        }
+        
+        // Make the API request to OpenAI's Chat API
+        const response = await fetch(`${apiManager.config.endpoints.openai}/chat/completions`, {
+          method: 'POST',
+          headers: apiManager.getAuthHeaders('openai'),
+          body: JSON.stringify({
+            model: dialogueService.config.primaryModel,
+            messages: messages,
+            temperature: dialogueService.config.temperature,
+            max_tokens: dialogueService.config.maxTokens
+          }),
+          signal: AbortSignal.timeout(apiManager.config.timeouts.openai)
+        });
+        
+        if (!response.ok) {
+          // Try fallback model if primary fails
+          if (dialogueService.config.primaryModel !== dialogueService.config.fallbackModel) {
+            console.warn(`Primary model failed, trying fallback model ${dialogueService.config.fallbackModel}`);
+            const fallbackResponse = await fetch(`${apiManager.config.endpoints.openai}/chat/completions`, {
+              method: 'POST',
+              headers: apiManager.getAuthHeaders('openai'),
+              body: JSON.stringify({
+                model: dialogueService.config.fallbackModel,
+                messages: messages,
+                temperature: dialogueService.config.temperature,
+                max_tokens: dialogueService.config.maxTokens
+              }),
+              signal: AbortSignal.timeout(apiManager.config.timeouts.openai)
+            });
+            
+            if (fallbackResponse.ok) {
+              const data = await fallbackResponse.json();
+              return data.choices[0].message.content;
+            }
+          }
+          
+          throw new Error(`OpenAI API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.choices[0].message.content;
+      } else {
+        // Fallback to simple rule-based responses if no API key
+        console.log('No API key available. Using rule-based fallback.');
+        if (text.toLowerCase().includes('hello') || text.toLowerCase().includes('hi')) {
+          return 'Hello! It\'s nice to talk with you today.';
+        }
+        if (text.toLowerCase().includes('how are you')) {
+          return 'I\'m doing well, thank you for asking. How are you feeling today?';
+        }
+        if (text.toLowerCase().includes('name')) {
+          return context?.avatarPersonality?.name ? 
+            `My name is ${context.avatarPersonality.name}. It's wonderful to chat with you.` : 
+            'I\'m your digital companion. I\'m here to chat with you and keep you company.';
+        }
+        
+        // Default response
+        return 'That\'s interesting! Tell me more about what\'s on your mind.';
+      }
+    } catch (error) {
+      console.error('Error in dialogue generation:', error);
+      return "I'm having trouble thinking clearly at the moment. Could we try again in a moment?";
     }
-    if (text.includes('how are you')) {
-      return 'I\'m doing well, thank you for asking. How are you feeling today?';
-    }
-    if (text.includes('name')) {
-      return 'My name is your digital companion. I\'m here to chat with you and keep you company.';
-    }
-    // Default response
-    return 'That\'s interesting! Tell me more about what\'s on your mind.';
   }
 };
 
