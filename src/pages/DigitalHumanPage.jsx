@@ -162,7 +162,7 @@ const DigitalHumanPage = () => {
       digitalHumanService.addMemory(selectedHuman.id, {
         type: 'text',
         content: newMemory,
-        tags: ['手动添加']
+        tags: [t('digitalHuman.memories.manuallyAdded')]
       });
       
       alert(t('digitalHuman.memories.added'));
