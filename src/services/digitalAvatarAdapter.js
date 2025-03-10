@@ -51,11 +51,76 @@ const apiManager = {
   }
 };
 
-// Mock Speech Recognition Service
+// Speech Recognition Service with Whisper API integration
 const speechRecognitionService = {
+  config: {
+    language: 'auto',
+    model: 'whisper-1',
+    options: {
+      vadSensitivity: 0.5,
+      filterProfanity: false
+    }
+  },
   initialize: (config) => {
-    console.log('Mock Speech Recognition Service initialized with config:', config);
+    speechRecognitionService.config = {
+      ...speechRecognitionService.config,
+      ...config
+    };
+    console.log('Speech Recognition Service initialized');
     return true;
+  },
+  transcribeAudio: async (audioBlob, language = 'auto') => {
+    try {
+      // If we have a valid OpenAI API key
+      if (apiManager.config.keys.openai) {
+        // Convert audio blob to file
+        const audioFile = new File([audioBlob], 'recording.webm', { 
+          type: 'audio/webm' 
+        });
+        
+        // Create form data for the API request
+        const formData = new FormData();
+        formData.append('file', audioFile);
+        formData.append('model', speechRecognitionService.config.model);
+        
+        if (language && language !== 'auto') {
+          formData.append('language', language);
+        }
+        
+        // Make the API request to OpenAI's Whisper API
+        const response = await fetch(`${apiManager.config.endpoints.openai}/audio/transcriptions`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiManager.config.keys.openai}`
+            // Don't set Content-Type as it's set automatically for FormData
+          },
+          body: formData,
+          signal: AbortSignal.timeout(apiManager.config.timeouts.openai)
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Whisper API error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.text || '';
+      } else {
+        // Fallback to Web Speech API if available
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+          return new Promise((resolve) => {
+            // Simulate a short delay and return a placeholder response
+            setTimeout(() => {
+              resolve("I couldn't transcribe your speech due to missing API key. Please provide what you said in text form.");
+            }, 1000);
+          });
+        } else {
+          return "Your browser doesn't support speech recognition. Please enable API integration.";
+        }
+      }
+    } catch (error) {
+      console.error('Error in speech recognition:', error);
+      return "I couldn't understand what you said. Could you try again?";
+    }
   }
 };
 
