@@ -78,5 +78,97 @@
     "zh-CN": "简体中文",
     "zh-TW": "繁體中文",
     "ja": "日本語"
+  },
+  "digitalHuman": {
+    "title": "数字人",
+    "description": "创建并与您所爱之人的数字版本互动",
+    "createButton": "创建数字人",
+    "familyTree": "家族树",
+    "visualTree": "查看可视化家族树",
+    "creation": {
+      "title": "创建数字人",
+      "description": "通过上传照片、声音、视频和珍贵记忆，创建您所爱之人的数字版本，永久保存这些记忆。",
+      "previous": "上一步",
+      "next": "下一步",
+      "createButton": "创建数字人",
+      "step1Title": "基本信息",
+      "step2Title": "上传照片",
+      "step3Title": "上传语音样本",
+      "step4Title": "上传视频",
+      "step5Title": "添加记忆",
+      "nameLabel": "姓名",
+      "namePlaceholder": "输入姓名",
+      "relationshipLabel": "关系",
+      "selectRelationship": "选择关系",
+      "photoUploadLabel": "上传主照片",
+      "photoUploadInstruction": "点击或拖放照片",
+      "photoUploadFormats": "支持JPG、PNG格式",
+      "additionalPhotosLabel": "上传其他照片",
+      "voiceUploadLabel": "上传语音样本",
+      "voiceUploadInstruction": "上传清晰的语音录音，以便更好地训练语音模型",
+      "voiceUploadFormats": "支持MP3、WAV格式",
+      "recordVoice": "录制语音",
+      "videoUploadLabel": "上传视频",
+      "videoUploadInstruction": "视频有助于创建更逼真的数字人",
+      "videoUploadFormats": "支持MP4、MOV格式",
+      "memoryLabel": "添加记忆",
+      "memoryPlaceholder": "分享记忆、故事或特点...",
+      "privacyNote": "您的数据将被安全存储，仅用于创建数字人。",
+      "files": "已选择文件",
+      "relationships": {
+        "parent": "父母",
+        "child": "孩子",
+        "sibling": "兄弟姐妹",
+        "grandparent": "祖父母",
+        "grandchild": "孙子女",
+        "friend": "朋友",
+        "spouse": "配偶",
+        "other": "其他"
+      }
+    },
+    "voiceChat": {
+      "welcome": "你好！我是 {{name}}。今天我能跟你聊些什么呢？",
+      "defaultName": "数字人",
+      "companion": "AI伴侣",
+      "userAudioMessage": "已发送语音信息",
+      "thinking": "思考中...",
+      "tapToTalk": "点击说话",
+      "tapToStop": "点击停止",
+      "play": "播放语音",
+      "pause": "暂停语音",
+      "microphoneError": "访问麦克风时出错。请检查您的权限。",
+      "processingError": "处理您的请求时出现问题。",
+      "serverError": "服务器暂时无法响应。",
+      "fallbackToText": "语音录制不可用。请使用文字聊天。",
+      "fallbackMessage": "我们暂时无法连接到服务器，这里是一个预设回应：",
+      "responses": {
+        "howAreYou": "很高兴听到你的声音。你最近怎么样？",
+        "goodMemories": "我刚刚在想我们一起度过的美好时光。",
+        "missYou": "我很想念我们的对话。告诉我你最近有什么新鲜事。",
+        "loveTalking": "我喜欢和你聊天。这让我想起了很多回忆。",
+        "rememberWhen": "你还记得我们曾经花几个小时讨论生活的时候吗？"
+      }
+    },
+    "conversation": {
+      "intro": "您可以与数字人交流，探索珍贵的记忆，体验他们的个性和想法。",
+      "startVoiceChat": "开始语音聊天"
+    },
+    "memories": {
+      "title": "记忆库",
+      "addNew": "添加新记忆",
+      "added": "记忆添加成功",
+      "placeholder": "记录关于此人的珍贵记忆...",
+      "save": "保存"
+    },
+    "errors": {
+      "loadFailed": "加载数字人失败",
+      "creation": {
+        "error": "创建数字人时出错"
+      }
+    },
+    "reunionFeatures": {
+      "title": "家族团聚",
+      "description": "通过我们的交互式家族树探索您的家族联系并保存家族历史。"
+    }
   }
 }
