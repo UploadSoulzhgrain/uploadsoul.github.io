@@ -253,7 +253,7 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
           name="description"
           value={formData.description}
           onChange={handleChange}
-          placeholder="Describe this person..."
+          placeholder={t('digitalHuman.creation.descriptionPlaceholder', {defaultValue: 'Describe this person...'})}
           className="w-full border border-gray-300 rounded-lg px-4 py-2 h-32 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
         />
       </div>
