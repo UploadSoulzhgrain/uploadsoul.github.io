@@ -279,7 +279,7 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
                 alt="Preview" 
                 className="h-48 object-cover rounded-lg mb-3"
               />
-              <span className="text-sm text-purple-600">Click to change photo</span>
+              <span className="text-sm text-purple-600">{t('digitalHuman.creation.changePhoto', {defaultValue: 'Click to change photo'})}</span>
             </div>
           ) : (
             <>
