@@ -247,7 +247,7 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
       
       <div>
         <label className="block text-gray-700 font-medium mb-2">
-          Description
+          {t('digitalHuman.creation.descriptionLabel', {defaultValue: 'Description'})}
         </label>
         <textarea
           name="description"
