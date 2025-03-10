@@ -669,7 +669,7 @@ const digitalAvatarAdapter = {
   getVoiceModels: async (digitalHumanId = null) => {
     try {
       // Get voices from our speech synthesis service
-      const voices = speechSynthesisService.getVoices();
+      const voices = await speechSynthesisService.getVoices();
       
       // Format them to match the expected format in audioService
       return voices.map(voice => ({
@@ -685,6 +685,83 @@ const digitalAvatarAdapter = {
         { id: 'demo-1', name: 'Default Voice', gender: 'female' },
         { id: 'demo-2', name: 'Male Voice', gender: 'male' }
       ];
+    }
+  },
+  
+  /**
+   * Create a voice model from audio samples using ElevenLabs voice cloning
+   * @param {Object} data - Voice model creation data
+   * @returns {Promise<Object>} Created voice model info
+   */
+  createVoiceModel: async (data) => {
+    try {
+      // Check if we have a valid ElevenLabs API key
+      if (!apiManager.config.keys.elevenlabs) {
+        throw new Error('ElevenLabs API key is required for voice model creation');
+      }
+      
+      const formData = new FormData();
+      
+      // Add voice name
+      formData.append('name', data.name || `Voice Model ${Date.now()}`);
+      
+      // Add voice description
+      formData.append('description', `Digital human voice model created from audio samples. ID: ${data.digitalHumanId}`);
+      
+      // Add audio samples - ElevenLabs requires at least 3 samples
+      if (!data.audioSamples || data.audioSamples.length < 3) {
+        throw new Error('At least 3 audio samples are required to create a voice model');
+      }
+      
+      // Only use up to 10 samples to avoid overloading the API
+      const maxSamples = Math.min(data.audioSamples.length, 10);
+      
+      // Add each audio sample
+      for (let i = 0; i < maxSamples; i++) {
+        formData.append('files', data.audioSamples[i]);
+      }
+      
+      // Send the request to ElevenLabs API
+      console.log('Sending voice creation request to ElevenLabs');
+      const response = await fetch(`${apiManager.config.endpoints.elevenlabs}/voices/add`, {
+        method: 'POST',
+        headers: apiManager.getAuthHeaders('elevenlabs'),
+        body: formData,
+        signal: AbortSignal.timeout(apiManager.config.timeouts.elevenlabs * 2) // Double timeout for voice creation
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Voice model creation failed: ${response.status} - ${errorText}`);
+      }
+      
+      const responseData = await response.json();
+      console.log('Voice model created successfully:', responseData);
+      
+      // Store the new voice ID in the conversation context if we have a digital human ID
+      if (data.digitalHumanId) {
+        const context = getConversationContext(data.digitalHumanId);
+        if (context) {
+          context.avatarPersonality.voiceId = responseData.voice_id;
+        }
+      }
+      
+      // Return in the format expected by audioService
+      return {
+        success: true,
+        modelId: responseData.voice_id,
+        name: responseData.name,
+        message: 'Voice model created successfully'
+      };
+    } catch (error) {
+      console.error('Error creating voice model:', error);
+      
+      // Return a fallback response to prevent breaking the UI
+      return {
+        success: false,
+        message: `Error creating voice model: ${error.message}`,
+        error: error.message
+      };
     }
   },
   
