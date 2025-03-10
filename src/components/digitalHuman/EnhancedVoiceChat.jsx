@@ -161,10 +161,11 @@ const EnhancedVoiceChat = ({ digitalHuman, onClose }) => {
         setMessages(prevMessages => 
           prevMessages.map(msg => 
             msg.id === userMessageId 
-              ? {...msg, content: data.transcription} 
+              ? {...msg, content: data.transcription, transcription: true} 
               : msg
           )
         );
+        console.log('Updated with transcription:', data.transcription);
       }
       
       // Get the response text and audio URL
