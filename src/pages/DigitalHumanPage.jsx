@@ -500,9 +500,9 @@ const DigitalHumanPage = () => {
                   {activeTab === 'media' && (
                     <div className="mb-6">
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-lg font-medium text-gray-900">媒体文件</h3>
+                        <h3 className="text-lg font-medium text-gray-900">{t('digitalHuman.mediaFiles')}</h3>
                         <button className="text-sm text-purple-600 hover:text-purple-800 transition">
-                          上传新文件
+                          {t('digitalHuman.uploadNewFile')}
                         </button>
                       </div>
 
