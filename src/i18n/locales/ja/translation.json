@@ -10,7 +10,48 @@
     "about": "について",
     "login": "ログイン",
     "signup": "登録",
-    "language": "言語"
+    "language": "言語",
+    "shop": "バーチャルモール"
+  },
+  "digitalHuman": {
+    "title": "デジタルヒューマン",
+    "description": "あなたの愛する人のデジタルヒューマンを作成し、いつでもどこでも会話を楽しめます。",
+    "createNew": "新規作成",
+    "voiceChat": {
+      "welcome": "こんにちは、{name}です。お話ししましょう。",
+      "defaultName": "デジタルヒューマン",
+      "companion": "デジタルコンパニオン",
+      "tapToTalk": "タップして話す",
+      "tapToStop": "タップして停止",
+      "thinking": "考え中...",
+      "play": "再生",
+      "userAudioMessage": "音声メッセージ",
+      "microphoneError": "マイクへのアクセスができません",
+      "processingError": "音声の処理中にエラーが発生しました",
+      "serverError": "サーバーとの通信に問題が発生しました",
+      "fallbackToText": "音声録音が利用できません。テキストチャットをご利用ください。",
+      "fallbackMessage": "現在デモモードです。",
+      "responses": {
+        "howAreYou": "今日はどうですか？",
+        "goodMemories": "一緒に過ごした素敵な思い出がありますね。",
+        "missYou": "あなたのことをいつも考えています。",
+        "loveTalking": "あなたとの会話が大好きです。",
+        "rememberWhen": "あの日のことを覚えていますか？素晴らしい時間でした。"
+      }
+    },
+    "intro": "このデジタルヒューマンと会話し、大切な思い出を探索し、その個性や考えを体験することができます。",
+    "startVoiceChat": "音声チャットを開始",
+    "memories": {
+      "title": "メモリーライブラリ",
+      "addNew": "新しい思い出を追加",
+      "added": "思い出が追加されました",
+      "placeholder": "この人についての大切な思い出を記録...",
+      "save": "保存"
+    },
+    "reunionFeatures": {
+      "title": "家族再会",
+      "description": "インタラクティブな家系図を通じて家族のつながりを探索し、家族の歴史を保存します。"
+    }
   },
   "footer": {
     "aboutUs": "会社概要",
