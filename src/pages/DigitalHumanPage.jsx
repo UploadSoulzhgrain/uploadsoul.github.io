@@ -277,7 +277,7 @@ const DigitalHumanPage = () => {
           {/* Digital Human Selection Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md p-4">
-              <h2 className="font-bold text-lg text-gray-800 mb-4">我的数字人</h2>
+              <h2 className="font-bold text-lg text-gray-800 mb-4">{t('digitalHuman.myDigitalHumans')}</h2>
               <div className="space-y-3">
                 {digitalHumans.map((human) => (
                   <div 
