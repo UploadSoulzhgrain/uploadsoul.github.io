@@ -406,15 +406,25 @@ const conversationState = new Map();
  */
 const initializeServices = async () => {
   try {
+    // Get API keys from environment variables if available
+    // Use GitHub Secrets for the actual API keys in production
+    const openaiApiKey = process.env.REACT_APP_OPENAI_API_KEY || window.OPENAI_API_KEY || '';
+    const elevenlabsApiKey = process.env.REACT_APP_ELEVENLABS_API_KEY || window.ELEVENLABS_API_KEY || '';
+    
+    console.log('Initializing with API keys available:', { 
+      openai: openaiApiKey ? 'Available' : 'Not available', 
+      elevenlabs: elevenlabsApiKey ? 'Available' : 'Not available'
+    });
+    
     // Initialize API Manager
     apiManager.initialize({
       keys: {
-        openai: process.env.REACT_APP_OPENAI_API_KEY || '',
-        elevenlabs: process.env.REACT_APP_ELEVENLABS_API_KEY || ''
+        openai: openaiApiKey,
+        elevenlabs: elevenlabsApiKey
       },
       endpoints: {
         openai: 'https://api.openai.com/v1',
-        elevenlabs: 'https://api.elevenlabs.io'
+        elevenlabs: 'https://api.elevenlabs.io/v1'
       },
       timeouts: {
         openai: 60000, // 60s timeout for OpenAI
