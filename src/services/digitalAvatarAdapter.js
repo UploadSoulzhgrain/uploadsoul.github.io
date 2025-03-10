@@ -434,7 +434,7 @@ const initializeServices = async () => {
     
     // Initialize Dialogue Service
     dialogueService.initialize({
-      primaryModel: 'gpt-4',
+      primaryModel: 'gpt-4o-mini',
       fallbackModel: 'gpt-3.5-turbo',
       systemPrompt: 'You are a helpful digital avatar assistant. Keep responses concise and engaging.',
       temperature: 0.7,
