@@ -5,7 +5,7 @@ import CompanionPage from '../pages/CompanionPage';
 import DigitalHumanPage from '../pages/DigitalHumanPage';
 import FamilyTreePage from '../pages/FamilyTreePage';
 import ShopPage from '../pages/ShopPage';
-import GamesPage from '../pages/GamesPage';
+import DigitalRebirthPage from '../pages/DigitalRebirthPage';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
