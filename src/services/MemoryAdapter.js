@@ -89,7 +89,7 @@ const MemoryAdapter = {
         // Error handler
         request.onerror = (event) => {
           console.error('Error initializing memory database:', event.target.error);
-          MemoryAdapter.useInMemoryFallback();
+          MemoryAdapter.setupInMemoryFallback();
           resolve(false);
         };
       } catch (error) {
