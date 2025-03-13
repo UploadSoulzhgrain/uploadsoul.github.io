@@ -42,6 +42,10 @@ const Header = () => {
               <span>VR</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
+            <Link to="/games" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
+              <span>{t('games.title')}</span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
+            </Link>
             <Link to="/shop" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
               <span>{t('header.shop')}</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
