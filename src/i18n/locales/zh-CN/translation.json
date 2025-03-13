@@ -80,6 +80,17 @@
     "zh-TW": "繁體中文",
     "ja": "日本語"
   },
+  "digitalRebirth": {
+    "title": "数字重生",
+    "description": "通过先进的AI技术体验数字重生",
+    "features": {
+      "dataAnalysis": "高级数据分析",
+      "personalityReconstruction": "人格重建",
+      "memorySynthesis": "记忆合成",
+      "learningAlgorithm": "学习算法"
+    },
+    "startButton": "开始数字重生"
+  },
   "games": {
     "title": "游戏",
     "play": "立即游戏",
