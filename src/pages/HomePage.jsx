@@ -46,18 +46,23 @@ const HomePage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Digital Immortality Feature */}
-            <div className="p-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-              <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                <FeatureIllustrations type="digitalImmortality" size="lg" />
+            <Link to="/digital-human" className="block">
+              <div className="p-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+                <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                  <FeatureIllustrations type="digitalImmortality" size="lg" />
+                </div>
+                <h3 className="text-xl font-bold text-center text-white mb-3">数字永生</h3>
+                <p className="text-white text-center opacity-90">
+                  突破时空限制，将您的思想、记忆和性格数字化，实现永恒的生命延续
+                </p>
+                <div className="mt-4 flex justify-center">
+                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">立即体验</span>
+                </div>
+                <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
+                  <div className="h-full w-1/2 bg-white animate-shimmer"></div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-center text-white mb-3">数字永生</h3>
-              <p className="text-white text-center opacity-90">
-                突破时空限制，将您的思想、记忆和性格数字化，实现永恒的生命延续
-              </p>
-              <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
-                <div className="h-full w-1/2 bg-white animate-shimmer"></div>
-              </div>
-            </div>
+            </Link>
             
             {/* Emotional Companion Feature */}
             <div className="p-8 bg-white border border-purple-100 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group animate-fadeInUp" style={{animationDelay: '0.3s'}}>
