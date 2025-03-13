@@ -8,6 +8,7 @@ import Logo from '../components/common/Logo';
 import FeatureIllustrations from '../components/common/FeatureIllustrations';
 
 const HomePage = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white overflow-hidden">
       <AnimationStyles />
