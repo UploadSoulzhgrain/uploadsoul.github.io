@@ -21,5 +21,10 @@
   "github": {
     "enabled": true,
     "silent": true
+  },
+  "build": {
+    "env": {
+      "PNPM_VERSION": "8.10.2"
+    }
   }
 }
