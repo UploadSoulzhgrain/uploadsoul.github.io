@@ -632,21 +632,55 @@ const digitalAvatarAdapter = {
         transcription = 'I couldn\'t understand what you said.';
       }
       
-      // Step 2: Generate dialogue response using our dialogue service
+      // Step 2: Generate dialogue response using our dialogue service with memories
       let dialogueResponse = '';
       try {
-        // Get conversation context
-        const context = getConversationContext(digitalHumanId);
+        // Get conversation context with memory support
+        const context = await getConversationContext(digitalHumanId);
         
         // Add user message to history
-        updateConversationHistory(digitalHumanId, 'user', transcription);
+        await updateConversationHistory(digitalHumanId, 'user', transcription);
+        
+        // Get relevant memories based on the current query
+        try {
+          const relevantMemories = await MemoryAdapter.getRelevantMemories(
+            digitalHumanId, 
+            transcription, 
+            { limit: 3 }
+          );
+          
+          // Add memories to context for the dialogue service
+          if (relevantMemories && relevantMemories.length > 0) {
+            context.relevantMemories = relevantMemories;
+            console.log('Retrieved relevant memories:', relevantMemories.length);
+          }
+        } catch (memoryError) {
+          console.warn('Failed to retrieve relevant memories:', memoryError);
+          // Continue without memories
+        }
         
         // Generate response using our dialogue service
-        dialogueResponse = await dialogueService.generateResponse(transcription, context);
+        // Enhance prompt with relevant memories if available
+        let enhancedContext = { ...context };
+        if (context.relevantMemories && context.relevantMemories.length > 0) {
+          // Prepare memory content for the dialogue model
+          const memoryContent = context.relevantMemories
+            .map(mem => `Memory: ${mem.content}`)
+            .join('\n');
+            
+          // Add memory context to the system prompt
+          if (enhancedContext.avatarPersonality) {
+            enhancedContext.avatarPersonality.background = 
+              (enhancedContext.avatarPersonality.background || '') + 
+              `\n\nRelevant memories to consider:\n${memoryContent}`;
+          }
+        }
+        
+        dialogueResponse = await dialogueService.generateResponse(transcription, enhancedContext);
         console.log('Dialogue response:', dialogueResponse);
         
         // Add AI response to history
-        updateConversationHistory(digitalHumanId, 'assistant', dialogueResponse);
+        await updateConversationHistory(digitalHumanId, 'assistant', dialogueResponse);
       } catch (error) {
         console.error('Error generating dialogue:', error);
         dialogueResponse = 'Sorry, I encountered an issue while processing your request.';
