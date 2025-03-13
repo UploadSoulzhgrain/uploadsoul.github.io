@@ -123,8 +123,9 @@ const MemoryGame = ({ digitalHuman, onFinish }) => {
         setMatchedPairs([...matchedPairs, cards[firstIndex].name]);
         setFlippedIndexes([]);
         
-        // Play match sound
-        new Audio('/assets/sounds/match.mp3').play().catch(() => {});
+        // Play match sound - would use actual audio in production
+        // new Audio('/assets/sounds/match.mp3').play().catch(() => {});
+        console.log('Match found!');
       } else {
         // No match, flip cards back after a delay
         setTimeout(() => {
