@@ -8,6 +8,7 @@
  */
 
 // Import dependencies needed for API integration
+import MemoryAdapter from './MemoryAdapter';
 
 // API Manager handles authentication and API key management
 const apiManager = {
