@@ -211,6 +211,17 @@
     "zh-TW": "繁體中文",
     "ja": "日本語"
   },
+  "digitalRebirth": {
+    "title": "Digital Rebirth",
+    "description": "Experience digital rebirth with advanced AI technology",
+    "features": {
+      "dataAnalysis": "Advanced Data Analysis",
+      "personalityReconstruction": "Personality Reconstruction",
+      "memorySynthesis": "Memory Synthesis",
+      "learningAlgorithm": "Learning Algorithm"
+    },
+    "startButton": "Start Digital Rebirth"
+  },
   "games": {
     "title": "Games",
     "play": "Play Now",
