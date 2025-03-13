@@ -103,6 +103,21 @@
     "createButton": "创建数字人",
     "familyTree": "家族树",
     "visualTree": "查看可视化家族树",
+    "myDigitalHumans": "我的数字人",
+    "mediaFiles": "媒体文件",
+    "voiceModel": "语音模型",
+    "noDigitalHumans": "暂无数字人",
+    "createNew": "创建新数字人",
+    "createDescription": "通过上传照片、语音和记忆创建您所爱之人的数字版本",
+    "startCreating": "开始创建",
+    "created": "创建于",
+    "conversation": "对话",
+    "uploadNewFile": "上传新文件",
+    "conversation": {
+      "inputPlaceholder": "输入消息...",
+      "send": "发送",
+      "description": "与您的数字人进行对话"
+    },
     "creation": {
       "title": "创建数字人",
       "description": "通过上传照片、声音、视频和珍贵记忆，创建您所爱之人的数字版本，永久保存这些记忆。",
