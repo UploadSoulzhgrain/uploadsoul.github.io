@@ -22,7 +22,9 @@
     "conversation": {
       "inputPlaceholder": "Type a message...",
       "send": "Send",
-      "description": "Have conversations with your digital human"
+      "description": "Have conversations with your digital human",
+      "intro": "Have a conversation with your digital human using text. Use the voice chat option for spoken conversations.",
+      "startVoiceChat": "Start Voice Chat"
     },
     "creation": {
       "title": "Create Digital Human",
