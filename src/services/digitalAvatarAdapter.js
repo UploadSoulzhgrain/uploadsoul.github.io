@@ -408,8 +408,8 @@ const initializeServices = async () => {
   try {
     // Get API keys from environment variables if available
     // Use GitHub Secrets for the actual API keys in production
-    const openaiApiKey = process.env.REACT_APP_OPENAI_API_KEY || window.OPENAI_API_KEY || '';
-    const elevenlabsApiKey = process.env.REACT_APP_ELEVENLABS_API_KEY || window.ELEVENLABS_API_KEY || '';
+    const openaiApiKey = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_OPENAI_API_KEY) || window.OPENAI_API_KEY || '';
+    const elevenlabsApiKey = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_ELEVENLABS_API_KEY) || window.ELEVENLABS_API_KEY || '';
     
     console.log('Initializing with API keys available:', { 
       openai: openaiApiKey ? 'Available' : 'Not available', 
