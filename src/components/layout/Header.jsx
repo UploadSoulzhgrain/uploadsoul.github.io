@@ -116,7 +116,7 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <span className="w-1 h-5 bg-gradient-to-b from-purple-600 to-indigo-500 rounded-full mr-2 opacity-0 group-hover:opacity-100"></span>
-                {t('home.features.digitalImmortality.title')}
+                {t('digitalHuman.title')}
               </Link>
               <Link 
                 to="/vr" 
