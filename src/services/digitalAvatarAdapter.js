@@ -406,10 +406,10 @@ const conversationState = new Map();
  */
 const initializeServices = async () => {
   try {
-    // Get API keys from environment variables if available
+    // Get API keys from environment variables or window globals
     // Use GitHub Secrets for the actual API keys in production
-    const openaiApiKey = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_OPENAI_API_KEY) || window.OPENAI_API_KEY || '';
-    const elevenlabsApiKey = (typeof process !== 'undefined' && process.env && process.env.REACT_APP_ELEVENLABS_API_KEY) || window.ELEVENLABS_API_KEY || '';
+    const openaiApiKey = window.OPENAI_API_KEY || '';
+    const elevenlabsApiKey = window.ELEVENLABS_API_KEY || '';
     
     console.log('Initializing with API keys available:', { 
       openai: openaiApiKey ? 'Available' : 'Not available', 
