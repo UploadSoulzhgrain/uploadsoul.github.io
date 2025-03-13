@@ -111,7 +111,7 @@
     "createDescription": "通过上传照片、语音和记忆创建您所爱之人的数字版本",
     "startCreating": "开始创建",
     "created": "创建于",
-    "conversation": "对话",
+    "conversationTab": "对话",
     "uploadNewFile": "上传新文件",
     "conversation": {
       "inputPlaceholder": "输入消息...",
