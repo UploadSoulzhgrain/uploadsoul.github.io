@@ -103,7 +103,7 @@ const MemoryAdapter = {
   /**
    * Set up in-memory fallback when IndexedDB is not available
    */
-  useInMemoryFallback: () => {
+  setupInMemoryFallback: () => {
     // In-memory storage
     MemoryAdapter.inMemoryMemories = {};
     MemoryAdapter.inMemoryConversations = {};
