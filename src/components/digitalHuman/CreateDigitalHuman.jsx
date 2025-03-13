@@ -535,7 +535,7 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
               disabled={!memoryText.trim()}
               className="bg-purple-600 text-white rounded-lg px-4 py-2 hover:bg-purple-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              Add
+              {t('digitalHuman.creation.addButton', {defaultValue: 'Add'})}
             </button>
           </div>
           
