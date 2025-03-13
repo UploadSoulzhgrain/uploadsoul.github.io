@@ -94,7 +94,7 @@ const MemoryAdapter = {
         };
       } catch (error) {
         console.error('Error in memory database initialization:', error);
-        MemoryAdapter.useInMemoryFallback();
+        MemoryAdapter.setupInMemoryFallback();
         resolve(false);
       }
     });
