@@ -8,5 +8,14 @@
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }
   ],
-  "packageManager": "pnpm@8.10.2"
+  "packageManager": "pnpm@8.10.2",
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--max-old-space-size=4096"
+    }
+  },
+  "github": {
+    "silent": true,
+    "autoAlias": true
+  }
 }
