@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "./vercel-build.sh",
+  "buildCommand": "chmod +x ./vercel-build.sh && ./vercel-build.sh",
   "framework": "vite",
-  "installCommand": "pnpm install --no-frozen-lockfile",
+  "installCommand": "npm install -g pnpm@8.10.2 && pnpm install --no-frozen-lockfile",
   "outputDirectory": "dist",
   "routes": [
     { "handle": "filesystem" },
