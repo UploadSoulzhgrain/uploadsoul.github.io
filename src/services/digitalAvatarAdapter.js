@@ -643,7 +643,7 @@ const digitalAvatarAdapter = {
         
         // Get relevant memories based on the current query
         try {
-          const relevantMemories = await MemoryAdapter.getRelevantMemories(
+          const relevantMemories = await MemoryAdapter.searchMemories(
             digitalHumanId, 
             transcription, 
             { limit: 3 }
