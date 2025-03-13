@@ -585,7 +585,7 @@ const updateConversationHistory = async (digitalHumanId, role, content) => {
     if (role === 'assistant' && content.length > 50) {
       try {
         // Attempt to extract key memories from the conversation
-        await MemoryAdapter.extractAndStoreMemories(digitalHumanId, content);
+        await MemoryAdapter.extractMemoriesFromConversation(digitalHumanId, 5);
       } catch (memoryError) {
         console.warn('Failed to extract memories from conversation:', memoryError);
       }
