@@ -80,6 +80,23 @@
     "zh-TW": "繁體中文",
     "ja": "日本語"
   },
+  "games": {
+    "title": "游戏",
+    "play": "立即游戏",
+    "memory": {
+      "title": "记忆游戏",
+      "shortDescription": "通过我们有趣的配对游戏测试您的记忆能力",
+      "description": "尽可能少的步骤匹配卡片对",
+      "newGame": "新游戏",
+      "moves": "步数: {{count}}",
+      "pairs": "配对: {{found}} / {{total}}",
+      "time": "时间: {{time}}秒",
+      "congrats": "恭喜!",
+      "stats": "您用{{moves}}步和{{time}}秒完成了游戏",
+      "playAgain": "再玩一次"
+    }
+  },
+
   "digitalHuman": {
     "title": "数字人",
     "description": "创建并与您所爱之人的数字版本互动",
