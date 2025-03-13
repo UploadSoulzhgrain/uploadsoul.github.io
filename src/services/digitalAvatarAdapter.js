@@ -470,10 +470,15 @@ const initializeServices = async () => {
 
 /**
  * Get or initialize conversation state for a digital human
+ * Uses MemoryAdapter for retrieving conversation history
  */
-const getConversationContext = (digitalHumanId) => {
+const getConversationContext = async (digitalHumanId) => {
+  // Initialize MemoryAdapter if not already initialized
+  await MemoryAdapter.initialize();
+  
   if (!conversationState.has(digitalHumanId)) {
-    conversationState.set(digitalHumanId, {
+    // Create new conversation state
+    const newState = {
       history: [],
       relevantMemories: [],
       userProfile: {
@@ -498,7 +503,39 @@ const getConversationContext = (digitalHumanId) => {
           empathy: 0.8
         }
       }
-    });
+    };
+    
+    // Get conversation history from MemoryAdapter
+    try {
+      const conversationHistory = await MemoryAdapter.getConversationHistory(digitalHumanId, {
+        limit: 20 // Get last 20 messages
+      });
+      
+      if (conversationHistory && conversationHistory.length > 0) {
+        // Convert from MemoryAdapter format to our format
+        newState.history = conversationHistory.map(msg => ({
+          id: msg.id,
+          role: msg.role, // 'user' or 'assistant'
+          content: msg.content,
+          timestamp: msg.timestamp,
+          language: 'en'
+        }));
+      }
+      
+      // Try to get relevant memories
+      const memories = await MemoryAdapter.getMemories(digitalHumanId, {
+        limit: 10, // Get most important memories
+      });
+      
+      if (memories && memories.length > 0) {
+        newState.relevantMemories = memories;
+      }
+    } catch (error) {
+      console.warn('Failed to load memories from MemoryAdapter:', error);
+      // Continue with empty history
+    }
+    
+    conversationState.set(digitalHumanId, newState);
   }
   
   return conversationState.get(digitalHumanId);
