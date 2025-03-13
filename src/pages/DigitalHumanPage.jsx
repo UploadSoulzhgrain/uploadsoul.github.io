@@ -6,7 +6,7 @@ import CreateDigitalHuman from '../components/digitalHuman/CreateDigitalHuman';
 import VoiceChat from '../components/digitalHuman/EnhancedVoiceChat';
 import digitalHumanService from '../services/digitalHumanService';
 
-const DigitalHumanPage = () => {
+const DigitalHumanPage = ({ create = false }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [digitalHumans, setDigitalHumans] = useState([]);
