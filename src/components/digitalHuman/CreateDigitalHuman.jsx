@@ -541,7 +541,7 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
           
           {formData.memories.length > 0 && (
             <div className="space-y-2 mt-4">
-              <h4 className="font-medium text-gray-700">Added Memories:</h4>
+              <h4 className="font-medium text-gray-700">{t('digitalHuman.creation.addedMemories', {defaultValue: 'Added Memories:'})}</h4>
               {formData.memories.map((memory, index) => (
                 <div key={index} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
                   <p className="text-sm text-gray-700">{memory}</p>
