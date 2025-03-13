@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -e # Exit immediately if a command exits with a non-zero status
+# Make sure the script is executable
+chmod +x "$(dirname "$0")/vercel-build.sh"
 
 # Create log directory
 mkdir -p logs
