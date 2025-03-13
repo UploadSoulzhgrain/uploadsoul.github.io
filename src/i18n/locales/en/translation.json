@@ -17,7 +17,7 @@
     "createDescription": "Create a digital version of your loved ones by uploading photos, voice, and memories",
     "startCreating": "Start Creating",
     "created": "Created",
-    "conversation": "Conversation",
+    "conversationTab": "Conversation",
     "uploadNewFile": "Upload New File",
     "conversation": {
       "inputPlaceholder": "Type a message...",
