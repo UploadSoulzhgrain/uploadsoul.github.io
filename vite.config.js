@@ -14,5 +14,19 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    // Add sourcemap for better debugging
+    sourcemap: true,
+    // Improve chunking strategy
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [
+            'react', 
+            'react-dom',
+            'react-router-dom'
+          ],
+        },
+      },
+    }
   }
 })
