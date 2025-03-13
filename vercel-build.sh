@@ -41,6 +41,11 @@ cat .npmrc | tee -a logs/build.log || log "No .npmrc file found"
 log "\n========== INSTALLING DEPENDENCIES =========="
 NODE_OPTIONS="--max-old-space-size=4096" pnpm install --no-frozen-lockfile || { log "Failed to install dependencies"; exit 1; }
 
+# Ensure Vite is globally installed
+log "\n========== ENSURING VITE IS INSTALLED =========="
+pnpm add -g vite@5.4.1 || { log "Failed to install global vite"; exit 1; }
+log "Vite version: $(pnpm vite --version || echo 'Not found')"
+
 # Run lint
 log "\n========== RUNNING LINT =========="
 pnpm run lint || log "Lint failed but continuing build process"
