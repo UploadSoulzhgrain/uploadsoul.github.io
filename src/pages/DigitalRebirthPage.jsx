@@ -23,7 +23,7 @@ const DigitalRebirthPage = () => {
         </svg>
       ),
       title: 'digitalRebirth.features.dataAnalysis',
-      description: 'Our advanced AI analyzes vast amounts of personal data to understand patterns, preferences, and unique characteristics that define an individual's digital identity.',
+      description: 'Our advanced AI analyzes vast amounts of personal data to understand patterns, preferences, and unique characteristics that define an individual\'s digital identity.',
       imageUrl: '/assets/images/data-analysis.jpg'
     },
     {
