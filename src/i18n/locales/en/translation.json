@@ -22,7 +22,8 @@
     "conversation": {
       "inputPlaceholder": "Type a message...",
       "send": "Send",
-      "description": "Have conversations with your digital human",
+      "description": "Have conversations with your digital human"
+    },
     "creation": {
       "title": "Create Digital Human",
       "description": "By uploading photos, voice, videos and precious memories, create a digital version of your loved ones to preserve these memories forever.",
