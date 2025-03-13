@@ -102,23 +102,22 @@ const HomePage = () => {
           
           {/* Additional Features Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            {/* Memory Game Feature */}
-            <Link to="/games" className="block">
+            {/* Digital Rebirth Feature */}
+            <Link to="/digital-rebirth" className="block">
               <div className="p-6 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.5s'}}>
                 <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-center text-white mb-3">{t('games.memory.title')}</h3>
+                <h3 className="text-xl font-bold text-center text-white mb-3">{t('digitalRebirth.title')}</h3>
                 <p className="text-white text-center opacity-90">
-                  {t('games.memory.shortDescription')}
+                  {t('digitalRebirth.description')}
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('games.play')}</span>
+                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('digitalRebirth.startButton')}</span>
                 </div>
               </div>
             </Link>
