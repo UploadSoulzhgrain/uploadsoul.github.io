@@ -19,6 +19,8 @@ const AppRouter = () => {
           <Route path="/companion" element={<CompanionPage />} />
           <Route path="/digital-human" element={<DigitalHumanPage />} />
           <Route path="/digital-human/family-tree/:digitalHumanId?" element={<FamilyTreePage />} />
+          <Route path="/games" element={<GamesPage />} />
+          <Route path="/games/:digitalHumanId" element={<GamesPage />} />
           <Route path="/shop" element={<ShopPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
