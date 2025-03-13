@@ -178,7 +178,7 @@ const GamesPage = () => {
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = '/assets/games/default-game.png';
+                          e.target.src = '/assets/digital-humans/memory1.jpg';
                         }}
                       />
                     </div>
