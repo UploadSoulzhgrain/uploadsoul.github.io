@@ -44,7 +44,7 @@ const GamesPage = () => {
       id: 'memory',
       name: t('games.memory.title'),
       description: t('games.memory.shortDescription'),
-      image: '/assets/games/memory-game.png',
+      image: '/assets/digital-humans/memory1.jpg',
       difficulty: 'medium',
       timeEstimate: '5-10',
       component: MemoryGame
