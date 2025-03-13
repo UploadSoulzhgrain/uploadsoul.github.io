@@ -120,6 +120,22 @@
       "intro": "使用文本与您的数字人对话。使用语音聊天选项进行语音对话。",
       "startVoiceChat": "开始语音聊天"
     },
+    "memories": {
+      "title": "回忆",
+      "addNew": "添加新回忆",
+      "placeholder": "写下关于这个人的回忆或故事...",
+      "save": "保存回忆",
+      "description": "这些回忆有助于建立更准确的数字表示。",
+      "added": "回忆添加成功",
+      "manuallyAdded": "手动添加"
+    },
+    "errors": {
+      "loadFailed": "加载数字人失败"
+    },
+    "reunionFeatures": {
+      "title": "开启虚拟团聚",
+      "description": "邀请家庭成员参加虚拟团聚，你们可以一起与你的数字人互动。"
+    },
     "creation": {
       "title": "创建数字人",
       "description": "通过上传照片、声音、视频和珍贵记忆，创建您所爱之人的数字版本，永久保存这些记忆。",
