@@ -173,7 +173,7 @@ const GamesPage = () => {
                   >
                     <div className="h-40 bg-gray-100">
                       <img 
-                        src={game.image || '/assets/games/default-game.png'} 
+                        src={game.image || '/assets/digital-humans/memory1.jpg'} 
                         alt={game.name} 
                         className="w-full h-full object-cover"
                         onError={(e) => {
