@@ -694,7 +694,7 @@ const digitalAvatarAdapter = {
         
         // Try to find a voice matching the digital human's preferences
         let voiceId = null;
-        const context = getConversationContext(digitalHumanId);
+        const context = await getConversationContext(digitalHumanId);
         
         if (context?.avatarPersonality?.voiceId) {
           // If the digital human has a preferred voice, use it
