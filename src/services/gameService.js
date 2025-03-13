@@ -18,18 +18,19 @@ const gameService = {
   getMemoryImages(pairCount, digitalHuman) {
     // Default images to use if no digital human is provided or no media files are available
     const defaultImages = [
-      { url: '/assets/memories/family-photo-1.jpg', name: 'Family Photo' },
-      { url: '/assets/memories/birthday-celebration.jpg', name: 'Birthday Celebration' },
-      { url: '/assets/memories/wedding-day.jpg', name: 'Wedding Day' },
-      { url: '/assets/memories/family-vacation.jpg', name: 'Family Vacation' },
-      { url: '/assets/memories/graduation-ceremony.jpg', name: 'Graduation' },
-      { url: '/assets/memories/holiday-gathering.jpg', name: 'Holiday Gathering' },
-      { url: '/assets/memories/childhood-home.jpg', name: 'Childhood Home' },
-      { url: '/assets/memories/first-car.jpg', name: 'First Car' },
-      { url: '/assets/memories/favorite-pet.jpg', name: 'Beloved Pet' },
-      { url: '/assets/memories/family-dinner.jpg', name: 'Family Dinner' },
-      { url: '/assets/memories/fishing-trip.jpg', name: 'Fishing Trip' },
-      { url: '/assets/memories/school-days.jpg', name: 'School Days' }
+      // Using placeholders from digital-humans directory which we know exists
+      { url: '/assets/digital-humans/grandpa.jpg', name: 'Family Elder' },
+      { url: '/assets/digital-humans/grandma.jpg', name: 'Family Matriarch' },
+      { url: '/assets/digital-humans/uncle.jpg', name: 'Uncle' },
+      { url: '/assets/digital-humans/cousin1.jpg', name: 'Cousin 1' },
+      { url: '/assets/digital-humans/cousin2.jpg', name: 'Cousin 2' },
+      { url: '/assets/digital-humans/mother.jpg', name: 'Mother' },
+      { url: '/assets/digital-humans/me.jpg', name: 'Self' },
+      { url: '/assets/digital-humans/memory1.jpg', name: 'Memory 1' },
+      { url: '/assets/digital-humans/memory2.jpg', name: 'Memory 2' },
+      { url: '/assets/digital-humans/memory3.jpg', name: 'Memory 3' },
+      { url: '/assets/digital-humans/memory4.jpg', name: 'Memory 4' },
+      { url: '/assets/digital-humans/grandpa.jpg', name: 'Grandfather' }
     ];
 
     let availableImages = [...defaultImages];
