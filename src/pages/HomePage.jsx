@@ -149,16 +149,31 @@ const HomePage = () => {
               无论何时何地，都有专属于您的数字伙伴
             </p>
           </div>
-          <div className="group inline-block animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-            <Link 
-              to="/register" 
-              className="relative overflow-hidden bg-purple-600 text-white px-10 py-4 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform group-hover:-translate-y-1 text-lg font-medium"
-            >
-              <span className="relative z-10">免费注册</span>
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out animate-gradient"></span>
-            </Link>
-            <div className="mt-2 text-purple-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-              开启您的数字灵魂之旅
+          <div className="flex justify-center space-x-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
+            <div className="group inline-block">
+              <Link 
+                to="/register" 
+                className="relative overflow-hidden bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform group-hover:-translate-y-1 text-lg font-medium"
+              >
+                <span className="relative z-10">免费注册</span>
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out animate-gradient"></span>
+              </Link>
+              <div className="mt-2 text-purple-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                开启您的数字灵魂之旅
+              </div>
+            </div>
+            
+            <div className="group inline-block">
+              <Link 
+                to="/digital-human" 
+                className="relative overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-4 rounded-lg hover:opacity-90 transition shadow-lg hover:shadow-xl transform group-hover:-translate-y-1 text-lg font-medium"
+              >
+                <span className="relative z-10">数字人体验</span>
+                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out animate-gradient"></span>
+              </Link>
+              <div className="mt-2 text-indigo-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                创建您的数字永生体验
+              </div>
             </div>
           </div>
           
