@@ -14,6 +14,7 @@ const DigitalHumanPage = ({ create = false }) => {
   // State for loading and error handling
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(create);
   
   // Load digital humans from service
   useEffect(() => {
