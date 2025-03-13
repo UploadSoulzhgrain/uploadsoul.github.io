@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import HeroBackground from '../components/common/HeroBackground';
 import WaveAnimation from '../components/animations/WaveAnimation';
 import AnimationStyles from '../components/animations/AnimationStyles';
