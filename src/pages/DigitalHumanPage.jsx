@@ -78,7 +78,6 @@ const DigitalHumanPage = ({ create = false }) => {
     fetchDigitalHumans();
   }, [t]);
   const [selectedHuman, setSelectedHuman] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showVoiceChat, setShowVoiceChat] = useState(false);
   const [activeTab, setActiveTab] = useState('memories'); // memories, conversation, media, tree
   const [newMemory, setNewMemory] = useState('');
