@@ -132,8 +132,9 @@ const MemoryGame = ({ digitalHuman, onFinish }) => {
           setFlippedIndexes([]);
         }, 1000);
         
-        // Play no match sound
-        new Audio('/assets/sounds/nomatch.mp3').play().catch(() => {});
+        // Play no match sound - would use actual audio in production
+        // new Audio('/assets/sounds/nomatch.mp3').play().catch(() => {});
+        console.log('No match!');
       }
     }
   };
