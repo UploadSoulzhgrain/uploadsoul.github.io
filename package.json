@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint ./src --quiet",
     "preview": "vite preview",
-    "deploy": "vite build && vercel --prod"
+    "deploy": "vite build && vercel --prod",
+    "vercel-build": "vite build"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
