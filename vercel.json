@@ -7,5 +7,6 @@
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }
-  ]
+  ],
+  "packageManager": "pnpm@8.10.2"
 }
