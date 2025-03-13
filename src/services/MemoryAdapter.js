@@ -52,7 +52,7 @@ const MemoryAdapter = {
         // Check if IndexedDB is supported
         if (!window.indexedDB) {
           console.warn('Your browser doesn\'t support IndexedDB. Using fallback memory storage.');
-          MemoryAdapter.useInMemoryFallback();
+          MemoryAdapter.setupInMemoryFallback();
           resolve(true);
           return;
         }
