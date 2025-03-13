@@ -131,6 +131,14 @@ const Header = () => {
                 VR
               </Link>
               <Link 
+                to="/games" 
+                className="px-3 py-3 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 flex items-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <span className="w-1 h-5 bg-gradient-to-b from-purple-600 to-indigo-500 rounded-full mr-2 opacity-0 group-hover:opacity-100"></span>
+                {t('games.title')}
+              </Link>
+              <Link 
                 to="/shop" 
                 className="px-3 py-3 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 flex items-center"
                 onClick={() => setIsMenuOpen(false)}
