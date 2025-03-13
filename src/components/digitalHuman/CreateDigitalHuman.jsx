@@ -517,7 +517,7 @@ const CreateDigitalHuman = ({ onClose, onSubmit }) => {
         
         <div className="bg-purple-50 rounded-lg p-4 mb-4">
           <p className="text-sm text-purple-700">
-            Add stories, memories, and characteristics that make this person special
+            {t('digitalHuman.creation.memoryInstruction', {defaultValue: 'Add stories, memories, and characteristics that make this person special'})}
           </p>
         </div>
         
