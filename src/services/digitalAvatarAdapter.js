@@ -543,21 +543,56 @@ const getConversationContext = async (digitalHumanId) => {
 
 /**
  * Update conversation history with new messages
+ * Stores in both local state and MemoryAdapter for persistence
  */
-const updateConversationHistory = (digitalHumanId, role, content) => {
-  const context = getConversationContext(digitalHumanId);
+const updateConversationHistory = async (digitalHumanId, role, content) => {
+  const context = await getConversationContext(digitalHumanId);
   
-  context.history.push({
-    id: `msg-${Date.now()}`,
+  const messageId = `msg-${Date.now()}`;
+  const timestamp = Date.now();
+  
+  // Add to local context
+  const newMessage = {
+    id: messageId,
     role: role,
     content: content,
-    timestamp: Date.now(),
+    timestamp: timestamp,
     language: 'en'
-  });
+  };
+  
+  context.history.push(newMessage);
   
   // Limit history size to prevent context length issues
   if (context.history.length > 50) {
     context.history = context.history.slice(context.history.length - 50);
+  }
+  
+  // Store in MemoryAdapter for persistence
+  try {
+    await MemoryAdapter.storeConversationEntry({
+      id: messageId,
+      digitalHumanId: digitalHumanId,
+      role: role,
+      content: content,
+      timestamp: timestamp,
+      metadata: {
+        language: 'en',
+        source: 'digitalAvatarAdapter'
+      }
+    });
+    
+    // If this is an AI response, extract and store any potential memories
+    if (role === 'assistant' && content.length > 50) {
+      try {
+        // Attempt to extract key memories from the conversation
+        await MemoryAdapter.extractAndStoreMemories(digitalHumanId, content);
+      } catch (memoryError) {
+        console.warn('Failed to extract memories from conversation:', memoryError);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to store conversation in MemoryAdapter:', error);
+    // Continue with local storage only
   }
 };
 
