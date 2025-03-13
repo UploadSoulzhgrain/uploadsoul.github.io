@@ -569,7 +569,7 @@ const updateConversationHistory = async (digitalHumanId, role, content) => {
   
   // Store in MemoryAdapter for persistence
   try {
-    await MemoryAdapter.storeConversationEntry({
+    await MemoryAdapter.storeConversationMessage({
       id: messageId,
       digitalHumanId: digitalHumanId,
       role: role,
