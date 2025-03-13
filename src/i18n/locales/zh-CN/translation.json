@@ -116,7 +116,9 @@
     "conversation": {
       "inputPlaceholder": "输入消息...",
       "send": "发送",
-      "description": "与您的数字人进行对话"
+      "description": "与您的数字人进行对话",
+      "intro": "使用文本与您的数字人对话。使用语音聊天选项进行语音对话。",
+      "startVoiceChat": "开始语音聊天"
     },
     "creation": {
       "title": "创建数字人",
