@@ -26,6 +26,22 @@
       "intro": "Have a conversation with your digital human using text. Use the voice chat option for spoken conversations.",
       "startVoiceChat": "Start Voice Chat"
     },
+    "memories": {
+      "title": "Memories",
+      "addNew": "Add New Memory",
+      "placeholder": "Write a memory or story about this person...",
+      "save": "Save Memory",
+      "description": "These memories help build a more accurate digital representation.",
+      "added": "Memory added successfully",
+      "manuallyAdded": "Manually added"
+    },
+    "errors": {
+      "loadFailed": "Failed to load digital humans"
+    },
+    "reunionFeatures": {
+      "title": "Open Virtual Reunion",
+      "description": "Invite family members to a virtual reunion where you can all interact with your digital human together."
+    },
     "creation": {
       "title": "Create Digital Human",
       "description": "By uploading photos, voice, videos and precious memories, create a digital version of your loved ones to preserve these memories forever.",
