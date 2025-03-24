@@ -407,10 +407,14 @@ const conversationState = new Map();
  */
 const initializeServices = async () => {
   try {
-    // Get API keys from environment variables or window globals
-    // Use GitHub Secrets for the actual API keys in production
-    const openaiApiKey = window.OPENAI_API_KEY || '';
-    const elevenlabsApiKey = window.ELEVENLABS_API_KEY || '';
+    // Get API keys from our apiKeyService
+    // Import is done dynamically to avoid circular dependencies
+    const apiKeyService = await import('./apiKeyService.js')
+      .then(module => module.default)
+      .catch(() => ({ getApiKey: () => '' })); // Fallback if module not found
+    
+    const openaiApiKey = apiKeyService.getApiKey('openai') || window.OPENAI_API_KEY || '';
+    const elevenlabsApiKey = apiKeyService.getApiKey('elevenlabs') || window.ELEVENLABS_API_KEY || '';
     
     console.log('Initializing with API keys available:', { 
       openai: openaiApiKey ? 'Available' : 'Not available', 

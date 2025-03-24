@@ -6,6 +6,7 @@ import DigitalHumanPage from '../pages/DigitalHumanPage';
 import FamilyTreePage from '../pages/FamilyTreePage';
 import ShopPage from '../pages/ShopPage';
 import DigitalRebirthPage from '../pages/DigitalRebirthPage';
+import ApiConfigPage from '../pages/ApiConfigPage';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 
@@ -22,6 +23,7 @@ const AppRouter = () => {
           <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
           <Route path="/digital-human/create" element={<DigitalHumanPage create={true} />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/api-config" element={<ApiConfigPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
