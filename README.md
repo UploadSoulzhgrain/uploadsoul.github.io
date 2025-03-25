@@ -1,14 +1,14 @@
 # MGX AI Platform Backend
 
-这是 MGX AI Platform 的后端服务，使用 Node.js、Express、TypeScript 和 MongoDB 构建。
+这是 MGX AI Platform 的后端服务，提供用户认证、文件上传等功能。
 
 ## 功能特性
 
-- 用户认证（注册/登录）
-- JWT 令牌认证
-- 用户信息管理
-- 错误处理中间件
-- 数据验证
+- 用户认证 (注册、登录、密码重置)
+- 文件上传和管理
+- 邮件验证
+- 短信验证
+- AWS S3 文件存储
 
 ## 技术栈
 
@@ -16,82 +16,46 @@
 - Express
 - TypeScript
 - MongoDB
-- JWT
-- Zod (数据验证)
+- AWS S3
+- JWT 认证
 
-## 开始使用
+## 开发环境设置
 
-### 前置要求
-
-- Node.js (v14 或更高版本)
-- MongoDB (v4.4 或更高版本)
-- npm 或 yarn
-
-### 安装
-
-1. 克隆仓库：
-```bash
-git clone <repository-url>
-cd mgx-ai-platform/backend
-```
-
-2. 安装依赖：
+1. 安装依赖:
 ```bash
 npm install
 ```
 
-3. 创建环境变量文件：
+2. 配置环境变量:
 ```bash
 cp .env.example .env
 ```
 
-4. 配置环境变量：
-编辑 `.env` 文件，设置必要的环境变量：
-```
-PORT=3001
-MONGODB_URI=mongodb://localhost:27017/mgx-ai-platform
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-NODE_ENV=development
-```
-
-### 运行
-
-开发环境：
+3. 启动开发服务器:
 ```bash
 npm run dev
 ```
 
-生产环境：
-```bash
-npm run build
-npm start
-```
+## API 文档
 
-## API 端点
+### 认证相关
 
-### 认证
+- POST /api/auth/register - 用户注册
+- POST /api/auth/login - 用户登录
+- POST /api/auth/verify-email - 验证邮箱
+- POST /api/auth/verify-phone - 验证手机号
+- POST /api/auth/reset-password - 重置密码
 
-- POST `/api/auth/register` - 用户注册
-- POST `/api/auth/login` - 用户登录
+### 文件相关
 
-### 用户
+- POST /api/files/upload - 上传文件
+- GET /api/files - 获取文件列表
+- GET /api/files/:id - 获取单个文件
+- DELETE /api/files/:id - 删除文件
 
-- GET `/api/users/profile` - 获取用户信息
-- PATCH `/api/users/profile` - 更新用户信息
+## 部署
 
-## 开发
-
-### 构建
-
-```bash
-npm run build
-```
-
-### 代码检查
-
-```bash
-npm run lint
-```
+项目同时部署在 Vercel 和 Railway 平台上，使用 MongoDB Atlas 作为数据库服务，AWS S3 作为文件存储。
 
 ## 许可证
 

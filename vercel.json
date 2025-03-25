@@ -10,6 +10,10 @@
     {
       "src": "/api/(.*)",
       "dest": "dist/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ],
   "env": {
@@ -32,4 +36,4 @@
     "AWS_SECRET_ACCESS_KEY": "@aws-secret-access-key",
     "AWS_S3_BUCKET": "@aws-s3-bucket"
   }
-} 
+}
