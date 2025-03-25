@@ -10,11 +10,11 @@
       }
     },
     {
-      "src": "backend/src/index.ts",
+      "src": "backend/dist/index.js",
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "backend/**"
+          "backend/dist/**"
         ]
       }
     }
@@ -22,7 +22,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/backend/src/index.ts"
+      "dest": "/backend/dist/index.js"
     },
     {
       "handle": "filesystem"
@@ -33,7 +33,7 @@
     }
   ],
   "functions": {
-    "backend/src/index.ts": {
+    "backend/dist/index.js": {
       "memory": 1024,
       "maxDuration": 10
     }
