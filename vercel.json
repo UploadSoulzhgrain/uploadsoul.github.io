@@ -1,19 +1,13 @@
 {
   "version": 2,
-  "buildCommand": "pnpm install && pnpm run build",
-  "framework": "vite",
+  "framework": null,
   "installCommand": "npm install -g pnpm@8.10.2 && pnpm install --no-frozen-lockfile",
+  "buildCommand": "pnpm run build",
   "outputDirectory": "dist",
   "routes": [
     { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
-
-  "build": {
-    "env": {
-      "NODE_OPTIONS": "--max-old-space-size=4096"
-    }
-  },
   "github": {
     "silent": true,
     "autoAlias": true
