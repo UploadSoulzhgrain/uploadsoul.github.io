@@ -6,10 +6,7 @@
       "use": "@vercel/node",
       "config": {
         "includeFiles": [
-          "backend/**",
-          "backend/.env*",
-          "backend/package.json",
-          "backend/tsconfig.json"
+          "backend/**"
         ]
       }
     }
@@ -17,8 +14,13 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/src/index.ts"
+      "dest": "/backend/src/index.ts"
     }
   ],
-  "workingDirectory": "backend"
+  "functions": {
+    "backend/src/index.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 } 
