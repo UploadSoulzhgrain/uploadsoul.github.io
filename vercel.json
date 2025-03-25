@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "npm install && npm run build",
   "builds": [
     {
       "src": "dist/index.js",
@@ -9,8 +10,7 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/index.js",
-      "continue": true
+      "dest": "/dist/index.js"
     }
   ],
   "env": {
