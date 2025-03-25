@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "version": 2,
   "buildCommand": "npm install && npm run build",
@@ -34,3 +35,6 @@
     "AWS_S3_BUCKET": "@aws-s3-bucket"
   }
 }
+=======
+ 
+>>>>>>> 034f851459aef6248b73ca7fb91500344adf7c0f
