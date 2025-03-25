@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "buildCommand": "npm run vercel-build",
   "builds": [
     {
       "src": "backend/src/index.ts",
@@ -21,7 +22,7 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/backend/src/index.ts"
+      "dest": "/index.html"
     }
   ],
   "functions": {
