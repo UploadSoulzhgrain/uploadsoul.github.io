@@ -1,17 +1,22 @@
-<<<<<<< HEAD
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
+  "buildCommand": "cd backend && npm install && npm run build",
+  "outputDirectory": "backend/dist",
+  "installCommand": "cd backend && npm install",
   "builds": [
     {
-      "src": "dist/index.js",
-      "use": "@vercel/node"
+      "src": "src/index.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["dist/**"],
+        "buildCommand": "npm run build"
+      }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/index.js"
+      "dest": "/src/index.ts"
     }
   ],
   "env": {
@@ -35,6 +40,3 @@
     "AWS_S3_BUCKET": "@aws-s3-bucket"
   }
 }
-=======
- 
->>>>>>> 034f851459aef6248b73ca7fb91500344adf7c0f
