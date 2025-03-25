@@ -2,13 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/src/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["backend/**/*"]
-      }
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
@@ -19,21 +12,11 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "backend/src/index.ts"
-    },
-    {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "dist/index.html"
+      "dest": "/index.html"
     }
-  ],
-  "functions": {
-    "backend/src/index.ts": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
+  ]
 } 
