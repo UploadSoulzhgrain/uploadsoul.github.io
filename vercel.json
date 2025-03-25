@@ -5,7 +5,12 @@
       "src": "backend/src/index.ts",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["backend/package.json"]
+        "includeFiles": [
+          "backend/**",
+          "backend/.env*",
+          "backend/package.json",
+          "backend/tsconfig.json"
+        ]
       }
     }
   ],
@@ -14,5 +19,6 @@
       "src": "/api/(.*)",
       "dest": "backend/src/index.ts"
     }
-  ]
+  ],
+  "workingDirectory": "backend"
 } 
