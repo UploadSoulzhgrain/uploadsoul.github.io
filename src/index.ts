@@ -1,32 +1,48 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { connectDB } from './config/database';
-import authRoutes from './routes/auth';
-import userRoutes from './routes/user';
-import { errorHandler } from './middleware/errorHandler';
+import { connectDB } from './config/database.js';
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import path from 'path';
 
-// 加载环境变量
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables
 dotenv.config();
 
-// 创建Express应用
+// Create Express app
 const app = express();
 
-// 连接数据库
+// Connect to database
 connectDB();
 
-// 中间件
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// 路由
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 
-// 错误处理中间件
+// Health check endpoint
+app.get('/api/health', (req: Request, res: Response) => {
+  res.json({ status: 'ok' });
+});
+
+// Home route
+app.get('/', (req: Request, res: Response) => {
+  res.json({ message: 'Welcome to MGX AI Platform API' });
+});
+
+// Error handling middleware
 app.use(errorHandler);
 
-// 启动服务器
+// Start server
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
