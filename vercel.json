@@ -28,7 +28,7 @@
     }
   ],
   "functions": {
-    "backend/dist/index.js": {
+    "backend/src/index.ts": {
       "memory": 1024,
       "maxDuration": 10
     }
