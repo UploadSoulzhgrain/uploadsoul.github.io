@@ -7,6 +7,7 @@ on:
     paths:
       - 'server/**'
       - 'package.json'
+      - 'tsconfig.server.json'
       - '.github/workflows/backend-deploy.yml'
 
 jobs:
@@ -32,4 +33,6 @@ jobs:
         uses: amondnet/vercel-action@v20
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          vercel-args: '--prod' 
+          vercel-args: '--prod'
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }} 
