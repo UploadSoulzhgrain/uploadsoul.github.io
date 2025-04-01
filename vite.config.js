@@ -10,7 +10,7 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  base: './', // Change base to relative path for better local file loading
+  base: '/', // Use absolute path for production
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
