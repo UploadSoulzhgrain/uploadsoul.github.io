@@ -1,7 +1,9 @@
 // pages/ShopPage.jsx
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const ShopPage = () => {
+  const { t } = useTranslation();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
@@ -187,7 +189,7 @@ const ShopPage = () => {
         {/* Page Header */}
         <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">模拟商城</h1>
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t('header.shop')}</h1>
             <p className="text-gray-600 mt-1">选购虚拟物品，升级您的AI伙伴体验</p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center">
