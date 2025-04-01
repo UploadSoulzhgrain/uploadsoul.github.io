@@ -30,7 +30,9 @@ jobs:
         run: npm run build:server
 
       - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v20
+        uses: vercel/action@v2
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod' 
