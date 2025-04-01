@@ -8,6 +8,10 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { t } = useTranslation();
 
+  const handleLanguageChange = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <header className="bg-white bg-opacity-95 backdrop-blur-sm shadow-md sticky top-0 z-50 transition-all duration-300">
       <div className="container mx-auto px-4 py-3">
@@ -54,7 +58,7 @@ const Header = () => {
 
           {/* User Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <LanguageSelector />
+            <LanguageSelector onLanguageChange={handleLanguageChange} />
             <Link 
               to="/login" 
               className="text-gray-700 hover:text-purple-600 transition-colors duration-200 px-3 py-1.5 rounded-md hover:bg-gray-50 border border-transparent hover:border-gray-200"
@@ -148,7 +152,7 @@ const Header = () => {
               </Link>
               <div className="pt-4 border-t border-gray-200 mt-2 space-y-3">
                 <div className="px-3">
-                  <LanguageSelector />
+                  <LanguageSelector onLanguageChange={handleLanguageChange} />
                 </div>
                 <div className="flex flex-col space-y-2 px-3">
                   <Link 
