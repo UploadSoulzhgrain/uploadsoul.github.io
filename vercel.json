@@ -1,8 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm install && npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
   "builds": [
     {
       "src": "package.json",
@@ -26,6 +23,9 @@
       "dest": "/$1"
     }
   ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "framework": "vite",
   "env": {
     "NODE_ENV": "production",
     "MONGODB_URI": "@mongodb-uri",
