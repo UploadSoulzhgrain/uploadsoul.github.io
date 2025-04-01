@@ -10,7 +10,8 @@ export default defineConfig({
       '@': resolve(__dirname, 'src'),
     },
   },
-  base: '/', // Use absolute path for production
+  root: '.',
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -18,6 +19,9 @@ export default defineConfig({
     sourcemap: true,
     // Improve chunking strategy
     rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html')
+      },
       output: {
         manualChunks: {
           vendor: [
