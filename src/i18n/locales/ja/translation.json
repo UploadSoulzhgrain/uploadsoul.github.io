@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "UploadSoul - バーチャル世界、デジタル不死",
+    "description": "UploadSoul - ホログラフィック感情伴侶、仮想ペット、デジタル不死などのサービス"
+  },
+  "header": {
+    "home": "ホーム",
+    "explore": "探索",
+    "companions": "伴侶",
+    "about": "について",
+    "login": "ログイン",
+    "signup": "登録",
+    "language": "言語",
+    "shop": "バーチャルモール"
+  },
+  "digitalHuman": {
+    "title": "デジタルヒューマン",
+    "description": "あなたの愛する人のデジタルヒューマンを作成し、いつでもどこでも会話を楽しめます。",
+    "createNew": "新規作成",
+    "voiceChat": {
+      "welcome": "こんにちは、{name}です。お話ししましょう。",
+      "defaultName": "デジタルヒューマン",
+      "companion": "デジタルコンパニオン",
+      "tapToTalk": "タップして話す",
+      "tapToStop": "タップして停止",
+      "thinking": "考え中...",
+      "play": "再生",
+      "userAudioMessage": "音声メッセージ",
+      "microphoneError": "マイクへのアクセスができません",
+      "processingError": "音声の処理中にエラーが発生しました",
+      "serverError": "サーバーとの通信に問題が発生しました",
+      "fallbackToText": "音声録音が利用できません。テキストチャットをご利用ください。",
+      "fallbackMessage": "現在デモモードです。",
+      "responses": {
+        "howAreYou": "今日はどうですか？",
+        "goodMemories": "一緒に過ごした素敵な思い出がありますね。",
+        "missYou": "あなたのことをいつも考えています。",
+        "loveTalking": "あなたとの会話が大好きです。",
+        "rememberWhen": "あの日のことを覚えていますか？素晴らしい時間でした。"
+      }
+    },
+    "intro": "このデジタルヒューマンと会話し、大切な思い出を探索し、その個性や考えを体験することができます。",
+    "startVoiceChat": "音声チャットを開始",
+    "memories": {
+      "title": "メモリーライブラリ",
+      "addNew": "新しい思い出を追加",
+      "added": "思い出が追加されました",
+      "placeholder": "この人についての大切な思い出を記録...",
+      "save": "保存"
+    },
+    "reunionFeatures": {
+      "title": "家族再会",
+      "description": "インタラクティブな家系図を通じて家族のつながりを探索し、家族の歴史を保存します。"
+    }
+  },
+  "footer": {
+    "aboutUs": "会社概要",
+    "privacyPolicy": "プライバシーポリシー",
+    "termsOfService": "利用規約",
+    "contactUs": "お問い合わせ",
+    "copyright": "すべての権利を保有。",
+    "services": "サービス",
+    "aboutCompany": "会社紹介",
+    "team": "チームメンバー",
+    "contact": "お問い合わせ",
+    "joinUs": "採用情報",
+    "contactMethods": "連絡先",
+    "email": "メール",
+    "phone": "電話",
+    "address": "住所",
+    "addressDetails": "カナダ、バンクーバー",
+    "platformName": "バーチャル世界、デジタル不死"
+  },
+  "home": {
+    "hero": {
+      "title": "あなたのデジタル感情伴侶",
+      "subtitle": "先進的なAI技術で感情伴侶の未来を体験してください",
+      "cta": "今すぐ試す"
+    },
+    "features": {
+      "title": "プラットフォームの特徴",
+      "emotionalCompanion": {
+        "title": "ホログラフィック感情伴侶",
+        "description": "独自の性格特性を持つパーソナライズされたAI伴侶を作成"
+      },
+      "virtualPet": {
+        "title": "仮想ペット",
+        "description": "高度なAI行動を備えたデジタルペットを養子にして育てる"
+      },
+      "digitalImmortality": {
+        "title": "デジタル不死",
+        "description": "あなたの記憶と個性をデジタル形式で保存"
+      }
+    },
+    "testimonials": {
+      "title": "ユーザーの声",
+      "seeMore": "もっと見る"
+    }
+  },
+  "companion": {
+    "selectCompanion": "AIコンパニオンを選択",
+    "startConversation": "との会話を開始",
+    "sendMessage": "送信",
+    "inputPlaceholder": "メッセージを入力...",
+    "record": "録音",
+    "uploadImage": "画像をアップロード",
+    "addEmoji": "絵文字を追加"
+  },
+  "auth": {
+    "login": "ログイン",
+    "signup": "登録",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "forgotPassword": "パスワードをお忘れですか？",
+    "orContinueWith": "または次で続行"
+  },
+  "languages": {
+    "en": "English",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}

@@ -1,0 +1,241 @@
+{
+  "app": {
+    "title": "UploadSoul - Virtual World, Digital Immortality",
+    "description": "UploadSoul - Holographic emotional companion, virtual pet, digital immortality and other services"
+  },
+  "digitalHuman": {
+    "title": "Digital Humans",
+    "description": "Create and interact with digital versions of your loved ones",
+    "createButton": "Create Digital Human",
+    "familyTree": "Family Tree",
+    "visualTree": "View Visual Family Tree",
+    "myDigitalHumans": "My Digital Humans",
+    "mediaFiles": "Media Files",
+    "voiceModel": "Voice Model",
+    "noDigitalHumans": "No digital humans yet",
+    "createNew": "Create New",
+    "createDescription": "Create a digital version of your loved ones by uploading photos, voice, and memories",
+    "startCreating": "Start Creating",
+    "created": "Created",
+    "conversationTab": "Conversation",
+    "uploadNewFile": "Upload New File",
+    "conversation": {
+      "inputPlaceholder": "Type a message...",
+      "send": "Send",
+      "description": "Have conversations with your digital human",
+      "intro": "Have a conversation with your digital human using text. Use the voice chat option for spoken conversations.",
+      "startVoiceChat": "Start Voice Chat"
+    },
+    "memories": {
+      "title": "Memories",
+      "addNew": "Add New Memory",
+      "placeholder": "Write a memory or story about this person...",
+      "save": "Save Memory",
+      "description": "These memories help build a more accurate digital representation.",
+      "added": "Memory added successfully",
+      "manuallyAdded": "Manually added"
+    },
+    "errors": {
+      "loadFailed": "Failed to load digital humans"
+    },
+    "reunionFeatures": {
+      "title": "Open Virtual Reunion",
+      "description": "Invite family members to a virtual reunion where you can all interact with your digital human together."
+    },
+    "creation": {
+      "title": "Create Digital Human",
+      "description": "By uploading photos, voice, videos and precious memories, create a digital version of your loved ones to preserve these memories forever.",
+      "previous": "Previous",
+      "next": "Next",
+      "createButton": "Create Digital Human",
+      "step1Title": "Basic Information",
+      "step2Title": "Upload Photos",
+      "step3Title": "Upload Voice Samples",
+      "step4Title": "Upload Videos",
+      "step5Title": "Add Memories",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter name",
+      "relationshipLabel": "Relationship",
+      "selectRelationship": "Select relationship",
+      "photoUploadLabel": "Upload Main Photo",
+      "photoUploadInstruction": "Click or drag and drop photo",
+      "photoUploadFormats": "Supports JPG, PNG formats",
+      "additionalPhotosLabel": "Upload Additional Photos",
+      "voiceUploadLabel": "Upload Voice Samples",
+      "voiceUploadInstruction": "Upload clear voice recordings for better voice model training",
+      "voiceUploadFormats": "Supports MP3, WAV formats",
+      "recordVoice": "Record Voice",
+      "videoUploadLabel": "Upload Videos",
+      "videoUploadInstruction": "Videos help create more realistic digital humans",
+      "videoUploadFormats": "Supports MP4, MOV formats",
+      "memoryLabel": "Add Memories",
+      "memoryPlaceholder": "Share memories, stories, or characteristics...",
+      "privacyNote": "Your data is securely stored and will only be used to create your digital human.",
+      "files": "files selected",
+      "memoryInstruction": "Add stories, memories, and characteristics that make this person special",
+      "addButton": "Add",
+      "addedMemories": "Added Memories:",
+      "changePhoto": "Click to change photo",
+      "uploadVideos": "Click or drag to upload videos",
+      "voiceTipsTitle": "Tips for best results:",
+      "voiceTip1": "Upload at least 3 audio samples of the person speaking",
+      "voiceTip2": "Each clip should be 5-30 seconds in length",
+      "voiceTip3": "Clear audio without background noise works best",
+      "voiceTip4": "Samples should capture the person's natural speaking voice",
+      "uploadVoiceSamples": "Upload Voice Samples",
+      "processing": "Processing your request...",
+      "success": "Digital human created successfully",
+      "error": "Error creating digital human",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe this person...",
+      "relationships": {
+        "parent": "Parent",
+        "child": "Child",
+        "sibling": "Sibling",
+        "grandparent": "Grandparent",
+        "grandchild": "Grandchild",
+        "friend": "Friend",
+        "spouse": "Spouse",
+        "other": "Other"
+      }
+    },
+    "voiceChat": {
+      "welcome": "Hello! I'm {{name}}. How can I talk with you today?",
+      "defaultName": "Digital Human",
+      "companion": "AI Companion",
+      "userAudioMessage": "Voice message sent",
+      "thinking": "Thinking...",
+      "tapToTalk": "Tap to talk",
+      "tapToStop": "Tap to stop",
+      "play": "Play audio",
+      "pause": "Pause audio",
+      "microphoneError": "Error accessing microphone. Please check your permissions.",
+      "responses": {
+        "howAreYou": "It's so good to hear your voice. How have you been?",
+        "goodMemories": "I was just thinking about the good times we had together.",
+        "missYou": "I've missed our conversations. Tell me what's new with you.",
+        "loveTalking": "I love talking with you. It brings back so many memories.",
+        "rememberWhen": "Do you remember when we used to spend hours talking about life?"
+      }
+    },
+    "conversation": {
+      "intro": "You can converse with the digital human, explore precious memories, and experience their personality and thoughts.",
+      "startVoiceChat": "Start Voice Chat"
+    },
+    "memories": {
+      "title": "Memory Library",
+      "addNew": "Add New Memory",
+      "added": "Memory added successfully",
+      "placeholder": "Record a precious memory about this person...",
+      "save": "Save"
+    },
+    "reunionFeatures": {
+      "title": "Family Reunion",
+      "description": "Explore your family connections and preserve your family history through our interactive family tree."
+    }
+  },
+  "header": {
+    "home": "Home",
+    "explore": "Explore",
+    "companions": "Companions",
+    "about": "About",
+    "login": "Login",
+    "signup": "Sign Up",
+    "language": "Language",
+    "shop": "Virtual Mall"
+  },
+  "footer": {
+    "aboutUs": "About Us",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "contactUs": "Contact Us",
+    "copyright": "All rights reserved.",
+    "services": "Our Services",
+    "aboutCompany": "Company Introduction",
+    "team": "Our Team",
+    "contact": "Contact Us",
+    "joinUs": "Join Us",
+    "contactMethods": "Contact Information",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "addressDetails": "Vancouver, Canada",
+    "platformName": "Virtual World, Digital Immortality"
+  },
+  "home": {
+    "hero": {
+      "title": "Your Digital Emotional Companion",
+      "subtitle": "Experience the future of emotional companionship with advanced AI technology",
+      "cta": "Try Now"
+    },
+    "features": {
+      "title": "Platform Features",
+      "emotionalCompanion": {
+        "title": "Holographic Emotional Companion",
+        "description": "Create your personalized AI companion with unique personality traits"
+      },
+      "virtualPet": {
+        "title": "Virtual Pet",
+        "description": "Adopt and nurture digital pets with advanced AI behaviors"
+      },
+      "digitalImmortality": {
+        "title": "Digital Immortality",
+        "description": "Preserve your memories and personality in a digital form"
+      }
+    },
+    "testimonials": {
+      "title": "User Testimonials",
+      "seeMore": "See More"
+    }
+  },
+  "companion": {
+    "selectCompanion": "Select Your AI Companion",
+    "startConversation": "Start a conversation with",
+    "sendMessage": "Send",
+    "inputPlaceholder": "Enter message...",
+    "record": "Record",
+    "uploadImage": "Upload Image",
+    "addEmoji": "Add Emoji"
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "orContinueWith": "Or continue with"
+  },
+  "languages": {
+    "en": "English",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  },
+  "digitalRebirth": {
+    "title": "Digital Rebirth",
+    "description": "Experience digital rebirth with advanced AI technology",
+    "features": {
+      "dataAnalysis": "Advanced Data Analysis",
+      "personalityReconstruction": "Personality Reconstruction",
+      "memorySynthesis": "Memory Synthesis",
+      "learningAlgorithm": "Learning Algorithm"
+    },
+    "startButton": "Start Digital Rebirth"
+  },
+  "games": {
+    "title": "Games",
+    "play": "Play Now",
+    "memory": {
+      "title": "Memory Game",
+      "shortDescription": "Test your memory skills with our fun matching game.",
+      "description": "Match pairs of cards in the fewest number of moves",
+      "newGame": "New Game",
+      "moves": "Moves: {{count}}",
+      "pairs": "Pairs: {{found}} / {{total}}",
+      "time": "Time: {{time}}s",
+      "congrats": "Congratulations!",
+      "stats": "You completed the game in {{moves}} moves and {{time}} seconds",
+      "playAgain": "Play Again"
+    }
+  }
+}

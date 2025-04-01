@@ -1,0 +1,16 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm run build"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 100
+restartPolicyType = "on-failure"
+restartPolicyMaxRetries = 3
+
+[deploy.env]
+AWS_REGION = "@aws-region"
+AWS_ACCESS_KEY_ID = "@aws-access-key-id"
+AWS_SECRET_ACCESS_KEY = "@aws-secret-access-key"
+AWS_S3_BUCKET = "@aws-s3-bucket" 

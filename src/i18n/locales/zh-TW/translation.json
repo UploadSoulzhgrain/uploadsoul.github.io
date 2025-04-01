@@ -1,0 +1,123 @@
+{
+  "app": {
+    "title": "UploadSoul 傳靈 虛擬世界，數字永生",
+    "description": "UploadSoul 傳靈 - 全息情感陪伴、虛擬寵物、數字永生等服務"
+  },
+  "header": {
+    "home": "首頁",
+    "explore": "探索",
+    "companions": "伴侶",
+    "about": "關於",
+    "login": "登入",
+    "signup": "註冊",
+    "language": "語言",
+    "shop": "虛擬商城"
+  },
+  "digitalHuman": {
+    "title": "數字人類",
+    "description": "創建您所愛的人的數字人類，隨時隨地享受對話。",
+    "createNew": "新建",
+    "voiceChat": {
+      "welcome": "您好，我是{name}。讓我們聊天吧。",
+      "defaultName": "數字人類",
+      "companion": "數字伴侶",
+      "tapToTalk": "點擊開始對話",
+      "tapToStop": "點擊停止",
+      "thinking": "思考中...",
+      "play": "播放",
+      "userAudioMessage": "語音訊息",
+      "microphoneError": "無法訪問麥克風",
+      "processingError": "處理語音時出錯",
+      "serverError": "伺服器連接問題",
+      "fallbackToText": "語音錄製不可用。請使用文字聊天。",
+      "fallbackMessage": "現在是演示模式。",
+      "responses": {
+        "howAreYou": "今天感覺如何？",
+        "goodMemories": "我們一起度過了美好的時光。",
+        "missYou": "我一直在想你。",
+        "loveTalking": "我喜歡與你交談。",
+        "rememberWhen": "記得那天嗎？那是很美好的時光。"
+      }
+    },
+    "intro": "您可以與數字人類交談，探索珍貴記憶，體驗他們的個性和思想。",
+    "startVoiceChat": "開始語音聊天",
+    "memories": {
+      "title": "記憶庫",
+      "addNew": "添加新記憶",
+      "added": "成功添加記憶",
+      "placeholder": "記錄關於這個人的珍貴記憶...",
+      "save": "保存"
+    },
+    "reunionFeatures": {
+      "title": "家庭團聚",
+      "description": "透過互動式家譜探索您的家庭連結並保存家族歷史。"
+    }
+  },
+  "footer": {
+    "aboutUs": "關於我們",
+    "privacyPolicy": "隱私政策",
+    "termsOfService": "服務條款",
+    "contactUs": "聯絡我們",
+    "copyright": "版權所有。",
+    "services": "產品服務",
+    "aboutCompany": "公司介紹",
+    "team": "團隊成員",
+    "contact": "聯絡我們",
+    "joinUs": "加入我們",
+    "contactMethods": "聯絡方式",
+    "email": "郵箱",
+    "phone": "電話",
+    "address": "地址",
+    "addressDetails": "加拿大溫哥華",
+    "platformName": "傳靈 虛擬世界，數字永生"
+  },
+  "home": {
+    "hero": {
+      "title": "您的數字情感伴侶",
+      "subtitle": "通過先進的AI技術體驗情感陪伴的未來",
+      "cta": "立即體驗"
+    },
+    "features": {
+      "title": "平台特色",
+      "emotionalCompanion": {
+        "title": "全息情感陪伴",
+        "description": "創建您的個性化AI伴侶，擁有獨特的性格特點"
+      },
+      "virtualPet": {
+        "title": "虛擬寵物",
+        "description": "領養並培養具有高級AI行為的數字寵物"
+      },
+      "digitalImmortality": {
+        "title": "數字永生",
+        "description": "以數字形式保存您的記憶和個性"
+      }
+    },
+    "testimonials": {
+      "title": "用戶評價",
+      "seeMore": "查看更多"
+    }
+  },
+  "companion": {
+    "selectCompanion": "選擇您的AI夥伴",
+    "startConversation": "開始與以下對象的對話",
+    "sendMessage": "發送",
+    "inputPlaceholder": "輸入訊息...",
+    "record": "錄音",
+    "uploadImage": "上傳圖片",
+    "addEmoji": "添加表情"
+  },
+  "auth": {
+    "login": "登入",
+    "signup": "註冊",
+    "email": "電子郵件",
+    "password": "密碼",
+    "forgotPassword": "忘記密碼？",
+    "orContinueWith": "或繼續使用"
+  },
+  "languages": {
+    "en": "English",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語"
+  }
+}
