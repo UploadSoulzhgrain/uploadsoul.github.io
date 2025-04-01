@@ -1,0 +1,76 @@
+{
+  "app": {
+    "title": "UploadSoul - Vida Digital, Compañía Eterna",
+    "description": "UploadSoul - Compañeros AI Emocionales, Mascotas Virtuales, Servicios de Inmortalidad Digital"
+  },
+  "header": {
+    "home": "Inicio",
+    "explore": "Explorar",
+    "companions": "Compañero Emocional",
+    "digitalLife": "Vida Digital",
+    "virtualLove": "Amor Virtual",
+    "about": "Acerca de",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "language": "Idioma",
+    "shop": "Tienda"
+  },
+  "footer": {
+    "aboutUs": "Sobre Nosotros",
+    "privacyPolicy": "Política de Privacidad",
+    "termsOfService": "Términos de Servicio",
+    "contactUs": "Contáctanos",
+    "copyright": "Todos los derechos reservados.",
+    "services": "Nuestros Servicios",
+    "aboutCompany": "Introducción de la Empresa",
+    "team": "Nuestro Equipo",
+    "contact": "Contáctanos",
+    "joinUs": "Únete a Nosotros",
+    "contactMethods": "Información de Contacto",
+    "email": "Correo Electrónico",
+    "phone": "Teléfono",
+    "address": "Dirección",
+    "addressDetails": "Vancouver, Canadá",
+    "platformName": "Mundo Virtual, Inmortalidad Digital"
+  },
+  "home": {
+    "hero": {
+      "title": "Tu Compañero Emocional Digital",
+      "subtitle": "Mundo Virtual, Inmortalidad Digital",
+      "description": "Crea tu compañero digital personalizado, compañía eterna más allá del tiempo",
+      "cta": "Comenzar Experiencia"
+    },
+    "features": {
+      "title": "Características de la Plataforma",
+      "description": "Experiencia digital del alma de dimensiones completas, haciendo cada interacción cálida y emocional",
+      "emotionalCompanion": {
+        "title": "Compañero Emocional",
+        "description": "Basado en tecnología avanzada de computación emocional, proporcionando apoyo y comprensión emocional personalizada"
+      },
+      "virtualPet": {
+        "title": "Compañero Virtual",
+        "description": "Diversos compañeros virtuales AI para satisfacer las necesidades de compañía en diferentes escenarios"
+      },
+      "digitalImmortality": {
+        "title": "Inmortalidad Digital",
+        "description": "Rompe las limitaciones del tiempo y el espacio, digitaliza tus pensamientos, recuerdos y personalidad para lograr una continuación eterna de la vida"
+      }
+    },
+    "cta": {
+      "title": "Comienza tu Viaje con Compañero AI Ahora",
+      "description": "No importa cuándo ni dónde, siempre hay un compañero digital para ti"
+    },
+    "testimonials": {
+      "title": "Testimonios de Usuarios",
+      "seeMore": "Ver Más"
+    }
+  },
+  "languages": {
+    "en": "English",
+    "zh-CN": "简体中文",
+    "zh-TW": "繁體中文",
+    "ja": "日本語",
+    "ko": "한국어",
+    "es": "Español"
+  }
+} 

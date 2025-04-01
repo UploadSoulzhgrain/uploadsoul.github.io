@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "UploadSoul - Virtual World, Digital Immortality",
-    "description": "UploadSoul - Holographic emotional companion, virtual pet, digital immortality and other services"
+    "title": "UploadSoul - Digital Life, Eternal Companionship",
+    "description": "UploadSoul - Emotional AI Companions, Virtual Pets, Digital Immortality Services"
   },
   "digitalHuman": {
     "title": "Digital Humans",
@@ -137,12 +137,14 @@
   "header": {
     "home": "Home",
     "explore": "Explore",
-    "companions": "Companions",
+    "companions": "Emotional Companion",
+    "digitalLife": "Digital Life",
+    "virtualLove": "Virtual Love",
     "about": "About",
     "login": "Login",
     "signup": "Sign Up",
     "language": "Language",
-    "shop": "Virtual Mall"
+    "shop": "Shop"
   },
   "footer": {
     "aboutUs": "About Us",
@@ -165,23 +167,29 @@
   "home": {
     "hero": {
       "title": "Your Digital Emotional Companion",
-      "subtitle": "Experience the future of emotional companionship with advanced AI technology",
-      "cta": "Try Now"
+      "subtitle": "Virtual World, Digital Immortality",
+      "description": "Create your personalized digital companion, eternal companionship beyond time",
+      "cta": "Start Experience"
     },
     "features": {
       "title": "Platform Features",
+      "description": "Full-dimensional digital soul experience, making every interaction warm and emotional",
       "emotionalCompanion": {
-        "title": "Holographic Emotional Companion",
-        "description": "Create your personalized AI companion with unique personality traits"
+        "title": "Emotional Companion",
+        "description": "Based on advanced emotional computing technology, providing personalized emotional support and understanding"
       },
       "virtualPet": {
-        "title": "Virtual Pet",
-        "description": "Adopt and nurture digital pets with advanced AI behaviors"
+        "title": "Virtual Partner",
+        "description": "Diverse AI virtual partners to meet companionship needs in different scenarios"
       },
       "digitalImmortality": {
         "title": "Digital Immortality",
-        "description": "Preserve your memories and personality in a digital form"
+        "description": "Break through time and space limitations, digitize your thoughts, memories, and personality to achieve eternal life continuation"
       }
+    },
+    "cta": {
+      "title": "Start Your AI Companion Journey Now",
+      "description": "No matter when and where, there's always a digital companion for you"
     },
     "testimonials": {
       "title": "User Testimonials",
@@ -209,7 +217,9 @@
     "en": "English",
     "zh-CN": "简体中文",
     "zh-TW": "繁體中文",
-    "ja": "日本語"
+    "ja": "日本語",
+    "ko": "한국어",
+    "es": "Español"
   },
   "digitalRebirth": {
     "title": "Digital Rebirth",

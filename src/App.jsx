@@ -1,15 +1,25 @@
-import React from 'react';
-import { BrowserRouter } from 'react-router-dom';
-import AppRouter from './core/router';
-import AnimationStyles from './components/animations/AnimationStyles';
+import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Header from './components/layout/Header'
+import Footer from './components/layout/Footer'
+import HomePage from './pages/HomePage'
+import AnimationStyles from './components/animations/AnimationStyles'
 
 function App() {
   return (
-    <BrowserRouter>
-      <AnimationStyles />
-      <AppRouter />
-    </BrowserRouter>
-  );
+    <Router>
+      <div className="flex flex-col min-h-screen">
+        <AnimationStyles />
+        <Header />
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </Router>
+  )
 }
 
-export default App;
+export default App

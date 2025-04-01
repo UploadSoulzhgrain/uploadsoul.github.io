@@ -55,25 +55,8 @@
 </head>
 
 <body>
-  <!-- Preloader -->
-  <div class="preloader" id="preloader">
-    <div class="pulse"></div>
-  </div>
-  
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
-  <script>
-    // Hide preloader after content loads
-    window.addEventListener('load', function() {
-      const preloader = document.getElementById('preloader');
-      setTimeout(() => {
-        preloader.classList.add('fade-out');
-        setTimeout(() => {
-          preloader.style.display = 'none';
-        }, 500);
-      }, 1000);
-    });
-  </script>
 </body>
 
 </html>

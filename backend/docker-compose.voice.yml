@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  voice_service:
+    build:
+      context: ./voice_service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8000"  # Map container port 8000 to host port 8002
+    volumes:
+      - ./voice_service:/app  # For development to enable hot-reload
+      - voice_storage:/app/storage  # Persistent storage for audio files
+    environment:
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - STT_PROVIDER=google
+      - TTS_PROVIDER=gtts
+      - STT_DEFAULT_LANGUAGE=en-US
+      - TTS_DEFAULT_LANGUAGE=en-US
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  voice_storage:  # Named volume for persistent storage

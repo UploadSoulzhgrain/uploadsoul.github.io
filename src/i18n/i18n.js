@@ -8,6 +8,7 @@ import zhCNTranslation from './locales/zh-CN/translation.json';
 import zhTWTranslation from './locales/zh-TW/translation.json';
 import jaTranslation from './locales/ja/translation.json';
 import koTranslation from './locales/ko/translation.json';
+import esTranslation from './locales/es/translation.json';
 
 // Also import legacy translations for backward compatibility
 import legacyEnTranslations from '../core/i18n/en';
@@ -33,6 +34,9 @@ const resources = {
   },
   ko: {
     translation: koTranslation
+  },
+  es: {
+    translation: esTranslation
   },
   // Add legacy mappings for backward compatibility
   zh: {
@@ -100,7 +104,8 @@ export const getSupportedLanguages = () => {
     { code: 'zh-TW', name: '中文 (繁體)' },
     { code: 'en', name: 'English' },
     { code: 'ja', name: '日本語' },
-    { code: 'ko', name: '한국어' }
+    { code: 'ko', name: '한국어' },
+    { code: 'es', name: 'Spanish' }
   ];
 };
 

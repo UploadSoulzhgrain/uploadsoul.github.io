@@ -27,7 +27,7 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link to="/companion" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('companion.selectCompanion')}</span>
+              <span>{t('header.companions')}</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link to="/pet" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
@@ -35,11 +35,7 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link to="/digital-human" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('digitalHuman.title')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/vr" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>VR</span>
+              <span>{t('header.digitalLife')}</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link to="/digital-rebirth" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
@@ -47,7 +43,7 @@ const Header = () => {
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link to="/digital-human/create" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('digitalHuman.createButton')}</span>
+              <span>{t('header.virtualLove')}</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
             <Link to="/shop" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
@@ -108,7 +104,7 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <span className="w-1 h-5 bg-gradient-to-b from-purple-600 to-indigo-500 rounded-full mr-2 opacity-0 group-hover:opacity-100"></span>
-                {t('companion.selectCompanion')}
+                {t('header.companions')}
               </Link>
               <Link 
                 to="/pet" 
@@ -124,15 +120,7 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <span className="w-1 h-5 bg-gradient-to-b from-purple-600 to-indigo-500 rounded-full mr-2 opacity-0 group-hover:opacity-100"></span>
-                {t('digitalHuman.title')}
-              </Link>
-              <Link 
-                to="/vr" 
-                className="px-3 py-3 text-gray-700 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200 flex items-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span className="w-1 h-5 bg-gradient-to-b from-purple-600 to-indigo-500 rounded-full mr-2 opacity-0 group-hover:opacity-100"></span>
-                VR
+                {t('header.digitalLife')}
               </Link>
               <Link 
                 to="/digital-rebirth" 
@@ -148,7 +136,7 @@ const Header = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 <span className="w-1 h-5 bg-gradient-to-b from-purple-600 to-indigo-500 rounded-full mr-2 opacity-0 group-hover:opacity-100"></span>
-                {t('digitalHuman.createButton')}
+                {t('header.virtualLove')}
               </Link>
               <Link 
                 to="/shop" 

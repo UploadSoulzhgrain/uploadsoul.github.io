@@ -1,0 +1,163 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - api-gateway
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+  api-gateway:
+    build:
+      context: ./api_gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - GATEWAY_DEBUG=true
+    volumes:
+      - ./api_gateway:/app
+    depends_on:
+      - user-service
+      - companion-service
+      - auth-service
+      - voice-service
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+  auth-service:
+    build:
+      context: ./auth_service
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - AUTH_DEBUG=true
+      - AUTH_DB_HOST=postgres
+      - AUTH_DB_PORT=5432
+      - AUTH_DB_USER=postgres
+      - AUTH_DB_PASSWORD=postgres
+      - AUTH_DB_NAME=auth_db
+      - AUTH_JWT_SECRET=your_secure_jwt_secret_key
+    volumes:
+      - ./auth_service:/app
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+  user-service:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - USER_DEBUG=true
+      - USER_DB_HOST=postgres
+      - USER_DB_PORT=5432
+      - USER_DB_USER=postgres
+      - USER_DB_PASSWORD=postgres
+      - USER_DB_NAME=user_db
+    volumes:
+      - ./user_service:/app
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+  companion-service:
+    build:
+      context: ./companion_service
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - COMPANION_DEBUG=true
+      - COMPANION_DB_HOST=postgres
+      - COMPANION_DB_PORT=5432
+      - COMPANION_DB_USER=postgres
+      - COMPANION_DB_PASSWORD=postgres
+      - COMPANION_DB_NAME=companion_db
+    volumes:
+      - ./companion_service:/app
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+  voice-service:
+    build:
+      context: ./voice_service
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=true
+      - LOG_LEVEL=INFO
+      - CORS_ORIGINS=*
+      - STT_PROVIDER=google
+      - TTS_PROVIDER=local
+      - STT_DEFAULT_LANGUAGE=en-US
+      - TTS_DEFAULT_VOICE=en-US-Standard-A
+    volumes:
+      - ./voice_service:/app
+      - voice_storage:/data/storage
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  postgres:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_MULTIPLE_DATABASES=auth_db,user_db,companion_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - uploadsoul-network
+
+networks:
+  uploadsoul-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  voice_storage:

@@ -6,7 +6,9 @@
   "header": {
     "home": "首页",
     "explore": "探索",
-    "companions": "伴侣",
+    "companions": "情感陪伴",
+    "digitalLife": "数字永生",
+    "virtualLove": "虚拟恋爱",
     "about": "关于",
     "login": "登录",
     "signup": "注册",
@@ -34,23 +36,29 @@
   "home": {
     "hero": {
       "title": "您的数字情感伴侣",
-      "subtitle": "通过先进的AI技术体验情感陪伴的未来",
-      "cta": "立即体验"
+      "subtitle": "虚拟世界，数字永生",
+      "description": "打造您专属的数字伴侣，超越时间的永恒陪伴",
+      "cta": "开始体验"
     },
     "features": {
       "title": "平台特色",
+      "description": "全维度数字灵魂体验，让每一次互动充满温度与情感",
       "emotionalCompanion": {
-        "title": "全息情感陪伴",
-        "description": "创建您的个性化AI伴侣，拥有独特的性格特点"
+        "title": "情感陪伴",
+        "description": "基于先进的情感计算技术，为您提供专属的情感支持和理解"
       },
       "virtualPet": {
-        "title": "虚拟宠物",
-        "description": "领养并培养具有高级AI行为的数字宠物"
+        "title": "虚拟伙伴",
+        "description": "多样化的AI虚拟伙伴，满足不同场景下的陪伴需求"
       },
       "digitalImmortality": {
         "title": "数字永生",
-        "description": "以数字形式保存您的记忆和个性"
+        "description": "突破时空限制，将您的思想、记忆和性格数字化，实现永恒的生命延续"
       }
+    },
+    "cta": {
+      "title": "立即开启您的AI陪伴之旅",
+      "description": "无论何时何地，都有专属于您的数字伙伴"
     },
     "testimonials": {
       "title": "用户评价",
@@ -78,7 +86,9 @@
     "en": "English",
     "zh-CN": "简体中文",
     "zh-TW": "繁體中文",
-    "ja": "日本語"
+    "ja": "日本語",
+    "ko": "韩语",
+    "es": "西班牙语"
   },
   "digitalRebirth": {
     "title": "数字重生",
