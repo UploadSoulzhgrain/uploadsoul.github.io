@@ -24,7 +24,7 @@
     }
   ],
   "buildCommand": "npm run build",
-  "installCommand": "npm ci",
+  "installCommand": "npm install",
   "framework": "vite",
   "env": {
     "NODE_ENV": "production",
