@@ -8,10 +8,6 @@
         "distDir": "dist",
         "buildCommand": "npm run build"
       }
-    },
-    {
-      "src": "server/index.ts",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -19,10 +15,6 @@
       "src": "^/assets/(.*)",
       "headers": { "cache-control": "public, max-age=31536000, immutable" },
       "continue": true
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/index.ts"
     },
     {
       "handle": "filesystem"
@@ -40,25 +32,5 @@
       "dest": "/index.html"
     }
   ],
-  "framework": "vite",
-  "env": {
-    "NODE_ENV": "production",
-    "MONGODB_URI": "@mongodb-uri",
-    "JWT_SECRET": "@jwt-secret",
-    "JWT_EXPIRES_IN": "7d",
-    "FRONTEND_URL": "https://www.uploadsoul.com",
-    "SMTP_HOST": "@smtp-host",
-    "SMTP_PORT": "@smtp-port",
-    "SMTP_USER": "@smtp-user",
-    "SMTP_PASS": "@smtp-pass",
-    "SMTP_FROM": "@smtp-from",
-    "SMS_ACCESS_KEY_ID": "@sms-access-key-id",
-    "SMS_ACCESS_KEY_SECRET": "@sms-access-key-secret",
-    "SMS_SIGN_NAME": "@sms-sign-name",
-    "SMS_TEMPLATE_CODE": "@sms-template-code",
-    "AWS_REGION": "@aws-region",
-    "AWS_ACCESS_KEY_ID": "@aws-access-key-id",
-    "AWS_SECRET_ACCESS_KEY": "@aws-secret-access-key",
-    "AWS_S3_BUCKET": "@aws-s3-bucket"
-  }
+  "framework": "vite"
 }

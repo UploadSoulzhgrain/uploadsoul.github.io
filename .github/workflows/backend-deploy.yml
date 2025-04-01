@@ -1,14 +1,9 @@
 name: Deploy Backend to Vercel
 
+# Temporarily disable backend deployment
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'server/**'
-      - 'package.json'
-      - 'tsconfig.server.json'
-      - '.github/workflows/backend-deploy.yml'
+  workflow_dispatch:
+    # Manual trigger only
 
 jobs:
   deploy-backend:
