@@ -59,7 +59,7 @@ i18n
       escapeValue: false // Not needed for React as it escapes by default
     },
     detection: {
-      order: ['querystring', 'cookie', 'localStorage', 'navigator'],
+      order: ['localStorage', 'querystring', 'cookie', 'navigator'],
       lookupQuerystring: 'lang',
       lookupCookie: 'i18next',
       lookupLocalStorage: 'i18nextLng',

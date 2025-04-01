@@ -26,6 +26,10 @@ const LanguageSelector = ({ onLanguageChange }) => {
   const changeLanguage = async (langCode) => {
     try {
       await i18n.changeLanguage(langCode);
+      // Save language preference to localStorage
+      localStorage.setItem('i18nextLng', langCode);
+      // Force i18n to use the saved language
+      i18n.language = langCode;
       setIsOpen(false);
       if (onLanguageChange) {
         onLanguageChange(langCode);
@@ -34,6 +38,14 @@ const LanguageSelector = ({ onLanguageChange }) => {
       console.error('Error changing language:', error);
     }
   };
+
+  // Initialize language from localStorage on component mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('i18nextLng');
+    if (savedLanguage && savedLanguage !== i18n.language) {
+      i18n.changeLanguage(savedLanguage);
+    }
+  }, []);
 
   // Close dropdown when clicking outside
   useEffect(() => {
