@@ -2,11 +2,16 @@
 node_modules/
 dist/
 dist-ssr
+.pnp/
+.pnp.js
 
 # Environment
 .env
 .env.local
 .env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Uploads
 uploads/
@@ -72,3 +77,6 @@ backend/**/.idea
 !backend/**/Dockerfile
 !backend/**/.env.example
 !backend/**/requirements.txt
+
+# Local backend directory
+backend_local/
