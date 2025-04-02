@@ -57,23 +57,23 @@ const Footer = () => {
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.services')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/companion" className="hover:text-white hover:pl-1 transition-all duration-200">
-                  {t('home.features.emotionalCompanion.title')}
+                <Link to="/companion" className="text-gray-300 hover:text-white transition-colors">
+                  全息情感陪伴
                 </Link>
               </li>
               <li>
-                <Link to="/digital-rebirth" className="hover:text-white hover:pl-1 transition-all duration-200">
-                  {t('digitalRebirth.title')}
+                <Link to="/digital-immortality" className="text-gray-300 hover:text-white transition-colors">
+                  数字永生和重生
                 </Link>
               </li>
               <li>
-                <Link to="/vr" className="hover:text-white hover:pl-1 transition-all duration-200">
-                  {t('home.features.vr.title')}
+                <Link to="/vr" className="text-gray-300 hover:text-white transition-colors">
+                  VR设备
                 </Link>
               </li>
               <li>
-                <Link to="/all-in-one" className="hover:text-white hover:pl-1 transition-all duration-200">
-                  {t('home.features.allInOne.title')}
+                <Link to="/all-in-one" className="text-gray-300 hover:text-white transition-colors">
+                  AI一体机
                 </Link>
               </li>
             </ul>

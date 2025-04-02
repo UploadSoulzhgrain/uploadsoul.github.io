@@ -119,26 +119,24 @@ const HomePage = () => {
           {/* Additional Features Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             {/* 虚拟宠物 */}
-            <Link to="/pet" className="block">
+            <div className="block">
               <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp h-full" style={{animationDelay: '0.7s'}}>
                 <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
                   <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
+                    <FeatureIllustrations type="virtualPet" size="md" />
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.virtualPet.title')}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">虚拟宠物</h3>
                   <p className="text-gray-600 max-w-sm">
-                    {t('home.features.virtualPet.description')}
+                    智能虚拟宠物，带来温暖陪伴
                   </p>
                   <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
                   </div>
                 </div>
               </div>
-            </Link>
+            </div>
 
             {/* VR Experience Feature */}
             <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
