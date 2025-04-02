@@ -119,7 +119,7 @@ const HomePage = () => {
           {/* Additional Features Row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             {/* 虚拟宠物 */}
-            <div className="block">
+            <Link to="/pet" className="block">
               <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp h-full" style={{animationDelay: '0.7s'}}>
                 <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
                   <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
@@ -136,7 +136,7 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </Link>
 
             {/* VR Experience Feature */}
             <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
