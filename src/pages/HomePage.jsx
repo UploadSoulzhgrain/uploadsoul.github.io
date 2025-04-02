@@ -32,7 +32,7 @@ const HomePage = () => {
               <span className="relative z-10">{t('home.hero.cta')}</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </Link>
-            <a href="https://www.mvp-test.uploadsoul.com" target="_blank" rel="noopener noreferrer" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <a href="https://mvp-test.uploadsoul.com" target="_blank" rel="noopener noreferrer" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
               <span className="relative z-10">MVP测试通道</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </a>
