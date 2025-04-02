@@ -44,9 +44,14 @@ const Footer = () => {
             <div className="mb-4">
               <Logo variant="white" size="md" />
             </div>
-            <p className="text-sm text-gray-400">
-              {t('footer.description')}
-            </p>
+            <div>
+              <p className="text-gray-300 mb-2">
+                传灵 - 让爱与记忆永存
+              </p>
+              <p className="text-gray-300">
+                打造专属的数字情感世界
+              </p>
+            </div>
           </div>
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-200">
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.services')}</h4>
