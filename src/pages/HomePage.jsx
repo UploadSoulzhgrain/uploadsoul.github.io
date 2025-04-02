@@ -28,7 +28,7 @@ const HomePage = () => {
             {t('home.hero.description')}
           </p>
           <div className="flex justify-center space-x-4 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
-            <Link to="/companion" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <Link to="/digital-human" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
               <span className="relative z-10">{t('home.hero.cta')}</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </Link>
@@ -49,44 +49,30 @@ const HomePage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Digital Immortality Feature */}
             <Link to="/digital-human" className="block">
-              <div className="p-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.1s'}}>
+              <div className="p-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.5s'}}>
                 <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-center text-white mb-3">{t('home.features.digitalImmortality.title')}</h3>
+                <h3 className="text-xl font-bold text-center text-white mb-3">{t('digitalImmortality.title')}</h3>
                 <p className="text-white text-center opacity-90">
-                  {t('home.features.digitalImmortality.description')}
+                  {t('digitalImmortality.description')}
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">立即体验</span>
+                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('digitalImmortality.startButton')}</span>
                 </div>
                 <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
                   <div className="h-full w-1/2 bg-white animate-shimmer"></div>
                 </div>
               </div>
             </Link>
-            
-            {/* Emotional Companion Feature */}
-            <div className="p-8 bg-white border border-purple-100 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-              <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 animate-bounce">
-                <FeatureIllustrations type="emotionalCompanion" size="lg" />
-              </div>
-              <h3 className="text-xl font-bold text-center text-gray-900 mb-3">{t('home.features.emotionalCompanion.title')}</h3>
-              <p className="text-gray-600 text-center">
-                {t('home.features.emotionalCompanion.description')}
-              </p>
-              <div className="flex justify-center mt-4">
-                <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">AI 情感分析</span>
-              </div>
-            </div>
-            
+
             {/* Digital Rebirth Feature */}
             <Link to="/digital-rebirth" className="block">
-              <div className="p-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.5s'}}>
+              <div className="p-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp" style={{animationDelay: '0.5s'}}>
                 <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -106,10 +92,7 @@ const HomePage = () => {
                 </div>
               </div>
             </Link>
-          </div>
-          
-          {/* Additional Features Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+
             {/* Virtual Partner Feature */}
             <div className="p-8 bg-white border border-purple-100 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group animate-fadeInUp" style={{animationDelay: '0.5s'}}>
               <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110">
@@ -118,9 +101,9 @@ const HomePage = () => {
                   <div className="absolute -top-1 -right-1 bg-indigo-500 rounded-full w-6 h-6 flex items-center justify-center text-white text-xs font-bold animate-pulse-slow">+</div>
                 </div>
               </div>
-              <h3 className="text-xl font-bold text-center text-gray-900 mb-3">{t('home.features.virtualPet.title')}</h3>
+              <h3 className="text-xl font-bold text-center text-gray-900 mb-3">{t('home.features.emotionalCompanion.title')}</h3>
               <p className="text-gray-600 text-center">
-                {t('home.features.virtualPet.description')}
+                {t('home.features.emotionalCompanion.description')}
               </p>
               <div className="flex justify-center space-x-1 mt-4">
                 <span className="w-2 h-2 rounded-full bg-green-500"></span>
@@ -128,6 +111,30 @@ const HomePage = () => {
                 <span className="w-2 h-2 rounded-full bg-purple-500"></span>
               </div>
             </div>
+          </div>
+          
+          {/* Additional Features Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            {/* 虚拟宠物 */}
+            <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
+              <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
+                <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.virtualPet.title')}</h3>
+                <p className="text-gray-600 max-w-sm">
+                  {t('home.features.virtualPet.description')}
+                </p>
+                <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
+                </div>
+              </div>
+            </div>
+
             {/* VR Experience Feature */}
             <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
               <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">

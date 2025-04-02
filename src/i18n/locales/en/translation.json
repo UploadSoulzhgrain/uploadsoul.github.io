@@ -138,8 +138,8 @@
     "home": "Home",
     "explore": "Explore",
     "companions": "Emotional Companion",
-    "digitalLife": "Digital Life",
     "virtualLove": "Virtual Love",
+    "digitalLife": "Digital Immortality",
     "about": "About",
     "login": "Login",
     "signup": "Sign Up",
@@ -221,16 +221,103 @@
     "ko": "한국어",
     "es": "Español"
   },
+  "digitalImmortality": {
+    "title": "Digital Immortality",
+    "description": "Achieve digital immortality through AI technology, preparing for future brain-computer interfaces",
+    "features": {
+      "memoryDigitization": "Memory Digitization",
+      "aiTraining": "AI Training System",
+      "hardwareIntegration": "Hardware Integration",
+      "continuousEvolution": "Continuous Evolution"
+    },
+    "startButton": "Start Digital Immortality",
+    "steps": {
+      "upload": "Upload Photos",
+      "personality": "Set Personality",
+      "confirm": "Confirm Information"
+    },
+    "form": {
+      "name": "Your Name",
+      "photos": "Upload Photos",
+      "personality": "Personality Traits",
+      "memories": "Important Memories",
+      "voice": "Voice Sample"
+    },
+    "placeholders": {
+      "name": "Enter your name",
+      "personality": "Describe your personality traits",
+      "memories": "Share some important memories",
+      "voice": "Upload a voice sample"
+    },
+    "hints": {
+      "photos": "Recommended: 3-5 photos from different angles",
+      "voice": "Recommended: 1-2 minutes of clear voice recording"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Start Creation"
+    }
+  },
   "digitalRebirth": {
     "title": "Digital Rebirth",
-    "description": "Experience digital rebirth with advanced AI technology",
-    "features": {
-      "dataAnalysis": "Advanced Data Analysis",
-      "personalityReconstruction": "Personality Reconstruction",
-      "memorySynthesis": "Memory Synthesis",
-      "learningAlgorithm": "Learning Algorithm"
+    "description": "Achieve digital rebirth through AI technology, allowing your memories and consciousness to be reborn in the virtual world",
+    "startButton": "Start Digital Rebirth",
+    "steps": {
+      "upload": "Upload Photos",
+      "personality": "Set Personality",
+      "confirm": "Confirm Information"
     },
-    "startButton": "Start Digital Rebirth"
+    "form": {
+      "name": "Your Name",
+      "photos": "Upload Photos",
+      "personality": "Personality Traits",
+      "memories": "Important Memories",
+      "voice": "Voice Sample"
+    },
+    "placeholders": {
+      "name": "Enter your name",
+      "personality": "Describe your personality traits",
+      "memories": "Share some important memories",
+      "voice": "Upload a voice sample"
+    },
+    "hints": {
+      "photos": "Recommended: 3-5 photos from different angles",
+      "voice": "Recommended: 1-2 minutes of clear voice recording"
+    },
+    "navigation": {
+      "previous": "Previous",
+      "next": "Next",
+      "submit": "Start Creation"
+    }
+  },
+  "virtualLove": {
+    "title": "Virtual Love",
+    "description": "Create your exclusive digital companion and experience romance beyond reality",
+    "steps": {
+      "upload": "Upload Photos",
+      "personality": "Set Personality",
+      "review": "Review"
+    },
+    "form": {
+      "name": "Name",
+      "namePlaceholder": "Enter your name",
+      "photos": "Photos",
+      "uploadButton": "Upload Photos",
+      "orDragDrop": "or drag and drop files here",
+      "uploadHint": "Supports JPG, PNG formats, up to 5 photos",
+      "personality": "Personality Traits",
+      "personalityPlaceholder": "Describe your personality traits, interests, etc.",
+      "memories": "Important Memories",
+      "memoriesPlaceholder": "Share some important memories and experiences",
+      "voice": "Voice Sample",
+      "noVoice": "Not uploaded",
+      "submit": "Create Digital Companion"
+    }
+  },
+  "common": {
+    "previous": "Previous",
+    "next": "Next"
   },
   "games": {
     "title": "Games",
