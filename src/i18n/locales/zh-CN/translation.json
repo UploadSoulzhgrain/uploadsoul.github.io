@@ -16,6 +16,7 @@
     "shop": "虚拟商城"
   },
   "footer": {
+    "description": "传灵 - 让爱与记忆永存，打造专属的数字情感世界",
     "aboutUs": "关于我们",
     "privacyPolicy": "隐私政策",
     "termsOfService": "服务条款",
@@ -54,6 +55,12 @@
       "digitalImmortality": {
         "title": "数字永生",
         "description": "突破时空限制，将您的思想、记忆和性格数字化，实现永恒的生命延续"
+      },
+      "vr": {
+        "title": "VR设备"
+      },
+      "allInOne": {
+        "title": "一体机"
       }
     },
     "cta": {

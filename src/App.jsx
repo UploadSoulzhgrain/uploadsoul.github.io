@@ -34,6 +34,7 @@ function App() {
               <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
               <Route path="/start-experience" element={<DigitalHumanPage />} />
               <Route path="/about" element={<MVPTestPage />} />
+              <Route path="/digital-human-experience" element={<DigitalHumanExperiencePage />} />
             </Routes>
           </main>
           <Footer />

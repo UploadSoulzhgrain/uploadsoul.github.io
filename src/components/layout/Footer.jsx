@@ -44,17 +44,33 @@ const Footer = () => {
             <div className="mb-4">
               <Logo variant="white" size="md" />
             </div>
-            <p className="text-sm">
+            <p className="text-sm text-gray-400">
               {t('footer.description')}
             </p>
           </div>
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-200">
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.services')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/companion" className="hover:text-white hover:pl-1 transition-all duration-200">{t('companion.selectCompanion')}</Link></li>
-              <li><Link to="/pet" className="hover:text-white hover:pl-1 transition-all duration-200">{t('home.features.virtualPet.title')}</Link></li>
-              <li><Link to="/digital-human" className="hover:text-white hover:pl-1 transition-all duration-200">{t('home.features.digitalImmortality.title')}</Link></li>
-              <li><Link to="/vr" className="hover:text-white hover:pl-1 transition-all duration-200">VR</Link></li>
+              <li>
+                <Link to="/companion" className="hover:text-white hover:pl-1 transition-all duration-200">
+                  {t('home.features.emotionalCompanion.title')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/digital-rebirth" className="hover:text-white hover:pl-1 transition-all duration-200">
+                  {t('digitalRebirth.title')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/vr" className="hover:text-white hover:pl-1 transition-all duration-200">
+                  {t('home.features.vr.title')}
+                </Link>
+              </li>
+              <li>
+                <Link to="/all-in-one" className="hover:text-white hover:pl-1 transition-all duration-200">
+                  {t('home.features.allInOne.title')}
+                </Link>
+              </li>
             </ul>
           </div>
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-300">

@@ -189,32 +189,17 @@ const HomePage = () => {
               {t('home.cta.description')}
             </p>
           </div>
-          <div className="flex justify-center space-x-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-            <div className="group inline-block">
-              <Link 
-                to="/register" 
-                className="relative overflow-hidden bg-purple-600 text-white px-8 py-4 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform group-hover:-translate-y-1 text-lg font-medium"
-              >
-                <span className="relative z-10">免费注册</span>
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out animate-gradient"></span>
-              </Link>
-              <div className="mt-2 text-purple-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                开启您的数字灵魂之旅
-              </div>
-            </div>
-            
-            <div className="group inline-block">
-              <Link 
-                to="/digital-human" 
-                className="relative overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-8 py-4 rounded-lg hover:opacity-90 transition shadow-lg hover:shadow-xl transform group-hover:-translate-y-1 text-lg font-medium"
-              >
-                <span className="relative z-10">数字永生</span>
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-500 via-indigo-600 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out animate-gradient"></span>
-              </Link>
-              <div className="mt-2 text-indigo-500 text-sm opacity-0 group-hover:opacity-100 transition-opacity">
-                创建您的数字永生体验
-              </div>
-            </div>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link to="/register" className="w-full sm:w-auto">
+              <button className="w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                免费注册
+              </button>
+            </Link>
+            <Link to="/digital-human-experience" className="w-full sm:w-auto">
+              <button className="w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
+                数字人体验
+              </button>
+            </Link>
           </div>
           
           <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-gradient-to-tl from-purple-300/30 to-indigo-300/30 rounded-full blur-3xl animate-pulse-slow"></div>
