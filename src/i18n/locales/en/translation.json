@@ -334,5 +334,20 @@
       "stats": "You completed the game in {{moves}} moves and {{time}} seconds",
       "playAgain": "Play Again"
     }
+  },
+  "about": {
+    "title": "About UploadSoul",
+    "subtitle": "Building the World's Leading Digital Emotional Companion Platform",
+    "contactUs": "Contact Us",
+    "joinUs": "Join Us",
+    "intro": "UploadSoul is a technology startup registered in Vancouver, Canada, dedicated to building the world's leading digital emotional companion platform based on artificial intelligence and holographic virtual technology. We provide comprehensive, immersive emotional companionship solutions for users.",
+    "vision": "With 'Digital Immortality' and 'Holographic Emotional Companion' as our core competitiveness, UploadSoul has created a new emotional companionship ecosystem by integrating cutting-edge AI, big data, and VR immersive technology. With precise market positioning, advanced technology system, and international strategic layout, we are confident in achieving high-speed growth and capturing a significant share of the global emotional companionship market in the coming years.",
+    "techInnovation": "Technology Innovation",
+    "techInnovationDesc": "Integrating cutting-edge AI, big data, and VR immersive technology to create a unique digital emotional ecosystem",
+    "globalLayout": "Global Layout",
+    "globalLayoutDesc": "International strategic layout, committed to serving global users",
+    "investment": "Angel Round Financing",
+    "investmentDesc": "Currently conducting angel round financing, looking forward to working with you to jointly promote the new era of digital emotions and achieve win-win development.",
+    "contactInvest": "Learn More"
   }
 }
