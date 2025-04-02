@@ -42,7 +42,7 @@ const Header = () => {
               <span>{t('header.virtualLove')}</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
-            <Link to="/digital-human" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
+            <Link to="/digital-immortality" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
               <span>{t('digitalImmortality.title')}</span>
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
             </Link>
@@ -107,7 +107,7 @@ const Header = () => {
                 <Link to="/virtual-love" className="block text-gray-700 hover:text-purple-600 transition">
                   {t('header.virtualLove')}
                 </Link>
-                <Link to="/digital-human" className="block text-gray-700 hover:text-purple-600 transition">
+                <Link to="/digital-immortality" className="block text-gray-700 hover:text-purple-600 transition">
                   {t('digitalImmortality.title')}
                 </Link>
                 <Link to="/digital-rebirth" className="block text-gray-700 hover:text-purple-600 transition">

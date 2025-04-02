@@ -12,6 +12,9 @@ import ShopPage from './pages/ShopPage'
 import DigitalRebirthPage from './pages/DigitalRebirthPage'
 import CreateDigitalHumanPage from './pages/CreateDigitalHumanPage'
 import VirtualLovePage from './pages/VirtualLovePage'
+import DigitalHumanExperiencePage from './pages/DigitalHumanExperiencePage'
+import MVPTestPage from './pages/MVPTestPage'
+import DigitalImmortalityPage from './pages/DigitalImmortalityPage'
 
 function App() {
   return (
@@ -25,10 +28,12 @@ function App() {
               <Route path="/companion" element={<CompanionPage />} />
               <Route path="/pet" element={<PetPage />} />
               <Route path="/virtual-love" element={<VirtualLovePage />} />
-              <Route path="/digital-human" element={<DigitalHumanPage />} />
-              <Route path="/digital-human/create" element={<CreateDigitalHumanPage />} />
+              <Route path="/digital-immortality" element={<DigitalImmortalityPage />} />
+              <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
+              <Route path="/start-experience" element={<DigitalHumanPage />} />
+              <Route path="/about" element={<MVPTestPage />} />
             </Routes>
           </main>
           <Footer />

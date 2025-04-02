@@ -53,7 +53,8 @@ i18n
   // Initialize configuration
   .init({
     resources,
-    fallbackLng: 'zh-CN',
+    lng: 'zh-CN', // 设置默认语言为中文
+    fallbackLng: 'en',
     debug: false, // Set to false for production
     interpolation: {
       escapeValue: false // Not needed for React as it escapes by default
