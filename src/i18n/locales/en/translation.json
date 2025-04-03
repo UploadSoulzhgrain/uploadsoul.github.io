@@ -459,5 +459,80 @@
       "title": "Contact Us",
       "content": "If you have any questions or suggestions about this privacy policy, please contact us at:\nEmail: privacy@uploadsoul.com\nAddress: Vancouver, Canada"
     }
+  },
+  "pet": {
+    "title": "My Virtual Pet",
+    "customize": "Customize Pet",
+    "adopt": "Adopt New Pet",
+    "myPets": "My Pets",
+    "custom": "Custom Pet",
+    "species": {
+      "cat": "Cat",
+      "dog": "Dog",
+      "rabbit": "Rabbit",
+      "bird": "Bird"
+    },
+    "stats": "Stats",
+    "happiness": "Happiness",
+    "energy": "Energy",
+    "health": "Health",
+    "level": "Level",
+    "experience": "Experience",
+    "customFeatures": "Custom Features",
+    "voice": "Voice",
+    "playRealSound": "Play Real Sound",
+    "playCustomVoice": "Play Custom Voice",
+    "memories": "Memories",
+    "actions": {
+      "feed": "Feed",
+      "play": "Play",
+      "sleep": "Sleep",
+      "clean": "Clean"
+    },
+    "selectPrompt": "Please select or adopt a pet",
+    "createNew": "Adopt New Pet",
+    "name": "Pet Name",
+    "namePlaceholder": "Give your pet a name",
+    "customizeTitle": "Customize Your Pet",
+    "photo": "Pet Photo",
+    "video": "Pet Video",
+    "realSound": "Real Sound",
+    "customVoice": "Custom Voice",
+    "addMemory": "Add Memory",
+    "memoryPlaceholder": "Enter a memory about your pet",
+    "personality": "Personality",
+    "personalities": {
+      "friendly": "Friendly",
+      "playful": "Playful",
+      "calm": "Calm",
+      "energetic": "Energetic"
+    },
+    "introduction": {
+      "title": "Virtual Pet Introduction",
+      "customize": {
+        "title": "Customize Pet",
+        "description": "Create your own virtual pet by uploading photos, videos, and sounds. You can:",
+        "features": {
+          "photo": "Upload real photos and videos of your pet",
+          "sound": "Add your pet's real sounds",
+          "voice": "Choose or upload custom voices",
+          "memories": "Add precious memories related to your pet",
+          "personality": "Select your pet's personality traits"
+        },
+        "button": "Start Customizing"
+      },
+      "adopt": {
+        "title": "Adopt New Pet",
+        "description": "Choose from our carefully designed pets to start your virtual pet journey. You can:",
+        "features": {
+          "species": "Choose from different pet types (cat, dog, rabbit, bird)",
+          "name": "Give your pet a unique name",
+          "stats": "Improve your pet's attributes through interactions",
+          "memories": "Record beautiful moments with your pet",
+          "growth": "Nurture your pet's growth and evolution"
+        },
+        "button": "Adopt Now"
+      }
+    }
   }
 }

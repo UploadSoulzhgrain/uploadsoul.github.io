@@ -511,5 +511,80 @@
       "title": "联系我们",
       "content": "如果您对本隐私政策有任何疑问或建议，请通过以下方式联系我们：\n邮箱：privacy@uploadsoul.com\n地址：加拿大温哥华"
     }
+  },
+  "pet": {
+    "title": "我的虚拟宠物",
+    "customize": "定制宠物",
+    "adopt": "领养新宠物",
+    "myPets": "我的宠物",
+    "custom": "定制宠物",
+    "species": {
+      "cat": "猫",
+      "dog": "狗",
+      "rabbit": "兔子",
+      "bird": "鸟"
+    },
+    "stats": "属性",
+    "happiness": "快乐",
+    "energy": "能量",
+    "health": "健康",
+    "level": "等级",
+    "experience": "经验",
+    "customFeatures": "定制功能",
+    "voice": "声音",
+    "playRealSound": "播放真实声音",
+    "playCustomVoice": "播放定制声音",
+    "memories": "记忆",
+    "actions": {
+      "feed": "喂食",
+      "play": "玩耍",
+      "sleep": "睡觉",
+      "clean": "清洁"
+    },
+    "selectPrompt": "请选择或领养一个宠物",
+    "createNew": "领养新宠物",
+    "name": "宠物名称",
+    "namePlaceholder": "给您的宠物起个名字",
+    "customizeTitle": "定制您的宠物",
+    "photo": "宠物照片",
+    "video": "宠物视频",
+    "realSound": "真实声音",
+    "customVoice": "定制声音",
+    "addMemory": "添加记忆",
+    "memoryPlaceholder": "输入关于您宠物的记忆",
+    "personality": "性格",
+    "personalities": {
+      "friendly": "友好",
+      "playful": "活泼",
+      "calm": "安静",
+      "energetic": "精力充沛"
+    },
+    "introduction": {
+      "title": "虚拟宠物介绍",
+      "customize": {
+        "title": "定制宠物",
+        "description": "通过上传照片、视频和声音，创建您专属的虚拟宠物。您可以：",
+        "features": {
+          "photo": "上传宠物的真实照片和视频",
+          "sound": "添加宠物的真实叫声",
+          "voice": "选择或上传定制的声音",
+          "memories": "添加与宠物相关的珍贵记忆",
+          "personality": "选择宠物的性格特征"
+        },
+        "button": "开始定制"
+      },
+      "adopt": {
+        "title": "领养新宠物",
+        "description": "从我们精心设计的宠物中选择一个，开始您的虚拟宠物之旅。您可以：",
+        "features": {
+          "species": "选择不同种类的宠物（猫、狗、兔子、鸟）",
+          "name": "为您的宠物取一个独特的名字",
+          "stats": "通过互动提升宠物的各项属性",
+          "memories": "记录与宠物相处的美好时光",
+          "growth": "培养宠物的成长和进化"
+        },
+        "button": "立即领养"
+      }
+    }
   }
 }
