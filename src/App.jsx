@@ -5,21 +5,21 @@ import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import HomePage from './pages/home-page'
-import CompanionPage from './pages/companion-page'
-import PetPage from './pages/pet-page'
-import DigitalHumanPage from './pages/digital-human-page'
-import ShopPage from './pages/shop-page'
-import DigitalRebirthPage from './pages/digital-rebirth-page'
-import CreateDigitalHumanPage from './pages/create-digital-human-page'
-import VirtualLove from './pages/virtual-love'
-import DigitalHumanExperiencePage from './pages/digital-human-experience-page'
-import MVPTestPage from './pages/mvp-test-page'
-import DigitalImmortalityPage from './pages/digital-immortality-page'
-import AboutPage from './pages/about-page'
-import TeamPage from './pages/team-page'
-import ContactPage from './pages/contact-page'
-import JoinPage from './pages/join-page'
-import VRPage from './pages/vr-page'
+import CompanionPage from './pages/CompanionPage'
+import PetPage from './pages/PetPage'
+import DigitalHumanPage from './pages/DigitalHumanPage'
+import ShopPage from './pages/ShopPage'
+import DigitalRebirthPage from './pages/DigitalRebirthPage'
+import CreateDigitalHumanPage from './pages/CreateDigitalHumanPage'
+import VirtualLovePage from './pages/VirtualLovePage'
+import DigitalHumanExperiencePage from './pages/DigitalHumanExperiencePage'
+import MVPTestPage from './pages/MVPTestPage'
+import DigitalImmortalityPage from './pages/DigitalImmortalityPage'
+import AboutPage from './pages/AboutPage'
+import TeamPage from './pages/TeamPage'
+import ContactPage from './pages/ContactPage'
+import JoinPage from './pages/JoinPage'
+import VRPage from './pages/VRPage'
 import AllInOnePage from './pages/all-in-one-page'
 import PrivacyPage from './pages/privacy-page'
 import TermsPage from './pages/terms-page'
@@ -36,7 +36,7 @@ function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/companion" element={<CompanionPage />} />
               <Route path="/pet" element={<PetPage />} />
-              <Route path="/virtual-love" element={<VirtualLove />} />
+              <Route path="/virtual-love" element={<VirtualLovePage />} />
               <Route path="/digital-immortality" element={<DigitalImmortalityPage />} />
               <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
               <Route path="/shop" element={<ShopPage />} />
