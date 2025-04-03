@@ -9,7 +9,7 @@ export default defineConfig({
     alias: {
       '@': resolve(__dirname, 'src'),
     },
-    extensions: ['.js', '.jsx', '.ts', '.tsx', ''],
+    extensions: ['.mjs', '.js', '.mts', '.ts', '.jsx', '.tsx', '.json'],
     caseSensitive: true
   },
   root: '.',
