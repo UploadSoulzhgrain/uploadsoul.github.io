@@ -219,13 +219,87 @@
     }
   },
   "companion": {
-    "selectCompanion": "Select Your AI Companion",
-    "startConversation": "Start a conversation with",
-    "sendMessage": "Send",
-    "inputPlaceholder": "Enter message...",
-    "record": "Record",
-    "uploadImage": "Upload Image",
-    "addEmoji": "Add Emoji"
+    "ai": {
+      "title": "AI Companion",
+      "description": "Connect with intelligent AI companions for emotional support and companionship. Each AI companion has unique personality and expertise.",
+      "features": {
+        "personality": "Personalized AI companions tailored to your needs",
+        "chat": "Natural and fluid conversation experience",
+        "support": "24/7 emotional support and companionship"
+      },
+      "button": "Start Chat",
+      "select": "Select Your AI Companion",
+      "selectPrompt": "Choose an AI companion to start chatting",
+      "selectDescription": "Select an AI character from the left to begin your emotional companionship journey. Each character has unique personality and traits.",
+      "startChat": "Start chatting with {{name}}",
+      "inputPlaceholder": "Type a message...",
+      "send": "Send",
+      "record": "Record",
+      "uploadImage": "Upload Image",
+      "addEmoji": "Add Emoji"
+    },
+    "elderly": {
+      "title": "Elderly Companion",
+      "description": "Companionship services designed specifically for the elderly, providing daily care, health monitoring, and community interaction.",
+      "features": {
+        "daily": "Daily life reminders and companionship",
+        "health": "Health monitoring and care",
+        "activities": "Rich activity arrangements"
+      },
+      "button": "Learn More",
+      "daily": {
+        "title": "Daily Companion",
+        "reminder": "Smart reminders for medication, meals, and rest",
+        "schedule": "Personalized schedule to maintain regular routines",
+        "activities": "Rich cultural and entertainment activities for daily life"
+      },
+      "health": {
+        "title": "Health Care",
+        "monitor": "Real-time health data monitoring",
+        "medication": "Smart medication reminders and management",
+        "emergency": "One-click emergency assistance"
+      },
+      "community": {
+        "title": "Community Interaction",
+        "groups": "Interest Groups",
+        "groupsDesc": "Join groups with like-minded elderly friends to share life moments",
+        "events": "Offline Events",
+        "eventsDesc": "Participate in diverse community activities to expand social circles",
+        "support": "Mutual Support",
+        "supportDesc": "Build support networks to help each other face life challenges together"
+      }
+    },
+    "therapy": {
+      "title": "Psychological Support",
+      "description": "Professional mental health services providing support and assistance for users with psychological concerns.",
+      "features": {
+        "professional": "Online services from professional counselors",
+        "tools": "Scientific psychological assessment and intervention tools",
+        "support": "Complete privacy protection and emotional support"
+      },
+      "button": "Seek Help",
+      "professional": {
+        "title": "Professional Consultation",
+        "consultants": "One-on-one service from experienced counselors",
+        "schedule": "Flexible scheduling, available anytime",
+        "privacy": "Strict privacy protection mechanisms"
+      },
+      "tools": {
+        "title": "Psychological Tools",
+        "assessment": "Professional psychological assessment scales",
+        "exercises": "Scientific psychological adjustment exercises",
+        "progress": "Personalized progress tracking"
+      },
+      "resources": {
+        "title": "Resource Center",
+        "articles": "Psychological Knowledge Articles",
+        "articlesDesc": "Professional mental health knowledge to help you better understand yourself",
+        "videos": "Psychological Course Videos",
+        "videosDesc": "Practical psychological adjustment techniques, learn anytime, anywhere",
+        "support": "Support Community",
+        "supportDesc": "Connect with friends who share similar experiences for mutual support and encouragement"
+      }
+    }
   },
   "auth": {
     "login": "Login",
