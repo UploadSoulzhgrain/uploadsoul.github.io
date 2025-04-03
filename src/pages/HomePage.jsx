@@ -33,7 +33,7 @@ const HomePage = () => {
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </Link>
             <a href="https://mvp-test.uploadsoul.com" target="_blank" rel="noopener noreferrer" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <span className="relative z-10">MVP测试通道</span>
+              <span className="relative z-10">{t('home.hero.mvpTest')}</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </a>
             <Link to="/about" className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg hover:bg-purple-50 transition shadow hover:shadow-md">
@@ -131,9 +131,9 @@ const HomePage = () => {
                   </div>
                 </div>
                 <div className="flex-grow">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">虚拟宠物</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.virtualPet.title')}</h3>
                   <p className="text-gray-600 max-w-sm">
-                    智能虚拟宠物，带来温暖陪伴
+                    {t('home.features.virtualPet.description')}
                   </p>
                   <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
@@ -150,9 +150,9 @@ const HomePage = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">VR沉浸体验</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.vrExperience.title')}</h3>
                 <p className="text-gray-600 max-w-sm">
-                  通过虚拟现实技术，实现更沉浸式的数字陪伴体验
+                  {t('home.features.vrExperience.description')}
                 </p>
                 <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
@@ -168,9 +168,9 @@ const HomePage = () => {
                 </div>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">数字世界构建</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.digitalWorld.title')}</h3>
                 <p className="text-gray-600 max-w-sm">
-                  创建属于您的专属数字世界，与您的数字伴侣共同探索
+                  {t('home.features.digitalWorld.description')}
                 </p>
                 <div className="w-full h-1 bg-purple-100 rounded-full mt-2 overflow-hidden">
                   <div className="h-full w-3/4 bg-gradient-to-r from-purple-400 to-indigo-400 animate-shimmer"></div>

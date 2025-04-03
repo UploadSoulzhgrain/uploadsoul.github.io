@@ -169,7 +169,8 @@
       "title": "Your Digital Emotional Companion",
       "subtitle": "Virtual World, Digital Immortality",
       "description": "Create your personalized digital companion, eternal companionship beyond time",
-      "cta": "Start Experience"
+      "cta": "Start Experience",
+      "mvpTest": "MVP Test Channel"
     },
     "features": {
       "title": "Platform Features",
@@ -179,12 +180,24 @@
         "description": "Based on advanced emotional computing technology, providing personalized emotional support and understanding"
       },
       "virtualPet": {
-        "title": "Virtual Partner",
-        "description": "Diverse AI virtual partners to meet companionship needs in different scenarios"
+        "title": "Virtual Pet",
+        "description": "Smart virtual pets that bring warm companionship"
+      },
+      "vrExperience": {
+        "title": "VR Immersive Experience",
+        "description": "Achieve more immersive digital companionship through virtual reality technology"
+      },
+      "digitalWorld": {
+        "title": "Digital World Creation",
+        "description": "Create your own digital world and explore it with your digital companions"
       },
       "digitalImmortality": {
         "title": "Digital Immortality",
         "description": "Break through time and space limitations, digitize your thoughts, memories, and personality to achieve eternal life continuation"
+      },
+      "allInOne": {
+        "title": "UploadSoul All-in-One",
+        "description": "Smart device designed for digital emotional companionship, providing immersive experience"
       }
     },
     "cta": {
@@ -349,5 +362,32 @@
     "investment": "Angel Round Financing",
     "investmentDesc": "Currently conducting angel round financing, looking forward to working with you to jointly promote the new era of digital emotions and achieve win-win development.",
     "contactInvest": "Learn More"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "introduction": {
+      "title": "Introduction",
+      "content": "UploadSoul values your privacy. This privacy policy explains how we collect, use, and protect your personal information."
+    },
+    "dataCollection": {
+      "title": "Data Collection",
+      "content": "The information we collect includes but is not limited to: personal information (name, email, contact details, etc.), usage data (access records, interaction data, etc.), uploaded content (photos, videos, text, etc.), and device information (device model, operating system, etc.)."
+    },
+    "dataUse": {
+      "title": "Data Use",
+      "content": "We use the collected information to: provide and improve our services, personalize user experience, send service notifications and updates, prevent fraud and ensure security."
+    },
+    "dataProtection": {
+      "title": "Data Protection",
+      "content": "We implement various security measures to protect your information: data encryption for storage and transmission, access control and permission management, regular security audits, and employee confidentiality training."
+    },
+    "userRights": {
+      "title": "User Rights",
+      "content": "You have the following rights regarding your personal information: access and view personal information, correct or update personal information, delete personal information, and withdraw consent."
+    },
+    "contact": {
+      "title": "Contact Us",
+      "content": "If you have any questions or suggestions about this privacy policy, please contact us at:\nEmail: privacy@uploadsoul.com\nAddress: Vancouver, Canada"
+    }
   }
 }
