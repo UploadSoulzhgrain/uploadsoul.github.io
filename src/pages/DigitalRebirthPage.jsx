@@ -21,79 +21,79 @@ const DigitalRebirthPage = () => {
           <p className="text-xl text-gray-600 text-center mb-12">{t('digitalRebirth.description')}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* 记忆数据化 */}
+            {/* Memory Digitization */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
               className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
             >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.memoryDigitization')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.memoryDigitization.title')}</h2>
               <p className="text-gray-600 mb-4">
-                通过多种方式收集和数字化您的记忆：
+                {t('digitalRebirth.features.memoryDigitization.description')}
               </p>
               <ul className="space-y-2 text-gray-600">
-                <li>• 聊天记录分析</li>
-                <li>• 照片和视频资料</li>
-                <li>• 文字和笔记内容</li>
-                <li>• 语音和视频记录</li>
+                <li>• {t('digitalRebirth.features.memoryDigitization.points.0')}</li>
+                <li>• {t('digitalRebirth.features.memoryDigitization.points.1')}</li>
+                <li>• {t('digitalRebirth.features.memoryDigitization.points.2')}</li>
+                <li>• {t('digitalRebirth.features.memoryDigitization.points.3')}</li>
               </ul>
             </motion.div>
 
-            {/* AI训练系统 */}
+            {/* AI Training System */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
               className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
             >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.aiTraining')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.aiTraining.title')}</h2>
               <p className="text-gray-600 mb-4">
-                先进的AI训练系统：
+                {t('digitalRebirth.features.aiTraining.description')}
               </p>
               <ul className="space-y-2 text-gray-600">
-                <li>• 深度学习模型训练</li>
-                <li>• 自然语言处理优化</li>
-                <li>• 情感识别系统</li>
-                <li>• 个性化行为模拟</li>
+                <li>• {t('digitalRebirth.features.aiTraining.points.0')}</li>
+                <li>• {t('digitalRebirth.features.aiTraining.points.1')}</li>
+                <li>• {t('digitalRebirth.features.aiTraining.points.2')}</li>
+                <li>• {t('digitalRebirth.features.aiTraining.points.3')}</li>
               </ul>
             </motion.div>
 
-            {/* 硬件集成 */}
+            {/* Hardware Integration */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 }}
               className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
             >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.hardwareIntegration')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.hardwareIntegration.title')}</h2>
               <p className="text-gray-600 mb-4">
-                为未来硬件集成做准备：
+                {t('digitalRebirth.features.hardwareIntegration.description')}
               </p>
               <ul className="space-y-2 text-gray-600">
-                <li>• 脑机接口预留</li>
-                <li>• 硬件设备兼容</li>
-                <li>• 数据迁移接口</li>
-                <li>• 实时同步机制</li>
+                <li>• {t('digitalRebirth.features.hardwareIntegration.points.0')}</li>
+                <li>• {t('digitalRebirth.features.hardwareIntegration.points.1')}</li>
+                <li>• {t('digitalRebirth.features.hardwareIntegration.points.2')}</li>
+                <li>• {t('digitalRebirth.features.hardwareIntegration.points.3')}</li>
               </ul>
             </motion.div>
 
-            {/* 持续进化 */}
+            {/* Continuous Evolution */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 }}
               className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
             >
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.continuousEvolution')}</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('digitalRebirth.features.continuousEvolution.title')}</h2>
               <p className="text-gray-600 mb-4">
-                持续学习和进化：
+                {t('digitalRebirth.features.continuousEvolution.description')}
               </p>
               <ul className="space-y-2 text-gray-600">
-                <li>• 自适应学习系统</li>
-                <li>• 记忆更新机制</li>
-                <li>• 性格特征优化</li>
-                <li>• 交互体验提升</li>
+                <li>• {t('digitalRebirth.features.continuousEvolution.points.0')}</li>
+                <li>• {t('digitalRebirth.features.continuousEvolution.points.1')}</li>
+                <li>• {t('digitalRebirth.features.continuousEvolution.points.2')}</li>
+                <li>• {t('digitalRebirth.features.continuousEvolution.points.3')}</li>
               </ul>
             </motion.div>
           </div>
