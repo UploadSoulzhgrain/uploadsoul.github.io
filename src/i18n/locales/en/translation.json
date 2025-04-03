@@ -770,5 +770,40 @@
         "button": "Adopt Now"
       }
     }
+  },
+  "nav": {
+    "digitalWorld": "Digital World"
+  },
+  "digitalWorld": {
+    "title": "Digital World Builder",
+    "description": "Create your own digital world and explore it with your digital companions",
+    "scenes": {
+      "home": {
+        "title": "Cozy Home",
+        "description": "Build your ideal living space and enjoy cozy moments"
+      },
+      "park": {
+        "title": "Nature Park",
+        "description": "Take a walk in the lush park and experience nature's beauty"
+      },
+      "beach": {
+        "title": "Beach Resort",
+        "description": "Enjoy leisurely time on the sunny beach"
+      },
+      "custom": {
+        "title": "Custom Scene",
+        "description": "Create unique scenes based on your preferences"
+      }
+    },
+    "modes": {
+      "single": "Single Player",
+      "multi": "Multiplayer",
+      "couple": "Couple Mode"
+    },
+    "modal": {
+      "title": "Select Experience Mode",
+      "selectMode": "Please select an experience mode",
+      "startExperience": "Start Experience"
+    }
   }
 }

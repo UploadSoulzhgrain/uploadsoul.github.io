@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
 import HeroBackground from '../components/common/HeroBackground';
 import WaveAnimation from '../components/animations/WaveAnimation';
 import AnimationStyles from '../components/animations/AnimationStyles';
@@ -23,9 +22,7 @@ const HomePage = () => {
           </div>
           <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6 animate-fadeInUp">{t('app.title')}</h1>
           <h2 className="text-3xl font-semibold text-purple-600 mb-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-            {t('home.hero.subtitle') === '虚拟世界，数字永生' || t('home.hero.subtitle') === 'Virtual World, Digital Immortality' 
-              ? (t('home.hero.subtitle') === '虚拟世界，数字永生' ? '正在进行天使轮融资，期待与您携手' : 'Currently in Angel Round Financing, Looking Forward to Collaboration') 
-              : t('home.hero.subtitle')}
+            {t('home.hero.subtitle')}
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
             {t('home.hero.description')}
@@ -35,7 +32,7 @@ const HomePage = () => {
               <span className="relative z-10">{t('home.hero.cta')}</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </Link>
-            <a href="https://digital.uploadsoul.com" target="_blank" rel="noopener noreferrer" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+            <a href="https://mvp-test.uploadsoul.com" target="_blank" rel="noopener noreferrer" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
               <span className="relative z-10">{t('home.hero.mvpTest')}</span>
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
             </a>
@@ -146,24 +143,22 @@ const HomePage = () => {
             </Link>
 
             {/* VR Experience Feature */}
-            <Link to="/vr" className="block">
-              <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
-                <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
-                  <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
-                    <FeatureIllustrations type="virtualReality" size="md" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.vrExperience.title')}</h3>
-                  <p className="text-gray-600 max-w-sm">
-                    {t('home.features.vrExperience.description')}
-                  </p>
-                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
-                  </div>
+            <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp" style={{animationDelay: '0.7s'}}>
+              <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
+                <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
+                  <FeatureIllustrations type="virtualReality" size="md" />
                 </div>
               </div>
-            </Link>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.vrExperience.title')}</h3>
+                <p className="text-gray-600 max-w-sm">
+                  {t('home.features.vrExperience.description')}
+                </p>
+                <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
+                </div>
+              </div>
+            </div>
             
             {/* Digital World Feature */}
             <Link to="/digital-world" className="block">
@@ -178,8 +173,8 @@ const HomePage = () => {
                   <p className="text-gray-600 max-w-sm">
                     {t('home.features.digitalWorld.description')}
                   </p>
-                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
+                  <div className="w-full h-1 bg-purple-100 rounded-full mt-2 overflow-hidden">
+                    <div className="h-full w-3/4 bg-gradient-to-r from-purple-400 to-indigo-400 animate-shimmer"></div>
                   </div>
                 </div>
               </div>
@@ -220,4 +215,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default HomePage; 

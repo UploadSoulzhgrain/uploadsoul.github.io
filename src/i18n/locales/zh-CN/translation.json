@@ -959,5 +959,40 @@
         "button": "立即领养"
       }
     }
+  },
+  "nav": {
+    "digitalWorld": "数字世界"
+  },
+  "digitalWorld": {
+    "title": "数字世界构建",
+    "description": "创建属于您的专属数字世界，与您的数字伴侣共同探索",
+    "scenes": {
+      "home": {
+        "title": "温馨家园",
+        "description": "打造您的理想居所，享受温馨时光"
+      },
+      "park": {
+        "title": "自然公园",
+        "description": "在绿意盎然的公园中漫步，感受大自然的魅力"
+      },
+      "beach": {
+        "title": "海滨度假",
+        "description": "在阳光沙滩上享受悠闲时光"
+      },
+      "custom": {
+        "title": "自定义场景",
+        "description": "根据您的喜好，创建独特的场景"
+      }
+    },
+    "modes": {
+      "single": "单人模式",
+      "multi": "多人模式",
+      "couple": "双人模式"
+    },
+    "modal": {
+      "title": "选择体验模式",
+      "selectMode": "请选择体验模式",
+      "startExperience": "开始体验"
+    }
   }
 }
