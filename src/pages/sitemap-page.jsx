@@ -69,6 +69,21 @@ const SitemapPage = () => {
                   传灵一体机
                 </Link>
               </li>
+              <li>
+                <Link to="/digital-rebirth" className="text-purple-400 hover:text-purple-300">
+                  数字重生
+                </Link>
+              </li>
+              <li>
+                <Link to="/digital-rebirth/reunion-space" className="text-purple-400 hover:text-purple-300">
+                  团聚空间
+                </Link>
+              </li>
+              <li>
+                <Link to="/digital-rebirth/family-tree" className="text-purple-400 hover:text-purple-300">
+                  家族族谱
+                </Link>
+              </li>
             </ul>
           </section>
 
