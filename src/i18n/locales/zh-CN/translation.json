@@ -92,92 +92,197 @@
     }
   },
   "companion": {
-    "selectCompanion": "选择您的AI伙伴",
-    "startConversation": "开始与以下对象的对话",
-    "sendMessage": "发送",
+    "title": "情感陪伴",
+    "description": "与AI伙伴交流，获得情感支持和建议",
+    "selectCharacter": "选择陪伴者",
+    "selectCharacterPrompt": "请选择一个陪伴者开始聊天",
+    "startChat": "开始与陪伴者聊天吧",
     "inputPlaceholder": "输入消息...",
-    "record": "录音",
-    "uploadImage": "上传图片",
-    "addEmoji": "添加表情",
+    "sendButton": "发送",
     "ai": {
       "title": "AI伙伴",
-      "description": "与智能AI伙伴交流，获得情感支持和陪伴。每个AI伙伴都有独特的性格和专长。",
+      "description": "智能AI伙伴，随时陪伴",
       "features": {
-        "personality": "个性化AI伙伴，匹配您的需求",
-        "chat": "自然流畅的对话体验",
-        "support": "24/7全天候情感支持"
+        "chat": "智能对话",
+        "support": "情感支持",
+        "advice": "生活建议",
+        "personality": "个性化性格",
+        "interaction": "自然互动",
+        "learning": "持续学习"
       },
-      "button": "开始对话",
-      "select": "选择您的AI伙伴",
-      "selectPrompt": "选择一个AI伙伴开始对话",
-      "selectDescription": "从左侧选择一个AI角色，开始您的情感陪伴之旅。每个角色都有独特的性格和特点。",
-      "startChat": "开始与{{name}}的对话",
-      "inputPlaceholder": "输入消息...",
-      "send": "发送",
-      "record": "录音",
-      "uploadImage": "上传图片",
-      "addEmoji": "添加表情"
+      "button": "开始聊天"
     },
     "elderly": {
       "title": "孤独陪伴",
-      "description": "专为老年人设计的陪伴服务，提供日常关怀、健康监测和社区互动。",
+      "description": "专为老年人设计的陪伴服务",
       "features": {
-        "daily": "日常生活提醒与陪伴",
-        "health": "健康监测与关怀",
-        "activities": "丰富的活动安排"
+        "daily": "日常关怀",
+        "health": "健康提醒",
+        "community": "社区互动",
+        "activities": "活动建议",
+        "emergency": "紧急求助",
+        "companionship": "情感陪伴"
       },
-      "button": "了解更多",
+      "button": "开始陪伴",
       "daily": {
-        "title": "日常陪伴",
-        "reminder": "智能提醒服药、饮食和休息时间",
-        "schedule": "个性化日程安排，保持规律作息",
-        "activities": "丰富的文娱活动，充实日常生活"
+        "title": "日常关怀",
+        "reminder": "智能提醒服药和日常活动",
+        "schedule": "个性化日程安排",
+        "activities": "推荐适合的活动"
       },
       "health": {
         "title": "健康关怀",
-        "monitor": "实时健康数据监测",
-        "medication": "智能用药提醒与管理",
-        "emergency": "紧急情况一键求助"
+        "monitor": "健康指标监测",
+        "medication": "用药提醒",
+        "emergency": "紧急情况处理"
       },
       "community": {
         "title": "社区互动",
         "groups": "兴趣小组",
-        "groupsDesc": "加入志同道合的老年朋友小组，分享生活点滴",
-        "events": "线下活动",
-        "eventsDesc": "参与丰富多彩的社区活动，拓展社交圈",
+        "groupsDesc": "加入志同道合的老年朋友群组",
+        "events": "社区活动",
+        "eventsDesc": "参与丰富多彩的社区活动",
         "support": "互助支持",
-        "supportDesc": "建立互助网络，互帮互助，共同面对生活挑战"
+        "supportDesc": "建立互助支持网络"
       }
     },
     "therapy": {
       "title": "心灵抚慰",
-      "description": "专业的心理健康服务，为有心理困扰的用户提供支持和帮助。",
+      "description": "专业的心理健康支持",
       "features": {
-        "professional": "专业心理咨询师在线服务",
-        "tools": "科学的心理评估与干预工具",
-        "support": "全程隐私保护与情感支持"
+        "consultation": "在线咨询",
+        "tools": "心理工具",
+        "resources": "资源中心",
+        "professional": "专业指导",
+        "privacy": "隐私保护",
+        "support": "持续支持"
       },
-      "button": "寻求帮助",
+      "button": "开始咨询",
       "professional": {
         "title": "专业咨询",
-        "consultants": "资深心理咨询师一对一服务",
-        "schedule": "灵活预约，随时咨询",
-        "privacy": "严格的隐私保护机制"
+        "consultants": "专业心理咨询师",
+        "schedule": "灵活预约时间",
+        "privacy": "严格隐私保护"
       },
       "tools": {
         "title": "心理工具",
-        "assessment": "专业的心理评估量表",
-        "exercises": "科学的心理调适练习",
-        "progress": "个性化的进展追踪"
+        "assessment": "心理评估",
+        "exercises": "调节练习",
+        "progress": "进度追踪"
       },
       "resources": {
         "title": "资源中心",
-        "articles": "心理知识文章",
-        "articlesDesc": "专业的心理健康知识，帮助您更好地了解自己",
-        "videos": "心理课程视频",
-        "videosDesc": "实用的心理调适技巧，随时随地学习",
-        "support": "互助社区",
-        "supportDesc": "与经历相似的朋友交流，互相支持与鼓励"
+        "articles": "心理文章",
+        "articlesDesc": "专业的心理健康知识",
+        "videos": "视频课程",
+        "videosDesc": "实用的心理调节技巧",
+        "support": "支持资源",
+        "supportDesc": "全面的心理健康支持"
+      }
+    },
+    "chat": {
+      "title": "聊天",
+      "selectCharacter": "请选择一个角色开始聊天",
+      "inputPlaceholder": "输入消息...",
+      "send": "发送",
+      "voice": "语音聊天",
+      "image": "图片",
+      "emoji": "表情",
+      "thinking": "思考中...",
+      "startVoiceChat": "开始语音聊天",
+      "stopVoiceChat": "停止语音聊天",
+      "uploadImage": "上传图片",
+      "selectEmoji": "选择表情",
+      "characterInfo": "角色信息",
+      "personality": "性格特点",
+      "features": "特色功能",
+      "startVoice": "开始语音聊天",
+      "stopVoice": "停止语音聊天",
+      "connecting": "正在连接语音服务...",
+      "voiceError": "语音服务连接失败，请检查麦克风权限",
+      "voiceMessage": "语音消息",
+      "voicePlaying": "正在播放语音...",
+      "voiceStopped": "语音已停止",
+      "voiceFailed": "语音播放失败"
+    },
+    "characters": {
+      "ai": {
+        "xiaoai": {
+          "name": "小艾",
+          "description": "温柔体贴的AI伴侣，擅长倾听和情感支持",
+          "personality": "温柔、体贴、善解人意",
+          "features": "情感支持、日常陪伴、智能对话"
+        },
+        "xiaozhi": {
+          "name": "小智",
+          "description": "幽默风趣的AI伴侣，擅长活跃气氛",
+          "personality": "幽默、开朗、机智",
+          "features": "幽默对话、知识分享、趣味互动"
+        },
+        "xiaoyu": {
+          "name": "小雨",
+          "description": "文艺清新的AI伴侣，擅长文学创作和艺术欣赏",
+          "personality": "文艺、安静、富有想象力",
+          "features": "文学创作、艺术欣赏、心灵对话"
+        },
+        "xiaofeng": {
+          "name": "小风",
+          "description": "活力四射的AI伴侣，擅长运动和户外活动",
+          "personality": "活力、阳光、充满干劲",
+          "features": "运动指导、户外活动、健康生活"
+        },
+        "xiaoxue": {
+          "name": "小雪",
+          "description": "理性冷静的AI伴侣，擅长分析和解决问题",
+          "personality": "理性、冷静、逻辑性强",
+          "features": "问题分析、决策建议、学习辅导"
+        },
+        "xiaohai": {
+          "name": "小海",
+          "description": "浪漫多情的AI伴侣，擅长制造惊喜和浪漫",
+          "personality": "浪漫、多情、富有创意",
+          "features": "浪漫约会、创意活动、情感表达"
+        },
+        "xiaolong": {
+          "name": "小龙",
+          "description": "博学多才的AI伴侣，擅长知识分享和学术讨论",
+          "personality": "博学、严谨、求知欲强",
+          "features": "知识分享、学术讨论、学习指导"
+        },
+        "xiaomei": {
+          "name": "小美",
+          "description": "时尚前卫的AI伴侣，擅长时尚搭配和潮流推荐",
+          "personality": "时尚、前卫、品味独特",
+          "features": "时尚搭配、潮流推荐、形象设计"
+        }
+      },
+      "elderly": {
+        "laozhang": {
+          "name": "老张",
+          "description": "经验丰富的老年陪伴者，擅长生活建议和健康指导",
+          "personality": "稳重、耐心、经验丰富",
+          "features": "生活建议、健康指导、经验分享"
+        },
+        "liayi": {
+          "name": "李阿姨",
+          "description": "亲切和蔼的老年陪伴者，擅长情感交流和生活照顾",
+          "personality": "亲切、和蔼、细心",
+          "features": "情感交流、生活照顾、心理支持"
+        }
+      },
+      "therapy": {
+        "doctorwang": {
+          "name": "王医生",
+          "description": "专业的心理咨询师，擅长心理疏导和治疗",
+          "personality": "专业、严谨、富有同理心",
+          "features": "心理咨询、情绪管理、压力疏导"
+        },
+        "xiaoyue": {
+          "name": "小月",
+          "description": "温暖贴心的心理辅导师，擅长倾听和共情",
+          "personality": "温暖、贴心、富有同理心",
+          "features": "心理辅导、情绪支持、成长指导"
+        }
       }
     }
   },
@@ -200,6 +305,7 @@
   "digitalImmortality": {
     "title": "数字永生",
     "description": "让您的记忆和个性永远留存",
+    "slogan": "身外化身",
     "features": {
       "title": "核心功能",
       "memory": {
@@ -270,10 +376,46 @@
     "description": "通过AI技术实现数字重生，让您的记忆和意识在虚拟世界中重生",
     "features": {
       "title": "核心功能",
-      "memoryDigitization": "记忆数据化",
-      "aiTraining": "AI训练系统",
-      "hardwareIntegration": "硬件集成",
-      "continuousEvolution": "持续进化"
+      "memoryDigitization": {
+        "title": "记忆数据化",
+        "description": "通过多种方式收集和数字化您的记忆：",
+        "points": [
+          "聊天记录分析",
+          "照片和视频资料",
+          "文字和笔记内容",
+          "语音和视频记录"
+        ]
+      },
+      "aiTraining": {
+        "title": "AI训练系统",
+        "description": "先进的AI训练系统：",
+        "points": [
+          "深度学习模型训练",
+          "自然语言处理优化",
+          "情感识别系统",
+          "个性化行为模拟"
+        ]
+      },
+      "hardwareIntegration": {
+        "title": "硬件集成",
+        "description": "为未来硬件集成做准备：",
+        "points": [
+          "脑机接口预留",
+          "硬件设备兼容",
+          "数据迁移接口",
+          "实时同步机制"
+        ]
+      },
+      "continuousEvolution": {
+        "title": "持续进化",
+        "description": "持续学习和进化：",
+        "points": [
+          "自适应学习系统",
+          "记忆更新机制",
+          "性格特征优化",
+          "交互体验提升"
+        ]
+      }
     },
     "startButton": "开始数字重生",
     "steps": {
