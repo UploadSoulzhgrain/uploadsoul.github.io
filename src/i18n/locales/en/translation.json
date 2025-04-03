@@ -152,7 +152,14 @@
     "termsOfService": "Terms of Service",
     "contactUs": "Contact Us",
     "copyright": "All rights reserved.",
-    "services": "Our Services",
+    "services": {
+      "title": "Our Services",
+      "holographicCompanion": "Holographic Emotional Companion",
+      "digitalImmortality": "Digital Immortality",
+      "digitalRebirth": "Digital Rebirth",
+      "vrDevice": "VR Device",
+      "aiAllInOne": "AI All-in-One"
+    },
     "aboutCompany": "Company Introduction",
     "team": "Our Team",
     "contact": "Contact Us",
@@ -202,7 +209,9 @@
     },
     "cta": {
       "title": "Start Your AI Companion Journey Now",
-      "description": "No matter when and where, there's always a digital companion for you"
+      "description": "No matter when and where, there's always a digital companion for you",
+      "freeRegister": "Free Registration",
+      "digitalHumanExperience": "Digital Human Experience"
     },
     "testimonials": {
       "title": "User Testimonials",
@@ -306,26 +315,87 @@
   },
   "virtualLove": {
     "title": "Virtual Love",
-    "description": "Create your exclusive digital companion and experience romance beyond reality",
-    "steps": {
-      "upload": "Upload Photos",
-      "personality": "Set Personality",
-      "review": "Review"
+    "subtitle": "Customize Your Soulmate",
+    "description": "Create your perfect companion with AI technology",
+    "features": {
+      "title": "Core Features",
+      "customization": {
+        "title": "Personalization",
+        "description": "Customize everything from appearance to personality"
+      },
+      "aiTechnology": {
+        "title": "AI Intelligence",
+        "description": "Natural and fluid interactions powered by advanced AI"
+      },
+      "memorySharing": {
+        "title": "Memory Sharing",
+        "description": "Create shared memories for more authentic connections"
+      }
     },
+    "companionTypes": {
+      "title": "Companion Types",
+      "soulmate": {
+        "title": "Soulmate",
+        "description": "Deep emotional connection with a perfectly matched soulmate"
+      },
+      "temporary": {
+        "title": "Temporary Partner",
+        "description": "Light and enjoyable short-term companionship"
+      },
+      "friend": {
+        "title": "Close Friend",
+        "description": "Warm and caring close friendship"
+      }
+    },
+    "customization": {
+      "title": "Customization",
+      "appearance": {
+        "title": "Appearance",
+        "description": "Choose or upload your preferred appearance",
+        "options": {
+          "upload": "Upload Photo",
+          "generate": "AI Generate",
+          "template": "Choose Template"
+        }
+      },
+      "voice": {
+        "title": "Voice",
+        "description": "Select or record your preferred voice",
+        "options": {
+          "upload": "Upload Recording",
+          "record": "Record Now",
+          "template": "Voice Templates"
+        }
+      },
+      "personality": {
+        "title": "Personality",
+        "description": "Set personality traits and behavior patterns",
+        "traits": {
+          "openness": "Openness",
+          "conscientiousness": "Conscientiousness",
+          "extraversion": "Extraversion",
+          "agreeableness": "Agreeableness",
+          "neuroticism": "Neuroticism"
+        }
+      },
+      "memories": {
+        "title": "Memories",
+        "description": "Add memories and experiences you want to share",
+        "placeholder": "Describe the memory you want to share...",
+        "add": "Add Memory"
+      }
+    },
+    "startButton": "Start Customizing",
     "form": {
       "name": "Name",
-      "namePlaceholder": "Enter your name",
-      "photos": "Photos",
-      "uploadButton": "Upload Photos",
-      "orDragDrop": "or drag and drop files here",
-      "uploadHint": "Supports JPG, PNG formats, up to 5 photos",
-      "personality": "Personality Traits",
-      "personalityPlaceholder": "Describe your personality traits, interests, etc.",
-      "memories": "Important Memories",
-      "memoriesPlaceholder": "Share some important memories and experiences",
-      "voice": "Voice Sample",
-      "noVoice": "Not uploaded",
-      "submit": "Create Digital Companion"
+      "namePlaceholder": "Enter name",
+      "type": "Companion Type",
+      "selectType": "Select type",
+      "appearance": "Appearance",
+      "voice": "Voice",
+      "personality": "Personality",
+      "memories": "Memories",
+      "submit": "Create Companion"
     }
   },
   "common": {

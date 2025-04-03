@@ -22,7 +22,14 @@
     "termsOfService": "服务条款",
     "contactUs": "联系我们",
     "copyright": "版权所有。",
-    "services": "产品服务",
+    "services": {
+      "title": "产品服务",
+      "holographicCompanion": "全息情感陪伴",
+      "digitalImmortality": "数字永生",
+      "digitalRebirth": "数字重生",
+      "vrDevice": "VR设备",
+      "aiAllInOne": "AI一体机"
+    },
     "aboutCompany": "公司介绍",
     "team": "团队成员",
     "contact": "联系我们",
@@ -75,7 +82,9 @@
     },
     "cta": {
       "title": "立即开启您的AI陪伴之旅",
-      "description": "无论何时何地，都有专属于您的数字伙伴"
+      "description": "无论何时何地，都有专属于您的数字伙伴",
+      "freeRegister": "免费注册",
+      "digitalHumanExperience": "数字人体验"
     },
     "testimonials": {
       "title": "用户评价",
@@ -378,26 +387,87 @@
   },
   "virtualLove": {
     "title": "虚拟恋爱",
-    "description": "创建您的专属数字伴侣，体验超越现实的浪漫",
-    "steps": {
-      "upload": "上传照片",
-      "personality": "设置性格",
-      "review": "确认信息"
+    "subtitle": "定制您的专属灵魂伴侣",
+    "description": "通过AI技术，打造完美契合您的理想伴侣",
+    "features": {
+      "title": "核心特色",
+      "customization": {
+        "title": "个性化定制",
+        "description": "从外表到性格，完全按照您的喜好定制"
+      },
+      "aiTechnology": {
+        "title": "AI智能",
+        "description": "基于先进AI技术，提供自然流畅的互动体验"
+      },
+      "memorySharing": {
+        "title": "记忆共享",
+        "description": "创建专属记忆，让感情更加真实"
+      }
     },
+    "companionTypes": {
+      "title": "伴侣类型",
+      "soulmate": {
+        "title": "灵魂伴侣",
+        "description": "深度情感连接，完美契合的灵魂伴侣"
+      },
+      "temporary": {
+        "title": "临时伙伴",
+        "description": "轻松愉快的短期陪伴"
+      },
+      "friend": {
+        "title": "知心好友",
+        "description": "温暖贴心的知心好友"
+      }
+    },
+    "customization": {
+      "title": "个性化定制",
+      "appearance": {
+        "title": "外表定制",
+        "description": "选择或上传您喜欢的形象",
+        "options": {
+          "upload": "上传照片",
+          "generate": "AI生成",
+          "template": "模板选择"
+        }
+      },
+      "voice": {
+        "title": "声音定制",
+        "description": "选择或录制您喜欢的声音",
+        "options": {
+          "upload": "上传录音",
+          "record": "实时录制",
+          "template": "声音模板"
+        }
+      },
+      "personality": {
+        "title": "性格定制",
+        "description": "设置性格特征和行为模式",
+        "traits": {
+          "openness": "开放性",
+          "conscientiousness": "尽责性",
+          "extraversion": "外向性",
+          "agreeableness": "宜人性",
+          "neuroticism": "神经质"
+        }
+      },
+      "memories": {
+        "title": "记忆定制",
+        "description": "添加您想要分享的记忆和经历",
+        "placeholder": "描述您想要分享的记忆...",
+        "add": "添加记忆"
+      }
+    },
+    "startButton": "开始定制",
     "form": {
       "name": "名字",
       "namePlaceholder": "请输入名字",
-      "photos": "照片",
-      "uploadButton": "上传照片",
-      "orDragDrop": "或拖拽文件到这里",
-      "uploadHint": "支持 JPG、PNG 格式，最多 5 张照片",
-      "personality": "性格特征",
-      "personalityPlaceholder": "描述性格特征、兴趣爱好等",
-      "memories": "重要记忆",
-      "memoriesPlaceholder": "分享一些重要的记忆和经历",
-      "voice": "声音样本",
-      "noVoice": "未上传",
-      "submit": "创建数字伴侣"
+      "type": "伴侣类型",
+      "selectType": "选择类型",
+      "appearance": "外表",
+      "voice": "声音",
+      "personality": "性格",
+      "memories": "记忆",
+      "submit": "创建伴侣"
     }
   },
   "about": {
