@@ -1,6 +1,6 @@
-# MGX AI Platform Backend
+# AI Platform Backend
 
-这是 MGX AI Platform 的后端服务，提供用户认证、文件上传等功能。
+这是 AI Platform 的后端服务，提供用户认证、文件上传等功能。
 
 ## 功能特性
 
