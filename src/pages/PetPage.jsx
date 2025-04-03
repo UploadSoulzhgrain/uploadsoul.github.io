@@ -1,13 +1,25 @@
 // pages/PetPage.jsx
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const PetPage = () => {
+  const { t, i18n } = useTranslation();
   const [selectedPet, setSelectedPet] = useState(null);
   const [petStats, setPetStats] = useState(null);
   const [pets, setPets] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [newPetName, setNewPetName] = useState('');
   const [selectedSpecies, setSelectedSpecies] = useState('cat');
+  const [customPetData, setCustomPetData] = useState({
+    name: '',
+    photo: null,
+    video: null,
+    realSound: null,
+    customVoice: null,
+    memories: [],
+    personality: 'friendly'
+  });
 
   // Mock pet data
   useEffect(() => {
@@ -136,6 +148,71 @@ const PetPage = () => {
     });
   };
 
+  // Handle custom pet creation
+  const handleCustomPetCreate = () => {
+    if (!customPetData.name.trim()) return;
+    
+    const newPet = {
+      id: `${pets.length + 1}`,
+      name: customPetData.name,
+      species: 'custom',
+      avatar: customPetData.photo || '/assets/pets/custom-pet.jpg',
+      video: customPetData.video,
+      sounds: {
+        real: customPetData.realSound,
+        custom: customPetData.customVoice
+      },
+      memories: customPetData.memories,
+      personality: customPetData.personality,
+      stats: {
+        happiness: 50,
+        energy: 50,
+        health: 50,
+        experience: 0,
+        level: 1
+      },
+      lastInteraction: new Date().toISOString()
+    };
+    
+    setPets([...pets, newPet]);
+    setCustomPetData({
+      name: '',
+      photo: null,
+      video: null,
+      realSound: null,
+      customVoice: null,
+      memories: [],
+      personality: 'friendly'
+    });
+    setShowCustomizeModal(false);
+    handleSelectPet(newPet);
+  };
+
+  // Handle file uploads
+  const handleFileUpload = (type, file) => {
+    setCustomPetData(prev => ({
+      ...prev,
+      [type]: file
+    }));
+  };
+
+  // Add memory
+  const handleAddMemory = (memory) => {
+    setCustomPetData(prev => ({
+      ...prev,
+      memories: [...prev.memories, {
+        id: Date.now(),
+        text: memory,
+        date: new Date().toISOString()
+      }]
+    }));
+  };
+
+  // Change language
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
   // Render stat bar
   const StatBar = ({ label, value, color }) => (
     <div className="mb-2">
@@ -157,20 +234,96 @@ const PetPage = () => {
       <div className="container mx-auto">
         {/* Page Header */}
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">我的虚拟宠物</h1>
-          <button 
-            onClick={() => setShowCreateModal(true)}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
-          >
-            领养新宠物
-          </button>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t('pet.title')}</h1>
+          <div className="flex items-center space-x-4">
+            {/* Language Switcher */}
+            <div className="flex items-center bg-white rounded-lg shadow-sm p-1">
+              <button 
+                onClick={() => changeLanguage('zh-CN')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+                  i18n.language === 'zh-CN' 
+                    ? 'bg-purple-100 text-purple-800' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                中文
+              </button>
+              <button 
+                onClick={() => changeLanguage('en')}
+                className={`px-3 py-1 rounded-md text-sm font-medium transition ${
+                  i18n.language === 'en' 
+                    ? 'bg-purple-100 text-purple-800' 
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                English
+              </button>
+            </div>
+            <button 
+              onClick={() => setShowCustomizeModal(true)}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition"
+            >
+              {t('pet.customize')}
+            </button>
+            <button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition"
+            >
+              {t('pet.adopt')}
+            </button>
+          </div>
+        </div>
+
+        {/* Introduction Section */}
+        <div className="mb-8 bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-xl font-bold text-gray-800 mb-4">{t('pet.introduction.title')}</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-indigo-50 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-indigo-700 mb-2">{t('pet.introduction.customize.title')}</h3>
+              <p className="text-gray-700 mb-3">
+                {t('pet.introduction.customize.description')}
+              </p>
+              <ul className="list-disc list-inside text-gray-600 space-y-1">
+                <li>{t('pet.introduction.customize.features.photo')}</li>
+                <li>{t('pet.introduction.customize.features.sound')}</li>
+                <li>{t('pet.introduction.customize.features.voice')}</li>
+                <li>{t('pet.introduction.customize.features.memories')}</li>
+                <li>{t('pet.introduction.customize.features.personality')}</li>
+              </ul>
+              <button 
+                onClick={() => setShowCustomizeModal(true)}
+                className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition w-full"
+              >
+                {t('pet.introduction.customize.button')}
+              </button>
+            </div>
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="text-lg font-semibold text-purple-700 mb-2">{t('pet.introduction.adopt.title')}</h3>
+              <p className="text-gray-700 mb-3">
+                {t('pet.introduction.adopt.description')}
+              </p>
+              <ul className="list-disc list-inside text-gray-600 space-y-1">
+                <li>{t('pet.introduction.adopt.features.species')}</li>
+                <li>{t('pet.introduction.adopt.features.name')}</li>
+                <li>{t('pet.introduction.adopt.features.stats')}</li>
+                <li>{t('pet.introduction.adopt.features.memories')}</li>
+                <li>{t('pet.introduction.adopt.features.growth')}</li>
+              </ul>
+              <button 
+                onClick={() => setShowCreateModal(true)}
+                className="mt-4 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition w-full"
+              >
+                {t('pet.introduction.adopt.button')}
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Pet Selection Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md p-4">
-              <h2 className="font-bold text-lg text-gray-800 mb-4">我的宠物</h2>
+              <h2 className="font-bold text-lg text-gray-800 mb-4">{t('pet.myPets')}</h2>
               <div className="space-y-3">
                 {pets.map((pet) => (
                   <div 
@@ -192,164 +345,133 @@ const PetPage = () => {
                           Lv.{pet.stats.level}
                         </span>
                         <span className="text-xs text-gray-500 ml-2">
-                          {pet.species === 'cat' ? '猫' : 
-                           pet.species === 'dog' ? '狗' : 
-                           pet.species === 'rabbit' ? '兔子' : '鸟'}
+                          {pet.species === 'custom' ? t('pet.custom') : t(`pet.species.${pet.species}`)}
                         </span>
                       </div>
                     </div>
                   </div>
                 ))}
-                {pets.length === 0 && (
-                  <div className="text-center py-10">
-                    <p className="text-gray-500">您还没有宠物，快去领养一只吧！</p>
-                    <button 
-                      onClick={() => setShowCreateModal(true)}
-                      className="mt-3 text-purple-600 hover:text-purple-800 transition"
-                    >
-                      领养宠物
-                    </button>
-                  </div>
-                )}
               </div>
             </div>
           </div>
 
-          {/* Main Content */}
+          {/* Pet Details and Interaction */}
           <div className="lg:col-span-3">
-            {!selectedPet ? (
-              <div className="bg-white rounded-xl shadow-md p-8 text-center">
-                <div className="w-20 h-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-4">选择或领养宠物</h2>
-                <p className="text-gray-600 mb-6">从左侧选择一只宠物进行互动，或者领养一只新的宠物开始您的养宠之旅。</p>
-                <button 
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
-                >
-                  领养新宠物
-                </button>
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                {/* Pet Header */}
-                <div className="h-40 md:h-60 relative bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-                  <div className="absolute inset-0 flex items-end">
-                    <div className="w-32 h-32 md:w-48 md:h-48 relative mx-auto mb-[-24px] md:mb-[-40px]">
-                      <img 
-                        src={selectedPet.avatar} 
-                        alt={selectedPet.name}
-                        className="w-full h-full object-cover rounded-full border-4 border-white shadow-lg"
-                      />
-                      <div className="absolute bottom-0 right-0 bg-green-500 w-5 h-5 rounded-full border-2 border-white"></div>
+            {selectedPet ? (
+              <div className="bg-white rounded-xl shadow-md p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Pet Info */}
+                  <div>
+                    <div className="mb-6">
+                      <h2 className="text-2xl font-bold text-gray-800 mb-2">{selectedPet.name}</h2>
+                      <p className="text-gray-600">{t(`pet.species.${selectedPet.species}`)}</p>
                     </div>
-                  </div>
-                </div>
-                
-                <div className="pt-10 md:pt-14 px-4 md:px-8">
-                  {/* Pet Name and Info */}
-                  <div className="text-center mb-6">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900">{selectedPet.name}</h2>
-                    <p className="text-gray-500">
-                      {selectedPet.species === 'cat' ? '猫' : 
-                      selectedPet.species === 'dog' ? '狗' : 
-                      selectedPet.species === 'rabbit' ? '兔子' : '鸟'} · 
-                      等级 {petStats.level} · 
-                      经验值 {petStats.experience}/{petStats.level * 100}
-                    </p>
-                  </div>
+                    
+                    {/* Stats */}
+                    <div className="mb-6">
+                      <h3 className="font-semibold text-gray-700 mb-3">{t('pet.stats')}</h3>
+                      <StatBar label={t('pet.happiness')} value={petStats.happiness} color="bg-yellow-400" />
+                      <StatBar label={t('pet.energy')} value={petStats.energy} color="bg-blue-400" />
+                      <StatBar label={t('pet.health')} value={petStats.health} color="bg-green-400" />
+                      <div className="mt-2 text-sm text-gray-600">
+                        {t('pet.level')}: {petStats.level} | {t('pet.experience')}: {petStats.experience}
+                      </div>
+                    </div>
 
-                  {/* Status Bars */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    <div>
-                      <StatBar label="心情" value={petStats.happiness} color="bg-yellow-500" />
-                    </div>
-                    <div>
-                      <StatBar label="体力" value={petStats.energy} color="bg-blue-500" />
-                    </div>
-                    <div>
-                      <StatBar label="健康" value={petStats.health} color="bg-green-500" />
-                    </div>
-                    <div>
-                      <StatBar 
-                        label="经验" 
-                        value={(petStats.experience / (petStats.level * 100)) * 100} 
-                        color="bg-purple-500" 
-                      />
-                    </div>
-                  </div>
+                    {/* Custom Pet Features */}
+                    {selectedPet.species === 'custom' && (
+                      <div className="mb-6">
+                        <h3 className="font-semibold text-gray-700 mb-3">{t('pet.customFeatures')}</h3>
+                        <div className="space-y-4">
+                          {/* Voice Controls */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-600 mb-2">{t('pet.voice')}</h4>
+                            <div className="flex space-x-2">
+                              <button 
+                                onClick={() => {/* Play real sound */}}
+                                className="px-3 py-1 bg-gray-100 rounded-lg text-sm hover:bg-gray-200"
+                              >
+                                {t('pet.playRealSound')}
+                              </button>
+                              <button 
+                                onClick={() => {/* Play custom voice */}}
+                                className="px-3 py-1 bg-gray-100 rounded-lg text-sm hover:bg-gray-200"
+                              >
+                                {t('pet.playCustomVoice')}
+                              </button>
+                            </div>
+                          </div>
 
-                  {/* Interaction Buttons */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-                    <button
-                      onClick={() => handlePetInteraction('feed')}
-                      className="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-100 transition p-4 rounded-lg"
-                    >
-                      <div className="text-3xl mb-2">🍖</div>
-                      <span className="text-gray-800 font-medium">喂食</span>
-                    </button>
-                    <button
-                      onClick={() => handlePetInteraction('play')}
-                      className="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-100 transition p-4 rounded-lg"
-                    >
-                      <div className="text-3xl mb-2">🎾</div>
-                      <span className="text-gray-800 font-medium">玩耍</span>
-                    </button>
-                    <button
-                      onClick={() => handlePetInteraction('sleep')}
-                      className="flex flex-col items-center justify-center bg-purple-50 hover:bg-purple-100 transition p-4 rounded-lg"
-                    >
-                      <div className="text-3xl mb-2">😴</div>
-                      <span className="text-gray-800 font-medium">休息</span>
-                    </button>
-                    <button
-                      onClick={() => handlePetInteraction('clean')}
-                      className="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-100 transition p-4 rounded-lg"
-                    >
-                      <div className="text-3xl mb-2">🛁</div>
-                      <span className="text-gray-800 font-medium">清洁</span>
-                    </button>
-                  </div>
+                          {/* Memories */}
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-600 mb-2">{t('pet.memories')}</h4>
+                            <div className="space-y-2">
+                              {selectedPet.memories.map(memory => (
+                                <div key={memory.id} className="p-2 bg-gray-50 rounded-lg text-sm">
+                                  {memory.text}
+                                  <div className="text-xs text-gray-500 mt-1">
+                                    {new Date(memory.date).toLocaleDateString()}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                  {/* Pet Customization Preview */}
-                  <div className="border-t border-gray-200 pt-6 mb-8">
-                    <h3 className="font-bold text-gray-800 mb-4">宠物装扮</h3>
-                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                      <div className="border border-gray-200 rounded-lg p-2 text-center cursor-pointer hover:border-purple-500">
-                        <div className="text-2xl mb-1">🎩</div>
-                        <span className="text-xs text-gray-600">帽子</span>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-2 text-center cursor-pointer hover:border-purple-500">
-                        <div className="text-2xl mb-1">🧣</div>
-                        <span className="text-xs text-gray-600">围巾</span>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-2 text-center cursor-pointer hover:border-purple-500">
-                        <div className="text-2xl mb-1">👓</div>
-                        <span className="text-xs text-gray-600">眼镜</span>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-2 text-center cursor-pointer hover:border-purple-500">
-                        <div className="text-2xl mb-1">🦺</div>
-                        <span className="text-xs text-gray-600">背心</span>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-2 text-center cursor-pointer hover:border-purple-500">
-                        <div className="text-2xl mb-1">👕</div>
-                        <span className="text-xs text-gray-600">衣服</span>
-                      </div>
-                      <div className="border border-dashed border-gray-300 rounded-lg p-2 text-center cursor-pointer hover:border-purple-500">
-                        <div className="text-xl mb-1 text-gray-400">+</div>
-                        <span className="text-xs text-gray-500">更多</span>
-                      </div>
-                    </div>
-                    <div className="mt-4 text-center">
-                      <button className="text-purple-600 hover:text-purple-800 transition text-sm">
-                        前往商城查看更多宠物装扮 →
+                    {/* Interaction Buttons */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button 
+                        onClick={() => handlePetInteraction('feed')}
+                        className="p-2 bg-yellow-100 text-yellow-800 rounded-lg hover:bg-yellow-200 transition"
+                      >
+                        {t('pet.actions.feed')}
+                      </button>
+                      <button 
+                        onClick={() => handlePetInteraction('play')}
+                        className="p-2 bg-blue-100 text-blue-800 rounded-lg hover:bg-blue-200 transition"
+                      >
+                        {t('pet.actions.play')}
+                      </button>
+                      <button 
+                        onClick={() => handlePetInteraction('sleep')}
+                        className="p-2 bg-indigo-100 text-indigo-800 rounded-lg hover:bg-indigo-200 transition"
+                      >
+                        {t('pet.actions.sleep')}
+                      </button>
+                      <button 
+                        onClick={() => handlePetInteraction('clean')}
+                        className="p-2 bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition"
+                      >
+                        {t('pet.actions.clean')}
                       </button>
                     </div>
                   </div>
+
+                  {/* Pet Display */}
+                  <div className="relative">
+                    {selectedPet.video ? (
+                      <video 
+                        src={selectedPet.video} 
+                        className="w-full rounded-lg"
+                        controls
+                        autoPlay
+                        loop
+                      />
+                    ) : (
+                      <img 
+                        src={selectedPet.avatar} 
+                        alt={selectedPet.name}
+                        className="w-full rounded-lg"
+                      />
+                    )}
+                  </div>
                 </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-xl shadow-md p-6 text-center">
+                <p className="text-gray-600">{t('pet.selectPrompt')}</p>
               </div>
             )}
           </div>
@@ -358,53 +480,208 @@ const PetPage = () => {
 
       {/* Create Pet Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-gray-900 mb-4">领养新宠物</h3>
-              <div className="mb-4">
-                <label className="block text-gray-700 mb-2">宠物名称</label>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">{t('pet.createNew')}</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.name')}
+                </label>
                 <input
                   type="text"
                   value={newPetName}
                   onChange={(e) => setNewPetName(e.target.value)}
-                  placeholder="给您的宠物起个名字"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full p-2 border rounded-lg"
+                  placeholder={t('pet.namePlaceholder')}
                 />
               </div>
-              <div className="mb-6">
-                <label className="block text-gray-700 mb-2">宠物类型</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {petSpecies.map((species) => (
-                    <div
-                      key={species.id}
-                      onClick={() => setSelectedSpecies(species.id)}
-                      className={`cursor-pointer border rounded-lg p-2 text-center transition ${
-                        selectedSpecies === species.id
-                          ? 'border-purple-500 bg-purple-50'
-                          : 'border-gray-200 hover:border-purple-300'
-                      }`}
-                    >
-                      <div className="w-12 h-12 mx-auto rounded-full overflow-hidden mb-1">
-                        <img src={species.avatar} alt={species.name} className="w-full h-full object-cover" />
-                      </div>
-                      <span className="text-sm">{species.name}</span>
-                    </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.species')}
+                </label>
+                <select
+                  value={selectedSpecies}
+                  onChange={(e) => setSelectedSpecies(e.target.value)}
+                  className="w-full p-2 border rounded-lg"
+                >
+                  {petSpecies.map(species => (
+                    <option key={species.id} value={species.id}>
+                      {t(`pet.species.${species.id}`)}
+                    </option>
                   ))}
-                </div>
+                </select>
               </div>
               <div className="flex justify-end space-x-3">
                 <button
                   onClick={() => setShowCreateModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
-                  取消
+                  {t('common.cancel')}
                 </button>
                 <button
                   onClick={handleCreatePet}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
                 >
-                  确认领养
+                  {t('common.create')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Customize Pet Modal */}
+      {showCustomizeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 max-w-2xl w-full">
+            <h2 className="text-xl font-bold mb-4">{t('pet.customizeTitle')}</h2>
+            <div className="space-y-4">
+              {/* Basic Info */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.name')}
+                </label>
+                <input
+                  type="text"
+                  value={customPetData.name}
+                  onChange={(e) => setCustomPetData(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full p-2 border rounded-lg"
+                  placeholder={t('pet.namePlaceholder')}
+                />
+              </div>
+
+              {/* Photo Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.photo')}
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFileUpload('photo', e.target.files[0])}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Video Upload */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.video')}
+                </label>
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleFileUpload('video', e.target.files[0])}
+                  className="w-full p-2 border rounded-lg"
+                />
+              </div>
+
+              {/* Sound Uploads */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('pet.realSound')}
+                  </label>
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={(e) => handleFileUpload('realSound', e.target.files[0])}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {t('pet.customVoice')}
+                  </label>
+                  <input
+                    type="file"
+                    accept="audio/*"
+                    onChange={(e) => handleFileUpload('customVoice', e.target.files[0])}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                </div>
+              </div>
+
+              {/* Memories */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.addMemory')}
+                </label>
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 border rounded-lg"
+                    placeholder={t('pet.memoryPlaceholder')}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddMemory(e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      const input = document.querySelector('input[placeholder="' + t('pet.memoryPlaceholder') + '"]');
+                      if (input.value) {
+                        handleAddMemory(input.value);
+                        input.value = '';
+                      }
+                    }}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  >
+                    {t('common.add')}
+                  </button>
+                </div>
+                <div className="mt-2 space-y-2">
+                  {customPetData.memories.map(memory => (
+                    <div key={memory.id} className="p-2 bg-gray-50 rounded-lg text-sm flex justify-between items-center">
+                      <span>{memory.text}</span>
+                      <button
+                        onClick={() => {
+                          setCustomPetData(prev => ({
+                            ...prev,
+                            memories: prev.memories.filter(m => m.id !== memory.id)
+                          }));
+                        }}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        {t('common.delete')}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Personality */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('pet.personality')}
+                </label>
+                <select
+                  value={customPetData.personality}
+                  onChange={(e) => setCustomPetData(prev => ({ ...prev, personality: e.target.value }))}
+                  className="w-full p-2 border rounded-lg"
+                >
+                  <option value="friendly">{t('pet.personalities.friendly')}</option>
+                  <option value="playful">{t('pet.personalities.playful')}</option>
+                  <option value="calm">{t('pet.personalities.calm')}</option>
+                  <option value="energetic">{t('pet.personalities.energetic')}</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end space-x-3">
+                <button
+                  onClick={() => setShowCustomizeModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  {t('common.cancel')}
+                </button>
+                <button
+                  onClick={handleCustomPetCreate}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                >
+                  {t('common.create')}
                 </button>
               </div>
             </div>
