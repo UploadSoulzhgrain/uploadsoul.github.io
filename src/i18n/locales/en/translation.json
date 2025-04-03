@@ -219,85 +219,38 @@
     }
   },
   "companion": {
+    "title": "Emotional Companion",
+    "description": "Chat with AI companions for emotional support and advice",
+    "selectCharacter": "Select Companion",
+    "selectCharacterPrompt": "Please select a companion to start chatting",
+    "startChat": "Start chatting with your companion",
+    "inputPlaceholder": "Type a message...",
+    "sendButton": "Send",
     "ai": {
       "title": "AI Companion",
-      "description": "Connect with intelligent AI companions for emotional support and companionship. Each AI companion has unique personality and expertise.",
+      "description": "Intelligent AI companions, always here for you",
       "features": {
-        "personality": "Personalized AI companions tailored to your needs",
-        "chat": "Natural and fluid conversation experience",
-        "support": "24/7 emotional support and companionship"
-      },
-      "button": "Start Chat",
-      "select": "Select Your AI Companion",
-      "selectPrompt": "Choose an AI companion to start chatting",
-      "selectDescription": "Select an AI character from the left to begin your emotional companionship journey. Each character has unique personality and traits.",
-      "startChat": "Start chatting with {{name}}",
-      "inputPlaceholder": "Type a message...",
-      "send": "Send",
-      "record": "Record",
-      "uploadImage": "Upload Image",
-      "addEmoji": "Add Emoji"
+        "chat": "Smart Conversation",
+        "support": "Emotional Support",
+        "advice": "Life Advice"
+      }
     },
     "elderly": {
       "title": "Elderly Companion",
-      "description": "Companionship services designed specifically for the elderly, providing daily care, health monitoring, and community interaction.",
+      "description": "Companionship services designed for the elderly",
       "features": {
-        "daily": "Daily life reminders and companionship",
-        "health": "Health monitoring and care",
-        "activities": "Rich activity arrangements"
-      },
-      "button": "Learn More",
-      "daily": {
-        "title": "Daily Companion",
-        "reminder": "Smart reminders for medication, meals, and rest",
-        "schedule": "Personalized schedule to maintain regular routines",
-        "activities": "Rich cultural and entertainment activities for daily life"
-      },
-      "health": {
-        "title": "Health Care",
-        "monitor": "Real-time health data monitoring",
-        "medication": "Smart medication reminders and management",
-        "emergency": "One-click emergency assistance"
-      },
-      "community": {
-        "title": "Community Interaction",
-        "groups": "Interest Groups",
-        "groupsDesc": "Join groups with like-minded elderly friends to share life moments",
-        "events": "Offline Events",
-        "eventsDesc": "Participate in diverse community activities to expand social circles",
-        "support": "Mutual Support",
-        "supportDesc": "Build support networks to help each other face life challenges together"
+        "daily": "Daily Care",
+        "health": "Health Reminders",
+        "community": "Community Interaction"
       }
     },
     "therapy": {
       "title": "Psychological Support",
-      "description": "Professional mental health services providing support and assistance for users with psychological concerns.",
+      "description": "Professional mental health support",
       "features": {
-        "professional": "Online services from professional counselors",
-        "tools": "Scientific psychological assessment and intervention tools",
-        "support": "Complete privacy protection and emotional support"
-      },
-      "button": "Seek Help",
-      "professional": {
-        "title": "Professional Consultation",
-        "consultants": "One-on-one service from experienced counselors",
-        "schedule": "Flexible scheduling, available anytime",
-        "privacy": "Strict privacy protection mechanisms"
-      },
-      "tools": {
-        "title": "Psychological Tools",
-        "assessment": "Professional psychological assessment scales",
-        "exercises": "Scientific psychological adjustment exercises",
-        "progress": "Personalized progress tracking"
-      },
-      "resources": {
-        "title": "Resource Center",
-        "articles": "Psychological Knowledge Articles",
-        "articlesDesc": "Professional mental health knowledge to help you better understand yourself",
-        "videos": "Psychological Course Videos",
-        "videosDesc": "Practical psychological adjustment techniques, learn anytime, anywhere",
-        "support": "Support Community",
-        "supportDesc": "Connect with friends who share similar experiences for mutual support and encouragement"
+        "consultation": "Online Consultation",
+        "tools": "Psychological Tools",
+        "resources": "Resource Center"
       }
     }
   },
@@ -320,13 +273,30 @@
   "digitalImmortality": {
     "title": "Digital Immortality",
     "description": "Achieve digital immortality through AI technology, preparing for future brain-computer interfaces",
+    "slogan": "Digital Avatar",
     "features": {
-      "memoryDigitization": "Memory Digitization",
-      "aiTraining": "AI Training System",
-      "hardwareIntegration": "Hardware Integration",
-      "continuousEvolution": "Continuous Evolution"
+      "title": "Core Features",
+      "memory": {
+        "title": "Memory Preservation",
+        "description": "Preserve your precious memories and experiences",
+        "points": [
+          "Photo and video records",
+          "Text and voice memories",
+          "Important moments marking"
+        ]
+      },
+      "personality": {
+        "title": "Personality Simulation",
+        "description": "AI-based personalized personality simulation",
+        "points": [
+          "Behavior pattern learning",
+          "Emotional response simulation",
+          "Personalized interaction"
+        ]
+      }
     },
     "startButton": "Start Digital Immortality",
+    "startCreation": "Start Creating Digital Immortality",
     "steps": {
       "upload": "Upload Photos",
       "personality": "Set Personality",
@@ -358,18 +328,69 @@
   "digitalRebirth": {
     "title": "Digital Rebirth",
     "description": "Achieve digital rebirth through AI technology, allowing your memories and consciousness to be reborn in the virtual world",
+    "features": {
+      "title": "Core Features",
+      "memoryDigitization": {
+        "title": "Memory Digitization",
+        "description": "Collect and digitize your memories through various methods:",
+        "points": [
+          "Chat history analysis",
+          "Photos and video materials",
+          "Text and note content",
+          "Voice and video recordings"
+        ]
+      },
+      "aiTraining": {
+        "title": "AI Training System",
+        "description": "Advanced AI training system:",
+        "points": [
+          "Deep learning model training",
+          "Natural language processing optimization",
+          "Emotion recognition system",
+          "Personalized behavior simulation"
+        ]
+      },
+      "hardwareIntegration": {
+        "title": "Hardware Integration",
+        "description": "Preparing for future hardware integration:",
+        "points": [
+          "Brain-computer interface reservation",
+          "Hardware device compatibility",
+          "Data migration interface",
+          "Real-time synchronization mechanism"
+        ]
+      },
+      "continuousEvolution": {
+        "title": "Continuous Evolution",
+        "description": "Continuous learning and evolution:",
+        "points": [
+          "Adaptive learning system",
+          "Memory update mechanism",
+          "Personality trait optimization",
+          "Interaction experience enhancement"
+        ]
+      }
+    },
     "startButton": "Start Digital Rebirth",
     "steps": {
       "upload": "Upload Photos",
       "personality": "Set Personality",
-      "confirm": "Confirm Information"
+      "confirm": "Confirm Information",
+      "review": "Review Information"
     },
     "form": {
       "name": "Your Name",
       "photos": "Upload Photos",
       "personality": "Personality Traits",
       "memories": "Important Memories",
-      "voice": "Voice Sample"
+      "voice": "Voice Sample",
+      "namePlaceholder": "Enter your name",
+      "personalityPlaceholder": "Describe your personality traits",
+      "memoriesPlaceholder": "Share some important memories",
+      "uploadButton": "Upload Files",
+      "orDragDrop": "or drag and drop",
+      "uploadHint": "You can upload up to 5 photos",
+      "submit": "Create Digital Rebirth"
     },
     "placeholders": {
       "name": "Enter your name",

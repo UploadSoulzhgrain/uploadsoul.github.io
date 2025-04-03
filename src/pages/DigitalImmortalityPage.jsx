@@ -9,8 +9,13 @@ const DigitalImmortalityPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
-        <h1 className="text-4xl font-bold mb-4">{t('digitalImmortality.title')}</h1>
-        <p className="text-xl text-gray-600">{t('digitalImmortality.description')}</p>
+        <h1 className="text-4xl font-bold mb-4">
+          {t('digitalImmortality.title')} 
+          <span className="ml-4">
+            {t('digitalImmortality.slogan')}
+          </span>
+        </h1>
+        <p className="text-xl text-gray-600 mb-2">{t('digitalImmortality.description')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
