@@ -26,6 +26,7 @@ import TermsPage from './pages/terms-page'
 import SitemapPage from './pages/sitemap-page'
 import ReunionSpacePage from './pages/ReunionSpacePage'
 import FamilyTreePage from './pages/FamilyTreePage'
+import DigitalWorldPage from './pages/DigitalWorldPage'
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/sitemap" element={<SitemapPage />} />
               <Route path="/mvp-test" element={<MVPTestPage />} />
+              <Route path="/digital-world" element={<DigitalWorldPage />} />
             </Routes>
           </main>
           <Footer />

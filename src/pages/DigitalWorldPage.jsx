@@ -1,50 +1,127 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Card, Row, Col, Button, Modal, Select, Space, Typography } from 'antd';
+import { GlobalOutlined, UserOutlined, TeamOutlined, HeartOutlined } from '@ant-design/icons';
+
+const { Title, Paragraph } = Typography;
+const { Option } = Select;
 
 const DigitalWorldPage = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-purple-600 mb-8">数字世界构建</h1>
-          <p className="text-xl text-gray-600 mb-12">
-            创建属于您的专属数字世界，与您的数字伴侣共同探索
-          </p>
-          
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="p-6 bg-purple-50 rounded-lg">
-                <h3 className="text-xl font-semibold text-purple-600 mb-4">个性化定制</h3>
-                <p className="text-gray-600">
-                  根据您的喜好，定制专属的数字世界场景和风格。
-                </p>
-              </div>
-              <div className="p-6 bg-indigo-50 rounded-lg">
-                <h3 className="text-xl font-semibold text-indigo-600 mb-4">互动体验</h3>
-                <p className="text-gray-600">
-                  丰富的互动元素，让您的数字世界充满生机和趣味。
-                </p>
-              </div>
-              <div className="p-6 bg-purple-50 rounded-lg">
-                <h3 className="text-xl font-semibold text-purple-600 mb-4">社交功能</h3>
-                <p className="text-gray-600">
-                  邀请好友一起探索，分享您的数字世界。
-                </p>
-              </div>
-              <div className="p-6 bg-indigo-50 rounded-lg">
-                <h3 className="text-xl font-semibold text-indigo-600 mb-4">持续更新</h3>
-                <p className="text-gray-600">
-                  定期更新新的场景和功能，让您的数字世界不断进化。
-                </p>
-              </div>
-            </div>
-          </div>
+  const { t } = useTranslation();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedScene, setSelectedScene] = useState(null);
+  const [selectedMode, setSelectedMode] = useState('single');
 
-          <div className="text-center">
-            <span className="inline-block px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
-              即将推出
-            </span>
-          </div>
-        </div>
+  const scenes = [
+    {
+      id: 'home',
+      title: t('digitalWorld.scenes.home.title'),
+      description: t('digitalWorld.scenes.home.description'),
+      icon: '🏠'
+    },
+    {
+      id: 'park',
+      title: t('digitalWorld.scenes.park.title'),
+      description: t('digitalWorld.scenes.park.description'),
+      icon: '🌳'
+    },
+    {
+      id: 'beach',
+      title: t('digitalWorld.scenes.beach.title'),
+      description: t('digitalWorld.scenes.beach.description'),
+      icon: '🏖️'
+    },
+    {
+      id: 'custom',
+      title: t('digitalWorld.scenes.custom.title'),
+      description: t('digitalWorld.scenes.custom.description'),
+      icon: '🎨'
+    }
+  ];
+
+  const modes = [
+    { value: 'single', label: t('digitalWorld.modes.single'), icon: <UserOutlined /> },
+    { value: 'multi', label: t('digitalWorld.modes.multi'), icon: <TeamOutlined /> },
+    { value: 'couple', label: t('digitalWorld.modes.couple'), icon: <HeartOutlined /> }
+  ];
+
+  const handleSceneSelect = (scene) => {
+    setSelectedScene(scene);
+    setIsModalVisible(true);
+  };
+
+  const handleModeSelect = (mode) => {
+    setSelectedMode(mode);
+  };
+
+  const handleStartExperience = () => {
+    // TODO: Implement the actual experience start logic
+    console.log('Starting experience with:', { selectedScene, selectedMode });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-8">
+      <div className="max-w-7xl mx-auto">
+        <Title level={1} className="text-center mb-8">
+          <GlobalOutlined className="mr-2" />
+          {t('digitalWorld.title')}
+        </Title>
+        
+        <Paragraph className="text-center text-lg mb-12">
+          {t('digitalWorld.description')}
+        </Paragraph>
+
+        <Row gutter={[24, 24]}>
+          {scenes.map((scene) => (
+            <Col xs={24} sm={12} lg={6} key={scene.id}>
+              <Card
+                hoverable
+                className="h-full"
+                onClick={() => handleSceneSelect(scene)}
+              >
+                <div className="text-4xl mb-4">{scene.icon}</div>
+                <Title level={4}>{scene.title}</Title>
+                <Paragraph>{scene.description}</Paragraph>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        <Modal
+          title={t('digitalWorld.modal.title')}
+          open={isModalVisible}
+          onCancel={() => setIsModalVisible(false)}
+          footer={null}
+        >
+          <Space direction="vertical" size="large" className="w-full">
+            <div>
+              <Title level={5}>{t('digitalWorld.modal.selectMode')}</Title>
+              <Select
+                className="w-full"
+                value={selectedMode}
+                onChange={handleModeSelect}
+              >
+                {modes.map((mode) => (
+                  <Option key={mode.value} value={mode.value}>
+                    <Space>
+                      {mode.icon}
+                      {mode.label}
+                    </Space>
+                  </Option>
+                ))}
+              </Select>
+            </div>
+
+            <Button
+              type="primary"
+              size="large"
+              block
+              onClick={handleStartExperience}
+            >
+              {t('digitalWorld.modal.startExperience')}
+            </Button>
+          </Space>
+        </Modal>
       </div>
     </div>
   );
