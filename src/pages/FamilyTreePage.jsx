@@ -5,9 +5,10 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 
 const FamilyTreePage = () => {
-  const { t } = useTranslation();
+  const { t, ready } = useTranslation();
   const { digitalHumanId } = useParams();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [familyData, setFamilyData] = useState(null);
   const [viewMode, setViewMode] = useState('visual'); // visual, list, timeline
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -162,21 +163,52 @@ const FamilyTreePage = () => {
   useEffect(() => {
     // Simulate loading family data from API
     const fetchFamilyData = async () => {
-      setLoading(true);
       try {
+        setLoading(true);
+        setError(null);
         // In a real app, you'd fetch this data from your backend
         setFamilyData(mockFamilyData);
         // Set the first digital human as selected member
         setSelectedMember(digitalHumans[0]);
       } catch (error) {
         console.error('Error fetching family data:', error);
+        setError(t('errors.general'));
       } finally {
         setLoading(false);
       }
     };
 
     fetchFamilyData();
-  }, [digitalHumanId]);
+  }, [digitalHumanId, t]);
+
+  // 如果翻译还没有准备好，显示加载状态
+  if (!ready) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin h-10 w-10 text-purple-600 mx-auto mb-4">Loading...</div>
+          <p className="text-gray-600">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 如果发生错误，显示错误信息
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            {t('common.retry')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Render a family tree node recursively
   const renderFamilyNode = (node, level = 0) => {

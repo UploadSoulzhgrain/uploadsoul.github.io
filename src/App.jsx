@@ -24,6 +24,8 @@ import AllInOnePage from './pages/all-in-one-page'
 import PrivacyPage from './pages/privacy-page'
 import TermsPage from './pages/terms-page'
 import SitemapPage from './pages/sitemap-page'
+import ReunionSpacePage from './pages/ReunionSpacePage'
+import FamilyTreePage from './pages/FamilyTreePage'
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
               <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
               <Route path="/shop" element={<ShopPage />} />
               <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
+              <Route path="/digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
+              <Route path="/digital-rebirth/family-tree" element={<FamilyTreePage />} />
               <Route path="/start-experience" element={<DigitalHumanPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/digital-human-experience" element={<DigitalHumanExperiencePage />} />
