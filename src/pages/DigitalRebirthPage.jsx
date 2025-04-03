@@ -20,6 +20,31 @@ const DigitalRebirthPage = () => {
           </h1>
           <p className="text-xl text-gray-600 text-center mb-12">{t('digitalRebirth.description')}</p>
 
+          {/* 新功能导航 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <Link to="/digital-rebirth/reunion-space">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
+              >
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('reunionSpace.title')}</h2>
+                <p className="text-gray-600 mb-4">{t('reunionSpace.description')}</p>
+                <div className="text-purple-600 font-medium">→ {t('reunionSpace.startReunion')}</div>
+              </motion.div>
+            </Link>
+
+            <Link to="/digital-rebirth/family-tree">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
+              >
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">{t('familyTree.title')}</h2>
+                <p className="text-gray-600 mb-4">{t('familyTree.description')}</p>
+                <div className="text-purple-600 font-medium">→ {t('familyTree.viewDetails')}</div>
+              </motion.div>
+            </Link>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Memory Digitization */}
             <motion.div
