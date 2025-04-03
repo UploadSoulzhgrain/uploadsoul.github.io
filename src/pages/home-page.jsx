@@ -23,7 +23,9 @@ const HomePage = () => {
           </div>
           <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6 animate-fadeInUp">{t('app.title')}</h1>
           <h2 className="text-3xl font-semibold text-purple-600 mb-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-            {t('home.hero.subtitle') === '虚拟世界，数字永生' ? '正在进行天使轮融资，期待与您携手' : t('home.hero.subtitle')}
+            {t('home.hero.subtitle') === '虚拟世界，数字永生' || t('home.hero.subtitle') === 'Virtual World, Digital Immortality' 
+              ? (t('home.hero.subtitle') === '虚拟世界，数字永生' ? '正在进行天使轮融资，期待与您携手' : 'Currently in Angel Round Financing, Looking Forward to Collaboration') 
+              : t('home.hero.subtitle')}
           </h2>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
             {t('home.hero.description')}
