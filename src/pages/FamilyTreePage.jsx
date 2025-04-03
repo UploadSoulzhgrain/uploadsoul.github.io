@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 const FamilyTreePage = () => {
   const { t } = useTranslation();
@@ -11,6 +12,8 @@ const FamilyTreePage = () => {
   const [viewMode, setViewMode] = useState('visual'); // visual, list, timeline
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [showReunionModal, setShowReunionModal] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [activeTab, setActiveTab] = useState('tree'); // 'tree', 'memories', 'events'
   
   // Mock digital humans
   const digitalHumans = [
@@ -19,12 +22,60 @@ const FamilyTreePage = () => {
       name: '张伯父',
       relationship: '祖父',
       avatar: '/assets/digital-humans/grandpa.jpg',
+      birthDate: '1930-05-15',
+      deathDate: '2015-11-23',
+      bio: '张伯父是一位退休教师，喜欢园艺和下象棋。',
+      memories: 5,
+      events: 3,
+      current: true
     },
     {
       id: '2',
       name: '李奶奶',
       relationship: '外婆',
       avatar: '/assets/digital-humans/grandma.jpg',
+      birthDate: '1932-08-22',
+      deathDate: '2018-03-10',
+      bio: '李奶奶是一位慈爱的家庭主妇，擅长烹饪传统菜肴。',
+      memories: 7,
+      events: 4,
+      current: true
+    }
+  ];
+
+  // Mock memories data
+  const memoriesData = [
+    {
+      id: 'mem1',
+      title: '第一次教我下象棋',
+      date: '1992-07-15',
+      description: '爷爷在我7岁时教我下象棋，那是夏天的一个下午，我们坐在院子的老槐树下，阳光透过树叶斑驳地洒在棋盘上。'
+    },
+    {
+      id: 'mem2',
+      title: '奶奶的红烧肉',
+      date: '1995-03-20',
+      description: '奶奶的红烧肉是全家人的最爱，每次过节她都会做一大锅，香气四溢，让人垂涎欲滴。'
+    }
+  ];
+
+  // Mock events data
+  const eventsData = [
+    {
+      id: 'evt1',
+      title: '爷爷的生日聚会',
+      date: '2023-05-15',
+      participants: 8,
+      environment: '老家的客厅',
+      activity: '家庭聚餐'
+    },
+    {
+      id: 'evt2',
+      title: '奶奶的纪念日',
+      date: '2023-03-10',
+      participants: 6,
+      environment: '花园',
+      activity: '讲故事'
     }
   ];
 
@@ -96,14 +147,7 @@ const FamilyTreePage = () => {
         ]
       }
     ],
-    memories: [
-      {
-        id: 'mem1',
-        title: '第一次教我下象棋',
-        date: '1992-07-15',
-        description: '爷爷在我7岁时教我下象棋，那是夏天的一个下午，我们坐在院子的老槐树下，阳光透过树叶斑驳地洒在棋盘上。'
-      }
-    ]
+    memories: memoriesData
   };
 
   // Timeline events
@@ -122,6 +166,8 @@ const FamilyTreePage = () => {
       try {
         // In a real app, you'd fetch this data from your backend
         setFamilyData(mockFamilyData);
+        // Set the first digital human as selected member
+        setSelectedMember(digitalHumans[0]);
       } catch (error) {
         console.error('Error fetching family data:', error);
       } finally {
@@ -140,7 +186,14 @@ const FamilyTreePage = () => {
       <div className={`mb-6 ${level > 0 ? 'ml-8 border-l-2 border-gray-200 pl-6' : ''}`} key={node.id || node.name}>
         <div className="flex items-start">
           <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-4 border-white shadow-lg">
-            <img src={node.avatar} alt={node.name} className="w-full h-full object-cover" />
+            <img 
+              src={node.avatar} 
+              alt={node.name} 
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+              }}
+            />
           </div>
           <div className="flex-1">
             <div className="flex items-center mb-2">
@@ -168,7 +221,14 @@ const FamilyTreePage = () => {
           <div className="ml-8 mt-4 border-l-2 border-pink-200 pl-6">
             <div className="flex items-start">
               <div className="w-14 h-14 rounded-full overflow-hidden mr-4 border-2 border-pink-200">
-                <img src={node.spouse.avatar} alt={node.spouse.name} className="w-full h-full object-cover" />
+                <img 
+                  src={node.spouse.avatar} 
+                  alt={node.spouse.name} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+                  }}
+                />
               </div>
               <div>
                 <h4 className="text-lg font-medium text-gray-900">{node.spouse.name}</h4>
@@ -200,55 +260,345 @@ const FamilyTreePage = () => {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="container mx-auto">
-        {/* Page Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <div>
-              <Link to="/digital-human" className="text-gray-500 hover:text-gray-700 transition flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-                </svg>
-                {t('digitalHuman.title')}
-              </Link>
+  // Render the family tree
+  const renderFamilyTree = () => {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex justify-center mb-8">
+          <div className="relative w-full max-w-4xl">
+            {/* 这里应该是一个实际的家族树可视化组件 */}
+            {/* 为了演示，我们使用一个简化的版本 */}
+            <div className="grid grid-cols-5 gap-4">
+              {/* 第一代 */}
+              <div className="col-span-5 flex justify-center">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className={`bg-purple-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
+                    selectedMember?.id === '1' ? 'ring-2 ring-purple-500' : ''
+                  }`}
+                  onClick={() => setSelectedMember(digitalHumans[0])}
+                >
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
+                    <img 
+                      src={digitalHumans[0].avatar} 
+                      alt={digitalHumans[0].name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+                      }}
+                    />
+                  </div>
+                  <h3 className="font-semibold">{digitalHumans[0].name}</h3>
+                  <p className="text-sm text-gray-600">{digitalHumans[0].relationship}</p>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className={`bg-purple-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
+                    selectedMember?.id === '2' ? 'ring-2 ring-purple-500' : ''
+                  }`}
+                  onClick={() => setSelectedMember(digitalHumans[1])}
+                >
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
+                    <img 
+                      src={digitalHumans[1].avatar} 
+                      alt={digitalHumans[1].name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+                      }}
+                    />
+                  </div>
+                  <h3 className="font-semibold">{digitalHumans[1].name}</h3>
+                  <p className="text-sm text-gray-600">{digitalHumans[1].relationship}</p>
+                </motion.div>
+              </div>
+              
+              {/* 第二代 */}
+              <div className="col-span-5 flex justify-center gap-8">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className={`bg-indigo-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
+                    selectedMember?.id === '3' ? 'ring-2 ring-purple-500' : ''
+                  }`}
+                  onClick={() => setSelectedMember(mockFamilyData.children[0])}
+                >
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
+                    <img 
+                      src={mockFamilyData.children[0].avatar} 
+                      alt={mockFamilyData.children[0].name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+                      }}
+                    />
+                  </div>
+                  <h3 className="font-semibold">{mockFamilyData.children[0].name}</h3>
+                  <p className="text-sm text-gray-600">{mockFamilyData.children[0].relationship}</p>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className={`bg-indigo-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
+                    selectedMember?.id === '4' ? 'ring-2 ring-purple-500' : ''
+                  }`}
+                  onClick={() => setSelectedMember(mockFamilyData.children[1])}
+                >
+                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
+                    <img 
+                      src={mockFamilyData.children[1].avatar} 
+                      alt={mockFamilyData.children[1].name} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+                      }}
+                    />
+                  </div>
+                  <h3 className="font-semibold">{mockFamilyData.children[1].name}</h3>
+                  <p className="text-sm text-gray-600">{mockFamilyData.children[1].relationship}</p>
+                </motion.div>
+              </div>
             </div>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
-            {selectedHuman?.name} {t('digitalHuman.familyTree')}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            {t('digitalHuman.loveNeverDies')}
-          </p>
         </div>
-
-        {/* Reunion Banner */}
-        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl p-6 mb-8 text-white shadow-lg">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="mb-4 md:mb-0">
-              <h2 className="text-xl md:text-2xl font-bold mb-2">{t('digitalHuman.reunionFeatures.title')}</h2>
-              <p className="opacity-90">{t('digitalHuman.reunionFeatures.description')}</p>
+        
+        {selectedMember && (
+          <div className="mt-8 bg-gray-50 rounded-lg p-6">
+            <div className="flex items-center mb-4">
+              <div className="w-20 h-20 rounded-full overflow-hidden mr-4 bg-gray-200">
+                <img 
+                  src={selectedMember.avatar} 
+                  alt={selectedMember.name} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/80?text=Avatar';
+                  }}
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold">{selectedMember.name}</h3>
+                <p className="text-gray-600">{selectedMember.relationship}</p>
+                <p className="text-sm text-gray-500">
+                  {t('familyTree.birthDate')}: {selectedMember.birthDate} | {t('familyTree.deathDate')}: {selectedMember.deathDate}
+                </p>
+              </div>
             </div>
-            <div className="flex space-x-3">
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold text-purple-700">{t('familyTree.digitalAvatar')}</h4>
+                <p className="text-gray-700">
+                  {selectedMember.current ? t('familyTree.hasAvatar') : t('familyTree.noAvatar')}
+                </p>
+                {!selectedMember.current && (
+                  <button className="mt-2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition-colors">
+                    {t('familyTree.createAvatar')}
+                  </button>
+                )}
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold text-indigo-700">{t('familyTree.memories')}</h4>
+                <p className="text-gray-700">{selectedMember.memories || 0} {t('familyTree.memoryCount')}</p>
+                <button className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition-colors">
+                  {t('familyTree.viewMemories')}
+                </button>
+              </div>
+              <div className="bg-white rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold text-blue-700">{t('familyTree.events')}</h4>
+                <p className="text-gray-700">{selectedMember.events || 0} {t('familyTree.eventCount')}</p>
+                <button className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                  {t('familyTree.viewEvents')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render the memories section
+  const renderMemories = () => {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900">{t('familyTree.memorySharing')}</h2>
+          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+            {t('familyTree.addMemory')}
+          </button>
+        </div>
+        
+        <div className="space-y-6">
+          {memoriesData.map((memory) => (
+            <div key={memory.id} className="bg-gray-50 rounded-lg p-6">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-xl font-semibold text-gray-900">{memory.title}</h3>
+                <span className="text-sm text-gray-500">{memory.date}</span>
+              </div>
+              <p className="text-gray-600 mb-4">{memory.description}</p>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">{t('familyTree.contributor')}: {selectedHuman.name}</span>
+                <div className="flex space-x-2">
+                  <button className="text-purple-600 hover:text-purple-800">
+                    {t('familyTree.edit')}
+                  </button>
+                  <button className="text-red-600 hover:text-red-800">
+                    {t('familyTree.delete')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // Render the events section
+  const renderEvents = () => {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900">{t('familyTree.familyEvents')}</h2>
+          <Link 
+            to="/digital-rebirth/reunion-space" 
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            {t('familyTree.planEvent')}
+          </Link>
+        </div>
+        
+        <div className="space-y-6">
+          {eventsData.map((event) => (
+            <div key={event.id} className="bg-gray-50 rounded-lg p-6">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
+                <span className="text-sm text-gray-500">{event.date}</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                  <p className="text-sm text-gray-500">{t('familyTree.participants')}</p>
+                  <p className="font-medium">{event.participants} {t('familyTree.people')}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">{t('familyTree.environment')}</p>
+                  <p className="font-medium">{event.environment}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">{t('familyTree.activity')}</p>
+                  <p className="font-medium">{event.activity}</p>
+                </div>
+              </div>
+              <div className="flex justify-end">
+                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                  {t('familyTree.viewDetails')}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-16">
+      <div className="container mx-auto px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-6xl mx-auto"
+        >
+          <h1 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 mb-4">
+            {t('familyTree.title')}
+          </h1>
+          <p className="text-xl text-gray-600 text-center mb-8">{t('familyTree.description')}</p>
+          
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-medium text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text"
+            >
+              {t('familyTree.slogan')}
+            </motion.div>
+          </div>
+
+          {/* 标签页 */}
+          <div className="flex justify-center mb-8">
+            <div className="bg-white rounded-lg shadow-md p-1 inline-flex">
               <button
-                onClick={() => setShowReunionModal(true)}
-                className="bg-white text-purple-700 px-4 py-2 rounded-lg hover:bg-gray-100 transition"
+                className={`px-6 py-2 rounded-md transition-colors ${
+                  activeTab === 'tree' ? 'bg-purple-100 text-purple-800' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+                onClick={() => setActiveTab('tree')}
               >
-                {t('digitalHuman.reunionFeatures.createRoom')}
+                {t('familyTree.treeTab')}
+              </button>
+              <button
+                className={`px-6 py-2 rounded-md transition-colors ${
+                  activeTab === 'memories' ? 'bg-purple-100 text-purple-800' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+                onClick={() => setActiveTab('memories')}
+              >
+                {t('familyTree.memoriesTab')}
+              </button>
+              <button
+                className={`px-6 py-2 rounded-md transition-colors ${
+                  activeTab === 'events' ? 'bg-purple-100 text-purple-800' : 'text-gray-600 hover:bg-gray-100'
+                }`}
+                onClick={() => setActiveTab('events')}
+              >
+                {t('familyTree.eventsTab')}
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="bg-white rounded-xl shadow-md p-6">
-          {viewMode === 'visual' && familyData && (
-            <div className="family-tree-container">
-              {renderFamilyNode(familyData)}
+          {/* 内容区域 */}
+          {activeTab === 'tree' && renderFamilyTree()}
+          {activeTab === 'memories' && renderMemories()}
+          {activeTab === 'events' && renderEvents()}
+
+          {/* 特殊日期提醒 */}
+          <div className="mt-12 bg-white rounded-xl shadow-lg p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-6">{t('familyTree.upcomingDates')}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-purple-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('familyTree.grandfatherBirthday')}</h3>
+                <p className="text-gray-700 mb-2">2023-05-15</p>
+                <p className="text-gray-600 text-sm mb-4">{t('familyTree.grandfatherBirthdayDesc')}</p>
+                <Link 
+                  to="/digital-rebirth/reunion-space" 
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors inline-block"
+                >
+                  {t('familyTree.planEvent')}
+                </Link>
+              </div>
+              <div className="bg-indigo-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-indigo-800 mb-2">{t('familyTree.grandmotherAnniversary')}</h3>
+                <p className="text-gray-700 mb-2">2023-11-10</p>
+                <p className="text-gray-600 text-sm mb-4">{t('familyTree.grandmotherAnniversaryDesc')}</p>
+                <Link 
+                  to="/digital-rebirth/reunion-space" 
+                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors inline-block"
+                >
+                  {t('familyTree.planEvent')}
+                </Link>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-4">
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">{t('familyTree.familyReunion')}</h3>
+                <p className="text-gray-700 mb-2">2023-12-25</p>
+                <p className="text-gray-600 text-sm mb-4">{t('familyTree.familyReunionDesc')}</p>
+                <Link 
+                  to="/digital-rebirth/reunion-space" 
+                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-block"
+                >
+                  {t('familyTree.planEvent')}
+                </Link>
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
