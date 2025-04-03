@@ -23,7 +23,7 @@ import VRPage from './pages/VRPage'
 import AllInOnePage from './pages/all-in-one-page'
 import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
-import SitemapPage from './pages/SitemapPage'
+import SitemapPage from './pages/sitemap-page'
 
 function App() {
   return (
