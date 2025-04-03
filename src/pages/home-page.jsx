@@ -194,12 +194,12 @@ const HomePage = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/register" className="w-full sm:w-auto">
               <button className="w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                免费注册
+                {t('home.cta.freeRegister')}
               </button>
             </Link>
             <Link to="/digital-human-experience" className="w-full sm:w-auto">
               <button className="w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                数字人体验
+                {t('home.cta.digitalHumanExperience')}
               </button>
             </Link>
           </div>
