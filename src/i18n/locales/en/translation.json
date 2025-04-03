@@ -327,86 +327,110 @@
   },
   "digitalRebirth": {
     "title": "Digital Rebirth",
-    "description": "Achieve digital rebirth through AI technology, allowing your memories and consciousness to be reborn in the virtual world",
+    "description": "Through advanced AI technology, allow departed loved ones to be reborn in digital form, preserving their memories and personality.",
+    "slogans": {
+      "reunion": "Rediscover the Joy of Reunion in the Virtual World",
+      "love": "Departure is Not Farewell, Love Continues Through Rebirth"
+    },
     "features": {
-      "title": "Core Features",
       "memoryDigitization": {
         "title": "Memory Digitization",
-        "description": "Collect and digitize your memories through various methods:",
+        "description": "Comprehensively capture loved ones' memories and personality traits through photos, videos, audio, and text records.",
         "points": [
-          "Chat history analysis",
-          "Photos and video materials",
-          "Text and note content",
-          "Voice and video recordings"
+          "High-definition photo and video scanning",
+          "Voice and conversation recording",
+          "Personal diary and letter digitization",
+          "Lifestyle and preference documentation"
         ]
       },
       "aiTraining": {
         "title": "AI Training System",
-        "description": "Advanced AI training system:",
+        "description": "Utilize deep learning algorithms to enable digital humans to mimic loved ones' speech patterns, expressions, and behavioral habits.",
         "points": [
-          "Deep learning model training",
-          "Natural language processing optimization",
-          "Emotion recognition system",
-          "Personalized behavior simulation"
+          "Voice synthesis and imitation",
+          "Facial expression generation",
+          "Personality trait simulation",
+          "Conversation style learning"
         ]
       },
       "hardwareIntegration": {
         "title": "Hardware Integration",
-        "description": "Preparing for future hardware integration:",
+        "description": "Create authentic interactive experiences through holographic projection, haptic feedback, and other technologies.",
         "points": [
-          "Brain-computer interface reservation",
-          "Hardware device compatibility",
-          "Data migration interface",
-          "Real-time synchronization mechanism"
+          "Holographic projection systems",
+          "Haptic feedback devices",
+          "Environmental sound simulation",
+          "Scent recreation technology"
         ]
       },
       "continuousEvolution": {
         "title": "Continuous Evolution",
-        "description": "Continuous learning and evolution:",
+        "description": "Digital humans can continuously learn and adapt, becoming more authentic and personalized over time.",
         "points": [
-          "Adaptive learning system",
-          "Memory update mechanism",
-          "Personality trait optimization",
-          "Interaction experience enhancement"
+          "Continuous learning of new information",
+          "Adaptation to family changes",
+          "Memory updates and integration",
+          "Enhanced personalized interactions"
         ]
       }
     },
-    "startButton": "Start Digital Rebirth",
-    "steps": {
-      "upload": "Upload Photos",
-      "personality": "Set Personality",
-      "confirm": "Confirm Information",
-      "review": "Review Information"
-    },
-    "form": {
-      "name": "Your Name",
-      "photos": "Upload Photos",
-      "personality": "Personality Traits",
-      "memories": "Important Memories",
-      "voice": "Voice Sample",
-      "namePlaceholder": "Enter your name",
-      "personalityPlaceholder": "Describe your personality traits",
-      "memoriesPlaceholder": "Share some important memories",
-      "uploadButton": "Upload Files",
-      "orDragDrop": "or drag and drop",
-      "uploadHint": "You can upload up to 5 photos",
-      "submit": "Create Digital Rebirth"
-    },
-    "placeholders": {
-      "name": "Enter your name",
-      "personality": "Describe your personality traits",
-      "memories": "Share some important memories",
-      "voice": "Upload a voice sample"
-    },
-    "hints": {
-      "photos": "Recommended: 3-5 photos from different angles",
-      "voice": "Recommended: 1-2 minutes of clear voice recording"
-    },
-    "navigation": {
-      "previous": "Previous",
-      "next": "Next",
-      "submit": "Start Creation"
-    }
+    "startButton": "Start Creation"
+  },
+  "reunionSpace": {
+    "title": "Reunion Space",
+    "description": "Meet with digital loved ones in the virtual world, participate in meaningful interactive activities together, and create eternal memories.",
+    "slogan": "Rediscover the Joy of Reunion in the Virtual World",
+    "selectAvatar": "Select Digital Loved One",
+    "selectEnvironment": "Choose Reunion Environment",
+    "selectActivity": "Choose Interactive Activity",
+    "specialDates": "Special Dates",
+    "birthday": "Birthday",
+    "birthdayDesc": "Celebrate this special day with your loved one on their birthday",
+    "anniversary": "Anniversary",
+    "anniversaryDesc": "Review beautiful memories on important anniversaries",
+    "festival": "Festival",
+    "festivalDesc": "Celebrate traditional festivals with your digital loved ones",
+    "planEvent": "Plan Event",
+    "startReunion": "Start Reunion"
+  },
+  "familyTree": {
+    "title": "Family Tree",
+    "description": "Customize digital humans for multiple family ancestors, rebuild complete family relationships in the virtual world, and participate in family activities together.",
+    "slogan": "Departure is Not Farewell, Love Continues Through Rebirth",
+    "treeTab": "Family Tree",
+    "memoriesTab": "Memory Sharing",
+    "eventsTab": "Family Events",
+    "birthDate": "Birth Date",
+    "deathDate": "Death Date",
+    "digitalAvatar": "Digital Avatar",
+    "hasAvatar": "Digital Avatar Created",
+    "noAvatar": "Digital Avatar Not Created",
+    "createAvatar": "Create Digital Avatar",
+    "memories": "Memories",
+    "memoryCount": "memories",
+    "viewMemories": "View Memories",
+    "events": "Events",
+    "eventCount": "events",
+    "viewEvents": "View Events",
+    "memorySharing": "Memory Sharing",
+    "addMemory": "Add Memory",
+    "contributor": "Contributor",
+    "edit": "Edit",
+    "delete": "Delete",
+    "familyEvents": "Family Events",
+    "planEvent": "Plan Event",
+    "participants": "Participants",
+    "people": "people",
+    "environment": "Environment",
+    "activity": "Activity",
+    "viewDetails": "View Details",
+    "upcomingDates": "Upcoming Dates",
+    "grandfatherBirthday": "Grandfather's Birthday",
+    "grandfatherBirthdayDesc": "Celebrate grandfather's 83rd birthday",
+    "grandmotherAnniversary": "Grandmother's Anniversary",
+    "grandmotherAnniversaryDesc": "Commemorate the 4th anniversary of grandmother's passing",
+    "familyReunion": "Family Reunion",
+    "familyReunionDesc": "Christmas family reunion event"
   },
   "virtualLove": {
     "title": "Virtual Love",
