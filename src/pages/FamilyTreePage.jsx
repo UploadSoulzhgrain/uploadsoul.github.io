@@ -153,11 +153,11 @@ const FamilyTreePage = () => {
 
   // Timeline events
   const timelineEvents = [
-    { year: '1930', event: t('digitalHuman.grandparentsBorn'), description: `${mockFamilyData.name}` },
-    { year: '1955', event: t('digitalHuman.parentsBorn'), description: `${mockFamilyData.children[0].name} & ${mockFamilyData.children[1].name}` },
-    { year: '1985', event: t('digitalHuman.selfBorn'), description: `${mockFamilyData.children[1].children[0].name}` },
-    { year: '2015', event: `${mockFamilyData.name} ${t('digitalHuman.dateOfDeath')}`, description: '' },
-    { year: '2023', event: t('digitalHuman.digitalHumanCreated'), description: `${mockFamilyData.name}` }
+    { year: '1930', event: t('familyTree.timeline.grandparentsBorn'), description: `${mockFamilyData.name}` },
+    { year: '1955', event: t('familyTree.timeline.parentsBorn'), description: `${mockFamilyData.children[0].name} & ${mockFamilyData.children[1].name}` },
+    { year: '1985', event: t('familyTree.timeline.selfBorn'), description: `${mockFamilyData.children[1].children[0].name}` },
+    { year: '2015', event: `${mockFamilyData.name} ${t('familyTree.timeline.dateOfDeath')}`, description: '' },
+    { year: '2023', event: t('familyTree.timeline.digitalHumanCreated'), description: `${mockFamilyData.name}` }
   ];
 
   useEffect(() => {
@@ -286,7 +286,7 @@ const FamilyTreePage = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin h-10 w-10 text-purple-600 mx-auto mb-4">Loading...</div>
-          <p className="text-gray-600">{t('digitalHuman.loadingFamilyTree')}</p>
+          <p className="text-gray-600">{t('familyTree.loading')}</p>
         </div>
       </div>
     );

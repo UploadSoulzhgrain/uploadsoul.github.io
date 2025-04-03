@@ -546,7 +546,8 @@
     "memoryCount": "memories",
     "eventCount": "events",
     "viewMemories": "View Memories",
-    "viewEvents": "View Events"
+    "viewEvents": "View Events",
+    "planEvent": "Plan Event"
   },
   "virtualLove": {
     "title": "Virtual Love",
