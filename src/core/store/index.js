@@ -1,10 +1,6 @@
 // src/core/store/index.js
 import { configureStore } from '@reduxjs/toolkit';
-import userReducer from './userSlice';
-import aiCharacterReducer from './aiCharacterSlice';
-import petReducer from './petSlice';
-import digitalHumanReducer from './digitalHumanSlice';
-import storeReducer from './storeSlice';
+import userReducer from './slices/userSlice';
 
 /**
  * 应用的根Redux存储
@@ -12,15 +8,18 @@ import storeReducer from './storeSlice';
  */
 const store = configureStore({
   reducer: {
-    user: userReducer,
-    aiCharacter: aiCharacterReducer,
-    pet: petReducer,
-    digitalHuman: digitalHumanReducer,
-    store: storeReducer
+    user: userReducer
   },
-  middleware: (getDefaultMiddleware) => 
+  middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false // 允许在Redux中存储非序列化数据
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ['user/login', 'user/updateUser'],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: ['payload.createdAt', 'payload.updatedAt'],
+        // Ignore these paths in the state
+        ignoredPaths: ['user.user.createdAt', 'user.user.updatedAt'],
+      },
     })
 });
 
