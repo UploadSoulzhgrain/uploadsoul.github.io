@@ -805,5 +805,30 @@
       "selectMode": "Please select an experience mode",
       "startExperience": "Start Experience"
     }
+  },
+  "login": {
+    "title": "Sign in to your account",
+    "email": "Email address",
+    "password": "Password",
+    "remember": "Remember me",
+    "forgot": "Forgot your password?",
+    "submit": "Sign in",
+    "loading": "Signing in...",
+    "error": "Invalid email or password",
+    "or": "Or",
+    "register": "Create a new account"
+  },
+  "register": {
+    "title": "Create your account",
+    "username": "Username",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "submit": "Create account",
+    "loading": "Creating account...",
+    "error": "Failed to create account",
+    "passwordMismatch": "Passwords do not match",
+    "or": "Or",
+    "login": "Sign in to your account"
   }
 }
