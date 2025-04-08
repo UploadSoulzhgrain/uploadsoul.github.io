@@ -13,7 +13,7 @@ export default defineConfig({
     caseSensitive: true
   },
   root: '.',
-  base: './',
+  base: '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

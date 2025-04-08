@@ -1,7 +1,8 @@
 {
   "app": {
     "title": "UploadSoul - Digital Life, Eternal Companion",
-    "description": "UploadSoul - Digital Life, Eternal Companion"
+    "description": "UploadSoul - Digital Life Platform, creating your eternal digital companion. Through AI technology to achieve digital immortality, emotional companionship and virtual reality experience.",
+    "keywords": "UploadSoul, Digital Immortality, Digital Companion, AI Companion, Virtual Reality, Emotional Companion, Digital World"
   },
   "digitalHuman": {
     "title": "Digital Humans",
@@ -169,40 +170,45 @@
     "phone": "Phone",
     "address": "Address",
     "addressDetails": "Vancouver, Canada",
-    "platformName": "Virtual World, Digital Immortality"
+    "platformName": "Virtual World, Digital Immortality",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "sitemap": "Sitemap"
   },
   "home": {
     "title": "Home",
     "description": "Welcome to UploadSoul - Your Digital Life Platform",
     "hero": {
-      "title": "Your Digital Emotional Companion",
-      "subtitle": "Virtual World, Digital Immortality",
-      "description": "Create your personalized digital companion, eternal companionship beyond time",
-      "cta": "Start Experience",
-      "mvpTest": "MVP Test Channel"
+      "title": "Create Your Digital Legacy",
+      "subtitle": "Connect with Loved Ones Beyond Time",
+      "description": "UploadSoul helps you preserve memories, create digital companions, and maintain eternal connections with those who matter most."
     },
     "features": {
       "title": "Platform Features",
       "description": "Full-dimensional digital soul experience, making every interaction warm and emotional",
       "emotionalCompanion": {
         "title": "Emotional Companion",
-        "description": "Based on advanced emotional computing technology, providing personalized emotional support and understanding"
+        "description": "Experience meaningful conversations and emotional support from your digital companions."
       },
       "virtualPet": {
         "title": "Virtual Pet",
-        "description": "Smart virtual pets that bring warm companionship"
+        "description": "Create and interact with digital pets that provide comfort and companionship."
       },
       "vrExperience": {
-        "title": "VR Immersive Experience",
-        "description": "Achieve more immersive digital companionship through virtual reality technology"
+        "title": "VR Experience",
+        "description": "Immerse yourself in virtual reality interactions with your digital companions."
       },
       "digitalWorld": {
-        "title": "Digital World Creation",
-        "description": "Create your own digital world and explore it with your digital companions"
+        "title": "Digital World",
+        "description": "Build and explore your own digital universe with your companions."
       },
       "digitalImmortality": {
         "title": "Digital Immortality",
-        "description": "Break through time and space limitations, digitize your thoughts, memories, and personality to achieve eternal life continuation"
+        "description": "Preserve your thoughts, memories, and personality in a digital form that lives on forever."
+      },
+      "digitalRebirth": {
+        "title": "Digital Rebirth",
+        "description": "Bring back loved ones in a digital form, allowing their essence to continue being part of your life."
       },
       "allInOne": {
         "title": "UploadSoul All-in-One",
@@ -210,10 +216,8 @@
       }
     },
     "cta": {
-      "title": "Start Your AI Companion Journey Now",
-      "description": "No matter when and where, there's always a digital companion for you",
-      "freeRegister": "Free Registration",
-      "digitalHumanExperience": "Digital Human Experience"
+      "title": "Start Your Digital Journey Today",
+      "description": "Join thousands of users who have already created their digital legacy."
     },
     "testimonials": {
       "title": "User Testimonials",
@@ -259,8 +263,21 @@
   "auth": {
     "login": "Login",
     "signup": "Sign Up",
+    "register": "Register",
+    "registerWithEmail": "Register with Email",
+    "registerWithPhone": "Register with Phone",
     "email": "Email",
     "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Name",
+    "phone": "Phone",
+    "verificationCode": "Verification Code",
+    "sendCode": "Send Code",
+    "resendCode": "Resend Code",
+    "rememberMe": "Remember Me",
+    "submit": "Submit",
+    "loginWithEmail": "Login with Email",
+    "loginWithPhone": "Login with Phone",
     "forgotPassword": "Forgot Password?",
     "orContinueWith": "Or continue with"
   },
@@ -748,5 +765,30 @@
     "title": "Sitemap",
     "description": "Complete list of pages on UploadSoul",
     "lastUpdated": "Last Updated"
+  },
+  "login": {
+    "title": "Sign in to your account",
+    "email": "Email address",
+    "password": "Password",
+    "remember": "Remember me",
+    "forgot": "Forgot your password?",
+    "submit": "Sign in",
+    "loading": "Signing in...",
+    "error": "Invalid email or password",
+    "or": "Or",
+    "register": "Create a new account"
+  },
+  "register": {
+    "title": "Create your account",
+    "username": "Username",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "submit": "Create account",
+    "loading": "Creating account...",
+    "error": "Failed to create account",
+    "passwordMismatch": "Passwords do not match",
+    "or": "Or",
+    "login": "Sign in to your account"
   }
 }

@@ -8,9 +8,10 @@
 const STORAGE_PREFIX = 'mgx_';
 
 /**
- * 基础存储服务
+ * 本地存储服务
+ * 处理本地存储和会话存储的操作
  */
-export class StorageService {
+class StorageService {
   constructor(prefix = STORAGE_PREFIX) {
     this.prefix = prefix;
   }
@@ -28,71 +29,121 @@ export class StorageService {
    * 设置存储项
    * @param {string} key - 键名
    * @param {any} value - 值
+   * @param {boolean} [isSession=false] - 是否使用会话存储
    */
-  setItem(key, value) {
+  static setItem(key, value, isSession = false) {
     try {
-      const prefixedKey = this.getKeyWithPrefix(key);
-      const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
-      localStorage.setItem(prefixedKey, stringValue);
+      const storage = isSession ? sessionStorage : localStorage;
+      const serializedValue = JSON.stringify(value);
+      storage.setItem(key, serializedValue);
     } catch (error) {
-      console.error('存储数据失败:', error);
+      console.error('StorageService.setItem error:', error);
     }
   }
 
   /**
    * 获取存储项
    * @param {string} key - 键名
-   * @param {any} defaultValue - 默认值
-   * @returns {any} 存储的值或默认值
+   * @param {boolean} [isSession=false] - 是否使用会话存储
+   * @returns {any} - 存储的值
    */
-  getItem(key, defaultValue = null) {
+  static getItem(key, isSession = false) {
     try {
-      const prefixedKey = this.getKeyWithPrefix(key);
-      const value = localStorage.getItem(prefixedKey);
-      
-      if (value === null) {
-        return defaultValue;
-      }
-      
-      // 尝试解析JSON
-      try {
-        return JSON.parse(value);
-      } catch {
-        return value;
-      }
+      const storage = isSession ? sessionStorage : localStorage;
+      const value = storage.getItem(key);
+      return value ? JSON.parse(value) : null;
     } catch (error) {
-      console.error('获取存储数据失败:', error);
-      return defaultValue;
+      console.error('StorageService.getItem error:', error);
+      return null;
     }
   }
 
   /**
    * 移除存储项
    * @param {string} key - 键名
+   * @param {boolean} [isSession=false] - 是否使用会话存储
    */
-  removeItem(key) {
+  static removeItem(key, isSession = false) {
     try {
-      const prefixedKey = this.getKeyWithPrefix(key);
-      localStorage.removeItem(prefixedKey);
+      const storage = isSession ? sessionStorage : localStorage;
+      storage.removeItem(key);
     } catch (error) {
-      console.error('移除存储数据失败:', error);
+      console.error('StorageService.removeItem error:', error);
     }
   }
 
   /**
-   * 清除所有带前缀的存储项
+   * 清除所有存储
+   * @param {boolean} [isSession=false] - 是否清除会话存储
    */
-  clear() {
+  static clear(isSession = false) {
     try {
-      // 仅清除带有当前前缀的项
-      Object.keys(localStorage).forEach(key => {
-        if (key.startsWith(this.prefix)) {
-          localStorage.removeItem(key);
-        }
-      });
+      const storage = isSession ? sessionStorage : localStorage;
+      storage.clear();
     } catch (error) {
-      console.error('清除存储数据失败:', error);
+      console.error('StorageService.clear error:', error);
     }
+  }
+
+  /**
+   * 设置认证令牌
+   * @param {string} token - JWT令牌
+   * @param {boolean} [isSession=false] - 是否使用会话存储
+   */
+  static setAuthToken(token, isSession = false) {
+    this.setItem('authToken', token, isSession);
+  }
+
+  /**
+   * 获取认证令牌
+   * @param {boolean} [isSession=false] - 是否从会话存储获取
+   * @returns {string|null} - JWT令牌
+   */
+  static getAuthToken(isSession = false) {
+    return this.getItem('authToken', isSession);
+  }
+
+  /**
+   * 设置刷新令牌
+   * @param {string} token - 刷新令牌
+   */
+  static setRefreshToken(token) {
+    this.setItem('refreshToken', token);
+  }
+
+  /**
+   * 获取刷新令牌
+   * @returns {string|null} - 刷新令牌
+   */
+  static getRefreshToken() {
+    return this.getItem('refreshToken');
+  }
+
+  /**
+   * 设置用户信息
+   * @param {object} user - 用户信息
+   * @param {boolean} [isSession=false] - 是否使用会话存储
+   */
+  static setUser(user, isSession = false) {
+    this.setItem('user', user, isSession);
+  }
+
+  /**
+   * 获取用户信息
+   * @param {boolean} [isSession=false] - 是否从会话存储获取
+   * @returns {object|null} - 用户信息
+   */
+  static getUser(isSession = false) {
+    return this.getItem('user', isSession);
+  }
+
+  /**
+   * 清除所有认证相关数据
+   */
+  static clearAuth() {
+    this.removeItem('authToken');
+    this.removeItem('refreshToken');
+    this.removeItem('user');
   }
 }
 
@@ -108,10 +159,10 @@ export class SessionStorageService extends StorageService {
   setItem(key, value) {
     try {
       const prefixedKey = this.getKeyWithPrefix(key);
-      const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
-      sessionStorage.setItem(prefixedKey, stringValue);
+      const serializedValue = JSON.stringify(value);
+      sessionStorage.setItem(prefixedKey, serializedValue);
     } catch (error) {
-      console.error('存储会话数据失败:', error);
+      console.error('Error saving to sessionStorage:', error);
     }
   }
 
@@ -124,20 +175,15 @@ export class SessionStorageService extends StorageService {
   getItem(key, defaultValue = null) {
     try {
       const prefixedKey = this.getKeyWithPrefix(key);
-      const value = sessionStorage.getItem(prefixedKey);
+      const serializedValue = sessionStorage.getItem(prefixedKey);
       
-      if (value === null) {
+      if (serializedValue === null) {
         return defaultValue;
       }
       
-      // 尝试解析JSON
-      try {
-        return JSON.parse(value);
-      } catch {
-        return value;
-      }
+      return JSON.parse(serializedValue);
     } catch (error) {
-      console.error('获取会话存储数据失败:', error);
+      console.error('Error reading from sessionStorage:', error);
       return defaultValue;
     }
   }
@@ -151,7 +197,7 @@ export class SessionStorageService extends StorageService {
       const prefixedKey = this.getKeyWithPrefix(key);
       sessionStorage.removeItem(prefixedKey);
     } catch (error) {
-      console.error('移除会话存储数据失败:', error);
+      console.error('Error removing from sessionStorage:', error);
     }
   }
 
@@ -167,7 +213,7 @@ export class SessionStorageService extends StorageService {
         }
       });
     } catch (error) {
-      console.error('清除会话存储数据失败:', error);
+      console.error('Error clearing sessionStorage:', error);
     }
   }
 }
@@ -231,8 +277,8 @@ export class SecureStorageService extends StorageService {
    * @param {any} value - 值
    */
   setItem(key, value) {
-    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
-    const encryptedValue = this.encrypt(stringValue);
+    const serializedValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+    const encryptedValue = this.encrypt(serializedValue);
     this.storage.setItem(key, encryptedValue);
   }
 
@@ -284,4 +330,4 @@ export const localStorageService = new StorageService();
 export const sessionStorageService = new SessionStorageService();
 export const secureStorageService = new SecureStorageService('MGX_SECRET_KEY');
 
-export default localStorageService;
+export { StorageService };
