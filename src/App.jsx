@@ -5,6 +5,8 @@ import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import HomePage from './pages/HomePage'
+import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import CompanionPage from './pages/CompanionPage'
 import PetPage from './pages/PetPage'
 import DigitalHumanPage from './pages/DigitalHumanPage'
@@ -44,6 +46,8 @@ function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
               <Route path="/companion" element={<CompanionPage />} />
               <Route path="/pet" element={<PetPage />} />
               <Route path="/virtual-love" element={<VirtualLovePage />} />
