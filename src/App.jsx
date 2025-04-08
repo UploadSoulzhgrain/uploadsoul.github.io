@@ -29,6 +29,7 @@ import ReunionSpacePage from './pages/ReunionSpacePage'
 import FamilyTreePage from './pages/FamilyTreePage'
 import DigitalWorldPage from './pages/DigitalWorldPage'
 import NotFoundPage from './pages/NotFoundPage'
+import SitemapPage from './pages/SitemapPage'
 import { Helmet } from 'react-helmet-async'
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
               <Route path="/all-in-one" element={<AllInOnePage />} />
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
+              <Route path="/sitemap" element={<SitemapPage />} />
               <Route path="/mvp-test" element={<MVPTestPage />} />
               <Route path="/digital-world" element={<DigitalWorldPage />} />
               <Route path="*" element={<NotFoundPage />} />
