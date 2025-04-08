@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://uploadsoul.com/sitemap.xml
 
 # Disallow admin and api routes

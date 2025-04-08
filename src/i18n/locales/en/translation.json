@@ -173,7 +173,8 @@
     "platformName": "Virtual World, Digital Immortality",
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "sitemap": "Sitemap"
+    "sitemap": "Sitemap",
+    "description": "UploadSoul - Digital Life, Eternal Companion"
   },
   "home": {
     "title": "Home",
@@ -764,7 +765,8 @@
   "sitemap": {
     "title": "Sitemap",
     "description": "Complete list of pages on UploadSoul",
-    "lastUpdated": "Last Updated"
+    "lastUpdated": "Last Updated",
+    "description": "Explore all pages of our website"
   },
   "login": {
     "title": "Sign in to your account",
