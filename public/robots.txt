@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+Sitemap: https://uploadsoul.com/sitemap.xml
+
+# Disallow admin and api routes
+Disallow: /admin/
+Disallow: /api/
+
+# Allow all other pages
+Allow: /*.html$
+Allow: /*.js$
+Allow: /*.css$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.gif$ 

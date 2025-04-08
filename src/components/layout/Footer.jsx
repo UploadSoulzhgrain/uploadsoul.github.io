@@ -152,7 +152,7 @@ const Footer = () => {
           <div className="flex justify-center space-x-6 text-gray-400">
             <Link to="/privacy" className="hover:text-white transition-colors hover:underline">{t('footer.privacy')}</Link>
             <Link to="/terms" className="hover:text-white transition-colors hover:underline">{t('footer.terms')}</Link>
-            <Link to="/sitemap" className="hover:text-white transition-colors hover:underline">{t('footer.sitemap')}</Link>
+            <a href="/sitemap.xml" className="hover:text-white transition-colors hover:underline">{t('footer.sitemap')}</a>
           </div>
         </div>
       </div>

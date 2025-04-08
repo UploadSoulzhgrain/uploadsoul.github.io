@@ -1,0 +1,68 @@
+{
+  "app": {
+    "title": "UploadSoul - 数字生活，永恒伴侣"
+  },
+  "auth": {
+    "login": "登录",
+    "register": "注册",
+    "registerWithEmail": "邮箱注册",
+    "registerWithPhone": "手机号注册",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "name": "姓名",
+    "phone": "手机号",
+    "verificationCode": "验证码",
+    "sendCode": "发送验证码",
+    "resendCode": "重新发送",
+    "forgotPassword": "忘记密码？",
+    "rememberMe": "记住我",
+    "submit": "提交",
+    "or": "或",
+    "loginWithEmail": "邮箱登录",
+    "loginWithPhone": "手机号登录"
+  },
+  "home": {
+    "hero": {
+      "title": "数字生活，永恒伴侣",
+      "subtitle": "创建您的数字遗产，与所爱之人永远相连",
+      "description": "UploadSoul 提供创新的数字解决方案，用于保存记忆、创建数字伴侣和维持永恒的联系。",
+      "dashboard": "进入控制台"
+    },
+    "features": {
+      "title": "我们的功能",
+      "description": "探索数字永生和永恒陪伴的力量",
+      "digitalImmortality": {
+        "title": "数字永生",
+        "description": "保存您的记忆，创建永存的数字遗产",
+        "startButton": "立即开始"
+      },
+      "digitalRebirth": {
+        "title": "数字重生",
+        "description": "在数字领域体验新的存在形式",
+        "startButton": "了解更多"
+      },
+      "emotionalCompanion": {
+        "title": "情感伴侣",
+        "description": "与理解并支持您的AI伴侣建立联系"
+      },
+      "virtualPet": {
+        "title": "虚拟宠物",
+        "description": "领养并培养您自己的数字伴侣"
+      },
+      "vrExperience": {
+        "title": "VR体验",
+        "description": "沉浸在虚拟世界和体验中"
+      },
+      "digitalWorld": {
+        "title": "数字世界",
+        "description": "探索和互动我们的数字宇宙"
+      }
+    },
+    "cta": {
+      "title": "立即开始您的数字之旅",
+      "description": "加入数千名已经开始创建数字遗产的用户",
+      "digitalHumanExperience": "体验数字人"
+    }
+  }
+} 
