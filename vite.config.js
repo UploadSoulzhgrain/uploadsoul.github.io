@@ -13,7 +13,7 @@ export default defineConfig({
     caseSensitive: true
   },
   root: '.',
-  base: '/',
+  base: './',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -37,7 +37,16 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true,
-    open: true
+    host: 'localhost',
+    open: true,
+    // 添加 SPA 路由支持
+    historyApiFallback: true
+  },
+  preview: {
+    port: 5173,
+    host: 'localhost',
+    open: true,
+    // 添加 SPA 路由支持
+    historyApiFallback: true
   }
 })
