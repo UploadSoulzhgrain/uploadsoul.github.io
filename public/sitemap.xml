@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="/sitemap.xsl"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://uploadsoul.com/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/"/>
+    <news:news>
+      <news:publication>
+        <news:name>数字生命平台 Digital Life Platform - UploadSoul</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>数字生命平台 Digital Life Platform | 虚拟伴侣 Virtual Companion | 数字助手 Digital Assistant | AI伴侣 AI Companion | 数字平台 Digital Platform | 智能陪伴 Smart Companionship | 数字永生 Digital Immortality</news:title>
+      <news:keywords>数字生命,digital life,虚拟伴侣,virtual companion,数字助手,digital assistant,AI伴侣,AI companion,数字平台,digital platform,智能陪伴,smart companionship,数字永生,digital immortality,数字世界,digital world,智能平台,intelligent platform</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/about</loc>
@@ -40,21 +51,57 @@
     <loc>https://uploadsoul.com/digital-human</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/digital-human"/>
+    <news:news>
+      <news:publication>
+        <news:name>数字人类 Digital Human - 虚拟数字人平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>数字人类 Digital Human | 虚拟数字人 Virtual Digital Human | AI人类 AI Human | 数字化身 Digital Avatar | 智能数字人 Intelligent Digital Human</news:title>
+      <news:keywords>数字人类,digital human,虚拟数字人,virtual digital human,AI人类,AI human,数字化身,digital avatar,智能数字人,intelligent digital human,数字伴侣,digital companion,虚拟人类,virtual human</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/digital-rebirth</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/digital-rebirth"/>
+    <news:news>
+      <news:publication>
+        <news:name>数字重生 Digital Rebirth - 数字生命平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>数字重生 Digital Rebirth | 意识上传 Mind Upload | 数字永生 Digital Immortality | 生命延续 Life Extension | 数字平台 Digital Platform</news:title>
+      <news:keywords>数字重生,digital rebirth,意识上传,mind upload,数字永生,digital immortality,生命延续,life extension,数字平台,digital platform,意识数字化,mind digitization,生命数字化,life digitization</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/digital-immortality</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/digital-immortality"/>
+    <news:news>
+      <news:publication>
+        <news:name>数字永生 Digital Immortality - 永恒生命平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>数字永生 Digital Immortality | 意识永存 Mind Preservation | 生命延续 Life Extension | 数字平台 Digital Platform | 永恒生命 Eternal Life</news:title>
+      <news:keywords>数字永生,digital immortality,意识永存,mind preservation,生命延续,life extension,数字平台,digital platform,永恒生命,eternal life,意识保存,consciousness preservation,生命数字化,life digitization</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/virtual-love</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/virtual-love"/>
+    <news:news>
+      <news:publication>
+        <news:name>虚拟恋人 Virtual Love - AI伴侣平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>虚拟恋人 Virtual Love | AI伴侣 AI Companion | 数字伴侣 Digital Companion | 情感陪伴 Emotional Companionship | 智能伴侣 Intelligent Companion</news:title>
+      <news:keywords>虚拟恋人,virtual love,AI伴侣,AI companion,数字伴侣,digital companion,情感陪伴,emotional companionship,智能伴侣,intelligent companion,虚拟伴侣,virtual companion,感情交流,emotional communication</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/pet</loc>
@@ -70,21 +117,57 @@
     <loc>https://uploadsoul.com/digital-world</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/digital-world"/>
+    <news:news>
+      <news:publication>
+        <news:name>数字世界 Digital World - 虚拟现实平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>数字世界 Digital World | 元宇宙 Metaverse | 虚拟现实 Virtual Reality | 数字平台 Digital Platform | 虚拟空间 Virtual Space</news:title>
+      <news:keywords>数字世界,digital world,元宇宙,metaverse,虚拟现实,virtual reality,数字平台,digital platform,虚拟空间,virtual space,数字宇宙,digital universe,虚拟世界,virtual world</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/family-tree</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/family-tree"/>
+    <news:news>
+      <news:publication>
+        <news:name>数字家谱 Digital Family Tree - 家族传承平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>数字家谱 Digital Family Tree | 家族传承 Family Heritage | 记忆永存 Memory Preservation | 数字平台 Digital Platform | 家族历史 Family History</news:title>
+      <news:keywords>数字家谱,digital family tree,家族传承,family heritage,记忆永存,memory preservation,数字平台,digital platform,家族历史,family history,数字记忆,digital memory,家族档案,family archive</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/reunion-space</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/reunion-space"/>
+    <news:news>
+      <news:publication>
+        <news:name>团聚空间 Reunion Space - 虚拟相聚平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>团聚空间 Reunion Space | 虚拟团聚 Virtual Reunion | 数字重逢 Digital Reunion | 永恒相聚 Eternal Gathering | 数字平台 Digital Platform</news:title>
+      <news:keywords>团聚空间,reunion space,虚拟团聚,virtual reunion,数字重逢,digital reunion,永恒相聚,eternal gathering,数字平台,digital platform,虚拟相聚,virtual gathering,在线团聚,online reunion</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/companion</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh" href="https://uploadsoul.com/companion"/>
+    <news:news>
+      <news:publication>
+        <news:name>AI伴侣 AI Companion - 智能陪伴平台</news:name>
+        <news:language>zh</news:language>
+      </news:publication>
+      <news:title>AI伴侣 AI Companion | 虚拟伴侣 Virtual Companion | 数字伴侣 Digital Companion | 智能陪伴 Smart Companionship | 情感交互 Emotional Interaction</news:title>
+      <news:keywords>AI伴侣,AI companion,虚拟伴侣,virtual companion,数字伴侣,digital companion,智能陪伴,smart companionship,情感交互,emotional interaction,智能助手,intelligent assistant,生活伴侣,life companion</news:keywords>
+    </news:news>
   </url>
   <url>
     <loc>https://uploadsoul.com/shop</loc>
