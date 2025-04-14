@@ -1,13 +1,12 @@
 {
   "version": 2,
   "framework": "vite",
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "pnpm run build",
-  "devCommand": "pnpm run dev",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
   "outputDirectory": "dist",
   "routes": [
     { "handle": "filesystem" },
     { "src": "/.*", "dest": "/index.html" }
-  ],
-  "packageManager": "pnpm@8.10.2"
+  ]
 }
