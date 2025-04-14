@@ -95,7 +95,69 @@
       },
       "allInOne": {
         "title": "传灵一体机",
-        "description": "专为数字情感陪伴设计的智能设备，提供沉浸式体验"
+        "description": "专为数字情感陪伴设计的智能设备，提供沉浸式体验",
+        "overview": "传灵AI一体机是一款全面的交互式设备，让您的数字伴侣栩栩如生",
+        "features": {
+          "title": "核心功能",
+          "appearance": {
+            "title": "可定制外观",
+            "description": "多种形态可选，满足您的个性化需求",
+            "types": {
+              "title": "可选形态",
+              "dolls": "互动玩偶",
+              "figurines": "收藏公仔",
+              "realistic": "真人外观复制",
+              "pets": "宠物伴侣",
+              "custom": "自定义设计"
+            },
+            "customization": "上传照片，根据真实形象创建专属设计"
+          },
+          "interaction": {
+            "title": "互动功能",
+            "description": "通过多种模式与您的伴侣互动",
+            "voice": "自然语音对话",
+            "movement": "简单互动动作",
+            "response": "情感反应系统",
+            "touch": "触感互动表面"
+          },
+          "memory": {
+            "title": "记忆集成",
+            "description": "连接平台上的数字记忆",
+            "upload": "上传数字记忆",
+            "sync": "与平台账户同步",
+            "share": "设备间记忆共享",
+            "backup": "安全记忆备份"
+          },
+          "technical": {
+            "title": "技术规格",
+            "processor": "先进AI处理单元",
+            "display": "高清全息显示",
+            "audio": "360°空间音频",
+            "battery": "24小时续航",
+            "connectivity": "Wi-Fi和蓝牙连接"
+          }
+        },
+        "models": {
+          "title": "可选型号",
+          "standard": {
+            "title": "标准版",
+            "description": "完美的日常陪伴选择"
+          },
+          "premium": {
+            "title": "高级版",
+            "description": "增强功能和更多定制选项"
+          },
+          "limited": {
+            "title": "限量版",
+            "description": "独家设计，配备高级功能"
+          }
+        },
+        "cta": {
+          "design": "设计您的伴侣",
+          "customize": "定制外观",
+          "explore": "探索型号",
+          "preorder": "立即预订"
+        }
       }
     },
     "cta": {

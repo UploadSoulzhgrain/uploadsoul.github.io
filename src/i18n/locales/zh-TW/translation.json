@@ -119,5 +119,71 @@
     "zh-CN": "简体中文",
     "zh-TW": "繁體中文",
     "ja": "日本語"
+  },
+  "allInOne": {
+    "title": "傳靈一體機",
+    "description": "專為數位情感陪伴設計的智能設備，提供沉浸式體驗",
+    "overview": "傳靈AI一體機是一款全面的互動式設備，讓您的數位伴侶栩栩如生",
+    "features": {
+      "title": "核心功能",
+      "appearance": {
+        "title": "可定製外觀",
+        "description": "多種形態可選，滿足您的個性化需求",
+        "types": {
+          "title": "可選形態",
+          "dolls": "互動玩偶",
+          "figurines": "收藏公仔",
+          "realistic": "真人外觀複製",
+          "pets": "寵物伴侶",
+          "custom": "自定義設計"
+        },
+        "customization": "上傳照片，根據真實形象創建專屬設計"
+      },
+      "interaction": {
+        "title": "互動功能",
+        "description": "通過多種模式與您的伴侶互動",
+        "voice": "自然語音對話",
+        "movement": "簡單互動動作",
+        "response": "情感反應系統",
+        "touch": "觸感互動表面"
+      },
+      "memory": {
+        "title": "記憶集成",
+        "description": "連接平台上的數位記憶",
+        "upload": "上傳數位記憶",
+        "sync": "與平台帳戶同步",
+        "share": "設備間記憶共享",
+        "backup": "安全記憶備份"
+      },
+      "technical": {
+        "title": "技術規格",
+        "processor": "先進AI處理單元",
+        "display": "高清全息顯示",
+        "audio": "360°空間音頻",
+        "battery": "24小時續航",
+        "connectivity": "Wi-Fi和藍牙連接"
+      }
+    },
+    "models": {
+      "title": "可選型號",
+      "standard": {
+        "title": "標準版",
+        "description": "完美的日常陪伴選擇"
+      },
+      "premium": {
+        "title": "高級版",
+        "description": "增強功能和更多定製選項"
+      },
+      "limited": {
+        "title": "限量版",
+        "description": "獨家設計，配備高級功能"
+      }
+    },
+    "cta": {
+      "design": "設計您的伴侶",
+      "customize": "定製外觀",
+      "explore": "探索型號",
+      "preorder": "立即預訂"
+    }
   }
 }
