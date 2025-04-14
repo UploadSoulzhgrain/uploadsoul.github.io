@@ -96,7 +96,6 @@ const Footer = () => {
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.contactMethods')}</h4>
             <ul className="space-y-2 text-sm">
               <li className="flex items-center"><span className="text-purple-400 mr-2">@</span>{t('footer.email')}: uploadsoul@outlook.com</li>
-              <li className="flex items-center"><span className="text-purple-400 mr-2">☏</span>{t('footer.phone')}: +1-888-123-4567</li>
               <li className="flex items-center"><span className="text-purple-400 mr-2">⌖</span>{t('footer.address')}: {t('footer.addressDetails')}</li>
             </ul>
           </div>
