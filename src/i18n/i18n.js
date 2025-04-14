@@ -106,7 +106,7 @@ export const getSupportedLanguages = () => {
     { code: 'en', name: 'English' },
     { code: 'ja', name: '日本語' },
     { code: 'ko', name: '한국어' },
-    { code: 'es', name: 'Spanish' }
+    { code: 'es', name: 'Español' }
   ];
 };
 
