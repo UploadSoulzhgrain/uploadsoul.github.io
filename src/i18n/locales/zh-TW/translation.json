@@ -1,56 +1,56 @@
 {
   "app": {
-    "title": "UploadSoul 傳靈 虛擬世界，數字永生",
-    "description": "UploadSoul 傳靈 - 全息情感陪伴、虛擬寵物、數字永生等服務"
+    "title": "UploadSoul - 虛擬世界，數位永生",
+    "description": "UploadSoul - 全息情感陪伴、虛擬寵物、數位永生等服務"
   },
   "header": {
     "home": "首頁",
     "explore": "探索",
-    "companions": "伴侶",
+    "companions": "陪伴者",
     "about": "關於",
     "login": "登入",
     "signup": "註冊",
     "language": "語言",
-    "shop": "虛擬商城"
+    "shop": "虛擬商店"
   },
   "digitalHuman": {
-    "title": "數字人類",
-    "description": "創建您所愛的人的數字人類，隨時隨地享受對話。",
-    "createNew": "新建",
+    "title": "數位人",
+    "description": "為您所愛的人創建數位人，隨時隨地享受對話。",
+    "createNew": "創建新的",
     "voiceChat": {
-      "welcome": "您好，我是{name}。讓我們聊天吧。",
-      "defaultName": "數字人類",
-      "companion": "數字伴侶",
-      "tapToTalk": "點擊開始對話",
+      "welcome": "你好，我是{name}。讓我們聊聊。",
+      "defaultName": "數位人",
+      "companion": "數位陪伴者",
+      "tapToTalk": "點擊開始說話",
       "tapToStop": "點擊停止",
       "thinking": "思考中...",
       "play": "播放",
       "userAudioMessage": "語音訊息",
       "microphoneError": "無法訪問麥克風",
-      "processingError": "處理語音時出錯",
+      "processingError": "語音處理錯誤",
       "serverError": "伺服器連接問題",
       "fallbackToText": "語音錄製不可用。請使用文字聊天。",
-      "fallbackMessage": "現在是演示模式。",
+      "fallbackMessage": "這是演示模式。",
       "responses": {
-        "howAreYou": "今天感覺如何？",
+        "howAreYou": "你今天感覺如何？",
         "goodMemories": "我們一起度過了美好的時光。",
         "missYou": "我一直在想你。",
-        "loveTalking": "我喜歡與你交談。",
-        "rememberWhen": "記得那天嗎？那是很美好的時光。"
+        "loveTalking": "我喜歡和你聊天。",
+        "rememberWhen": "記得那天嗎？那是個美好的時光。"
       }
     },
-    "intro": "您可以與數字人類交談，探索珍貴記憶，體驗他們的個性和思想。",
+    "intro": "你可以與數位人聊天，探索珍貴的回憶，體驗他們的個性和想法。",
     "startVoiceChat": "開始語音聊天",
     "memories": {
       "title": "記憶庫",
       "addNew": "添加新記憶",
-      "added": "成功添加記憶",
-      "placeholder": "記錄關於這個人的珍貴記憶...",
+      "added": "記憶添加成功",
+      "placeholder": "記錄關於這個人的珍貴回憶...",
       "save": "保存"
     },
     "reunionFeatures": {
       "title": "家庭團聚",
-      "description": "透過互動式家譜探索您的家庭連結並保存家族歷史。"
+      "description": "通過互動式家譜探索您的家庭關係並保存家族歷史。"
     }
   },
   "footer": {
@@ -59,50 +59,50 @@
     "termsOfService": "服務條款",
     "contactUs": "聯絡我們",
     "copyright": "版權所有。",
-    "services": "產品服務",
-    "aboutCompany": "公司介紹",
+    "services": "服務",
+    "aboutCompany": "關於公司",
     "team": "團隊成員",
-    "contact": "聯絡我們",
+    "contact": "聯絡",
     "joinUs": "加入我們",
     "contactMethods": "聯絡方式",
-    "email": "郵箱",
+    "email": "電子郵件",
     "phone": "電話",
     "address": "地址",
     "addressDetails": "加拿大溫哥華",
-    "platformName": "傳靈 虛擬世界，數字永生"
+    "platformName": "虛擬世界，數位永生"
   },
   "home": {
     "hero": {
-      "title": "您的數字情感伴侶",
+      "title": "您的數位情感陪伴者",
       "subtitle": "通過先進的AI技術體驗情感陪伴的未來",
-      "cta": "立即體驗"
+      "cta": "開始體驗"
     },
     "features": {
-      "title": "平台特色",
+      "title": "平台功能",
       "emotionalCompanion": {
-        "title": "全息情感陪伴",
-        "description": "創建您的個性化AI伴侶，擁有獨特的性格特點"
+        "title": "全息情感陪伴者",
+        "description": "創建具有獨特個性特徵的個性化AI陪伴者"
       },
       "virtualPet": {
         "title": "虛擬寵物",
-        "description": "領養並培養具有高級AI行為的數字寵物"
+        "description": "領養和培養具有先進AI行為的數位寵物"
       },
       "digitalImmortality": {
-        "title": "數字永生",
-        "description": "以數字形式保存您的記憶和個性"
+        "title": "數位永生",
+        "description": "以數位形式保存您的記憶和個性"
       }
     },
     "testimonials": {
-      "title": "用戶評價",
+      "title": "用戶見證",
       "seeMore": "查看更多"
     }
   },
   "companion": {
-    "selectCompanion": "選擇您的AI夥伴",
-    "startConversation": "開始與以下對象的對話",
+    "selectCompanion": "選擇您的AI陪伴者",
+    "startConversation": "開始與",
     "sendMessage": "發送",
     "inputPlaceholder": "輸入訊息...",
-    "record": "錄音",
+    "record": "錄製",
     "uploadImage": "上傳圖片",
     "addEmoji": "添加表情"
   },
@@ -112,7 +112,7 @@
     "email": "電子郵件",
     "password": "密碼",
     "forgotPassword": "忘記密碼？",
-    "orContinueWith": "或繼續使用"
+    "orContinueWith": "或使用以下方式繼續"
   },
   "languages": {
     "en": "English",
@@ -121,35 +121,35 @@
     "ja": "日本語"
   },
   "allInOne": {
-    "title": "傳靈一體機",
+    "title": "UploadSoul 一體機",
     "description": "專為數位情感陪伴設計的智能設備，提供沉浸式體驗",
-    "overview": "傳靈AI一體機是一款全面的互動式設備，讓您的數位伴侶栩栩如生",
+    "overview": "UploadSoul AI一體機是一款全面的互動設備，讓您的數位陪伴者栩栩如生",
     "features": {
       "title": "核心功能",
       "appearance": {
-        "title": "可定製外觀",
-        "description": "多種形態可選，滿足您的個性化需求",
+        "title": "可自定義外觀",
+        "description": "多種形式可供選擇，滿足您的個性化需求",
         "types": {
-          "title": "可選形態",
+          "title": "可用形式",
           "dolls": "互動玩偶",
-          "figurines": "收藏公仔",
-          "realistic": "真人外觀複製",
-          "pets": "寵物伴侶",
+          "figurines": "收藏人偶",
+          "realistic": "真實外觀複製",
+          "pets": "寵物陪伴者",
           "custom": "自定義設計"
         },
-        "customization": "上傳照片，根據真實形象創建專屬設計"
+        "customization": "上傳照片，根據真實圖像創建獨家設計"
       },
       "interaction": {
         "title": "互動功能",
-        "description": "通過多種模式與您的伴侶互動",
+        "description": "通過多種模式與您的陪伴者互動",
         "voice": "自然語音對話",
         "movement": "簡單互動動作",
-        "response": "情感反應系統",
-        "touch": "觸感互動表面"
+        "response": "情感回應系統",
+        "touch": "觸覺互動表面"
       },
       "memory": {
-        "title": "記憶集成",
-        "description": "連接平台上的數位記憶",
+        "title": "記憶整合",
+        "description": "與平台上的數位記憶連接",
         "upload": "上傳數位記憶",
         "sync": "與平台帳戶同步",
         "share": "設備間記憶共享",
@@ -160,28 +160,28 @@
         "processor": "先進AI處理單元",
         "display": "高清全息顯示",
         "audio": "360°空間音頻",
-        "battery": "24小時續航",
+        "battery": "24小時電池續航",
         "connectivity": "Wi-Fi和藍牙連接"
       }
     },
     "models": {
-      "title": "可選型號",
+      "title": "可用型號",
       "standard": {
         "title": "標準版",
-        "description": "完美的日常陪伴選擇"
+        "description": "日常陪伴的完美選擇"
       },
       "premium": {
         "title": "高級版",
-        "description": "增強功能和更多定製選項"
+        "description": "增強功能和更多自定義選項"
       },
       "limited": {
         "title": "限量版",
-        "description": "獨家設計，配備高級功能"
+        "description": "獨家設計，高級功能"
       }
     },
     "cta": {
-      "design": "設計您的伴侶",
-      "customize": "定製外觀",
+      "design": "設計您的陪伴者",
+      "customize": "自定義外觀",
       "explore": "探索型號",
       "preorder": "立即預訂"
     }
