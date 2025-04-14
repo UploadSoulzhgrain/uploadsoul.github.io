@@ -853,8 +853,70 @@
     "description": "Experience virtual reality with UploadSoul"
   },
   "allInOne": {
-    "title": "All-in-One",
-    "description": "Comprehensive digital life platform"
+    "title": "AI All-in-One",
+    "description": "Smart device designed for digital emotional companionship, providing immersive experience",
+    "overview": "The UploadSoul AI All-in-One is a comprehensive interactive device that brings your digital companions to life",
+    "features": {
+      "title": "Key Features",
+      "appearance": {
+        "title": "Customizable Appearance",
+        "description": "Choose from a variety of forms to match your preferences",
+        "types": {
+          "title": "Available Forms",
+          "dolls": "Interactive Dolls",
+          "figurines": "Collectible Figurines",
+          "realistic": "Realistic Human Replicas",
+          "pets": "Pet Companions",
+          "custom": "Custom Designs"
+        },
+        "customization": "Upload photos to create a design based on real appearances"
+      },
+      "interaction": {
+        "title": "Interactive Capabilities",
+        "description": "Engage with your companion through multiple modes",
+        "voice": "Natural Voice Conversations",
+        "movement": "Simple Interactive Movements",
+        "response": "Emotional Response System",
+        "touch": "Touch-Sensitive Surface"
+      },
+      "memory": {
+        "title": "Memory Integration",
+        "description": "Connect with your digital memories from the platform",
+        "upload": "Upload Digital Memories",
+        "sync": "Sync with Platform Account",
+        "share": "Share Memories Between Devices",
+        "backup": "Secure Memory Backup"
+      },
+      "technical": {
+        "title": "Technical Specifications",
+        "processor": "Advanced AI Processing Unit",
+        "display": "HD Holographic Display",
+        "audio": "360° Spatial Audio",
+        "battery": "24-hour Battery Life",
+        "connectivity": "Wi-Fi & Bluetooth Connectivity"
+      }
+    },
+    "models": {
+      "title": "Available Models",
+      "standard": {
+        "title": "Standard Edition",
+        "description": "Perfect for everyday companionship"
+      },
+      "premium": {
+        "title": "Premium Edition",
+        "description": "Enhanced features and customization options"
+      },
+      "limited": {
+        "title": "Limited Edition",
+        "description": "Exclusive designs with advanced capabilities"
+      }
+    },
+    "cta": {
+      "design": "Design Your Companion",
+      "customize": "Customize Appearance",
+      "explore": "Explore Models",
+      "preorder": "Pre-order Now"
+    }
   },
   "terms": {
     "title": "Terms of Service",
