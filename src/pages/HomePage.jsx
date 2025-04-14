@@ -21,10 +21,17 @@ const HomePage = () => {
             <Logo size="xl" className="animate-pulse-slow" />
           </div>
           <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6 animate-fadeInUp">{t('app.title')}</h1>
+          {/* 融资公告 */}
+          <div className="max-w-2xl mx-auto mb-6 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
+            <div className="p-3 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg text-center border border-purple-200 shadow-sm">
+              <p className="text-purple-800 text-lg font-bold mb-1">{t('home.features.funding.title')}</p>
+              <p className="text-purple-700">{t('home.features.funding.description')}</p>
+            </div>
+          </div>
           <h2 className="text-3xl font-semibold text-purple-600 mb-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
             {t('home.hero.subtitle')}
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
+          <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-10 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
             {t('home.hero.description')}
           </p>
           <div className="flex justify-center space-x-4 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
@@ -57,16 +64,16 @@ const HomePage = () => {
                 <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
                   <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m0-15C8.625 4.5 6 7.125 6 10.5c0 1.5.75 3.75 3 5.25 2.25 1.5 3 2.25 3 3.75m0-15c3.375 0 6 2.625 6 6 0 1.5-.75 3.75-3 5.25-2.25 1.5-3 2.25-3 3.75" />
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-xl font-bold text-center text-white mb-3">{t('digitalImmortality.title')}</h3>
+                <h3 className="text-xl font-bold text-center text-white mb-3">{t('home.features.digitalImmortality.title')}</h3>
                 <p className="text-white text-center opacity-90 flex-grow">
-                  {t('digitalImmortality.description')}
+                  {t('home.features.digitalImmortality.description')}
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('digitalImmortality.startButton')}</span>
+                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('common.startExperience')}</span>
                 </div>
                 <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
                   <div className="h-full w-1/2 bg-white animate-shimmer"></div>
@@ -111,7 +118,7 @@ const HomePage = () => {
                   {t('home.features.emotionalCompanion.description')}
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">开始体验</span>
+                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('common.startExperience')}</span>
                 </div>
                 <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
                   <div className="h-full w-1/2 bg-white animate-shimmer"></div>

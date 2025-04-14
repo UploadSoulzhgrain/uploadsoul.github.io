@@ -180,13 +180,19 @@
     "title": "Home",
     "description": "Welcome to UploadSoul - Your Digital Life Platform",
     "hero": {
-      "title": "Create Your Digital Legacy",
-      "subtitle": "Connect with Loved Ones Beyond Time",
-      "description": "UploadSoul helps you preserve memories, create digital companions, and maintain eternal connections with those who matter most."
+      "title": "Your Digital Emotional Companion",
+      "subtitle": "Virtual World, Digital Immortality",
+      "description": "Create your exclusive digital companion for eternal companionship beyond time",
+      "cta": "Start Experience",
+      "mvpTest": "MVP Test Channel"
     },
     "features": {
       "title": "Platform Features",
       "description": "Full-dimensional digital soul experience, making every interaction warm and emotional",
+      "funding": {
+        "title": "Funding Announcement",
+        "description": "Currently raising angel round investment, looking forward to advancing the new era of digital emotions with you"
+      },
       "emotionalCompanion": {
         "title": "Emotional Companion",
         "description": "Experience meaningful conversations and emotional support from your digital companions."
@@ -201,11 +207,13 @@
       },
       "digitalWorld": {
         "title": "Digital World",
-        "description": "Build and explore your own digital universe with your companions."
+        "description": "Build and explore your own digital universe with your companions.",
+        "fundingAd": "Currently raising angel round investment. Join us in advancing digital emotions."
       },
       "digitalImmortality": {
         "title": "Digital Immortality",
-        "description": "Preserve your thoughts, memories, and personality in a digital form that lives on forever."
+        "description": "AI technology captures personal memories and emotions, ensuring your legacy continues even after you're gone.",
+        "fundingAd": "Currently raising angel round investment. Join us in advancing digital emotions."
       },
       "digitalRebirth": {
         "title": "Digital Rebirth",
@@ -218,7 +226,9 @@
     },
     "cta": {
       "title": "Start Your Digital Journey Today",
-      "description": "Join thousands of users who have already created their digital legacy."
+      "description": "Join thousands of users who have already created their digital legacy.",
+      "freeRegister": "Free Registration",
+      "digitalHumanExperience": "Digital Human Experience"
     },
     "testimonials": {
       "title": "User Testimonials",
@@ -239,8 +249,12 @@
       "features": {
         "chat": "Smart Conversation",
         "support": "Emotional Support",
-        "advice": "Life Advice"
-      }
+        "advice": "Life Advice",
+        "personality": "Personalized Character",
+        "interaction": "Natural Interaction",
+        "learning": "Continuous Learning"
+      },
+      "button": "Start Chat"
     },
     "elderly": {
       "title": "Elderly Companion",
@@ -248,8 +262,12 @@
       "features": {
         "daily": "Daily Care",
         "health": "Health Reminders",
-        "community": "Community Interaction"
-      }
+        "community": "Community Interaction",
+        "activities": "Activity Suggestions",
+        "emergency": "Emergency Assistance",
+        "companionship": "Emotional Support"
+      },
+      "button": "Start Companionship"
     },
     "therapy": {
       "title": "Psychological Support",
@@ -257,7 +275,116 @@
       "features": {
         "consultation": "Online Consultation",
         "tools": "Psychological Tools",
-        "resources": "Resource Center"
+        "resources": "Resource Center",
+        "professional": "Professional Guidance",
+        "privacy": "Privacy Protection",
+        "support": "Continuous Support"
+      },
+      "button": "Start Consultation"
+    },
+    "chat": {
+      "title": "Chat",
+      "selectCharacter": "Please select a character to start chatting",
+      "inputPlaceholder": "Type a message...",
+      "send": "Send",
+      "voice": "Voice Chat",
+      "image": "Image",
+      "emoji": "Emoji",
+      "thinking": "Thinking...",
+      "startVoiceChat": "Start Voice Chat",
+      "stopVoiceChat": "Stop Voice Chat",
+      "uploadImage": "Upload Image",
+      "selectEmoji": "Select Emoji",
+      "characterInfo": "Character Info",
+      "personality": "Personality Traits",
+      "features": "Special Features",
+      "startVoice": "Start Voice Chat",
+      "stopVoice": "Stop Voice Chat",
+      "connecting": "Connecting to voice service...",
+      "voiceError": "Voice service connection failed, please check microphone permissions",
+      "voiceMessage": "Voice Message",
+      "voicePlaying": "Playing voice...",
+      "voiceStopped": "Voice stopped",
+      "voiceFailed": "Voice playback failed"
+    },
+    "characters": {
+      "therapy": {
+        "doctorwang": {
+          "name": "Dr. Wang",
+          "description": "Professional psychological consultant specializing in psychological guidance and therapy",
+          "personality": "Professional, rigorous, empathetic",
+          "features": "Psychological counseling, emotion management, stress relief"
+        },
+        "xiaoyue": {
+          "name": "Xiao Yue",
+          "description": "Warm and caring psychological counselor, skilled in listening and empathy",
+          "personality": "Warm, caring, empathetic",
+          "features": "Psychological guidance, emotional support, growth coaching"
+        }
+      },
+      "ai": {
+        "xiaoai": {
+          "name": "Xiao Ai",
+          "description": "Gentle and thoughtful AI companion, good at listening and providing emotional support",
+          "personality": "Gentle, thoughtful, understanding",
+          "features": "Emotional support, daily companionship, intelligent conversation"
+        },
+        "xiaozhi": {
+          "name": "Xiao Zhi",
+          "description": "Humorous and witty AI companion, good at creating a lively atmosphere",
+          "personality": "Humorous, cheerful, clever",
+          "features": "Witty conversation, knowledge sharing, fun interaction"
+        },
+        "xiaoyu": {
+          "name": "Xiao Yu",
+          "description": "Artistic and fresh AI companion, good at literary creation and art appreciation",
+          "personality": "Artistic, quiet, imaginative",
+          "features": "Literary creation, art appreciation, spiritual conversation"
+        },
+        "xiaofeng": {
+          "name": "Xiao Feng",
+          "description": "Energetic AI companion, good at sports and outdoor activities",
+          "personality": "Energetic, sunny, enthusiastic",
+          "features": "Exercise guidance, outdoor activities, healthy lifestyle"
+        },
+        "xiaoxue": {
+          "name": "Xiao Xue",
+          "description": "Rational and calm AI companion, good at analyzing and solving problems",
+          "personality": "Rational, calm, logical",
+          "features": "Problem analysis, decision advice, learning guidance"
+        },
+        "xiaohai": {
+          "name": "Xiao Hai",
+          "description": "Romantic AI companion, good at creating surprises and romantic experiences",
+          "personality": "Romantic, passionate, creative",
+          "features": "Romantic dates, creative activities, emotional expression"
+        },
+        "xiaolong": {
+          "name": "Xiao Long",
+          "description": "Knowledgeable AI companion, good at knowledge sharing and academic discussion",
+          "personality": "Knowledgeable, rigorous, curious",
+          "features": "Knowledge sharing, academic discussion, learning guidance"
+        },
+        "xiaomei": {
+          "name": "Xiao Mei",
+          "description": "Fashionable and trendy AI companion, good at fashion matching and trend recommendations",
+          "personality": "Fashionable, trendy, unique taste",
+          "features": "Fashion matching, trend recommendations, image design"
+        }
+      },
+      "elderly": {
+        "laozhang": {
+          "name": "Lao Zhang",
+          "description": "Experienced elderly companion, good at life advice and health guidance",
+          "personality": "Steady, patient, experienced",
+          "features": "Life advice, health guidance, experience sharing"
+        },
+        "liayi": {
+          "name": "Auntie Li",
+          "description": "Kind and gentle elderly companion, good at emotional communication and caregiving",
+          "personality": "Kind, gentle, attentive",
+          "features": "Emotional communication, daily care, psychological support"
+        }
       }
     }
   },
@@ -506,8 +633,19 @@
     }
   },
   "common": {
-    "previous": "Previous",
-    "next": "Next"
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "create": "Create",
+    "edit": "Edit",
+    "view": "View",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "startExperience": "Start Experience"
   },
   "games": {
     "title": "Games",
@@ -659,7 +797,8 @@
   },
   "digitalWorld": {
     "title": "Digital World",
-    "description": "Explore the digital world of UploadSoul",
+    "description": "Experience immersive interactions in our custom-designed virtual environments.",
+    "fundingAd": "Currently raising angel round investment. Join us in advancing digital emotions.",
     "scenes": {
       "home": {
         "title": "Cozy Home",

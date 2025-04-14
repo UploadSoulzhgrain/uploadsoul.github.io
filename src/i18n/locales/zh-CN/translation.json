@@ -43,8 +43,8 @@
   },
   "home": {
     "hero": {
-      "title": "您的数字情感伴侣",
-      "subtitle": "虚拟世界，数字永生",
+      "title": "UploadSoul 传灵 虚拟世界，数字永生",
+      "subtitle": "",
       "description": "打造您专属的数字伴侣，超越时间的永恒陪伴",
       "cta": "开始体验",
       "mvpTest": "MVP测试通道"
@@ -52,6 +52,28 @@
     "features": {
       "title": "平台特色",
       "description": "全维度数字灵魂体验，让每一次互动充满温度与情感",
+      "funding": {
+        "title": "融资公告",
+        "description": "正在进行天使轮融资，期待与您共同推动数字情感新时代的到来"
+      },
+      "digitalImmortality": {
+        "title": "数字永生",
+        "description": "AI技术捕捉个人记忆和情感，确保您的遗产在您离开后依然延续。",
+        "fundingAd": "目前正在进行天使轮融资，期待与您共同推动数字情感新时代的到来。"
+      },
+      "digitalRebirth": {
+        "title": "数字重生",
+        "description": "利用人工智能技术，结合照片、声音、记忆等数据，让逝去的亲人在数字世界中重生。"
+      },
+      "virtualPartner": {
+        "title": "虚拟伴侣",
+        "description": "创建您的理想伴侣，定制外貌、性格和声音，享受无与伦比的情感陪伴。"
+      },
+      "virtualWorld": {
+        "title": "虚拟世界",
+        "description": "在我们定制设计的虚拟环境中体验沉浸式互动。",
+        "fundingAd": "目前正在进行天使轮融资，期待与您共同推动数字情感新时代的到来。"
+      },
       "emotionalCompanion": {
         "title": "情感陪伴",
         "description": "基于先进的情感计算技术，为您提供专属的情感支持和理解"
@@ -67,10 +89,6 @@
       "digitalWorld": {
         "title": "数字世界构建",
         "description": "创建属于您的专属数字世界，与您的数字伴侣共同探索"
-      },
-      "digitalImmortality": {
-        "title": "数字永生",
-        "description": "突破时空限制，将您的思想、记忆和性格数字化，实现永恒的生命延续"
       },
       "vr": {
         "title": "VR设备"
@@ -755,8 +773,19 @@
     }
   },
   "common": {
-    "previous": "上一步",
-    "next": "下一步"
+    "back": "返回",
+    "next": "下一步",
+    "submit": "提交",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "create": "创建",
+    "edit": "编辑",
+    "view": "查看",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "startExperience": "开始体验"
   },
   "virtualLove": {
     "title": "虚拟恋爱",
