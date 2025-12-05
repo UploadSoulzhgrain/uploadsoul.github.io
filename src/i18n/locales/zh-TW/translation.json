@@ -90,6 +90,37 @@
       "digitalImmortality": {
         "title": "數位永生",
         "description": "以數位形式保存您的記憶和個性"
+      },
+      "allInOne": {
+        "title": "傳靈一體機",
+        "description": "一款全面的互動式設備，讓您的數位伴侶栩栩如生",
+        "overview": "傳靈AI一體機專為數位情感陪伴設計，提供沉浸式體驗",
+        "features": {
+          "title": "主要功能",
+          "appearance": {
+            "title": "外觀定制",
+            "description": "選擇多種外觀選項以匹配您的喜好",
+            "types": {
+              "dolls": "玩偶風格",
+              "figurines": "人偶風格",
+              "realistic": "寫實風格",
+              "pets": "寵物風格",
+              "custom": "自定義風格"
+            }
+          },
+          "interaction": {
+            "title": "互動功能",
+            "description": "先進的AI技術實現自然對話和情感回應"
+          },
+          "display": {
+            "title": "高品質顯示",
+            "description": "清晰顯示帶來逼真的視覺體驗"
+          }
+        },
+        "cta": {
+          "preorder": "立即預購",
+          "learnMore": "了解更多"
+        }
       }
     },
     "testimonials": {

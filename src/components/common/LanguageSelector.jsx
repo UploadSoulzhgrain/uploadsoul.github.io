@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 const LanguageSelector = ({ onLanguageChange }) => {
   const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState(i18n.language);
   
   // Available languages
   const languages = [
@@ -16,7 +17,7 @@ const LanguageSelector = ({ onLanguageChange }) => {
   ];
 
   // Get current language
-  const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[1]; // Default to zh-CN if not found
+  const currentLanguage = languages.find(lang => lang.code === currentLang) || languages[1]; // Default to zh-CN if not found
 
   const toggleDropdown = (e) => {
     e.stopPropagation();
@@ -25,25 +26,66 @@ const LanguageSelector = ({ onLanguageChange }) => {
 
   const changeLanguage = async (langCode) => {
     try {
-      await i18n.changeLanguage(langCode);
-      // Save language preference to localStorage
+      console.log('Changing language to:', langCode);
+      // 先设置localStorage
       localStorage.setItem('i18nextLng', langCode);
-      // Force i18n to use the saved language
-      i18n.language = langCode;
+      
+      // 然后改变i18n的语言
+      await i18n.changeLanguage(langCode);
+      
+      // 更新当前语言状态
+      setCurrentLang(langCode);
+      
+      // 强制刷新语言设置
+      document.documentElement.lang = langCode;
+      
       setIsOpen(false);
+      
       if (onLanguageChange) {
         onLanguageChange(langCode);
+      }
+      
+      // 如果是开发环境，可以考虑重新加载页面以确保所有组件使用新语言
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Development mode: Consider page reload if translations are not updating');
       }
     } catch (error) {
       console.error('Error changing language:', error);
     }
   };
 
-  // Initialize language from localStorage on component mount
+  // 监听i18n语言变化
+  useEffect(() => {
+    const handleLanguageChanged = (lang) => {
+      console.log('Language changed event:', lang);
+      setCurrentLang(lang);
+    };
+    
+    i18n.on('languageChanged', handleLanguageChanged);
+    
+    return () => {
+      i18n.off('languageChanged', handleLanguageChanged);
+    };
+  }, [i18n]);
+
+  // 初始化时从localStorage加载语言
   useEffect(() => {
     const savedLanguage = localStorage.getItem('i18nextLng');
-    if (savedLanguage && savedLanguage !== i18n.language) {
-      i18n.changeLanguage(savedLanguage);
+    console.log('Saved language in localStorage:', savedLanguage);
+    console.log('Current i18n language:', i18n.language);
+    
+    if (savedLanguage) {
+      // 规范化语言代码
+      const normalizedLang = savedLanguage === 'zh' ? 'zh-CN' : savedLanguage;
+      
+      if (normalizedLang !== i18n.language) {
+        console.log('Initializing language to:', normalizedLang);
+        i18n.changeLanguage(normalizedLang).then(() => {
+          setCurrentLang(normalizedLang);
+        });
+      } else {
+        setCurrentLang(i18n.language);
+      }
     }
   }, []);
 
@@ -96,7 +138,7 @@ const LanguageSelector = ({ onLanguageChange }) => {
                 className={`block w-full text-left px-4 py-2 text-sm ${currentLanguage.code === language.code ? 'bg-purple-50 text-purple-600' : 'text-gray-700 hover:bg-gray-100'} flex justify-between items-center`}
                 role="menuitem"
               >
-                <span>{t(`languages.${language.code}`)}</span>
+                <span>{language.name}</span>
                 <span className="text-gray-400 text-xs">{language.short}</span>
               </button>
             ))}

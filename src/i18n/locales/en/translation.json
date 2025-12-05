@@ -220,8 +220,35 @@
         "description": "Bring back loved ones in a digital form, allowing their essence to continue being part of your life."
       },
       "allInOne": {
-        "title": "UploadSoul All-in-One",
-        "description": "Smart device designed for digital emotional companionship, providing immersive experience"
+        "title": "AI All-in-One Device",
+        "description": "A comprehensive interactive device that brings your digital companion to life",
+        "overview": "The UploadSoul AI All-in-One device is designed for digital emotional companionship, providing an immersive experience",
+        "features": {
+          "title": "Key Features",
+          "appearance": {
+            "title": "Appearance Customization",
+            "description": "Choose from various appearance options to match your preferences",
+            "types": {
+              "dolls": "Doll Style",
+              "figurines": "Figurine Style",
+              "realistic": "Realistic Style",
+              "pets": "Pet Style",
+              "custom": "Custom Style"
+            }
+          },
+          "interaction": {
+            "title": "Interactive Features",
+            "description": "Advanced AI technology enables natural conversations and emotional responses"
+          },
+          "display": {
+            "title": "High-Quality Display",
+            "description": "Crystal-clear display for lifelike visual experience"
+          }
+        },
+        "cta": {
+          "preorder": "Pre-order Now",
+          "learnMore": "Learn More"
+        }
       }
     },
     "cta": {
@@ -293,7 +320,7 @@
       "thinking": "Thinking...",
       "startVoiceChat": "Start Voice Chat",
       "stopVoiceChat": "Stop Voice Chat",
-      "uploadImage": "Upload Image",
+    "uploadImage": "Upload Image",
       "selectEmoji": "Select Emoji",
       "characterInfo": "Character Info",
       "personality": "Personality Traits",
