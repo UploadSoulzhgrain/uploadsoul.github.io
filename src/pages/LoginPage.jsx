@@ -1,135 +1,130 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { login } from '../core/store/slices/userSlice';
-import authAPI from '../core/api/authAPI';
-import { StorageService } from '../core/utils/storage';
+import Logo from '../components/common/Logo';
 
 const LoginPage = () => {
   const { t } = useTranslation();
+  const { signIn } = useAuth();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
+    setError(null);
 
     try {
-      const response = await authAPI.login(formData);
-      if (response.token) {
-        StorageService.setItem('token', response.token);
-        dispatch(login(response.user));
-        navigate('/');
-      }
-    } catch (err) {
-      setError(err.message || t('login.error'));
+      const { error } = await signIn({ email, password });
+      if (error) throw error;
+      navigate('/');
+    } catch (error) {
+      console.error('Login error:', error);
+      setError(error.message || '登录失败，请检查邮箱和密码');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-500 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-2xl">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {t('login.title')}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            {t('login.or')}{' '}
-            <Link to="/register" className="font-medium text-purple-600 hover:text-purple-500">
-              {t('login.register')}
-            </Link>
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                {t('login.email')}
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                placeholder={t('login.email')}
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                {t('login.password')}
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-purple-500 focus:border-purple-500 focus:z-10 sm:text-sm"
-                placeholder={t('login.password')}
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+    <div className="min-h-screen bg-tech-gradient flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <Link to="/" className="inline-block mb-6">
+          <Logo size="lg" />
+        </Link>
+        <h2 className="text-3xl font-extrabold text-white mb-2">
+          {t('auth.login', '欢迎回来')}
+        </h2>
+        <p className="text-gray-400">
+          {t('auth.loginDesc', '登录您的 UploadSoul 账号')}
+        </p>
+      </div>
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
-                {t('login.remember')}
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-[#1A1A24] py-8 px-4 shadow-2xl sm:rounded-2xl sm:px-10 border border-white/5">
+          <form className="space-y-6" onSubmit={handleLogin}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                邮箱地址
               </label>
+              <div className="mt-1">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                />
+              </div>
             </div>
 
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-purple-600 hover:text-purple-500">
-                {t('login.forgot')}
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                密码
+              </label>
+              <div className="mt-1">
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                />
+              </div>
+            </div>
+
+            {error && (
+              <div className="text-red-400 text-sm text-center bg-red-900/20 py-2 rounded-lg border border-red-900/50">
+                {error}
+              </div>
+            )}
+
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white btn-premium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? '登录中...' : '立即登录'}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-700" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-[#1A1A24] text-gray-500">
+                  或者
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-3">
+              <Link
+                to="/register"
+                className="w-full flex justify-center py-3 px-4 border border-gray-700 rounded-xl shadow-sm bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 transition-colors"
+              >
+                注册新账号
               </Link>
             </div>
           </div>
-
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50"
-            >
-              {loading ? t('login.loading') : t('login.submit')}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
 
-export default LoginPage; 
+export default LoginPage;
