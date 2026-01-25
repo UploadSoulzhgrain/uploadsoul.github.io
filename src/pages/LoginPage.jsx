@@ -92,6 +92,14 @@ const LoginPage = () => {
               </div>
             )}
 
+            <div className="flex items-center justify-between">
+              <div className="text-sm">
+                <Link to="/forgot-password" className="font-medium text-amber-500 hover:text-amber-400">
+                  {t('auth.forgotPassword', '忘记密码?')}
+                </Link>
+              </div>
+            </div>
+
             <div>
               <button
                 type="submit"

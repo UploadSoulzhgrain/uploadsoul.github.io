@@ -17,10 +17,16 @@ const Header = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-    setIsUserMenuOpen(false);
-    setIsMenuOpen(false);
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Sign out error:', error);
+    } finally {
+      // 无论后端是否成功，前端必须清除状态并跳转
+      navigate('/');
+      setIsUserMenuOpen(false);
+      setIsMenuOpen(false);
+    }
   };
 
   return (
