@@ -40,7 +40,7 @@ const RegisterPage = () => {
       if (error) throw error;
 
       if (data?.session) {
-        navigate('/'); // 直接登录成功
+        navigate('/dashboard'); // 直接登录成功，跳转至仪表盘
       } else if (data?.user) {
         setMessage('注册确认邮件已发送！请查收邮件并点击链接完成验证。');
       }
@@ -74,8 +74,8 @@ const RegisterPage = () => {
             <button
               onClick={() => setMethod('email')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${method === 'email'
-                  ? 'bg-amber-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
+                ? 'bg-amber-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white'
                 }`}
             >
               邮箱注册
@@ -83,8 +83,8 @@ const RegisterPage = () => {
             <button
               onClick={() => setMethod('phone')}
               className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${method === 'phone'
-                  ? 'bg-amber-500 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
+                ? 'bg-amber-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white'
                 }`}
             >
               手机注册

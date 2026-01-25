@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import Logo from '../components/common/Logo';
@@ -13,6 +13,8 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const { state } = useLocation();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -21,7 +23,8 @@ const LoginPage = () => {
     try {
       const { error } = await signIn({ email, password });
       if (error) throw error;
-      navigate('/');
+      // 跳转回来源页面，或者默认跳去仪表盘
+      navigate(state?.from?.pathname || '/dashboard');
     } catch (error) {
       console.error('Login error:', error);
       setError(error.message || '登录失败，请检查邮箱和密码');

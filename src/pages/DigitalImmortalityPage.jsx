@@ -1,16 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 import FeatureIllustrations from '../components/FeatureIllustrations';
 
 const DigitalImmortalityPage = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleCreate = () => {
+    if (user) {
+      navigate('/digital-immortality/create');
+    } else {
+      navigate('/login', { state: { from: { pathname: '/digital-immortality/create' } } });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">
-          {t('digitalImmortality.title')} 
+          {t('digitalImmortality.title')}
           <span className="ml-4">
             {t('digitalImmortality.slogan')}
           </span>
@@ -59,12 +71,12 @@ const DigitalImmortalityPage = () => {
       </div>
 
       <div className="text-center">
-        <Link
-          to="/digital-immortality/create"
-          className="inline-block bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
+        <button
+          onClick={handleCreate}
+          className="inline-block bg-blue-600 text-white py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1"
         >
           {t('digitalImmortality.startCreation')}
-        </Link>
+        </button>
       </div>
 
       <FeatureIllustrations />

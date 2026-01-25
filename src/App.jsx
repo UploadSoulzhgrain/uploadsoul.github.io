@@ -31,6 +31,8 @@ import DigitalWorldPage from './pages/DigitalWorldPage'
 import NotFoundPage from './pages/NotFoundPage'
 import SitemapPage from './pages/SitemapPage'
 import { Helmet } from 'react-helmet-async'
+import DashboardPage from './pages/DashboardPage'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 
 function App() {
   return (
@@ -47,6 +49,14 @@ function App() {
           <main className="flex-grow">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <DashboardPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/companion" element={<CompanionPage />} />
