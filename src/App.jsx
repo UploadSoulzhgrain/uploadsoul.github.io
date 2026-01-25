@@ -33,6 +33,8 @@ import SitemapPage from './pages/SitemapPage'
 import { Helmet } from 'react-helmet-async'
 import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/auth/ProtectedRoute'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import UpdatePasswordPage from './pages/UpdatePasswordPage'
 
 function App() {
   return (
@@ -58,6 +60,8 @@ function App() {
                 }
               />
               <Route path="/login" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/update-password" element={<UpdatePasswordPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/companion" element={<CompanionPage />} />
               <Route path="/pet" element={<PetPage />} />
