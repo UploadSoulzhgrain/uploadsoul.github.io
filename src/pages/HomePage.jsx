@@ -1,9 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
 
 const HomePage = () => {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleAction = (path) => {
+    if (user) {
+      navigate(path);
+    } else {
+      navigate('/login', { state: { from: { pathname: path } } });
+    }
+  };
 
   // 核心功能
   const features = [
@@ -124,10 +136,10 @@ const HomePage = () => {
           {/* 功能网格 */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((feature, index) => (
-              <Link
+              <div
                 key={feature.id}
-                to={feature.link}
-                className={`card-premium p-8 group ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                onClick={() => handleAction(feature.link)}
+                className={`card-premium p-8 group cursor-pointer ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
               >
                 {/* 图标 */}
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6 text-amber-500 group-hover:text-amber-400 transition-colors">
@@ -151,7 +163,7 @@ const HomePage = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>

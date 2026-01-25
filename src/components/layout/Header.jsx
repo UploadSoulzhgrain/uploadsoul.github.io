@@ -73,7 +73,9 @@ const Header = () => {
                   <div className="absolute right-0 mt-2 w-48 bg-[#1A1A24] rounded-xl shadow-xl border border-white/10 py-1 z-50">
                     <div className="px-4 py-3 border-b border-white/5">
                       <p className="text-xs text-gray-500">已登录账号</p>
-                      <p className="text-sm text-white truncate">{user.email}</p>
+                      <Link to="/dashboard" className="text-sm text-amber-500 hover:text-amber-400 truncate block mt-1 hover:underline">
+                        我的仪表盘 &gt;
+                      </Link>
                     </div>
                     {/* 暂时没有个人中心页面，留空或指向首页 */}
                     <button
