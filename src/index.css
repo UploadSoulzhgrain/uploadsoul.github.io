@@ -2,21 +2,170 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 高端科技主题 - Premium SaaS Style (Warm Edition) */
+:root {
+  /* 深色背景配色 */
+  --bg-dark: #0A0A0F;
+  --bg-secondary: #12121A;
+  --bg-card: #1A1A24;
+  /* 强调色已全部更新为暖色调，避免“AI冷色” */
+  --accent-amber: #F59E0B;
+  --accent-orange: #EA580C;
+  --accent-gold: #FCD34D;
+  --accent-gradient: linear-gradient(135deg, #F59E0B 0%, #EA580C 50%, #FCD34D 100%);
+  --text-primary: #FFFFFF;
+  --text-secondary: #D1D5DB;
+  --text-muted: #9CA3AF;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --glow-amber: rgba(245, 158, 11, 0.4);
+  --glow-orange: rgba(234, 88, 12, 0.3);
+}
+
+/* 科技渐变背景 */
+.bg-tech-gradient {
+  background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-secondary) 100%);
+}
+
+.bg-tech-mesh {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(79, 125, 243, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(124, 92, 252, 0.1) 0%, transparent 50%),
+    var(--bg-dark);
+}
+
+/* 高级卡片 */
+.card-premium {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-premium:hover {
+  border-color: rgba(79, 125, 243, 0.3);
+  box-shadow: 0 0 40px rgba(79, 125, 243, 0.1);
+  transform: translateY(-4px);
+}
+
+/* 渐变文字 */
+.text-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, #E5E7EB 50%, #9CA3AF 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 高级按钮 */
+.btn-premium {
+  background: var(--accent-gradient);
+  color: white;
+  font-weight: 500;
+  padding: 14px 32px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px var(--glow-amber);
+}
+
+.btn-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--glow-amber);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  padding: 14px 32px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-outline:hover {
+  border-color: var(--accent-amber);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+/* 发光效果 */
+.glow-sm {
+  box-shadow: 0 0 20px var(--glow-amber);
+}
+
+.glow-lg {
+  box-shadow: 0 0 60px var(--glow-orange);
+}
+
+/* 科技动画 */
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes float-subtle {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-float-subtle {
+  animation: float-subtle 6s ease-in-out infinite;
+}
+
+/* 网格背景 */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* 滚动条样式 */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background-color: transparent;
+  background-color: var(--bg-dark);
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius: 25px;
   transition: all 0.3s;
-  background-color: rgba(106, 115, 125, 0.2);
+  background-color: rgba(79, 125, 243, 0.3);
+
   &:hover {
-    background-color: rgba(106, 115, 125, 0.27);
+    background-color: rgba(79, 125, 243, 0.5);
   }
 }
 

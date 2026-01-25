@@ -1,227 +1,203 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import HeroBackground from '../components/common/HeroBackground';
-import WaveAnimation from '../components/animations/WaveAnimation';
-import AnimationStyles from '../components/animations/AnimationStyles';
-import Logo from '../components/common/Logo';
-import FeatureIllustrations from '../components/common/FeatureIllustrations';
 
 const HomePage = () => {
   const { t } = useTranslation();
+
+  // 核心功能
+  const features = [
+    {
+      id: 'companion',
+      title: t('home.features.emotionalCompanion.title'),
+      desc: t('home.features.emotionalCompanion.description'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      ),
+      link: '/companion'
+    },
+    {
+      id: 'love',
+      title: t('header.virtualLove'),
+      desc: t('virtualLove.description'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      ),
+      link: '/virtual-love'
+    },
+    {
+      id: 'pet',
+      title: t('home.features.virtualPet.title'),
+      desc: t('home.features.virtualPet.description'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
+        </svg>
+      ),
+      link: '/pet'
+    },
+    {
+      id: 'rebirth',
+      title: t('digitalRebirth.title'),
+      desc: t('digitalRebirth.description'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      ),
+      link: '/digital-rebirth'
+    },
+    {
+      id: 'immortality',
+      title: t('digitalImmortality.title'),
+      desc: t('digitalImmortality.description'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+        </svg>
+      ),
+      link: '/digital-immortality'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white overflow-hidden">
-      <AnimationStyles />
-      
-      {/* Hero Section with animated background */}
-      <section className="py-20 px-4 relative">
-        <HeroBackground className="opacity-60" />
-        <div className="container mx-auto text-center relative z-10">
-          <div className="mb-8 flex justify-center">
-            <Logo size="xl" className="animate-pulse-slow" />
-          </div>
-          <h1 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6 animate-fadeInUp">{t('app.title')}</h1>
-          {/* 融资公告 */}
-          <div className="max-w-2xl mx-auto mb-6 animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-            <div className="p-3 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-lg text-center border border-purple-200 shadow-sm">
-              <p className="text-purple-800 text-lg font-bold mb-1">{t('home.features.funding.title')}</p>
-              <p className="text-purple-700">{t('home.features.funding.description')}</p>
-            </div>
-          </div>
-          <h2 className="text-3xl font-semibold text-purple-600 mb-6 animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-            {t('home.hero.subtitle')}
-          </h2>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-10 animate-fadeInUp" style={{animationDelay: '0.6s'}}>
+    <div className="min-h-screen bg-tech-mesh text-white">
+      {/* Hero Section - 极简 */}
+      <section className="relative min-h-[85vh] flex items-center justify-center px-4">
+        {/* 背景装饰 */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-gradient-to-br from-amber-500/5 to-orange-500/5 rounded-full blur-[120px] animate-pulse-slow" />
+          <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-gradient-to-br from-orange-500/5 to-amber-500/5 rounded-full blur-[100px] animate-pulse-slow" style={{ animationDelay: '2s' }} />
+          <div className="bg-grid absolute inset-0 opacity-20" />
+        </div>
+
+        <div className="relative z-10 max-w-4xl mx-auto text-center">
+          {/* 主标语 */}
+          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            <span className="text-gradient">UploadSoul 传灵</span>
+            <span className="block text-3xl md:text-4xl font-light text-white/90 mt-4 tracking-wider">
+              虚拟世界，数字永生
+            </span>
+          </h1>
+
+          {/* 简短描述 */}
+          <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
             {t('home.hero.description')}
           </p>
-          <div className="flex justify-center space-x-4 animate-fadeInUp" style={{animationDelay: '0.9s'}}>
-            <Link to="/start-experience" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <span className="relative z-10">{t('home.hero.cta')}</span>
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
-            </Link>
-            <a href="https://mvp-test.uploadsoul.com" target="_blank" rel="noopener noreferrer" className="relative overflow-hidden group bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <span className="relative z-10">{t('home.hero.mvpTest')}</span>
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
+
+          {/* CTA - 只保留关键出口 */}
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <a
+              href="https://mvp-test.uploadsoul.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-premium inline-flex items-center justify-center gap-2"
+            >
+              <span>{t('home.hero.mvpTest')}</span>
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
             </a>
-            <Link to="/about" className="border border-purple-600 text-purple-600 px-8 py-3 rounded-lg hover:bg-purple-50 transition shadow hover:shadow-md">
-              {t('header.about')}
-            </Link>
+          </div>
+
+          {/* 融资公告 - 简化 */}
+          <div className="mt-16 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-sm text-white/60">{t('home.features.funding.title')} · {t('home.features.funding.description').slice(0, 25)}...</span>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-16 px-4 bg-white relative">
-        <WaveAnimation className="h-24" opacity={0.05} />
-        <div className="container mx-auto relative z-10">
-          <h2 className="text-3xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-indigo-600 animate-gradient mb-4">{t('home.features.title')}</h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-12 animate-fadeInUp">{t('home.features.description')}</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Digital Immortality Feature */}
-            <Link to="/digital-immortality" className="block h-full">
-              <div className="p-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp h-full flex flex-col" style={{animationDelay: '0.5s'}}>
-                <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m0-15C8.625 4.5 6 7.125 6 10.5c0 1.5.75 3.75 3 5.25 2.25 1.5 3 2.25 3 3.75m0-15c3.375 0 6 2.625 6 6 0 1.5-.75 3.75-3 5.25-2.25 1.5-3 2.25-3 3.75" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-center text-white mb-3">{t('home.features.digitalImmortality.title')}</h3>
-                <p className="text-white text-center opacity-90 flex-grow">
-                  {t('home.features.digitalImmortality.description')}
-                </p>
-                <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('common.startExperience')}</span>
-                </div>
-                <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full w-1/2 bg-white animate-shimmer"></div>
-                </div>
-              </div>
-            </Link>
-
-            {/* Digital Rebirth Feature */}
-            <Link to="/digital-rebirth" className="block h-full">
-              <div className="p-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl transform hover:scale-105 transition duration-300 shadow-lg group animate-fadeInUp h-full flex flex-col" style={{animationDelay: '0.5s'}}>
-                <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-center text-white mb-3">{t('digitalRebirth.title')}</h3>
-                <p className="text-white text-center opacity-90 flex-grow">
-                  {t('digitalRebirth.description')}
-                </p>
-                <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('digitalRebirth.startButton')}</span>
-                </div>
-                <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full w-1/2 bg-white animate-shimmer"></div>
-                </div>
-              </div>
-            </Link>
-
-            {/* Virtual Partner Feature */}
-            <Link to="/companion" className="block h-full">
-              <div className="p-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl shadow-lg hover:shadow-xl transition duration-300 group animate-fadeInUp h-full flex flex-col" style={{animationDelay: '0.5s'}}>
-                <div className="flex justify-center mb-6 transition-transform duration-300 group-hover:scale-110">
-                  <div className="relative">
-                    <FeatureIllustrations type="virtualPartner" size="lg" />
-                    <div className="absolute -top-1 -right-1 bg-white rounded-full w-6 h-6 flex items-center justify-center text-indigo-600 text-xs font-bold animate-pulse-slow">+</div>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-center text-white mb-3">{t('home.features.emotionalCompanion.title')}</h3>
-                <p className="text-white text-center opacity-90 flex-grow">
-                  {t('home.features.emotionalCompanion.description')}
-                </p>
-                <div className="mt-4 flex justify-center">
-                  <span className="inline-block px-3 py-1 bg-white/20 text-white rounded-full text-xs font-medium">{t('common.startExperience')}</span>
-                </div>
-                <div className="w-full h-1 bg-white/30 rounded-full mt-4 overflow-hidden">
-                  <div className="h-full w-1/2 bg-white animate-shimmer"></div>
-                </div>
-              </div>
-            </Link>
+      {/* 功能区 - 极简卡片 */}
+      <section className="py-24 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* 标题 */}
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-4">{t('home.features.title')}</h2>
+            <p className="text-white/50 max-w-xl mx-auto">{t('home.features.description')}</p>
           </div>
-          
-          {/* Additional Features Row */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            {/* 虚拟宠物 */}
-            <Link to="/pet" className="block">
-              <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp h-full" style={{animationDelay: '0.7s'}}>
-                <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
-                  <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
-                    <FeatureIllustrations type="virtualPet" size="md" />
-                  </div>
-                </div>
-                <div className="flex-grow">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.virtualPet.title')}</h3>
-                  <p className="text-gray-600 max-w-sm">
-                    {t('home.features.virtualPet.description')}
-                  </p>
-                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
 
-            {/* VR Experience Feature */}
-            <Link to="/vr" className="block">
-              <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp h-full" style={{animationDelay: '0.7s'}}>
-                <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
-                  <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
-                    <FeatureIllustrations type="virtualReality" size="md" />
-                  </div>
+          {/* 功能网格 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <Link
+                key={feature.id}
+                to={feature.link}
+                className={`card-premium p-8 group ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+              >
+                {/* 图标 */}
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6 text-amber-500 group-hover:text-amber-400 transition-colors">
+                  {feature.icon}
                 </div>
-                <div className="flex-grow">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.vrExperience.title')}</h3>
-                  <p className="text-gray-600 max-w-sm">
-                    {t('home.features.vrExperience.description')}
-                  </p>
-                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
-                  </div>
+
+                {/* 标题 */}
+                <h3 className="text-xl font-semibold mb-3 group-hover:text-amber-500 transition-all">
+                  {feature.title}
+                </h3>
+
+                {/* 描述 */}
+                <p className="text-white/50 text-sm leading-relaxed line-clamp-2">
+                  {feature.desc}
+                </p>
+
+                {/* 箭头 */}
+                <div className="mt-6 flex items-center text-white/30 group-hover:text-amber-500 transition-colors">
+                  <span className="text-sm">{t('common.startExperience')}</span>
+                  <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
                 </div>
-              </div>
-            </Link>
-            
-            {/* Digital World Feature */}
-            <Link to="/digital-world" className="block">
-              <div className="p-6 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-xl hover:shadow-md transition duration-300 flex items-center group animate-fadeInUp h-full" style={{animationDelay: '0.9s'}}>
-                <div className="flex-shrink-0 mr-4 transition-transform duration-300 group-hover:rotate-6">
-                  <div className="bg-white p-3 rounded-full shadow-md group-hover:shadow-lg transition-all">
-                    <FeatureIllustrations type="digitalWorld" size="md" />
-                  </div>
-                </div>
-                <div className="flex-grow">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">{t('home.features.digitalWorld.title')}</h3>
-                  <p className="text-gray-600 max-w-sm">
-                    {t('home.features.digitalWorld.description')}
-                  </p>
-                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <span className="inline-block px-2 py-1 bg-indigo-100 text-indigo-700 rounded text-xs font-medium">新功能</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-20 px-4 relative overflow-hidden">
-        <HeroBackground animated={false} className="opacity-30" />
-        <div className="container mx-auto text-center relative z-10">
-          <div className="animate-fadeInUp">
-            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 animate-gradient mb-6">{t('home.cta.title')}</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto mb-10">
-              {t('home.cta.description')}
-            </p>
+      {/* 数据统计 - 极简 */}
+      <section className="py-16 px-4 border-t border-white/5">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {[
+              { num: '10,000+', label: '活跃用户' },
+              { num: '1M+', label: 'AI对话' },
+              { num: '99.9%', label: '满意度' },
+              { num: '24/7', label: '在线服务' }
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-gradient mb-2">{stat.num}</div>
+                <div className="text-sm text-white/40">{stat.label}</div>
+              </div>
+            ))}
           </div>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/register" className="w-full sm:w-auto">
-              <button className="w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                {t('home.cta.freeRegister')}
-              </button>
-            </Link>
-            <Link to="/digital-human-experience" className="w-full sm:w-auto">
-              <button className="w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300">
-                {t('home.cta.digitalHumanExperience')}
-              </button>
-            </Link>
-          </div>
-          
-          <div className="absolute -right-16 -bottom-16 w-64 h-64 bg-gradient-to-tl from-purple-300/30 to-indigo-300/30 rounded-full blur-3xl animate-pulse-slow"></div>
-          <div className="absolute -left-16 -bottom-8 w-48 h-48 bg-gradient-to-tr from-indigo-300/30 to-purple-300/30 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '1.5s'}}></div>
         </div>
-        <WaveAnimation className="bottom-0 left-0" color="#7C3AED" opacity={0.1} />
+      </section>
+
+      {/* 底部快捷入口 */}
+      <section className="py-12 px-4 border-t border-white/5">
+        <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3">
+          {[
+            { to: '/shop', label: t('header.shop'), icon: '🛒' },
+            { to: '/vr', label: t('home.features.vrExperience.title'), icon: '🥽' },
+            { to: '/about', label: t('header.about'), icon: '📖' },
+            { to: '/register', label: t('home.cta.freeRegister'), icon: '✨' }
+          ].map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className="px-5 py-2.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all text-sm flex items-center gap-2"
+            >
+              <span>{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </div>
       </section>
     </div>
   );
 };
 
-export default HomePage; 
+export default HomePage;

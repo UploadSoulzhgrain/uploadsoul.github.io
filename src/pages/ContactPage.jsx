@@ -42,7 +42,7 @@ const ContactPage = () => {
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-300 mb-2">邮箱</h3>
-                  <p className="text-gray-400">uploadsoul@outlook.com</p>
+                  <p className="text-gray-400">contact@uploadsoul.com</p>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-300 mb-2">工作时间</h3>

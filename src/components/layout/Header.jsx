@@ -13,76 +13,56 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white bg-opacity-95 backdrop-blur-sm shadow-md sticky top-0 z-50 transition-all duration-300">
+    <header className="bg-[#0A0A0F] bg-opacity-80 backdrop-blur-lg border-b border-white/5 sticky top-0 z-50 transition-all duration-300">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between relative">
-          {/* Purple gradient accent line */}
-          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500"></div>
           <div className="flex items-center">
-            <Link to="/" className="flex items-center hover:opacity-90 transition-opacity">
-              <Logo size="md" />
+            <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+              <Logo size="md" variant="default" />
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-6">
-            <Link to="/" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('header.home')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/companion" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('header.companions')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/pet" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('home.features.virtualPet.title')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/virtual-love" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('header.virtualLove')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/digital-immortality" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('digitalImmortality.title')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/digital-rebirth" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('digitalRebirth.title')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link to="/shop" className="px-2 py-1 rounded-md text-gray-700 hover:text-purple-600 hover:bg-purple-50 relative group transition-all duration-200">
-              <span>{t('header.shop')}</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-600 to-indigo-500 group-hover:w-full transition-all duration-300"></span>
-            </Link>
+          {/* Desktop Navigation - Simplified for width */}
+          <nav className="hidden lg:flex space-x-8">
+            {[
+              { to: '/', label: t('header.home') },
+              { to: '/companion', label: t('header.companions') },
+              { to: '/pet', label: t('home.features.virtualPet.title') },
+              { to: '/virtual-love', label: t('header.virtualLove') },
+              { to: '/digital-immortality', label: t('digitalImmortality.title') },
+              { to: '/digital-rebirth', label: t('digitalRebirth.title') }
+              // Shop moved to bottom of homepage
+            ].map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="text-gray-400 hover:text-white text-sm font-medium transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
-          {/* User Section */}
-          <div className="hidden md:flex items-center space-x-4">
+          {/* User Section - Merged Login/Register */}
+          <div className="hidden lg:flex items-center space-x-6">
             <LanguageSelector onLanguageChange={handleLanguageChange} />
-            <Link 
-              to="/login" 
-              className="text-gray-700 hover:text-purple-600 transition-colors duration-200 px-3 py-1.5 rounded-md hover:bg-gray-50 border border-transparent hover:border-gray-200"
+            <Link
+              to="/login"
+              className="px-6 py-2 bg-white text-black text-sm font-bold rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
             >
-              {t('auth.login')}
-            </Link>
-            <Link 
-              to="/register" 
-              className="relative group overflow-hidden bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-5 py-1.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
-            >
-              <span className="relative z-10">{t('auth.signup')}</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"></span>
+              {t('auth.login')} / {t('auth.signup')}
             </Link>
           </div>
 
           {/* Mobile Menu Button */}
-          <button 
-            className="md:hidden text-gray-700 p-2 rounded-full hover:bg-purple-50 focus:outline-none focus:ring-2 focus:ring-purple-200 transition-all duration-200"
+          <button
+            className="lg:hidden text-gray-400 p-2 hover:text-white transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               {isMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" className="text-purple-600" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               ) : (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               )}
@@ -90,53 +70,37 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Simplified */}
         {isMenuOpen && (
-          <nav className="mt-4 md:hidden bg-white rounded-lg shadow-lg py-4 px-2 animate-fadeIn">
-            <div className="flex flex-col space-y-1">
-              <div className="space-y-4">
-                <Link to="/" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('header.home')}
+          <nav className="mt-4 lg:hidden bg-[#12121A] border border-white/5 rounded-2xl shadow-2xl p-6 animate-fadeIn">
+            <div className="flex flex-col space-y-6">
+              {[
+                { to: '/', label: t('header.home') },
+                { to: '/companion', label: t('header.companions') },
+                { to: '/pet', label: t('home.features.virtualPet.title') },
+                { to: '/virtual-love', label: t('header.virtualLove') },
+                { to: '/digital-immortality', label: t('digitalImmortality.title') },
+                { to: '/digital-rebirth', label: t('digitalRebirth.title') }
+              ].map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="text-gray-400 hover:text-white text-lg font-medium transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {link.label}
                 </Link>
-                <Link to="/companion" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('header.companions')}
+              ))}
+              <div className="h-px bg-white/5"></div>
+              <div className="flex flex-col space-y-4">
+                <LanguageSelector onLanguageChange={handleLanguageChange} />
+                <Link
+                  to="/login"
+                  className="w-full py-4 bg-white text-black text-center text-lg font-bold rounded-2xl hover:bg-gray-200"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {t('auth.login')} / {t('auth.signup')}
                 </Link>
-                <Link to="/pet" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('home.features.virtualPet.title')}
-                </Link>
-                <Link to="/virtual-love" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('header.virtualLove')}
-                </Link>
-                <Link to="/digital-immortality" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('digitalImmortality.title')}
-                </Link>
-                <Link to="/digital-rebirth" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('digitalRebirth.title')}
-                </Link>
-                <Link to="/shop" className="block text-gray-700 hover:text-purple-600 transition">
-                  {t('header.shop')}
-                </Link>
-              </div>
-              <div className="pt-4 border-t border-gray-200 mt-2 space-y-3">
-                <div className="px-3">
-                  <LanguageSelector onLanguageChange={handleLanguageChange} />
-                </div>
-                <div className="flex flex-col space-y-2 px-3">
-                  <Link 
-                    to="/login" 
-                    className="text-gray-700 hover:text-purple-600 px-4 py-2 rounded-lg border border-gray-200 hover:border-purple-200 hover:bg-purple-50 transition-all duration-200 text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('auth.login')}
-                  </Link>
-                  <Link 
-                    to="/register" 
-                    className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 py-2 rounded-lg hover:shadow-md transition-all duration-200 text-center"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {t('auth.signup')}
-                  </Link>
-                </div>
               </div>
             </div>
           </nav>

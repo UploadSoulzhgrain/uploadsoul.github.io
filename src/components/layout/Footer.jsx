@@ -6,11 +6,11 @@ import WaveAnimation from '../animations/WaveAnimation';
 
 const Footer = () => {
   const { t } = useTranslation();
-  
+
   // Fade-in animation effect for footer content
   useEffect(() => {
     const footerElements = document.querySelectorAll('.footer-animate');
-    
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -30,14 +30,14 @@ const Footer = () => {
       footerElements.forEach((el) => observer.unobserve(el));
     };
   }, []);
-  
+
   return (
     <footer className="bg-gray-900 text-gray-300 py-10 relative">
       {/* Inverted wave at top of footer */}
       <div className="absolute top-0 left-0 w-full overflow-hidden" style={{ transform: 'rotate(180deg)', height: '50px' }}>
         <WaveAnimation color="#111827" opacity={0.9} />
       </div>
-      
+
       <div className="container mx-auto px-4 pt-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-100">
@@ -95,16 +95,16 @@ const Footer = () => {
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-400">
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.contactMethods')}</h4>
             <ul className="space-y-2 text-sm">
-              <li className="flex items-center"><span className="text-purple-400 mr-2">@</span>{t('footer.email')}: uploadsoul@outlook.com</li>
-              <li className="flex items-center"><span className="text-purple-400 mr-2">⌖</span>{t('footer.address')}: {t('footer.addressDetails')}</li>
+              <li className="flex items-center"><span className="text-amber-500 mr-2">@</span>{t('footer.email')}: contact@uploadsoul.com</li>
+              <li className="flex items-center"><span className="text-amber-500 mr-2">⌖</span>{t('footer.address')}: {t('footer.addressDetails')}</li>
             </ul>
           </div>
         </div>
         {/* Social Media Links */}
         <div className="flex justify-center space-x-8 mt-10 mb-8 footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-500">
           {/* GitHub */}
-          <a 
-            href="https://github.com/UploadSoulzhgrain/uploadsoul.github.io" 
+          <a
+            href="https://github.com/UploadSoulzhgrain/uploadsoul.github.io"
             className="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 transform group"
             target="_blank"
             rel="noopener noreferrer"
@@ -117,8 +117,8 @@ const Footer = () => {
             </div>
           </a>
           {/* Twitter */}
-          <a 
-            href="#" 
+          <a
+            href="#"
             className="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 transform group"
             target="_blank"
             rel="noopener noreferrer"
@@ -131,8 +131,8 @@ const Footer = () => {
             </div>
           </a>
           {/* LinkedIn */}
-          <a 
-            href="#" 
+          <a
+            href="#"
             className="text-gray-400 hover:text-white transition-all duration-300 hover:scale-110 transform group"
             target="_blank"
             rel="noopener noreferrer"
@@ -145,9 +145,9 @@ const Footer = () => {
             </div>
           </a>
         </div>
-        
+
         <div className="border-t border-gray-700 mt-8 pt-6 text-sm text-center footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-600">
-          <p className="mb-3">© {new Date().getFullYear()} <span className="text-purple-400 font-medium">UploadSoul</span> {t('footer.platformName')}. {t('footer.copyright')}</p>
+          <p className="mb-3">© {new Date().getFullYear()} <span className="text-amber-500 font-medium">UploadSoul</span> {t('footer.platformName')}. {t('footer.copyright')}</p>
           <div className="flex justify-center space-x-6 text-gray-400">
             <Link to="/privacy" className="hover:text-white transition-colors hover:underline">{t('footer.privacy')}</Link>
             <Link to="/terms" className="hover:text-white transition-colors hover:underline">{t('footer.terms')}</Link>

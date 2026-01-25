@@ -320,7 +320,7 @@
       "thinking": "Thinking...",
       "startVoiceChat": "Start Voice Chat",
       "stopVoiceChat": "Stop Voice Chat",
-    "uploadImage": "Upload Image",
+      "uploadImage": "Upload Image",
       "selectEmoji": "Select Emoji",
       "characterInfo": "Character Info",
       "personality": "Personality Traits",
@@ -739,7 +739,7 @@
     },
     "contact": {
       "title": "Contact Us",
-      "content": "If you have any questions about this policy, please contact us at privacy@uploadsoul.com"
+      "content": "If you have any questions about this policy, please contact us at contact@uploadsoul.com"
     },
     "lastUpdated": "Last Updated"
   },

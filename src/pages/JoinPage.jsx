@@ -85,11 +85,11 @@ const JoinPage = () => {
             <p className="text-gray-300 mb-4">
               如果您对我们的职位感兴趣，请将简历发送至：
             </p>
-            <a 
-              href="mailto:careers@uploadsoul.com" 
+            <a
+              href="mailto:jobs@uploadsoul.com"
               className="text-purple-400 hover:text-purple-300 transition-colors duration-300"
             >
-              careers@uploadsoul.com
+              jobs@uploadsoul.com
             </a>
           </div>
         </div>
