@@ -1,14 +1,25 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext';
 import LanguageSelector from '../common/LanguageSelector';
 import Logo from '../common/Logo';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { t } = useTranslation();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const handleLanguageChange = () => {
+    setIsMenuOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+    setIsUserMenuOpen(false);
     setIsMenuOpen(false);
   };
 
@@ -22,7 +33,7 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Desktop Navigation - Simplified for width */}
+          {/* Desktop Navigation */}
           <nav className="hidden lg:flex space-x-8">
             {[
               { to: '/', label: t('header.home') },
@@ -31,7 +42,6 @@ const Header = () => {
               { to: '/virtual-love', label: t('header.virtualLove') },
               { to: '/digital-immortality', label: t('digitalImmortality.title') },
               { to: '/digital-rebirth', label: t('digitalRebirth.title') }
-              // Shop moved to bottom of homepage
             ].map((link) => (
               <Link
                 key={link.to}
@@ -43,15 +53,46 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* User Section - Merged Login/Register */}
+          {/* User Section */}
           <div className="hidden lg:flex items-center space-x-6">
             <LanguageSelector onLanguageChange={handleLanguageChange} />
-            <Link
-              to="/login"
-              className="px-6 py-2 bg-white text-black text-sm font-bold rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-            >
-              {t('auth.login')} / {t('auth.signup')}
-            </Link>
+
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 focus:outline-none"
+                >
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-gray-300 text-sm max-w-[100px] truncate">{user.email}</span>
+                </button>
+
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-[#1A1A24] rounded-xl shadow-xl border border-white/10 py-1 z-50">
+                    <div className="px-4 py-3 border-b border-white/5">
+                      <p className="text-xs text-gray-500">已登录账号</p>
+                      <p className="text-sm text-white truncate">{user.email}</p>
+                    </div>
+                    {/* 暂时没有个人中心页面，留空或指向首页 */}
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5 transition-colors"
+                    >
+                      退出登录
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="px-6 py-2 bg-white text-black text-sm font-bold rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+              >
+                {t('auth.login')} / {t('auth.signup')}
+              </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,7 +111,7 @@ const Header = () => {
           </button>
         </div>
 
-        {/* Mobile Navigation - Simplified */}
+        {/* Mobile Navigation */}
         {isMenuOpen && (
           <nav className="mt-4 lg:hidden bg-[#12121A] border border-white/5 rounded-2xl shadow-2xl p-6 animate-fadeIn">
             <div className="flex flex-col space-y-6">
@@ -94,13 +135,31 @@ const Header = () => {
               <div className="h-px bg-white/5"></div>
               <div className="flex flex-col space-y-4">
                 <LanguageSelector onLanguageChange={handleLanguageChange} />
-                <Link
-                  to="/login"
-                  className="w-full py-4 bg-white text-black text-center text-lg font-bold rounded-2xl hover:bg-gray-200"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {t('auth.login')} / {t('auth.signup')}
-                </Link>
+
+                {user ? (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center gap-3 px-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-bold">
+                        {user.email?.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="text-white text-sm truncate">{user.email}</span>
+                    </div>
+                    <button
+                      onClick={handleSignOut}
+                      className="w-full py-3 bg-red-500/10 text-red-400 border border-red-500/30 text-center rounded-xl"
+                    >
+                      退出登录
+                    </button>
+                  </div>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="w-full py-4 bg-white text-black text-center text-lg font-bold rounded-2xl hover:bg-gray-200"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {t('auth.login')} / {t('auth.signup')}
+                  </Link>
+                )}
               </div>
             </div>
           </nav>

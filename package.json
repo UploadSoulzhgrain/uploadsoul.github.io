@@ -15,7 +15,7 @@
     "@emotion/styled": "^11.13.0",
     "@mui/material": "^6.0.2",
     "@reduxjs/toolkit": "^2.6.1",
-    "@supabase/supabase-js": "^2.47.12",
+    "@supabase/supabase-js": "^2.91.1",
     "antd": "^5.24.6",
     "axios": "^1.8.4",
     "framer-motion": "^12.5.0",
