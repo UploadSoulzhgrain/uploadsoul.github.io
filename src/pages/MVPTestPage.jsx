@@ -14,6 +14,16 @@ const MVPTestPage = () => {
   const videoRef = useRef(null);
   const synthesizerRef = useRef(null);
   const chatEndRef = useRef(null);
+  const [debugLog, setDebugLog] = useState([]);
+  const [webrtcState, setWebrtcState] = useState('new');
+  const [iceState, setIceState] = useState('new');
+  const [hasVideoTrack, setHasVideoTrack] = useState(false);
+  const [hasAudioTrack, setHasAudioTrack] = useState(false);
+
+  const addDebug = (msg) => {
+    console.log(`[AVATAR_DEBUG] ${msg}`);
+    setDebugLog(prev => [...prev.slice(-4), msg]);
+  };
 
   useEffect(() => {
     // 自动滚动到底部
@@ -57,45 +67,63 @@ const MVPTestPage = () => {
       // 5. 创建合成器
       synthesizerRef.current = new SpeechSDK.AvatarSynthesizer(speechConfig, avatarConfig);
 
+      // 重要：绑定视频元素给 SDK
+      if (videoRef.current) {
+        synthesizerRef.current.videoElement = videoRef.current;
+      }
+
       // 6. 准备 WebRTC 连接 (使用 ICE 服务器)
-      console.log('Preparing WebRTC PeerConnection with ICE servers:', iceServers);
+      // Azure 返回格式: { Urls: [...], Username: "...", Password: "..." }
+      addDebug(`ICE from Azure: ${JSON.stringify(iceServers).substring(0, 80)}...`);
+
+      const rtcIceServers = iceServers.Urls ? [{
+        urls: iceServers.Urls,
+        username: iceServers.Username,
+        credential: iceServers.Password
+      }] : [];
+
+      addDebug(`Using ${rtcIceServers.length} ICE server(s)`);
       const peerConnection = new RTCPeerConnection({
-        iceServers: iceServers.urls ? [iceServers] : []
+        iceServers: rtcIceServers
       });
 
       // 配置监听音视频流
       peerConnection.ontrack = (e) => {
-        console.log('RTCPeerConnection ontrack event received:', e);
-        if (videoRef.current && e.streams && e.streams[0]) {
-          console.log('Received remote stream, tracks:', e.streams[0].getTracks());
-          videoRef.current.srcObject = e.streams[0];
+        addDebug(`Track received: ${e.track.kind}`);
+        if (e.track.kind === 'video') setHasVideoTrack(true);
+        if (e.track.kind === 'audio') setHasAudioTrack(true);
 
-          // 确保视频播放 (处理自动播放限制)
-          videoRef.current.play().catch(err => {
-            console.warn('Video play failed (possibly autoplay policy):', err);
-          });
+        if (videoRef.current && e.streams && e.streams[0]) {
+          videoRef.current.srcObject = e.streams[0];
+          videoRef.current.play().catch(err => addDebug(`Autoplay blocked: ${err.message}`));
         }
       };
 
       // 监听连接状态
       peerConnection.onconnectionstatechange = () => {
-        console.log('WebRTC Connection State:', peerConnection.connectionState);
+        setWebrtcState(peerConnection.connectionState);
+        addDebug(`Conn State: ${peerConnection.connectionState}`);
       };
 
-      // 显式添加收发器 (只收不发)
-      peerConnection.addTransceiver('video', { direction: 'recvonly' });
-      peerConnection.addTransceiver('audio', { direction: 'recvonly' });
+      peerConnection.oniceconnectionstatechange = () => {
+        setIceState(peerConnection.iceConnectionState);
+        addDebug(`ICE State: ${peerConnection.iceConnectionState}`);
+      };
+
+      // 注意：不要手动添加 transceiver，让 SDK 自己处理媒体协商
+      // peerConnection.addTransceiver('video', { direction: 'recvonly' });
+      // peerConnection.addTransceiver('audio', { direction: 'recvonly' });
 
       // 7. 建立连接 (WebRTC)
-      console.log('Establishing WebRTC avatar connection...');
+      addDebug('Starting Avatar session...');
       await synthesizerRef.current.startAvatarAsync(peerConnection);
 
-      console.log('Avatar connection successful!');
+      addDebug('Avatar Ready!');
       setStatus('ready');
       addBotMessage("您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。");
     } catch (error) {
+      addDebug(`Error: ${error.message}`);
       console.error('Detailed Avatar Init Error:', error);
-      alert(`初始化失败: ${error.message}\n详情请查看浏览器控制台。`);
       setStatus('error');
     }
   };
@@ -192,11 +220,27 @@ const MVPTestPage = () => {
                 </div>
               )}
 
-              {status === 'error' && (
-                <div className="text-center p-8">
-                  <p className="text-red-400 mb-4 text-lg">⚠️ 连接失败</p>
-                  <p className="text-gray-500 mb-6 text-sm">请确认您的 Azure 凭证配置正确且区域支持数字人服务。</p>
-                  <button onClick={() => setStatus('idle')} className="text-amber-500 border-b border-amber-500 pb-1">重新尝试</button>
+              {status === 'ready' && (
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
+                  <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono">
+                    <div className="text-gray-400"># DIAGNOSTICS</div>
+                    <div className="flex gap-4">
+                      <span>ICE: <b className={iceState === 'connected' || iceState === 'completed' ? 'text-green-400' : 'text-amber-400'}>{iceState}</b></span>
+                      <span>VIDEO: <b className={hasVideoTrack ? 'text-green-400' : 'text-red-400'}>{hasVideoTrack ? 'OK' : 'NO'}</b></span>
+                      <span>AUDIO: <b className={hasAudioTrack ? 'text-green-400' : 'text-red-400'}>{hasAudioTrack ? 'OK' : 'NO'}</b></span>
+                    </div>
+                    {debugLog.length > 0 && (
+                      <div className="text-[9px] text-gray-500 italic truncate max-w-[200px]">
+                        Last: {debugLog[debugLog.length - 1]}
+                      </div>
+                    )}
+                  </div>
+
+                  {!hasVideoTrack && status === 'ready' && (
+                    <div className="bg-red-500/20 text-red-400 text-[10px] px-3 py-1 rounded-full animate-pulse border border-red-500/30">
+                      等待媒体流...
+                    </div>
+                  )}
                 </div>
               )}
             </div>

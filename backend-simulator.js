@@ -80,6 +80,11 @@ app.post('/api/chat', async (req, res) => {
             deployment: deploymentName,
         });
 
+        console.log(`--- Chat Request ---`);
+        console.log(`Endpoint: ${endpoint}`);
+        console.log(`Deployment: ${deploymentName}`);
+        console.log(`API Version: ${apiVersion}`);
+
         const result = await client.chat.completions.create({
             messages: [
                 { role: "system", content: "你是一个名为 UploadSoul 传灵的数字人助理。你亲切、专业，旨在为用户提供情感陪伴和数字永生咨询。请保持回答简短。" },
@@ -90,8 +95,16 @@ app.post('/api/chat', async (req, res) => {
 
         res.json({ reply: result.choices[0].message.content });
     } catch (err) {
-        console.error('Chat Error:', err.message);
-        res.status(500).json({ error: 'Chat failed: ' + err.message });
+        console.error('Chat Error Detail:', err);
+        const status = err.status || 500;
+        const message = err.message || 'Unknown error';
+        const body = err.error || {};
+
+        console.error(`Status ${status}: ${message}`);
+        res.status(status).json({
+            error: `API 响应异常 (${status}): ${message}`,
+            detail: body
+        });
     }
 });
 
