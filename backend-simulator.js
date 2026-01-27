@@ -1,0 +1,75 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import { AzureOpenAI } from "openai";
+import axios from 'axios';
+
+dotenv.config();
+
+const app = express();
+app.use(express.json());
+
+const PORT = 3000;
+
+// Speech Token API
+app.get('/api/speech-token', async (req, res) => {
+    const speechKey = process.env.AZURE_SPEECH_KEY;
+    const speechRegion = process.env.AZURE_SPEECH_REGION;
+
+    if (!speechKey || !speechRegion) {
+        return res.status(500).json({ error: 'Azure Speech credentials missing' });
+    }
+
+    try {
+        const fetchTokenEndpoint = `https://${speechRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
+        const response = await axios.post(fetchTokenEndpoint, null, {
+            headers: {
+                'Ocp-Apim-Subscription-Key': speechKey,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+        res.json({ token: response.data, region: speechRegion });
+    } catch (err) {
+        console.error('Speech Token Error:', err.message);
+        res.status(500).json({ error: 'Failed to fetch speech token: ' + err.message });
+    }
+});
+
+// Chat API
+app.post('/api/chat', async (req, res) => {
+    const { message } = req.body;
+    const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+    const azureApiKey = process.env.AZURE_OPENAI_KEY;
+    const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4';
+    const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-02-15-preview';
+
+    if (!endpoint || !azureApiKey) {
+        return res.status(500).json({ error: 'Azure OpenAI credentials missing' });
+    }
+
+    try {
+        const client = new AzureOpenAI({
+            endpoint,
+            apiKey: azureApiKey,
+            apiVersion,
+            deployment: deploymentName,
+        });
+
+        const result = await client.chat.completions.create({
+            messages: [
+                { role: "system", content: "你是一个名为 UploadSoul 传灵的数字人助理。你亲切、专业，旨在为用户提供情感陪伴和数字永生咨询。请保持回答简短。" },
+                { role: "user", content: message }
+            ],
+            model: deploymentName,
+        });
+
+        res.json({ reply: result.choices[0].message.content });
+    } catch (err) {
+        console.error('Chat Error:', err.message);
+        res.status(500).json({ error: 'Chat failed: ' + err.message });
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Backend simulator running at http://localhost:${PORT}`);
+    console.log(`Waiting for requests from http://127.0.0.1:5173/api/...`);
+});

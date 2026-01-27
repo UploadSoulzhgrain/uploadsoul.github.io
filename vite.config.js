@@ -29,7 +29,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: [
-            'react', 
+            'react',
             'react-dom',
             'react-router-dom'
           ],
@@ -39,16 +39,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: 'localhost',
+    host: '127.0.0.1',
     open: true,
-    // 添加 SPA 路由支持
-    historyApiFallback: {
-      rewrites: [
-        { from: /^\/sitemap\.xml$/, to: '/sitemap.xml' },
-        { from: /^\/sitemap\.xsl$/, to: '/sitemap.xsl' },
-        { from: /^\/robots\.txt$/, to: '/robots.txt' },
-        { from: /./, to: '/index.html' }
-      ]
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        rewrite: (path) => path
+      }
     }
   },
   preview: {

@@ -27,6 +27,10 @@ const MVPTestPage = () => {
     try {
       // 1. 获取 Token
       const tokenRes = await fetch('/api/speech-token');
+      if (!tokenRes.ok) {
+        const errData = await tokenRes.json().catch(() => ({}));
+        throw new Error(`Token API failed with status ${tokenRes.status}: ${errData.error || 'Unknown error'}`);
+      }
       const { token, region } = await tokenRes.json();
 
       // 2. 配置 Speech
@@ -35,32 +39,27 @@ const MVPTestPage = () => {
       speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural";
 
       // 3. 配置 Avatar
-      // 这里使用 Azure 默认的角色 'lisa'，可以根据需求更换
       const avatarConfig = new SpeechSDK.AvatarConfig("lisa", "graceful");
 
       // 4. 创建合成器
-      // 注意：Avatar 实时模式目前需要特定的预览版或特定版本的 SDK 支持
-      // 这里的代码基于标准 SDK 逻辑，实际可能需要根据 Azure 订阅权限微调
       synthesizerRef.current = new SpeechSDK.AvatarSynthesizer(speechConfig, avatarConfig);
 
-      // 5. 连接视频流
-      // WebRTC 连接逻辑
-      const connection = new SpeechSDK.Connection.fromSynthesizer(synthesizerRef.current);
+      // 5. 连接视频流并绑定到 DOM
+      const videoElement = videoRef.current;
+      if (videoElement) {
+        // 部分 SDK 版本通过 Connection 接收渲染
+        const connection = SpeechSDK.Connection.fromSynthesizer(synthesizerRef.current);
+        // 如果 SDK 支持自动绑定，可以在此处设置
+      }
 
       // 建立连接
       await synthesizerRef.current.startAvatarAsync();
 
-      // 将视频流绑定到 DOM
-      // 注意：API 可能会直接控制 video 元素或提供 stream
-      const videoElement = videoRef.current;
-      if (videoElement) {
-        // Azure SDK 会处理对 video 元素的控制
-      }
-
       setStatus('ready');
       addBotMessage("您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。");
     } catch (error) {
-      console.error('Avatar Init Error:', error);
+      console.error('Detailed Avatar Init Error:', error);
+      alert(`初始化失败: ${error.message}\n请检查控制台获取更多信息。`);
       setStatus('error');
     }
   };
@@ -178,8 +177,8 @@ const MVPTestPage = () => {
               messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed ${msg.role === 'user'
-                      ? 'bg-amber-500 text-black font-medium'
-                      : 'bg-white/5 text-gray-200 border border-white/10'
+                    ? 'bg-amber-500 text-black font-medium'
+                    : 'bg-white/5 text-gray-200 border border-white/10'
                     }`}>
                     {msg.text}
                   </div>
