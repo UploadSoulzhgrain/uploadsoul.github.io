@@ -25,41 +25,77 @@ const MVPTestPage = () => {
 
     setStatus('connecting');
     try {
-      // 1. 获取 Token
-      const tokenRes = await fetch('/api/speech-token');
-      if (!tokenRes.ok) {
-        const errData = await tokenRes.json().catch(() => ({}));
-        throw new Error(`Token API failed with status ${tokenRes.status}: ${errData.error || 'Unknown error'}`);
-      }
-      const { token, region } = await tokenRes.json();
+      // 1. 环境诊断
+      console.log('Secure Context:', window.isSecureContext);
+      console.log('RTCPeerConnection:', typeof window.RTCPeerConnection !== 'undefined');
 
-      // 2. 配置 Speech
+      if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        throw new Error('WebRTC 仅可在安全上下文 (HTTPS 或 localhost/127.0.0.1) 中运行。');
+      }
+
+      // 1. 获取 Token 和 ICE 服务器
+      const [tokenRes, iceRes] = await Promise.all([
+        fetch('/api/speech-token'),
+        fetch('/api/ice-servers')
+      ]);
+
+      if (!tokenRes.ok || !iceRes.ok) {
+        throw new Error('无法连接到音视频身份验证服务，请检查网络或后端。');
+      }
+
+      const { token, region } = await tokenRes.json();
+      const iceServers = await iceRes.json();
+
+      // 3. 配置 Speech
       const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
       speechConfig.speechSynthesisLanguage = "zh-CN";
       speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural";
 
-      // 3. 配置 Avatar
+      // 4. 配置 Avatar
       const avatarConfig = new SpeechSDK.AvatarConfig("lisa", "graceful");
 
-      // 4. 创建合成器
+      // 5. 创建合成器
       synthesizerRef.current = new SpeechSDK.AvatarSynthesizer(speechConfig, avatarConfig);
 
-      // 5. 连接视频流并绑定到 DOM
-      const videoElement = videoRef.current;
-      if (videoElement) {
-        // 部分 SDK 版本通过 Connection 接收渲染
-        const connection = SpeechSDK.Connection.fromSynthesizer(synthesizerRef.current);
-        // 如果 SDK 支持自动绑定，可以在此处设置
-      }
+      // 6. 准备 WebRTC 连接 (使用 ICE 服务器)
+      console.log('Preparing WebRTC PeerConnection with ICE servers:', iceServers);
+      const peerConnection = new RTCPeerConnection({
+        iceServers: iceServers.urls ? [iceServers] : []
+      });
 
-      // 建立连接
-      await synthesizerRef.current.startAvatarAsync();
+      // 配置监听音视频流
+      peerConnection.ontrack = (e) => {
+        console.log('RTCPeerConnection ontrack event received:', e);
+        if (videoRef.current && e.streams && e.streams[0]) {
+          console.log('Received remote stream, tracks:', e.streams[0].getTracks());
+          videoRef.current.srcObject = e.streams[0];
 
+          // 确保视频播放 (处理自动播放限制)
+          videoRef.current.play().catch(err => {
+            console.warn('Video play failed (possibly autoplay policy):', err);
+          });
+        }
+      };
+
+      // 监听连接状态
+      peerConnection.onconnectionstatechange = () => {
+        console.log('WebRTC Connection State:', peerConnection.connectionState);
+      };
+
+      // 显式添加收发器 (只收不发)
+      peerConnection.addTransceiver('video', { direction: 'recvonly' });
+      peerConnection.addTransceiver('audio', { direction: 'recvonly' });
+
+      // 7. 建立连接 (WebRTC)
+      console.log('Establishing WebRTC avatar connection...');
+      await synthesizerRef.current.startAvatarAsync(peerConnection);
+
+      console.log('Avatar connection successful!');
       setStatus('ready');
       addBotMessage("您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。");
     } catch (error) {
       console.error('Detailed Avatar Init Error:', error);
-      alert(`初始化失败: ${error.message}\n请检查控制台获取更多信息。`);
+      alert(`初始化失败: ${error.message}\n详情请查看浏览器控制台。`);
       setStatus('error');
     }
   };
@@ -87,17 +123,28 @@ const MVPTestPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text })
       });
-      const { reply } = await chatRes.json();
+
+      if (!chatRes.ok) {
+        throw new Error(`Chat API 响应异常: ${chatRes.status}`);
+      }
+
+      const data = await chatRes.json();
+      const reply = data.reply;
+
+      if (!reply) {
+        throw new Error('未能从回复中解析出文字。');
+      }
 
       addBotMessage(reply);
 
       // 2. 让数字人说话
       if (synthesizerRef.current) {
+        console.log('Synthesizing speech for:', reply);
         await synthesizerRef.current.speakTextAsync(reply);
       }
     } catch (error) {
       console.error('Chat Error:', error);
-      addBotMessage("抱歉，我现在出了一点小状况，请稍后再试。");
+      addBotMessage(`抱歉，我现在出了一点小状况 (${error.message})，请稍后再试。`);
     } finally {
       setIsTalking(false);
     }
