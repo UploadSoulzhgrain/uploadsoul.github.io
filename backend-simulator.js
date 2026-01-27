@@ -34,6 +34,32 @@ app.get('/api/speech-token', async (req, res) => {
     }
 });
 
+// ICE Servers API (For WebRTC Relay)
+app.get('/api/ice-servers', async (req, res) => {
+    const speechKey = process.env.AZURE_SPEECH_KEY;
+    const speechRegion = process.env.AZURE_SPEECH_REGION;
+
+    if (!speechKey || !speechRegion) {
+        return res.status(500).json({ error: 'Azure Speech credentials missing' });
+    }
+
+    try {
+        const relayEndpoint = `https://${speechRegion}.tts.speech.microsoft.com/cognitiveservices/avatar/relay/token/v1`;
+        const response = await axios.get(relayEndpoint, {
+            headers: {
+                'Ocp-Apim-Subscription-Key': speechKey
+            }
+        });
+
+        // Azure returns { urls: [...], username: "...", password: "..." }
+        res.json(response.data);
+    } catch (err) {
+        console.error('ICE Servers Error:', err.message);
+        // Fallback to empty if fails, though WebRTC might fail
+        res.status(500).json({ error: 'Failed to fetch ICE servers: ' + err.message });
+    }
+});
+
 // Chat API
 app.post('/api/chat', async (req, res) => {
     const { message } = req.body;
