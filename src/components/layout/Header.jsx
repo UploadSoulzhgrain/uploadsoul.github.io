@@ -44,6 +44,7 @@ const Header = () => {
             {[
               { to: '/', label: t('header.home') },
               { to: '/companion', label: t('header.companions') },
+
               { to: '/pet', label: t('home.features.virtualPet.title') },
               { to: '/virtual-love', label: t('header.virtualLove') },
               { to: '/digital-immortality', label: t('digitalImmortality.title') },
@@ -126,6 +127,7 @@ const Header = () => {
               {[
                 { to: '/', label: t('header.home') },
                 { to: '/companion', label: t('header.companions') },
+
                 { to: '/pet', label: t('home.features.virtualPet.title') },
                 { to: '/virtual-love', label: t('header.virtualLove') },
                 { to: '/digital-immortality', label: t('digitalImmortality.title') },
