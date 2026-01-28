@@ -17,7 +17,7 @@ const FounderColumnPage = () => {
             <section className="relative h-[40vh] md:h-[50vh] overflow-hidden">
                 <div className="absolute inset-0">
                     <img
-                        src="/src/assets/founder_column_hero.png"
+                        src="/assets/founder_column_hero.png"
                         alt="Founder's reflection"
                         className="w-full h-full object-cover opacity-60"
                     />

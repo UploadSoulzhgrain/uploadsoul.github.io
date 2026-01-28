@@ -13,7 +13,7 @@ const WarmStoriesPage = () => {
             tag: 'Healing · 治愈',
             title: '那个想再见爸爸的女孩',
             quote: '"如果有一天，我能再听到爸爸叫我的名字..."',
-            image: '/src/assets/story_healing.png',
+            image: '/assets/story_healing.png',
             accent: '#6dd5c3',
             content: (
                 <>
@@ -31,7 +31,7 @@ const WarmStoriesPage = () => {
             tag: 'Fulfillment · 圆满',
             title: '那个眼睛亮了的男孩',
             quote: '"他在听到\'定制记忆\'的那一刻，眼里有了光。"',
-            image: '/src/assets/story_fulfillment.png',
+            image: '/assets/story_fulfillment.png',
             accent: '#ffb3ba',
             content: (
                 <>
@@ -50,7 +50,7 @@ const WarmStoriesPage = () => {
             tag: 'Legacy · 延续',
             title: '怕被遗忘的你',
             quote: '"Remember me..."',
-            image: '/src/assets/story_legacy.png',
+            image: '/assets/story_legacy.png',
             accent: '#f4d5a6',
             content: (
                 <>
@@ -67,7 +67,7 @@ const WarmStoriesPage = () => {
             tag: 'Reunion · 重聚',
             title: '等待孩子回家的父母',
             quote: '"我只是想，再听他喊一声妈妈......"',
-            image: '/src/assets/story_reunion.png',
+            image: '/assets/story_reunion.png',
             accent: '#c4b5fd',
             content: (
                 <>
