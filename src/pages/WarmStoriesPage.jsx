@@ -242,7 +242,7 @@ const WarmStoriesPage = () => {
                 <div className="resonance-content">
                     <h2 className="resonance-title">
                         这不只是四个故事<br />
-                        这是无数灵魂的共同诉求
+                        这是无数重逢的期待
                     </h2>
 
                     <div className="keyword-wall" id="keywordWall" ref={keywordWallRef}></div>
