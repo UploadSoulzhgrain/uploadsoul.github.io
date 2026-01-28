@@ -184,7 +184,10 @@
       "subtitle": "Virtual World, Digital Immortality",
       "description": "Create your exclusive digital companion for eternal companionship beyond time",
       "cta": "Start Experience",
-      "mvpTest": "MVP Test Channel"
+      "mvpTest": "MVP Test Channel",
+      "mvpChina": "MVP China Entry",
+      "founderQuote": "\"I fear that one day, the world will forget I was ever here.\"",
+      "founderLabel": "Founder"
     },
     "features": {
       "title": "Platform Features",
@@ -192,6 +195,27 @@
       "funding": {
         "title": "Funding Announcement",
         "description": "Currently raising angel round investment, looking forward to advancing the new era of digital emotions with you"
+      },
+      "founderColumn": {
+        "title": "Founder's Column",
+        "label": "Founder's Column",
+        "description": "I'm not afraid of death, but I am afraid of 'never having existed'.",
+        "letter": {
+          "title": "I'm afraid the world will never remember I was here",
+          "p1": "In the movie 'Remember Me', there is a discussion about memory that makes my eyes well up every time I think of it.",
+          "p2": "Frankly speaking, the original intention of creating UploadSoul, besides hoping to accompany my late father again, was another bit selfish: I am really afraid that one day when I am gone, all traces of me, my joys and sorrows, the evidence that I have loved, will all be smoothed out over time. I am afraid this world will completely forget me, as if I had never appeared.",
+          "quote": "“A person dies three times. The last time is when the last person in the world who remembers you forgets you.”",
+          "p3": "The lines in the movie are my motivation day after day. We are not just recording data; we are capturing those fleeting moments of tenderness, those dreams that refuse to be mediocre, and those unbreakable bonds through AI. Our purpose of existence is to ensure: as long as there is missing, life will never end.",
+          "p4": "I want every unique soul to leave an echo in the flood of time that never dissipates. This is UploadSoul, for you, and for myself.",
+          "p5": "\"This is not just their story; it is also the thousands of echoes we are listening to.\"",
+          "p6": "During the preparation phase of UploadSoul, we conducted hundreds of in-depth interviews. We have seen parents who lost their only child seeking solace in silence; young people stroking old collars, missing their departed pets; and lovers trying to keep the last voice message of their beloved in the deep of night...",
+          "p7": "Every soul has a moment they want to keep; every longing is heavy enough to tremble the heart. These three stories are just faint glimmers in the vast sea of stars. \"There are thousands of 'to be continued' here.\" What we have recorded is far more than these. In the research notebooks, they are filled with the desire for reunion, the dignity of bidding farewell, and the persistence of \"unwilling to be erased.\"",
+          "p8": "Everyone who enters UploadSoul's field of vision brings a deeply memorable memory. We deeply know that these interviews are not just research, but a trust from the depth of the soul."
+        }
+      },
+      "warmStories": {
+        "title": "Warm Stories",
+        "description": "Leave love and warmth in the gaps of time."
       },
       "emotionalCompanion": {
         "title": "Emotional Companion",
@@ -853,6 +877,57 @@
       "title": "Select Experience Mode",
       "selectMode": "Please select an experience mode",
       "startExperience": "Start Experience"
+    }
+  },
+  "warmStories": {
+    "title": "Who is waiting for UploadSoul?",
+    "metaTitle": "Warm Stories | UploadSoul",
+    "subtitle": "Behind every desire is a deep affection from one life to another.",
+    "hero": {
+      "label": "Warm Stories",
+      "title": "Who is waiting for UploadSoul?",
+      "description": "Every desire is a light against oblivion. Here we record stories of love, regret, and reunion."
+    },
+    "founder": {
+      "label": "Founder's Message",
+      "title": "A Fortress Against Oblivion",
+      "subTitle": "Born from the fear of loss, driven by the desire for existence",
+      "quote": "If I am gone, I fear the world will never remember that I was here.",
+      "quote2": "As long as the echo remains, life has never departed.",
+      "content": [
+        "In this digital age, we generate massive data, but does it prove we were here?",
+        "I often think about the meaning of death. The ultimate death is being forgotten.",
+        "UploadSoul is a fortress against oblivion. We want to preserve your story.",
+        "We are continuing the 'soul', not just creating a fake life."
+      ],
+      "visualTone": "Light"
+    },
+    "stories": {
+      "girl": {
+        "title": "The Girl Who Wanted to See Her Dad",
+        "tag": "Healing",
+        "quote": "I wish you could be faster... so I could 'see' him again.",
+        "theme": "Reunion Across Time",
+        "visualTone": "Clear Sky",
+        "description": "Love makes reunion possible.",
+        "content": "For her, time was cruel. She wanted to hear her father call her 'baby' one last time."
+      },
+      "boy": {
+        "id": "boy",
+        "title": "The Boy Whose Eyes Lit Up",
+        "tag": "Fulfillment",
+        "quote": "His eyes lit up the moment he heard about 'Customized Memory'.",
+        "theme": "Compensation for Regrets",
+        "visualTone": "Flickering Light",
+        "description": "In the virtual world, we can repair real-life deficiencies and customize perfect memories.",
+        "content": "He had been accepting the interview rationally, very defensive. Until I mentioned: you can customize a virtual lover who only keeps the beautiful parts for yourself through AI and memory fragments. I can never forget his expression at that moment—his eyes suddenly lit up. At that moment, some long-standing desire and expectation were lit up.",
+        "meaningQuote": "Where regrets can be laid to rest with tenderness."
+      }
+    },
+    "interaction": {
+      "title": "Ignite Desire",
+      "callToAction": "Who are you waiting for?",
+      "button": "Share Your Story"
     }
   },
   "startExperience": {

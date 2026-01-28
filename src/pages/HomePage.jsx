@@ -2,6 +2,8 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { motion } from 'framer-motion';
+
 
 const HomePage = () => {
   const { t } = useTranslation();
@@ -91,15 +93,29 @@ const HomePage = () => {
           {/* 主标语 */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
             <span className="text-gradient">UploadSoul 传灵</span>
-            <span className="block text-3xl md:text-4xl font-light text-white/90 mt-4 tracking-wider">
-              虚拟世界，数字永生
-            </span>
+
           </h1>
 
-          {/* 简短描述 */}
-          <p className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
-            {t('home.hero.description')}
-          </p>
+          {/* 创始人语录 - 极简设计感 */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 0.5 }}
+            className="mb-14 relative inline-block"
+          >
+            <span className="absolute -top-6 -left-8 text-7xl text-white/5 font-serif select-none">“</span>
+            <p className="text-xl md:text-2xl text-white/90 font-serif italic leading-relaxed tracking-wider px-4">
+              {t('home.hero.founderQuote')}
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-3">
+              <div className="w-8 h-[1px] bg-gradient-to-r from-transparent to-amber-500/50" />
+              <span className="text-sm tracking-[0.3em] text-amber-500/80 uppercase font-light">
+                {t('home.hero.founderLabel')}
+              </span>
+              <div className="w-8 h-[1px] bg-gradient-to-l from-transparent to-amber-500/50" />
+            </div>
+            <span className="absolute -bottom-10 -right-8 text-7xl text-white/5 font-serif select-none rotate-180">“</span>
+          </motion.div>
 
           {/* CTA - 只保留关键出口 */}
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -112,6 +128,38 @@ const HomePage = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
             </div>
+
+            <div
+              onClick={() => { }}
+              className="px-8 py-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2 cursor-wait group"
+              title="即将上线"
+            >
+              <span className="text-white/80 group-hover:text-white transition-colors">
+                {t('home.hero.mvpChina')}
+              </span>
+              <div className="w-1.5 h-1.5 rounded-full bg-amber-500/50 animate-pulse" />
+            </div>
+          </div>
+
+          {/* 小型入口 - 几何设计感 */}
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              onClick={() => navigate('/our-stories')}
+              className="px-6 py-2 rounded-tl-2xl rounded-br-2xl border border-cyan-500/20 bg-cyan-500/10 backdrop-blur-md text-xs tracking-[0.2em] text-white/50 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-cyan-500/20 transition-all cursor-pointer flex items-center gap-2 group shadow-[0_0_20px_rgba(6,182,212,0.05)]"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/30 group-hover:bg-cyan-400 transition-colors" />
+              {t('home.features.warmStories.title')}
+            </motion.div>
+
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              onClick={() => navigate('/founder-column')}
+              className="px-6 py-2 rounded-tr-2xl rounded-bl-2xl border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-md text-xs tracking-[0.2em] text-white/50 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/20 transition-all cursor-pointer flex items-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30 group-hover:bg-emerald-400 transition-colors" />
+              {t('home.features.founderColumn.title')}
+            </motion.div>
           </div>
 
           {/* 融资公告 - 简化 */}

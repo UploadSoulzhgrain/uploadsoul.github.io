@@ -16,6 +16,7 @@ import CreateDigitalHumanPage from './pages/CreateDigitalHumanPage'
 import VirtualLovePage from './pages/VirtualLovePage'
 import DigitalHumanExperiencePage from './pages/DigitalHumanExperiencePage'
 import MVPTestPage from './pages/MVPTestPage'
+import WarmStoriesPage from './pages/WarmStoriesPage'
 import DigitalImmortalityPage from './pages/DigitalImmortalityPage'
 import AboutPage from './pages/AboutPage'
 import TeamPage from './pages/TeamPage'
@@ -35,6 +36,7 @@ import DashboardPage from './pages/DashboardPage'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import UpdatePasswordPage from './pages/UpdatePasswordPage'
+import FounderColumnPage from './pages/FounderColumnPage'
 
 function App() {
   return (
@@ -85,6 +87,8 @@ function App() {
               <Route path="/sitemap" element={<SitemapPage />} />
               <Route path="/mvp-test" element={<MVPTestPage />} />
               <Route path="/digital-world" element={<DigitalWorldPage />} />
+              <Route path="/our-stories" element={<WarmStoriesPage />} />
+              <Route path="/founder-column" element={<FounderColumnPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </main>
