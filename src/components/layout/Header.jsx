@@ -149,15 +149,33 @@ const Header = () => {
                 <LanguageSelector onLanguageChange={handleLanguageChange} />
 
                 {user ? (
-                  <div className="flex flex-col gap-3">
+                  <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-3 px-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-bold">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-md font-bold">
                         {(user.user_metadata?.nickname || user.email)?.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-white text-sm truncate">
-                        {user.user_metadata?.nickname || user.email}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className="text-white font-medium">
+                          {user.user_metadata?.nickname || user.email}
+                        </span>
+                        <Link
+                          to="/dashboard"
+                          className="text-amber-500 text-xs hover:underline"
+                          onClick={() => setIsMenuOpen(false)}
+                        >
+                          进入我的仪表盘 &gt;
+                        </Link>
+                      </div>
                     </div>
+
+                    <Link
+                      to="/dashboard"
+                      className="w-full py-4 bg-amber-500/10 text-amber-500 border border-amber-500/30 text-center rounded-xl font-bold"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      我的仪表盘
+                    </Link>
+
                     <button
                       onClick={handleSignOut}
                       className="w-full py-3 bg-red-500/10 text-red-400 border border-red-500/30 text-center rounded-xl"
