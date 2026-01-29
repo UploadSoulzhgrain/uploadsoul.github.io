@@ -91,9 +91,8 @@ const HomePage = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           {/* 主标语 */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
-            <span className="text-gradient">UploadSoul 传灵</span>
-
+          <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-wider font-serif">
+            <span className="text-sacred">UploadSoul 传灵</span>
           </h1>
 
           {/* 创始人语录 - 极简设计感 */}

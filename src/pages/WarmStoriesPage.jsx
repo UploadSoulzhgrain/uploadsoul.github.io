@@ -1,4 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabaseClient';
+import { motion, AnimatePresence } from 'framer-motion';
 import './WarmStoriesPage.css';
 
 const WarmStoriesPage = () => {
@@ -102,65 +105,127 @@ const WarmStoriesPage = () => {
 
     const themes = ['healing', 'fulfillment', 'legacy', 'reunion'];
 
+    const { user } = useAuth();
+    const [dbStories, setDbStories] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [hoveredStory, setHoveredStory] = useState(null);
+    // 新增：用于存储所有气泡和星星的视觉属性
+    const [visualParticles, setVisualParticles] = useState([]);
+
+    // 【新增修复】初始化时，同时从数据库和本地加载星星
     useEffect(() => {
-        const wall = keywordWallRef.current;
-        if (!wall) return;
+        const fetchInitialStories = async () => {
+            // 1. 先读本地
+            const localS = JSON.parse(localStorage.getItem('user_stories') || '[]');
 
-        // Clear existing bubbles to prevent duplication on re-renders (though strictly React handles this, direct DOM manip needs care)
-        wall.innerHTML = '';
+            try {
+                // 2. 尝试读云端
+                const { data, error } = await supabase
+                    .from('user_stories')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(30);
 
+                if (data && data.length > 0) {
+                    // 合并并去重
+                    const combined = [...data, ...localS.filter(ls => !data.find(d => d.content === ls.content))];
+                    setDbStories(combined);
+                } else {
+                    setDbStories(localS);
+                }
+            } catch (err) {
+                // 数据库不通时用本地
+                setDbStories(localS);
+            }
+        };
+        fetchInitialStories();
+    }, []);
+
+    // 初始化视觉粒子（关键词背景和用户故事星星）
+    // 使用 useMemo 或特定的 useEffect 来确保随机数在故事列表不改变时保持稳定
+    useEffect(() => {
+        const particles = [];
+
+        // 1. 添加原始的彩色气泡背景 (Keywords)
         allKeywords.forEach((text, index) => {
-            const bubble = document.createElement('div');
-            bubble.className = `keyword-bubble ${themes[index % 4]}`;
-            bubble.textContent = text;
-
-            // Set random positions styles directly
-            bubble.style.left = `${10 + (index * 6)}%`;
-            bubble.style.bottom = '0';
-            bubble.style.animationName = 'floatUp';
-            bubble.style.animationDuration = `${8 + Math.random() * 4}s`;
-            bubble.style.animationTimingFunction = 'linear';
-            bubble.style.animationIterationCount = 'infinite';
-            bubble.style.animationDelay = `${index * 0.5}s`;
-            bubble.style.setProperty('--x-offset', `${(Math.random() - 0.5) * 40}px`);
-
-            wall.appendChild(bubble);
+            particles.push({
+                id: `keyword-${index}`,
+                type: 'keyword',
+                text: text,
+                theme: themes[index % 4],
+                left: `${5 + (index * 6)}%`,
+                duration: `${10 + Math.random() * 5}s`,
+                delay: `${index * 0.4}s`,
+                xOffset: `${(Math.random() - 0.5) * 50}px`
+            });
         });
-    }, []); // Run once on mount
 
-    const handleSubmit = () => {
-        if (!storyInput.trim()) return;
+        // 2. 添加用户故事发光恒星 (User Stories)
+        dbStories.forEach((s, index) => {
+            particles.push({
+                id: `story-${s.id || index}`,
+                type: 'story',
+                text: s.content.length > 15 ? s.content.substring(0, 15) + '...' : s.content,
+                fullContent: s.content,
+                userName: s.user_name || '旅者',
+                left: `${Math.random() * 90}%`,
+                duration: `${15 + Math.random() * 10}s`,
+                delay: `${index * 1.2}s`,
+                xOffset: `${(Math.random() - 0.5) * 100}px`
+            });
+        });
 
-        // Simulate API call
-        console.log('Story submitted:', storyInput);
+        setVisualParticles(particles);
+    }, [dbStories]);
 
-        // Create immediate bubble
-        createUserStoryBubble(storyInput.trim());
+    const handleSubmit = async () => {
+        if (!storyInput.trim() || isSubmitting) return;
 
-        setShowSuccess(true);
-        setStoryInput('');
-        setTimeout(() => setShowSuccess(false), 5000);
-    };
+        if (!user) {
+            alert('请先登录，让您的光芒被永久铭记。');
+            return;
+        }
 
-    const createUserStoryBubble = (story) => {
-        if (!keywordWallRef.current) return;
+        setIsSubmitting(true);
+        const newStoryText = storyInput.trim();
+        const tempId = Date.now();
+        const displayName = user.user_metadata?.nickname || user.email?.split('@')[0] || '旅者';
 
-        const bubble = document.createElement('div');
-        bubble.className = 'keyword-bubble legacy';
+        try {
+            // 1. 本地优先：无论数据库通不通，先让用户看到成功
+            const localS = JSON.parse(localStorage.getItem('user_stories') || '[]');
+            const newLocalStory = {
+                id: tempId,
+                content: newStoryText,
+                user_name: displayName,
+                created_at: new Date().toISOString()
+            };
 
-        const preview = story.length > 20 ? story.substring(0, 20) + '...' : story;
-        bubble.textContent = preview;
+            const updatedLocal = [newLocalStory, ...localS].slice(0, 30);
+            localStorage.setItem('user_stories', JSON.stringify(updatedLocal));
 
-        bubble.style.left = `${Math.random() * 80 + 10}%`;
-        bubble.style.bottom = '0';
-        bubble.style.animationName = 'floatUp';
-        bubble.style.animationDuration = '10s';
-        bubble.style.animationTimingFunction = 'linear';
-        bubble.style.animationIterationCount = 'infinite';
-        bubble.style.setProperty('--x-offset', `${(Math.random() - 0.5) * 40}px`);
-        bubble.style.opacity = '1';
+            // 2. 视觉反馈：立即更新界面
+            setDbStories(prev => [newLocalStory, ...prev]);
+            setShowSuccess(true);
+            setStoryInput('');
+            setTimeout(() => setShowSuccess(false), 5000);
 
-        keywordWallRef.current.appendChild(bubble);
+            supabase.from('user_stories').insert([
+                {
+                    content: newStoryText,
+                    user_id: user.id,
+                    user_name: displayName
+                }
+            ]).then(({ error }) => {
+                if (error) console.warn('Supabase sync deferred:', error.message);
+            });
+
+        } catch (err) {
+            console.error('Local save error:', err);
+            alert('保存失败，请检查浏览器设置。');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -241,11 +306,48 @@ const WarmStoriesPage = () => {
             <section className="resonance">
                 <div className="resonance-content">
                     <h2 className="resonance-title">
-                        这不只是四个故事<br />
-                        这是无数重逢的期待
+                        <span className="artistic-text primary">这些不只是感人的故事</span><br />
+                        <span className="artistic-text secondary">更是无数重逢的期待</span>
                     </h2>
 
-                    <div className="keyword-wall" id="keywordWall" ref={keywordWallRef}></div>
+                    <div className="keyword-wall" id="keywordWall" ref={keywordWallRef}>
+                        {visualParticles.map((p) => (
+                            <div
+                                key={p.id}
+                                className={`keyword-bubble ${p.type === 'story' ? 'persistent-star' : p.theme}`}
+                                style={{
+                                    left: p.left,
+                                    bottom: '-30px',
+                                    animationName: 'floatUp',
+                                    animationDuration: p.duration,
+                                    animationDelay: p.delay,
+                                    animationIterationCount: 'infinite',
+                                    '--x-offset': p.xOffset,
+                                    pointerEvents: 'auto'
+                                }}
+                                onMouseEnter={p.type === 'story' ? () => setHoveredStory({ content: p.fullContent, name: p.userName }) : undefined}
+                                onMouseLeave={p.type === 'story' ? () => setHoveredStory(null) : undefined}
+                            >
+                                {p.text}
+                            </div>
+                        ))}
+
+                        {/* 动态浮动的故事详情 Tooltip */}
+                        <AnimatePresence>
+                            {hoveredStory && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    className="story-hover-tooltip"
+                                >
+                                    <div className="tooltip-grain"></div>
+                                    <p className="tooltip-content">"{hoveredStory.content}"</p>
+                                    <div className="tooltip-footer">— {hoveredStory.name}</div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
 
                     <p className="resonance-statement">
                         在 <strong>500+ 小时</strong>的访谈中，我们收到了<strong>上千份托付</strong>。<br />

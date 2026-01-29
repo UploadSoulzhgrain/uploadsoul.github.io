@@ -11,6 +11,7 @@ const RegisterPage = () => {
 
   const [method, setMethod] = useState('email'); // 'email' or 'phone'
   const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -35,6 +36,11 @@ const RegisterPage = () => {
       const { data, error } = await signUp({
         email,
         password,
+        options: {
+          data: {
+            nickname: nickname || email.split('@')[0]
+          }
+        }
       });
 
       if (error) throw error;
@@ -94,6 +100,23 @@ const RegisterPage = () => {
           <form className="space-y-6" onSubmit={handleRegister}>
             {method === 'email' ? (
               <>
+                <div>
+                  <label htmlFor="nickname" className="block text-sm font-medium text-gray-300">
+                    个性昵称
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="nickname"
+                      name="nickname"
+                      type="text"
+                      placeholder="想让星空如何称呼您？"
+                      required
+                      value={nickname}
+                      onChange={(e) => setNickname(e.target.value)}
+                      className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+                    />
+                  </div>
+                </div>
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-gray-300">
                     邮箱地址
