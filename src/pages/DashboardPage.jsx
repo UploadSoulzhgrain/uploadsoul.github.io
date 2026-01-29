@@ -18,17 +18,22 @@ const DashboardPage = () => {
         totalUsers: 0,
         activeNow: 0
     });
+    const [recentUsers, setRecentUsers] = useState([]);
 
     useEffect(() => {
         if (!isAdmin) return;
 
         const fetchStats = async () => {
-            // 1. 获取注册用户总数 (模拟从 auth.users 获取，通常需要专门的 profiles 表)
-            const { count: usersCount } = await supabase
-                .from('user_activity') // 假设我们用这个表记录活跃用户
-                .select('*', { count: 'exact', head: true });
+            // 1. 获取注册用户总表
+            const { data: userData, count: usersCount } = await supabase
+                .from('user_activity')
+                .select('*', { count: 'exact' })
+                .order('last_seen', { ascending: false })
+                .limit(10);
 
-            // 2. 获取今日访问 (site_analytics)
+            if (userData) setRecentUsers(userData);
+
+            // 2. 获取今日访问
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const { count: todayCount } = await supabase
@@ -48,12 +53,12 @@ const DashboardPage = () => {
                 todayVisits: todayCount || 0,
                 weekVisits: weekCount || 0,
                 totalUsers: usersCount || 0,
-                activeNow: Math.floor(Math.random() * 5) + 1 // 临时模拟在线人数
+                activeNow: Math.min(usersCount || 0, userData?.filter(u => (new Date() - new Date(u.last_seen)) < 300000).length + 1 || 1)
             });
         };
 
         fetchStats();
-        const interval = setInterval(fetchStats, 60000); // 每一分钟刷新一次
+        const interval = setInterval(fetchStats, 60000);
         return () => clearInterval(interval);
     }, [isAdmin]);
 
@@ -80,9 +85,9 @@ const DashboardPage = () => {
                     <div className="mb-12 animate-fadeIn">
                         <div className="flex items-center gap-2 mb-6">
                             <div className="w-2 h-6 bg-amber-500 rounded-full"></div>
-                            <h2 className="text-xl font-bold">系统运营概览 (仅管理员可见)</h2>
+                            <h2 className="text-xl font-bold">系统运营概览 (管理员权限)</h2>
                         </div>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                             <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
                                 <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">今日访客</p>
                                 <h4 className="text-3xl font-serif font-bold text-amber-500">{stats.todayVisits}</h4>
@@ -108,6 +113,49 @@ const DashboardPage = () => {
                                     </span>
                                 </div>
                                 <div className="mt-2 text-[10px] text-gray-500 italic">实时活跃监测</div>
+                            </div>
+                        </div>
+
+                        {/* 注册用户访问详情 */}
+                        <div className="bg-[#12121A] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                            <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                <h3 className="font-bold text-gray-200">注册用户访问日志 (最近 10 条)</h3>
+                                <span className="text-[10px] px-2 py-1 bg-amber-500/10 text-amber-500 rounded uppercase font-bold tracking-tighter">Live Monitor</span>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-white/5 text-gray-400 text-xs uppercase">
+                                        <tr>
+                                            <th className="px-6 py-4 font-medium">注册邮箱</th>
+                                            <th className="px-6 py-4 font-medium">最后访问时间</th>
+                                            <th className="px-6 py-4 font-medium">累计在线时长</th>
+                                            <th className="px-6 py-4 font-medium">状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5 text-gray-300">
+                                        {recentUsers.map((u) => (
+                                            <tr key={u.user_id} className="hover:bg-white/5 transition-colors">
+                                                <td className="px-6 py-4 font-medium text-amber-500/80">{u.email}</td>
+                                                <td className="px-6 py-4 text-xs">
+                                                    {new Date(u.last_seen).toLocaleString('zh-CN')}
+                                                </td>
+                                                <td className="px-6 py-4 text-xs">
+                                                    {Math.floor(u.online_seconds_increment / 60)} 分钟
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    {(new Date() - new Date(u.last_seen)) < 300000 ? (
+                                                        <span className="text-green-400 flex items-center gap-1">
+                                                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse"></span>
+                                                            在线
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-gray-500">离线</span>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
