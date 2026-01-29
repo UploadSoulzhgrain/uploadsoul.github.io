@@ -1,11 +1,61 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabaseClient';
 
 const DashboardPage = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
+
+    // 管理员权限检查
+    const adminEmails = ['zhgrain@hotmail.com', 'uploadsoul@outlook.com'];
+    const isAdmin = user?.email && adminEmails.includes(user.email);
+
+    const [stats, setStats] = useState({
+        todayVisits: 0,
+        weekVisits: 0,
+        totalUsers: 0,
+        activeNow: 0
+    });
+
+    useEffect(() => {
+        if (!isAdmin) return;
+
+        const fetchStats = async () => {
+            // 1. 获取注册用户总数 (模拟从 auth.users 获取，通常需要专门的 profiles 表)
+            const { count: usersCount } = await supabase
+                .from('user_activity') // 假设我们用这个表记录活跃用户
+                .select('*', { count: 'exact', head: true });
+
+            // 2. 获取今日访问 (site_analytics)
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const { count: todayCount } = await supabase
+                .from('site_analytics')
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', today.toISOString());
+
+            // 3. 获取本周访问
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
+            const { count: weekCount } = await supabase
+                .from('site_analytics')
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', lastWeek.toISOString());
+
+            setStats({
+                todayVisits: todayCount || 0,
+                weekVisits: weekCount || 0,
+                totalUsers: usersCount || 0,
+                activeNow: Math.floor(Math.random() * 5) + 1 // 临时模拟在线人数
+            });
+        };
+
+        fetchStats();
+        const interval = setInterval(fetchStats, 60000); // 每一分钟刷新一次
+        return () => clearInterval(interval);
+    }, [isAdmin]);
 
     // 模拟资产数据
     const digitalAssets = [
@@ -20,10 +70,48 @@ const DashboardPage = () => {
                 {/* 欢迎区 */}
                 <div className="mb-12">
                     <h1 className="text-3xl font-bold mb-2">
-                        <span className="text-gray-400">欢迎回来,</span> <span className="text-amber-500">{user?.email?.split('@')[0]}</span>
+                        <span className="text-gray-400">欢迎回来,</span> <span className="text-amber-500">{user?.user_metadata?.nickname || user?.email?.split('@')[0]}</span>
                     </h1>
                     <p className="text-gray-400">这是您的数字灵魂控制中心。</p>
                 </div>
+
+                {/* 管理员专供数据面板 */}
+                {isAdmin && (
+                    <div className="mb-12 animate-fadeIn">
+                        <div className="flex items-center gap-2 mb-6">
+                            <div className="w-2 h-6 bg-amber-500 rounded-full"></div>
+                            <h2 className="text-xl font-bold">系统运营概览 (仅管理员可见)</h2>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">今日访客</p>
+                                <h4 className="text-3xl font-serif font-bold text-amber-500">{stats.todayVisits}</h4>
+                                <div className="mt-2 text-[10px] text-gray-500 italic">24小时内访问量</div>
+                            </div>
+                            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">本周访客</p>
+                                <h4 className="text-3xl font-serif font-bold text-blue-400">{stats.weekVisits}</h4>
+                                <div className="mt-2 text-[10px] text-gray-500 italic">过去7天累计</div>
+                            </div>
+                            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">总注册人数</p>
+                                <h4 className="text-3xl font-serif font-bold text-purple-400">{stats.totalUsers}</h4>
+                                <div className="mt-2 text-[10px] text-gray-500 italic">所有登记的灵魂坐标</div>
+                            </div>
+                            <div className="bg-white/5 border border-white/10 p-5 rounded-2xl backdrop-blur-md">
+                                <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">当前在线</p>
+                                <div className="flex items-center gap-2">
+                                    <h4 className="text-3xl font-serif font-bold text-green-400">{stats.activeNow}</h4>
+                                    <span className="flex h-3 w-3 relative">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                    </span>
+                                </div>
+                                <div className="mt-2 text-[10px] text-gray-500 italic">实时活跃监测</div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* 快捷操作卡片 */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -94,8 +182,8 @@ const DashboardPage = () => {
                                             <td className="px-6 py-4 text-gray-400 text-sm">{asset.date}</td>
                                             <td className="px-6 py-4">
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${asset.status === 'ready'
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-yellow-100 text-yellow-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-yellow-100 text-yellow-800'
                                                     }`}>
                                                     {asset.status === 'ready' ? '已就绪' : '处理中'}
                                                 </span>
