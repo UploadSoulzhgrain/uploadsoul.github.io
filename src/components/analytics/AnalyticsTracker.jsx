@@ -14,28 +14,28 @@ const AnalyticsTracker = () => {
         const trackVisit = async () => {
             const hasVisitedToday = localStorage.getItem('last_visit_date') === new Date().toDateString();
 
-            // 发送到 Supabase 的 site_visits 表
-            // 如果表不存在，这里会报错，我们在控制台打印警告
             try {
-                const { error } = await supabase.from('site_analytics').insert([
-                    {
-                        event_type: 'page_view',
-                        is_unique: !hasVisitedToday,
-                        user_agent: navigator.userAgent,
-                        path: window.location.pathname
-                    }
-                ]);
+                const visitData = {
+                    event_type: 'page_view',
+                    is_unique: !hasVisitedToday,
+                    user_agent: navigator.userAgent,
+                    path: window.location.pathname,
+                    user_id: user?.id || null,
+                    user_email: user?.email || null
+                };
+
+                const { error } = await supabase.from('site_analytics').insert([visitData]);
 
                 if (!error) {
                     localStorage.setItem('last_visit_date', new Date().toDateString());
                 }
             } catch (err) {
-                console.warn('Analytics sync deferred (Table missing?):', err.message);
+                console.warn('Analytics sync deferred:', err.message);
             }
         };
 
         trackVisit();
-    }, []);
+    }, [user, window.location.pathname]); // 当切换页面或登录状态改变时记录
 
     useEffect(() => {
         if (!user) return;
