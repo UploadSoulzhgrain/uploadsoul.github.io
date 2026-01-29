@@ -119,24 +119,29 @@ const HomePage = () => {
           {/* CTA - 只保留关键出口 */}
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <div
-              onClick={() => handleAction('/mvp-test')}
-              className="btn-premium inline-flex items-center justify-center gap-2 cursor-pointer"
+              onClick={() => navigate('/mvp-test')}
+              className="btn-premium inline-flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10"
             >
-              <span>{t('home.hero.mvpTest')}</span>
+              <span className="relative flex h-2 w-2 mr-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              <span>{t('home.hero.mvpChina')}</span>
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
 
             <div
-              onClick={() => { }}
-              className="px-8 py-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2 cursor-wait group"
-              title="即将上线"
+              onClick={() => handleAction('/mvp-test')}
+              className="px-8 py-3 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-sm font-medium hover:bg-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-2 cursor-pointer group"
             >
               <span className="text-white/80 group-hover:text-white transition-colors">
-                {t('home.hero.mvpChina')}
+                {t('home.hero.mvpTest')}
               </span>
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-500/50 animate-pulse" />
+              <svg className="w-4 h-4 text-white/40 group-hover:text-white transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2.945M8 3.935A9 9 0 0116.5 16s-2-1-3-3l-2-1" />
+              </svg>
             </div>
           </div>
 
