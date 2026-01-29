@@ -29,7 +29,7 @@ const FounderColumnPage = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.3 }}
-                        className="text-4xl md:text-5xl font-serif italic text-white/90 text-center max-w-3xl"
+                        className="text-4xl md:text-5xl font-serif italic text-center max-w-3xl text-sacred"
                     >
                         {t('home.features.founderColumn.letter.title')}
                     </motion.h1>

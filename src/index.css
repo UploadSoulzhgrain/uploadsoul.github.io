@@ -55,6 +55,17 @@
   background-clip: text;
 }
 
+/* 神圣艺术文字效果 - 源自温情故事“存在的意义” */
+.text-sacred {
+  background: linear-gradient(to bottom, #f4d5a6 0%, #ece0d1 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(244, 213, 166, 0.3));
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+}
+
 /* 高级按钮 */
 .btn-premium {
   background: var(--accent-gradient);

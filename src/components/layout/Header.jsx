@@ -71,9 +71,11 @@ const Header = () => {
                   className="flex items-center gap-2 focus:outline-none"
                 >
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
-                    {user.email?.charAt(0).toUpperCase()}
+                    {(user.user_metadata?.nickname || user.email)?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-gray-300 text-sm max-w-[100px] truncate">{user.email}</span>
+                  <span className="text-gray-300 text-sm max-w-[100px] truncate">
+                    {user.user_metadata?.nickname || user.email}
+                  </span>
                 </button>
 
                 {isUserMenuOpen && (
@@ -150,9 +152,11 @@ const Header = () => {
                   <div className="flex flex-col gap-3">
                     <div className="flex items-center gap-3 px-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm font-bold">
-                        {user.email?.charAt(0).toUpperCase()}
+                        {(user.user_metadata?.nickname || user.email)?.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-white text-sm truncate">{user.email}</span>
+                      <span className="text-white text-sm truncate">
+                        {user.user_metadata?.nickname || user.email}
+                      </span>
                     </div>
                     <button
                       onClick={handleSignOut}
