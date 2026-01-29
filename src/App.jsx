@@ -37,12 +37,14 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import UpdatePasswordPage from './pages/UpdatePasswordPage'
 import FounderColumnPage from './pages/FounderColumnPage'
+import AnalyticsTracker from './components/analytics/AnalyticsTracker'
 
 function App() {
   return (
     <I18nextProvider i18n={i18n}>
       <Router>
         <div className="min-h-screen flex flex-col">
+          <AnalyticsTracker />
           <Helmet>
             <html lang={i18n.language} />
             <meta charSet="utf-8" />
