@@ -19,6 +19,7 @@ const DashboardPage = () => {
         activeNow: 0
     });
     const [recentUsers, setRecentUsers] = useState([]);
+    const [pathLogs, setPathLogs] = useState([]);
 
     useEffect(() => {
         if (!isAdmin) return;
@@ -33,7 +34,17 @@ const DashboardPage = () => {
 
             if (userData) setRecentUsers(userData);
 
-            // 2. 获取今日访问
+            // 2. 获取实时路径分析 (过滤掉游客，只看注册用户)
+            const { data: pathData } = await supabase
+                .from('site_analytics')
+                .select('*')
+                .not('user_email', 'is', null)
+                .order('created_at', { ascending: false })
+                .limit(15);
+
+            if (pathData) setPathLogs(pathData);
+
+            // 3. 基础汇总统计
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const { count: todayCount } = await supabase
@@ -41,7 +52,7 @@ const DashboardPage = () => {
                 .select('*', { count: 'exact', head: true })
                 .gte('created_at', today.toISOString());
 
-            // 3. 获取本周访问
+            // 4. 获取本周访问
             const lastWeek = new Date();
             lastWeek.setDate(lastWeek.getDate() - 7);
             const { count: weekCount } = await supabase
@@ -151,6 +162,44 @@ const DashboardPage = () => {
                                                     ) : (
                                                         <span className="text-gray-500">离线</span>
                                                     )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        {/* 路径分析：用户轨迹 */}
+                        <div className="mt-8 bg-[#12121A] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
+                            <div className="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                <h3 className="font-bold text-gray-200">实时路径分析 (用户足迹)</h3>
+                                <div className="flex items-center gap-2">
+                                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+                                    <span className="text-[10px] text-blue-400 font-bold uppercase">Real-time Journey</span>
+                                </div>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-white/5 text-gray-400 text-xs uppercase">
+                                        <tr>
+                                            <th className="px-6 py-4 font-medium">成员邮箱</th>
+                                            <th className="px-6 py-4 font-medium">访问路径</th>
+                                            <th className="px-6 py-4 font-medium">时间点</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5 text-gray-300">
+                                        {pathLogs.map((log, idx) => (
+                                            <tr key={idx} className="hover:bg-white/5 transition-colors group">
+                                                <td className="px-6 py-4">
+                                                    <span className="text-gray-400 group-hover:text-amber-500 transition-colors">{log.user_email}</span>
+                                                </td>
+                                                <td className="px-6 py-4">
+                                                    <code className="text-[11px] bg-white/5 px-2 py-1 rounded text-blue-300">
+                                                        {log.path === '/' ? '首页 (Home)' : log.path}
+                                                    </code>
+                                                </td>
+                                                <td className="px-6 py-4 text-xs text-gray-500">
+                                                    {new Date(log.created_at).toLocaleTimeString('zh-CN')}
                                                 </td>
                                             </tr>
                                         ))}
