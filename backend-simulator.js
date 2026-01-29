@@ -10,6 +10,23 @@ app.use(express.json());
 
 const PORT = 3000;
 
+// HeyGen Token API
+app.get('/api/heygen-token', async (req, res) => {
+    const HEYGEN_API_KEY = 'sk_V2_hgu_kUJuwlf4dLH_ljzwKlF1jsoS7UPRqkPLPmSj3fX2wG34';
+
+    try {
+        const response = await axios.post('https://api.heygen.com/v1/streaming.create_token', null, {
+            headers: {
+                'x-api-key': HEYGEN_API_KEY
+            }
+        });
+        res.json({ token: response.data.data.token });
+    } catch (err) {
+        console.error('HeyGen Token Error:', err.response?.data || err.message);
+        res.status(500).json({ error: 'Failed to fetch HeyGen token' });
+    }
+});
+
 // Speech Token API
 app.get('/api/speech-token', async (req, res) => {
     const speechKey = process.env.AZURE_SPEECH_KEY;

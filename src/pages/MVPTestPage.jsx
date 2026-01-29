@@ -1,8 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import * as Transition from '@headlessui/react';
-import * as SpeechSDK from 'microsoft-cognitiveservices-speech-sdk';
-import { useTranslation } from 'react-i18next';
-import Logo from '../components/common/Logo';
+import StreamingAvatar, { AvatarQuality, TaskType } from "@heygen/streaming-avatar";
 
 const MVPTestPage = () => {
   const { t } = useTranslation();
@@ -12,188 +8,76 @@ const MVPTestPage = () => {
   const [isTalking, setIsTalking] = useState(false);
 
   const videoRef = useRef(null);
-  const synthesizerRef = useRef(null);
+  const avatarRef = useRef(null);
   const chatEndRef = useRef(null);
   const [debugLog, setDebugLog] = useState([]);
-  const [webrtcState, setWebrtcState] = useState('new');
-  const [iceState, setIceState] = useState('new');
-  const [sigState, setSigState] = useState('stable');
-  const [gathState, setGathState] = useState('new');
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
-  const [hasAudioTrack, setHasAudioTrack] = useState(false);
 
   const addDebug = (msg) => {
-    console.log(`[AVATAR_DEBUG] ${msg}`);
+    console.log(`[HEYGEN_DEBUG] ${msg}`);
     setDebugLog(prev => [...prev.slice(-4), msg]);
   };
 
   useEffect(() => {
-    // 自动滚动到底部
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 清理函数
+  useEffect(() => {
+    return () => {
+      if (avatarRef.current) {
+        avatarRef.current.stopAvatar();
+      }
+    };
+  }, []);
+
   const initAvatar = async () => {
-    if (synthesizerRef.current) return;
+    if (avatarRef.current) return;
 
     setStatus('connecting');
     try {
-      // 1. 环境诊断
-      addDebug('正在检查环境安全上下文...');
+      addDebug('正在获取 HeyGen 访问令牌...');
+      const response = await fetch('/api/heygen-token');
+      const { token } = await response.json();
 
-      // 2. 获取连接凭证
-      const [tokenRes, iceRes] = await Promise.all([
-        fetch('/api/speech-token'),
-        fetch('/api/ice-servers')
-      ]);
+      if (!token) throw new Error('未能获取令牌');
 
-      if (!tokenRes.ok || !iceRes.ok) {
-        throw new Error('无法连接到服务，请检查网络连接。');
-      }
+      addDebug('正在初始化 HeyGen 引擎...');
+      avatarRef.current = new StreamingAvatar({ token });
 
-      const { token, region } = await tokenRes.json();
-      const iceServers = await iceRes.json();
-
-      // 3. 配置核心参数
-      const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
-      speechConfig.speechSynthesisLanguage = "zh-CN";
-      speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural";
-
-      // 4. 配置虚拟形象
-      const avatarConfig = new SpeechSDK.AvatarConfig("jenny", "graceful");
-
-      // 5. 创建合成器
-      synthesizerRef.current = new SpeechSDK.AvatarSynthesizer(speechConfig, avatarConfig);
-
-      // 绑定视频元素
-      if (videoRef.current) {
-        synthesizerRef.current.videoElement = videoRef.current;
-      }
-
-      // 6. 准备加密传输通道
-      addDebug('正在初始化安全通信通道...');
-
-      // 标准化 ICE 服务器配置 (包含 Google STUN 和 Azure TURN)
-      const rtcIceServers = [
-        {
-          urls: [
-            'stun:stun.l.google.com:19302',
-            'stun:stun1.l.google.com:19302'
-          ]
-        },
-        {
-          urls: iceServers.Urls || iceServers.urls,
-          username: iceServers.Username || iceServers.username,
-          credential: iceServers.Password || iceServers.password || iceServers.credential
+      // 绑定流准备就绪事件
+      avatarRef.current.on('stream_ready', (event) => {
+        addDebug('视频流已就绪');
+        if (videoRef.current) {
+          videoRef.current.srcObject = event.detail;
+          videoRef.current.oncanplay = () => {
+            videoRef.current.play().catch(console.error);
+            setHasVideoTrack(true);
+          };
         }
-      ];
-
-      addDebug('正在配置核心通信轨道...');
-      const peerConnection = new RTCPeerConnection({
-        iceServers: rtcIceServers,
-        iceCandidatePoolSize: 10,
-        bundlePolicy: 'max-bundle'
       });
 
-      // 【强效修复】创建一个虚拟数据通道，强制浏览器立即启动 ICE 候选者搜寻
-      // 这能解决在某些环境下 GATH 卡在 new 的问题
-      peerConnection.createDataChannel('health-check');
+      avatarRef.current.on('stream_disconnected', () => {
+        addDebug('流连接已断开');
+        setHasVideoTrack(false);
+        setStatus('idle');
+        avatarRef.current = null;
+      });
 
-      // 实时状态同步
-      peerConnection.onsignalingstatechange = () => setSigState(peerConnection.signalingState);
-      peerConnection.onicegatheringstatechange = () => setGathState(peerConnection.iceGatheringState);
-      peerConnection.onconnectionstatechange = () => setWebrtcState(peerConnection.connectionState);
-      peerConnection.oniceconnectionstatechange = () => setIceState(peerConnection.iceConnectionState);
+      // 启动正式会话
+      await avatarRef.current.createStartAvatar({
+        avatarName: "Anna_public_3_20240108", // 精选的高质量演示角色
+        quality: AvatarQuality.Low, // 快速演示建议用 Low
+      });
 
-      // 发现网络路径即时反馈
-      peerConnection.onicecandidate = (event) => {
-        if (event.candidate) {
-          setDebugLog(prev => [...prev.slice(-1), `找到网络路径: ${event.candidate.type}`]);
-        }
-      };
-
-      // 调试：监听 ICE 收集状态变化
-      peerConnection.onicegatheringstatechange = () => {
-        addDebug(`ICE Gathering: ${peerConnection.iceGatheringState}`);
-      };
-
-      // 配置监听音视频流
-      peerConnection.ontrack = (e) => {
-        addDebug(`Track received: ${e.track.kind}`);
-        if (e.track.kind === 'video') setHasVideoTrack(true);
-        if (e.track.kind === 'audio') setHasAudioTrack(true);
-
-        if (videoRef.current && e.streams && e.streams[0]) {
-          videoRef.current.srcObject = e.streams[0];
-
-          // 确保静音状态下先播放，然后再尝试取消静音 (处理浏览器限制)
-          videoRef.current.play().then(() => {
-            addDebug('Video playing successfully');
-          }).catch(err => {
-            addDebug(`Playback failed: ${err.message}`);
-            // 如果报错尝试显示一个手动的“点击恢复声音”按钮
-          });
-        }
-      };
-
-      // 监听连接状态
-      peerConnection.onconnectionstatechange = () => {
-        setWebrtcState(peerConnection.connectionState);
-        addDebug(`Conn State: ${peerConnection.connectionState}`);
-      };
-
-      peerConnection.oniceconnectionstatechange = () => {
-        setIceState(peerConnection.iceConnectionState);
-        addDebug(`ICE State: ${peerConnection.iceConnectionState}`);
-      };
-
-      // 注意：不要手动添加 transceiver，让 SDK 自己处理媒体协商
-      // peerConnection.addTransceiver('video', { direction: 'recvonly' });
-      // peerConnection.addTransceiver('audio', { direction: 'recvonly' });
-
-      // 7. 建立连接 (WebRTC)
-      // 预激活媒体引擎 (某些浏览器需要至少请求一次权限才能让 WebRTC 正常接收流)
-      try {
-        addDebug('Priming audio context...');
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        stream.getTracks().forEach(track => track.stop()); // 授权后立即释放
-        addDebug('Audio system ready');
-      } catch (e) {
-        addDebug('Mic access skipped (non-critical)');
-      }
-
-      addDebug('正在验证服务权限...');
-
-      // 启动会话并添加超时监控
-      const startAvatarSession = async () => {
-        return new Promise((resolve, reject) => {
-          const timer = setTimeout(() => reject(new Error('连接超时 (60秒)')), 60000);
-
-          synthesizerRef.current.startAvatarAsync(peerConnection).then(() => {
-            clearTimeout(timer);
-            resolve();
-          }).catch(err => {
-            clearTimeout(timer);
-            reject(err);
-          });
-        });
-      };
-
-      await startAvatarSession();
-
-      addDebug('会话已开启');
+      addDebug('HeyGen 会话已建立');
       setStatus('ready');
-      addBotMessage("您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。");
-    } catch (error) {
-      addDebug(`初始化失败`);
-      console.error('Detailed Error:', error);
-      setStatus('error');
-    }
-  };
+      addBotMessage("您好！我是 UploadSoul 的数字助手。借助 HeyGen 技术，我现在能为您提供更自然的交互体验了。");
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      addDebug(`Audio: ${videoRef.current.muted ? 'Muted' : 'Unmuted'}`);
+    } catch (error) {
+      addDebug(`初始化失败: ${error.message}`);
+      console.error('HeyGen Error:', error);
+      setStatus('error');
     }
   };
 
@@ -206,7 +90,7 @@ const MVPTestPage = () => {
   };
 
   const handleSend = async () => {
-    if (!inputValue.trim() || status !== 'ready') return;
+    if (!inputValue.trim() || status !== 'ready' || isTalking) return;
 
     const text = inputValue;
     setInputValue('');
@@ -214,36 +98,41 @@ const MVPTestPage = () => {
     setIsTalking(true);
 
     try {
-      // 1. 获取 GPT 回复
+      addDebug('正在思考回复...');
+      // 1. 获取 GPT 回复 (复用现有的后端 API)
       const chatRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text })
       });
 
-      if (!chatRes.ok) {
-        throw new Error(`Chat API 响应异常: ${chatRes.status}`);
-      }
-
       const data = await chatRes.json();
       const reply = data.reply;
 
-      if (!reply) {
-        throw new Error('未能从回复中解析出文字。');
-      }
+      if (reply) {
+        addBotMessage(reply);
 
-      addBotMessage(reply);
-
-      // 2. 让数字人说话
-      if (synthesizerRef.current) {
-        console.log('Synthesizing speech for:', reply);
-        await synthesizerRef.current.speakTextAsync(reply);
+        // 2. 让 HeyGen 数字人说话
+        if (avatarRef.current) {
+          addDebug('正在生成语音及表情...');
+          await avatarRef.current.speak({
+            text: reply,
+            task_type: TaskType.REPEAT
+          });
+        }
       }
     } catch (error) {
       console.error('Chat Error:', error);
-      addBotMessage(`抱歉，我现在出了一点小状况 (${error.message})，请稍后再试。`);
+      addBotMessage(`抱歉，我现在出了一点小状况 (${error.message})`);
     } finally {
       setIsTalking(false);
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      addDebug(`Audio: ${videoRef.current.muted ? 'Muted' : 'Unmuted'}`);
     }
   };
 
@@ -256,84 +145,73 @@ const MVPTestPage = () => {
           <div className="absolute top-6 left-6 z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
               <span className={`w-2 h-2 rounded-full ${status === 'ready' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
-              <span className="text-xs font-medium uppercase tracking-wider">
-                {status === 'ready' ? '实时连接中' : '准备连接'}
+              <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
+                {status === 'ready' ? 'HEYGEN 实时连接中' : '等待初始化'}
               </span>
             </div>
           </div>
 
-          <div className="flex-1 flex items-center justify-center relative">
+          <div className="flex-1 flex items-center justify-center relative bg-black/40">
             {/* 视频渲染容器 */}
             <div id="video-container" className="w-full h-full min-h-[400px] flex items-center justify-center">
               <video
                 ref={videoRef}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain"
                 playsInline
                 autoPlay
                 muted={true}
-                controls={false}
               />
 
               {status === 'idle' && (
                 <button
                   onClick={initAvatar}
-                  className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
+                  className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95 z-20"
                 >
-                  启动数字人交互
+                  启动 HeyGen 数字人
                 </button>
               )}
 
               {status === 'connecting' && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-400 animate-pulse font-light tracking-widest">初始化神经渲染...</p>
+                  <p className="text-gray-400 animate-pulse font-light tracking-widest text-sm">构建神经渲染通道...</p>
                 </div>
               )}
 
               {status === 'ready' && (
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
-                  <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono">
+                  <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono w-64">
                     <div className="text-gray-400 flex justify-between">
-                      <span># DIAGNOSTICS</span>
-                      <span className="text-[8px] opacity-50">{webrtcState}</span>
+                      <span># SYSTEM_LOG</span>
+                      <span className="text-[8px] opacity-50 tracking-tighter">HEYGEN_v2</span>
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <div className="flex gap-3">
-                        <span>ICE: <b className={(iceState === 'connected' || iceState === 'completed') ? 'text-green-400' : 'text-amber-400'}>{iceState}</b></span>
-                        <span>V: <b className={hasVideoTrack ? 'text-green-400' : 'text-red-400'}>{hasVideoTrack ? 'OK' : 'NO'}</b></span>
-                        <span>A: <b className={hasAudioTrack ? 'text-green-400' : 'text-red-400'}>{hasAudioTrack ? 'OK' : 'NO'}</b></span>
+                    <div className="flex flex-col gap-1 overflow-hidden">
+                      <div className="text-gray-500 text-[9px] truncate">
+                        {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting...'}
                       </div>
-                      <div className="text-amber-500/80 text-[8px] flex gap-2">
-                        <span>SIG: {sigState}</span>
-                        <span>GATH: {gathState}</span>
-                      </div>
-                      <div className="text-gray-500 text-[9px] truncate mt-1">
-                        {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting for init...'}
+                      <div className="flex gap-2 text-amber-500/60 text-[8px]">
+                        <span>STREAM: {hasVideoTrack ? 'ACTIVE' : 'READY'}</span>
+                        <span>LATENCY: LOW</span>
                       </div>
                     </div>
                   </div>
 
-                  {!hasVideoTrack && status === 'ready' && (
-                    <div className="bg-amber-500/20 text-amber-400 text-[10px] px-3 py-1 rounded-full animate-pulse border border-amber-500/30">
-                      正在加载视频流...
-                    </div>
-                  )}
-
-                  {hasVideoTrack && (
-                    <button
-                      onClick={toggleMute}
-                      className="bg-amber-500 text-black px-3 py-1.5 rounded-full text-[10px] font-bold shadow-lg hover:bg-amber-400 transition-all flex items-center gap-1.5"
-                    >
-                      <span>{videoRef.current?.muted ? '开启声音' : '静音'}</span>
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        {videoRef.current?.muted ? (
-                          <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
-                        ) : (
-                          <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                        )}
-                      </svg>
-                    </button>
-                  )}
+                  <button
+                    onClick={toggleMute}
+                    className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
+                        ? 'bg-gray-700 text-white'
+                        : 'bg-amber-500 text-black animate-pulse shadow-amber-500/20'
+                      }`}
+                  >
+                    <span>{videoRef.current?.muted ? '取消静音' : '正在收听'}</span>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      {videoRef.current?.muted ? (
+                        <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
+                      ) : (
+                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                  </button>
                 </div>
               )}
             </div>
@@ -344,25 +222,23 @@ const MVPTestPage = () => {
         <div className="w-full md:w-[400px] flex flex-col bg-[#12121A] rounded-3xl border border-white/5 shadow-2xl relative">
           <div className="p-6 border-b border-white/5">
             <h3 className="font-bold flex items-center gap-2 text-amber-500 uppercase tracking-widest text-sm">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              聊天记录
+              <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
+              交互对话日志
             </h3>
           </div>
 
           <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-600 text-center px-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">💬</div>
-                <p className="text-sm">尚未开始对话。启动数字人后即可进行实时交流。</p>
+                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 opacity-20">💬</div>
+                <p className="text-xs tracking-wider">对话窗口已就绪</p>
               </div>
             ) : (
               messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed ${msg.role === 'user'
-                    ? 'bg-amber-500 text-black font-medium'
-                    : 'bg-white/5 text-gray-200 border border-white/10'
+                    ? 'bg-amber-500 text-black font-medium shadow-lg shadow-amber-500/10'
+                    : 'bg-white/5 text-gray-200 border border-white/10 backdrop-blur-sm'
                     }`}>
                     {msg.text}
                   </div>
@@ -380,9 +256,9 @@ const MVPTestPage = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={status === 'ready' ? "发送消息给数字人..." : "请先启动数字人..."}
+                placeholder={status === 'ready' ? "输入消息..." : "请先开启连接..."}
                 disabled={status !== 'ready' || isTalking}
-                className="w-full bg-gray-900 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all placeholder:text-gray-600 disabled:opacity-50"
+                className="w-full bg-gray-900/50 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
               />
               <button
                 onClick={handleSend}

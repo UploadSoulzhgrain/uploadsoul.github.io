@@ -15,6 +15,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@headlessui/react": "^2.2.9",
+    "@heygen/streaming-avatar": "^2.1.0",
     "@mui/material": "^6.0.2",
     "@reduxjs/toolkit": "^2.6.1",
     "@supabase/supabase-js": "^2.91.1",
