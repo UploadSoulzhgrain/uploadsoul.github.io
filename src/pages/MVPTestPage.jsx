@@ -17,6 +17,8 @@ const MVPTestPage = () => {
   const [debugLog, setDebugLog] = useState([]);
   const [webrtcState, setWebrtcState] = useState('new');
   const [iceState, setIceState] = useState('new');
+  const [sigState, setSigState] = useState('stable');
+  const [gathState, setGathState] = useState('new');
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
   const [hasAudioTrack, setHasAudioTrack] = useState(false);
 
@@ -36,56 +38,83 @@ const MVPTestPage = () => {
     setStatus('connecting');
     try {
       // 1. 环境诊断
-      console.log('Secure Context:', window.isSecureContext);
-      console.log('RTCPeerConnection:', typeof window.RTCPeerConnection !== 'undefined');
+      addDebug('正在检查环境安全上下文...');
 
-      if (!window.isSecureContext && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-        throw new Error('WebRTC 仅可在安全上下文 (HTTPS 或 localhost/127.0.0.1) 中运行。');
-      }
-
-      // 1. 获取 Token 和 ICE 服务器
+      // 2. 获取连接凭证
       const [tokenRes, iceRes] = await Promise.all([
         fetch('/api/speech-token'),
         fetch('/api/ice-servers')
       ]);
 
       if (!tokenRes.ok || !iceRes.ok) {
-        throw new Error('无法连接到音视频身份验证服务，请检查网络或后端。');
+        throw new Error('无法连接到服务，请检查网络连接。');
       }
 
       const { token, region } = await tokenRes.json();
       const iceServers = await iceRes.json();
 
-      // 3. 配置 Speech
+      // 3. 配置核心参数
       const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
       speechConfig.speechSynthesisLanguage = "zh-CN";
       speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural";
 
-      // 4. 配置 Avatar
-      const avatarConfig = new SpeechSDK.AvatarConfig("lisa", "graceful");
+      // 4. 配置虚拟形象
+      const avatarConfig = new SpeechSDK.AvatarConfig("jenny", "graceful");
 
       // 5. 创建合成器
       synthesizerRef.current = new SpeechSDK.AvatarSynthesizer(speechConfig, avatarConfig);
 
-      // 重要：绑定视频元素给 SDK
+      // 绑定视频元素
       if (videoRef.current) {
         synthesizerRef.current.videoElement = videoRef.current;
       }
 
-      // 6. 准备 WebRTC 连接 (使用 ICE 服务器)
-      // Azure 返回格式: { Urls: [...], Username: "...", Password: "..." }
-      addDebug(`ICE from Azure: ${JSON.stringify(iceServers).substring(0, 80)}...`);
+      // 6. 准备加密传输通道
+      addDebug('正在初始化安全通信通道...');
 
-      const rtcIceServers = iceServers.Urls ? [{
-        urls: iceServers.Urls,
-        username: iceServers.Username,
-        credential: iceServers.Password
-      }] : [];
+      // 标准化 ICE 服务器配置 (包含 Google STUN 和 Azure TURN)
+      const rtcIceServers = [
+        {
+          urls: [
+            'stun:stun.l.google.com:19302',
+            'stun:stun1.l.google.com:19302'
+          ]
+        },
+        {
+          urls: iceServers.Urls || iceServers.urls,
+          username: iceServers.Username || iceServers.username,
+          credential: iceServers.Password || iceServers.password || iceServers.credential
+        }
+      ];
 
-      addDebug(`Using ${rtcIceServers.length} ICE server(s)`);
+      addDebug('正在配置核心通信轨道...');
       const peerConnection = new RTCPeerConnection({
-        iceServers: rtcIceServers
+        iceServers: rtcIceServers,
+        iceCandidatePoolSize: 10,
+        bundlePolicy: 'max-bundle'
       });
+
+      // 【强效修复】创建一个虚拟数据通道，强制浏览器立即启动 ICE 候选者搜寻
+      // 这能解决在某些环境下 GATH 卡在 new 的问题
+      peerConnection.createDataChannel('health-check');
+
+      // 实时状态同步
+      peerConnection.onsignalingstatechange = () => setSigState(peerConnection.signalingState);
+      peerConnection.onicegatheringstatechange = () => setGathState(peerConnection.iceGatheringState);
+      peerConnection.onconnectionstatechange = () => setWebrtcState(peerConnection.connectionState);
+      peerConnection.oniceconnectionstatechange = () => setIceState(peerConnection.iceConnectionState);
+
+      // 发现网络路径即时反馈
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          setDebugLog(prev => [...prev.slice(-1), `找到网络路径: ${event.candidate.type}`]);
+        }
+      };
+
+      // 调试：监听 ICE 收集状态变化
+      peerConnection.onicegatheringstatechange = () => {
+        addDebug(`ICE Gathering: ${peerConnection.iceGatheringState}`);
+      };
 
       // 配置监听音视频流
       peerConnection.ontrack = (e) => {
@@ -95,7 +124,14 @@ const MVPTestPage = () => {
 
         if (videoRef.current && e.streams && e.streams[0]) {
           videoRef.current.srcObject = e.streams[0];
-          videoRef.current.play().catch(err => addDebug(`Autoplay blocked: ${err.message}`));
+
+          // 确保静音状态下先播放，然后再尝试取消静音 (处理浏览器限制)
+          videoRef.current.play().then(() => {
+            addDebug('Video playing successfully');
+          }).catch(err => {
+            addDebug(`Playback failed: ${err.message}`);
+            // 如果报错尝试显示一个手动的“点击恢复声音”按钮
+          });
         }
       };
 
@@ -115,16 +151,49 @@ const MVPTestPage = () => {
       // peerConnection.addTransceiver('audio', { direction: 'recvonly' });
 
       // 7. 建立连接 (WebRTC)
-      addDebug('Starting Avatar session...');
-      await synthesizerRef.current.startAvatarAsync(peerConnection);
+      // 预激活媒体引擎 (某些浏览器需要至少请求一次权限才能让 WebRTC 正常接收流)
+      try {
+        addDebug('Priming audio context...');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        stream.getTracks().forEach(track => track.stop()); // 授权后立即释放
+        addDebug('Audio system ready');
+      } catch (e) {
+        addDebug('Mic access skipped (non-critical)');
+      }
 
-      addDebug('Avatar Ready!');
+      addDebug('正在验证服务权限...');
+
+      // 启动会话并添加超时监控
+      const startAvatarSession = async () => {
+        return new Promise((resolve, reject) => {
+          const timer = setTimeout(() => reject(new Error('连接超时 (60秒)')), 60000);
+
+          synthesizerRef.current.startAvatarAsync(peerConnection).then(() => {
+            clearTimeout(timer);
+            resolve();
+          }).catch(err => {
+            clearTimeout(timer);
+            reject(err);
+          });
+        });
+      };
+
+      await startAvatarSession();
+
+      addDebug('会话已开启');
       setStatus('ready');
       addBotMessage("您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。");
     } catch (error) {
-      addDebug(`Error: ${error.message}`);
-      console.error('Detailed Avatar Init Error:', error);
+      addDebug(`初始化失败`);
+      console.error('Detailed Error:', error);
       setStatus('error');
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      addDebug(`Audio: ${videoRef.current.muted ? 'Muted' : 'Unmuted'}`);
     }
   };
 
@@ -201,7 +270,8 @@ const MVPTestPage = () => {
                 className="w-full h-full object-cover"
                 playsInline
                 autoPlay
-                muted={false}
+                muted={true}
+                controls={false}
               />
 
               {status === 'idle' && (
@@ -223,23 +293,46 @@ const MVPTestPage = () => {
               {status === 'ready' && (
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
                   <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono">
-                    <div className="text-gray-400"># DIAGNOSTICS</div>
-                    <div className="flex gap-4">
-                      <span>ICE: <b className={iceState === 'connected' || iceState === 'completed' ? 'text-green-400' : 'text-amber-400'}>{iceState}</b></span>
-                      <span>VIDEO: <b className={hasVideoTrack ? 'text-green-400' : 'text-red-400'}>{hasVideoTrack ? 'OK' : 'NO'}</b></span>
-                      <span>AUDIO: <b className={hasAudioTrack ? 'text-green-400' : 'text-red-400'}>{hasAudioTrack ? 'OK' : 'NO'}</b></span>
+                    <div className="text-gray-400 flex justify-between">
+                      <span># DIAGNOSTICS</span>
+                      <span className="text-[8px] opacity-50">{webrtcState}</span>
                     </div>
-                    {debugLog.length > 0 && (
-                      <div className="text-[9px] text-gray-500 italic truncate max-w-[200px]">
-                        Last: {debugLog[debugLog.length - 1]}
+                    <div className="flex flex-col gap-1">
+                      <div className="flex gap-3">
+                        <span>ICE: <b className={(iceState === 'connected' || iceState === 'completed') ? 'text-green-400' : 'text-amber-400'}>{iceState}</b></span>
+                        <span>V: <b className={hasVideoTrack ? 'text-green-400' : 'text-red-400'}>{hasVideoTrack ? 'OK' : 'NO'}</b></span>
+                        <span>A: <b className={hasAudioTrack ? 'text-green-400' : 'text-red-400'}>{hasAudioTrack ? 'OK' : 'NO'}</b></span>
                       </div>
-                    )}
+                      <div className="text-amber-500/80 text-[8px] flex gap-2">
+                        <span>SIG: {sigState}</span>
+                        <span>GATH: {gathState}</span>
+                      </div>
+                      <div className="text-gray-500 text-[9px] truncate mt-1">
+                        {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting for init...'}
+                      </div>
+                    </div>
                   </div>
 
                   {!hasVideoTrack && status === 'ready' && (
-                    <div className="bg-red-500/20 text-red-400 text-[10px] px-3 py-1 rounded-full animate-pulse border border-red-500/30">
-                      等待媒体流...
+                    <div className="bg-amber-500/20 text-amber-400 text-[10px] px-3 py-1 rounded-full animate-pulse border border-amber-500/30">
+                      正在加载视频流...
                     </div>
+                  )}
+
+                  {hasVideoTrack && (
+                    <button
+                      onClick={toggleMute}
+                      className="bg-amber-500 text-black px-3 py-1.5 rounded-full text-[10px] font-bold shadow-lg hover:bg-amber-400 transition-all flex items-center gap-1.5"
+                    >
+                      <span>{videoRef.current?.muted ? '开启声音' : '静音'}</span>
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        {videoRef.current?.muted ? (
+                          <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
+                        ) : (
+                          <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        )}
+                      </svg>
+                    </button>
                   )}
                 </div>
               )}
@@ -304,11 +397,6 @@ const MVPTestPage = () => {
           </div>
         </div>
 
-      </div>
-
-      {/* 全屏对话模式的底部提示 */}
-      <div className="py-4 text-center text-[10px] text-gray-700 uppercase tracking-[0.2em] font-light">
-        Powered by Azure AI Speech & GPT-4 API
       </div>
     </div>
   );

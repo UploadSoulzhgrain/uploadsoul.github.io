@@ -141,24 +141,83 @@ const HomePage = () => {
             </div>
           </div>
 
-          {/* 小型入口 - 几何设计感 */}
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
+          <div className="mt-16 flex flex-wrap justify-center gap-12 items-center">
+            {/* 温情故事 - 斑驳古卷轴样式 */}
             <motion.div
               whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/our-stories')}
-              className="px-6 py-2 rounded-tl-2xl rounded-br-2xl border border-cyan-500/20 bg-cyan-500/10 backdrop-blur-md text-xs tracking-[0.2em] text-white/50 hover:text-cyan-400 hover:border-cyan-500/50 hover:bg-cyan-500/20 transition-all cursor-pointer flex items-center gap-2 group shadow-[0_0_20px_rgba(6,182,212,0.05)]"
+              className="relative w-48 h-16 cursor-pointer group"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-cyan-500/30 group-hover:bg-cyan-400 transition-colors" />
-              {t('home.features.warmStories.title')}
+              {/* 左卷轴轴头 - 深色紫檀木质感 */}
+              <div className="absolute left-0 top-[-6px] bottom-[-6px] w-4 rounded-sm bg-gradient-to-r from-[#211200] to-[#5D4037] border-r border-[#1a1000]/50 shadow-lg z-20"></div>
+
+              {/* 羊皮纸主体 - 斑驳做旧效果 */}
+              <div className="absolute inset-x-2 top-0 bottom-0 flex items-center justify-center shadow-[0_4px_15px_rgba(0,0,0,0.6)] z-10 overflow-hidden bg-[#D7CCC8]"
+                style={{
+                  // 复合渐变模拟泛黄、污渍和陈旧纹理
+                  backgroundImage: `
+                        radial-gradient(circle at 10% 20%, rgba(62, 39, 35, 0.1) 0%, transparent 15%),
+                        radial-gradient(circle at 90% 80%, rgba(62, 39, 35, 0.12) 0%, transparent 20%),
+                        radial-gradient(circle at 50% 50%, rgba(141, 110, 99, 0.05) 0%, transparent 60%),
+                        linear-gradient(to right, #6D4C41 0%, #A1887F 12%, #D7CCC8 40%, #D7CCC8 60%, #A1887F 88%, #6D4C41 100%)
+                     `,
+                  clipPath: 'polygon(0% 1%, 100% 0%, 100% 99%, 0% 100%)',
+                  boxShadow: 'inset 0 0 15px rgba(62, 39, 35, 0.3)'
+                }}>
+                {/* 纸张噪点纹理层 */}
+                <div className="absolute inset-0 opacity-10 bg-repeat" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E")' }}></div>
+
+                <span className="text-[#281815] font-serif font-bold tracking-[0.2em] text-sm group-hover:scale-105 transition-transform flex items-center gap-2 relative z-10">
+                  {/* 深色墨迹风格的书本图标 */}
+                  <svg className="w-4 h-4 text-[#1A0F0D] opacity-90" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
+                  {t('home.features.warmStories.title')}
+                </span>
+              </div>
+
+              {/* 右卷轴轴头 */}
+              <div className="absolute right-0 top-[-6px] bottom-[-6px] w-4 rounded-sm bg-gradient-to-l from-[#211200] to-[#5D4037] border-l border-[#1a1000]/50 shadow-lg z-20"></div>
             </motion.div>
 
+            {/* 创始人专栏 - 拟真信封样式 (完美对齐版) */}
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, rotate: 2 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/founder-column')}
-              className="px-6 py-2 rounded-tr-2xl rounded-bl-2xl border border-emerald-500/20 bg-emerald-500/10 backdrop-blur-md text-xs tracking-[0.2em] text-white/50 hover:text-emerald-400 hover:border-emerald-500/50 hover:bg-emerald-500/20 transition-all cursor-pointer flex items-center gap-2 group shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+              className="relative w-48 h-16 bg-[#D7CCC8] shadow-[0_4px_12px_rgba(0,0,0,0.4)] cursor-pointer overflow-hidden flex items-center justify-center group"
+              style={{
+                clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+                background: 'linear-gradient(135deg, #BCAAA4 0%, #D7CCC8 100%)'
+              }}
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30 group-hover:bg-emerald-400 transition-colors" />
-              {t('home.features.founderColumn.title')}
+              {/* 信封折痕 - 顶部三角形盖子 */}
+              <div className="absolute top-0 left-0 right-0 h-10 bg-[#A1887F] z-10 shadow-sm"
+                style={{
+                  clipPath: 'polygon(0% 0%, 50% 100%, 100% 0%)',
+                  backgroundImage: 'linear-gradient(to bottom, rgba(0,0,0,0.05), transparent)'
+                }}>
+              </div>
+
+              {/* 火漆印 - 移至右上角装饰 */}
+              <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-[#B71C1C] border border-[#801313] shadow-md z-20 flex items-center justify-center text-[8px] text-[#FFCDD2] font-serif font-bold group-hover:shadow-[0_0_8px_rgba(183,28,28,0.6)] transition-all transform group-hover:rotate-12">
+                US
+              </div>
+
+              {/* 信封主体文字 - 绝对居中 */}
+              <div className="relative z-10 flex flex-col items-center mt-2">
+                <span className="text-[#3E2723] font-serif tracking-[0.1em] text-sm font-bold border-b border-[#8D6E63]/30 leading-tight group-hover:scale-105 transition-transform flex items-center gap-2">
+                  <span className="opacity-80 text-xs">✉️</span> {t('home.features.founderColumn.title')}
+                </span>
+              </div>
+
+              {/* 信封左右折痕阴影 */}
+              <div className="absolute inset-0 pointer-events-none"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(0,0,0,0.05) 0%, transparent 40%, transparent 60%, rgba(0,0,0,0.05) 100%)'
+                }}>
+              </div>
             </motion.div>
           </div>
 

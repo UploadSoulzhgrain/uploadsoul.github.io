@@ -14,14 +14,17 @@
     --font-sans: 'Source Sans 3', sans-serif;
 
     /* Card warm colors */
-    --card-healing-bg: #f0fdf9;
-    --card-healing-text: #0d5c54;
-    --card-fulfillment-bg: #fff5f7;
-    --card-fulfillment-text: #8b2f3a;
-    --card-legacy-bg: #fffbf0;
-    --card-legacy-text: #6b4e1f;
-    --card-reunion-bg: #f5f3ff;
-    --card-reunion-text: #4c1d95;
+    /* Wood Texture Base Colors */
+    --wood-depth: #2d1b0d;
+    --wood-base: #3e2723;
+    --wood-light: #5d4037;
+    --wood-grain-color: rgba(0, 0, 0, 0.4);
+
+    --card-text-light: #ece0d1;
+    --card-healing-accent: #6dd5c3;
+    --card-fulfillment-accent: #ffb3ba;
+    --card-legacy-accent: #f4d5a6;
+    --card-reunion-accent: #c4b5fd;
 
     --color-accent-reunion: #c4b5fd;
 
@@ -163,22 +166,28 @@
 }
 
 .warm-stories-container .hero-subtitle {
-    font-size: 0.8rem;
-    letter-spacing: 0.3em;
+    font-size: 1.4rem;
+    letter-spacing: 0.6em;
     text-transform: uppercase;
-    color: var(--color-text-secondary);
-    margin-bottom: 1rem;
-    font-weight: 300;
+    color: var(--color-accent-legacy);
+    margin-bottom: 1.5rem;
+    font-weight: 200;
+    opacity: 0.8;
 }
 
 .warm-stories-container .hero-title {
     font-family: var(--font-serif);
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 300;
-    line-height: 1.2;
-    margin-bottom: 1rem;
-    letter-spacing: -0.02em;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.15em;
     position: relative;
+    background: linear-gradient(to bottom, #f4d5a6 0%, #ece0d1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 20px rgba(244, 213, 166, 0.2));
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 .warm-stories-container .hero-title::before {
@@ -230,19 +239,25 @@
 
 .warm-stories-container .story-card {
     position: relative;
-    background: var(--card-bg);
-    border-radius: 16px;
+    background-color: var(--wood-base);
+    background-image:
+        /* Fine grain noise */
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
+        /* Vertical wood grain */
+        repeating-linear-gradient(90deg,
+            transparent 0,
+            transparent 2px,
+            var(--wood-grain-color) 4px,
+            transparent 6px),
+        /* Subtle wood color variations */
+        linear-gradient(to right, var(--wood-depth) 0%, var(--wood-base) 25%, var(--wood-light) 50%, var(--wood-base) 75%, var(--wood-depth) 100%);
+    background-blend-mode: overlay, normal, normal;
+    border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.6s ease;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
-    background-image:
-        repeating-linear-gradient(45deg,
-            transparent,
-            transparent 10px,
-            rgba(255, 255, 255, 0.02) 10px,
-            rgba(255, 255, 255, 0.02) 20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.5);
 }
 
 .warm-stories-container .story-card:hover {
@@ -285,31 +300,27 @@
 }
 
 .warm-stories-container .story-card.healing {
-    --accent-color: var(--color-accent-healing);
-    --card-bg: var(--card-healing-bg);
-    --card-text: var(--card-healing-text);
-    --card-pattern: radial-gradient(circle at 70% 70%, var(--color-accent-healing) 0%, transparent 50%);
+    --accent-color: var(--card-healing-accent);
+    --card-text: var(--card-text-light);
+    --card-pattern: radial-gradient(circle at 70% 70%, var(--card-healing-accent) 0%, transparent 40%);
 }
 
 .warm-stories-container .story-card.fulfillment {
-    --accent-color: var(--color-accent-fulfillment);
-    --card-bg: var(--card-fulfillment-bg);
-    --card-text: var(--card-fulfillment-text);
-    --card-pattern: radial-gradient(circle at 70% 70%, var(--color-accent-fulfillment) 0%, transparent 50%);
+    --accent-color: var(--card-fulfillment-accent);
+    --card-text: var(--card-text-light);
+    --card-pattern: radial-gradient(circle at 70% 70%, var(--card-fulfillment-accent) 0%, transparent 40%);
 }
 
 .warm-stories-container .story-card.legacy {
-    --accent-color: var(--color-accent-legacy);
-    --card-bg: var(--card-legacy-bg);
-    --card-text: var(--card-legacy-text);
-    --card-pattern: radial-gradient(circle at 70% 70%, var(--color-accent-legacy) 0%, transparent 50%);
+    --accent-color: var(--card-legacy-accent);
+    --card-text: var(--card-text-light);
+    --card-pattern: radial-gradient(circle at 70% 70%, var(--card-legacy-accent) 0%, transparent 40%);
 }
 
 .warm-stories-container .story-card.reunion {
-    --accent-color: var(--color-accent-reunion);
-    --card-bg: var(--card-reunion-bg);
-    --card-text: var(--card-reunion-text);
-    --card-pattern: radial-gradient(circle at 70% 70%, var(--color-accent-reunion) 0%, transparent 50%);
+    --accent-color: var(--card-reunion-accent);
+    --card-text: var(--card-text-light);
+    --card-pattern: radial-gradient(circle at 70% 70%, var(--card-reunion-accent) 0%, transparent 40%);
 }
 
 /* Icon container */
