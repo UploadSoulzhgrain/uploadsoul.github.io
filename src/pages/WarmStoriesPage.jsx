@@ -82,6 +82,36 @@ const WarmStoriesPage = () => {
             ),
             meaning: '对于失独家庭来说，我们提供的不只是技术，而是一个可以安放思念的温柔空间。让那些永远定格的生命，在数字世界里延续他们的温度。',
             meaningQuote: '"爱从未离开，只是换了一种方式陪伴。"'
+        },
+        companion: {
+            id: 'companion',
+            tag: 'Companion · 陪伴',
+            title: '等不到明天的毛孩子',
+            quote: '"我只想让它知道，我有多爱它......"',
+            image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=80',
+            accent: '#ffa94d',
+            content: (
+                <>
+                    <p>她叫球球，是一只十四岁的橘黄色巨型贵宾。</p>
+                    <p>他坐在我对面，手机相册里几乎全是球球的照片。从最初小小的一团，被他一只手就能托起来；到现在满脸白毛，走路有些蹒跚，却依然努力抬头看人。</p>
+                    <p>"以前每次我回家，它都会兴奋地跳起来，前爪搭在我肩膀上。"他说这句话的时候语气很平静，手却一直在轻轻发抖。"它站起来的时候，几乎和我一样高。"</p>
+                    <p>医生告诉他，可能只剩下几个月了。</p>
+                    <p>"现在我每天下班回家的第一件事，就是看它还在不在门口等我。"</p>
+                    <p>球球陪了他整整十四年。失业、离婚、父亲去世……那些他一个人熬不过去的夜晚，球球总是安静地趴在他的脚边，不吵、不闹，只是在那里。</p>
+                    <p>"我知道它总有一天会走。"他停了一下，喉咙明显哽住了。"但我做不到再养一只了。"</p>
+                    <p>他说，他只是希望——如果有一天，他还能再摸摸它的头，再听它"汪"一声，哪怕只是通过手机。</p>
+                    <p>"我只想让它知道，我有多爱它。"</p>
+                    <p>他没能把这句话说完。眼泪落下来，滴在了球球的照片上。</p>
+                </>
+            ),
+            meaning: (
+                <>
+                    <p>无论是狗摇动的尾巴，猫贴着你胸口的呼噜声，仓鼠啃食时细碎的声响，还是鹦鹉忽然学会的一句："我爱你。"</p>
+                    <p>它们的生命那么短，却把一生的爱都给了我们。</p>
+                    <p>我们不能让它们多活一天，但我们可以把那些被爱过的瞬间留下来——在数字世界里，继续陪伴你。</p>
+                </>
+            ),
+            meaningQuote: '"它会一直在那里，等你回家。"'
         }
     };
 
@@ -250,55 +280,45 @@ const WarmStoriesPage = () => {
 
             {/* Stories Section */}
             <section className="stories">
-                <div className="stories-grid">
-                    {Object.values(stories).map((story) => (
-                        <div
-                            key={story.id}
-                            className={`story-card ${story.id}`}
-                            onClick={() => setActiveStory(story)}
-                        >
-                            <div className="story-icon">
-                                {/* Icons based on ID */}
-                                {story.id === 'healing' && (
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                    </svg>
-                                )}
-                                {story.id === 'fulfillment' && (
-                                    <svg viewBox="0 0 24 24">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                    </svg>
-                                )}
-                                {story.id === 'legacy' && (
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M18.36 5.64a9 9 0 0 1 0 12.73 9 9 0 0 1-12.73 0 9 9 0 0 1 0-12.73 9 9 0 0 1 12.73 0"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                )}
-                                {story.id === 'reunion' && (
-                                    <svg viewBox="0 0 24 24">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                        <circle cx="9" cy="7" r="4"></circle>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                    </svg>
-                                )}
+                <div className="bookmarks-shelf">
+                    {['healing', 'legacy', 'reunion', 'companion', 'fulfillment'].map((key) => {
+                        const story = stories[key];
+                        return (
+                            <div
+                                key={story.id}
+                                className={`bookmark-wrapper ${story.id}`}
+                                onClick={() => setActiveStory(story)}
+                            >
+                                <div className="bookmark-thread"></div>
+
+                                <div
+                                    className="story-bookmark"
+                                    style={{ backgroundImage: `url(${story.image})` }}
+                                >
+                                    <div className="bookmark-overlay"></div>
+                                    <div className="bookmark-hole"></div>
+                                    <div className="bookmark-knot"></div>
+
+                                    <div className="bookmark-body">
+                                        <h3 className="bookmark-title">{story.title}</h3>
+
+                                        <div className="bookmark-footer">
+                                            <div className="bookmark-icon">
+                                                {story.id === 'healing' && <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>}
+                                                {story.id === 'fulfillment' && <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>}
+                                                {story.id === 'legacy' && <svg viewBox="0 0 24 24"><path d="M18.36 5.64a9 9 0 0 1 0 12.73 9 9 0 0 1-12.73 0 9 9 0 0 1 0-12.73 9 9 0 0 1 12.73 0"></path><circle cx="12" cy="12" r="3"></circle></svg>}
+                                                {story.id === 'reunion' && <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>}
+                                                {story.id === 'companion' && <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5A3,3 0 0,1 12,8A3,3 0 0,1 9,5A3,3 0 0,1 12,2M19,3A3,3 0 0,1 22,6A3,3 0 0,1 19,9A3,3 0 0,1 16,6A3,3 0 0,1 19,3M5,3A3,3 0 0,1 8,6A3,3 0 0,1 5,9A3,3 0 0,1 2,6A3,3 0 0,1 5,3M12,10.5C14.8,10.5 17.5,11.5 19.5,13.5C21.5,15.5 22.5,18.2 22.5,21H16.5C16.5,18.5 14.5,16.5 12,16.5C9.5,16.5 7.5,18.5 7.5,21H1.5C1.5,18.2 2.5,15.5 4.5,13.5C6.5,11.5 9.2,10.5 12,10.5Z" /></svg>}
+                                            </div>
+                                            <div className="bookmark-tag">
+                                                {story.tag.split('·')[0].trim()}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="story-header">
-                                <div className="story-tag">{story.tag}</div>
-                                <h2 className="story-title">{story.title}</h2>
-                                <p className="story-tagline">
-                                    {/* Extract short quote or use hardcoded one from object */}
-                                    {story.quote.replace(/"/g, '')}
-                                </p>
-                            </div>
-                            <div className="story-arrow">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <path d="M5 12h14M12 5l7 7-7 7" />
-                                </svg>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             </section>
 
