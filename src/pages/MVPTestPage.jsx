@@ -43,8 +43,18 @@ const MVPTestPage = () => {
         fetch('/api/ice-servers')
       ]);
 
-      if (!tokenRes.ok || !iceRes.ok) {
-        throw new Error('无法连接到服务，请检查网络连接。');
+      if (!tokenRes.ok) {
+        const errText = await tokenRes.text();
+        addDebug(`Token API Error: ${tokenRes.status} ${tokenRes.statusText}`);
+        console.error('Token API Response:', errText);
+        throw new Error(`Token API Failed (${tokenRes.status})`);
+      }
+
+      if (!iceRes.ok) {
+        // ICE failure is not critical for checking envs, but critical for startup
+        const errText = await iceRes.text();
+        addDebug(`ICE API Error: ${iceRes.status} ${iceRes.statusText}`);
+        throw new Error(`ICE API Failed (${iceRes.status})`);
       }
 
       const { token, region } = await tokenRes.json();
