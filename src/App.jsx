@@ -16,6 +16,7 @@ import CreateDigitalHumanPage from './pages/CreateDigitalHumanPage'
 import VirtualLovePage from './pages/VirtualLovePage'
 import DigitalHumanExperiencePage from './pages/DigitalHumanExperiencePage'
 import MVPTestPage from './pages/MVPTestPage'
+import MVPChinaPage from './pages/MVPChinaPage'
 import WarmStoriesPage from './pages/WarmStoriesPage'
 import DigitalImmortalityPage from './pages/DigitalImmortalityPage'
 import AboutPage from './pages/AboutPage'
@@ -88,6 +89,7 @@ function App() {
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/sitemap" element={<SitemapPage />} />
               <Route path="/mvp-test" element={<MVPTestPage />} />
+              <Route path="/mvp-china" element={<MVPChinaPage />} />
               <Route path="/digital-world" element={<DigitalWorldPage />} />
               <Route path="/our-stories" element={<WarmStoriesPage />} />
               <Route path="/founder-column" element={<FounderColumnPage />} />

@@ -119,7 +119,7 @@ const HomePage = () => {
           {/* CTA - 只保留关键出口 */}
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <div
-              onClick={() => navigate('/mvp-test')}
+              onClick={() => navigate('/mvp-china')}
               className="btn-premium inline-flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10"
             >
               <span className="relative flex h-2 w-2 mr-1">

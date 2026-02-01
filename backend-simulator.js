@@ -68,8 +68,14 @@ app.get('/api/ice-servers', async (req, res) => {
             }
         });
 
-        // Azure returns { urls: [...], username: "...", password: "..." }
-        res.json(response.data);
+        // Azure returns { Urls: [...], Username: "...", Password: "..." }
+        // Normalize to lowercase for consistent frontend handling
+        const data = response.data;
+        res.json({
+            urls: data.Urls || data.urls,
+            username: data.Username || data.username,
+            credential: data.Password || data.password || data.credential
+        });
     } catch (err) {
         console.error('ICE Servers Error:', err.message);
         // Fallback to empty if fails, though WebRTC might fail
