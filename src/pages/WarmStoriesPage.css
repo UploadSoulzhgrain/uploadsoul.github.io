@@ -221,233 +221,234 @@
     display: none;
 }
 
-/* Stories Section */
+/* Bookmarks Shelf Layout */
 .warm-stories-container .stories {
-    padding: 3rem 2rem;
-    max-width: 1400px;
+    padding: 3rem 1rem;
+    max-width: 1200px;
     margin: 0 auto;
+    perspective: 1000px;
 }
 
-.warm-stories-container .stories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
+.warm-stories-container .bookmarks-shelf {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    padding-top: 2rem;
+    /* Space for ribbons */
 }
 
-@media (min-width: 1200px) {
-    .warm-stories-container .stories-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 1.5rem;
-    }
-}
-
-.warm-stories-container .story-card {
+.warm-stories-container .bookmark-wrapper {
     position: relative;
-    height: 160px;
-    /* 进一步优化高度，更像精致的长方形按钮 */
-    background-color: var(--card-theme-bg);
-    background-image:
-        /* 增加古朴感的垂直/水平斑驳纹理 */
-        linear-gradient(90deg, var(--wood-grain-dark) 1px, transparent 1px),
-        linear-gradient(var(--wood-grain-dark) 1px, transparent 1px),
-        /* 斑驳感背景 */
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.4), transparent),
-        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-    background-size: 30px 30px, 100% 3px, 100% 100%, 100% 100%;
-    background-blend-mode: multiply;
-    border-radius: 6px;
-    /* 更方正的圆角增加古拙感 */
-    overflow: hidden;
     cursor: pointer;
-    transition: all 0.4s ease;
-    border: 1px solid rgba(141, 110, 99, 0.15);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 1;
+}
+
+.warm-stories-container .bookmark-wrapper:hover {
+    transform: translateY(-20px) rotate(2deg);
+    z-index: 10;
+}
+
+.warm-stories-container .story-bookmark {
+    width: 140px;
+    height: 460px;
+    position: relative;
+    background-color: #fff8f0;
+    /* Paper Texture & Image Layering */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 4px;
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 10px 20px rgba(0, 0, 0, 0.2),
+        inset 0 0 20px rgba(0, 0, 0, 0.1);
+    /* Inner vignette */
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: 0 1.5rem;
+    justify-content: space-between;
+    overflow: hidden;
+    /* Vintage Paper Filter */
+    filter: sepia(0.3) contrast(0.95);
+    transition: all 0.4s ease;
 }
 
-.warm-stories-container .story-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
-    border-color: var(--accent-color);
-    background-color: #fff;
-    /* 悬停时稍微提亮 */
+.warm-stories-container .bookmark-wrapper:hover .story-bookmark {
+    filter: sepia(0) contrast(1.05);
+    /* Restore colors on hover */
+    box-shadow:
+        0 15px 30px rgba(0, 0, 0, 0.25),
+        0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* 移除多余层 */
-.warm-stories-container .story-card::after {
-    display: none;
+/* The Bookmark Hole & Thread */
+.warm-stories-container .bookmark-hole {
+    position: absolute;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 12px;
+    height: 12px;
+    background: #1a1614;
+    /* Match bg color to simulate hole */
+    border-radius: 50%;
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.warm-stories-container .story-card::before {
-    content: '';
+.warm-stories-container .bookmark-thread {
+    position: absolute;
+    top: -500px;
+    /* Long hanging thread from 'ceiling' or loop */
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 535px;
+    /* Reaches into the hole */
+    background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.1) 50%, var(--accent-thread) 100%);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* A decorative distinct tassel/knot at the hole */
+.warm-stories-container .bookmark-knot {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 25px;
+    background: var(--accent-thread);
+    border-radius: 2px;
+    z-index: 21;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Content Overlay */
+.warm-stories-container .bookmark-overlay {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 4px;
-    background: var(--accent-color);
-    opacity: 0.8;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom,
+            rgba(0, 0, 0, 0.1) 0%,
+            rgba(0, 0, 0, 0) 40%,
+            rgba(0, 0, 0, 0.6) 80%,
+            rgba(0, 0, 0, 0.85) 100%);
     z-index: 2;
 }
 
-.warm-stories-container .story-card:hover::before {
-    opacity: 0.2;
+.warm-stories-container .bookmark-body {
+    position: relative;
+    z-index: 5;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 3.5rem 1rem 2rem;
+    /* Clear the hole */
 }
 
-/* Decorative pattern overlay */
-.warm-stories-container .story-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 120px;
-    height: 120px;
-    background: var(--card-pattern);
-    opacity: 0.08;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-}
-
-.warm-stories-container .story-card:hover::after {
-    opacity: 0.15;
-}
-
-.warm-stories-container .story-card.healing {
-    --card-theme-bg: var(--card-healing-bg);
-    --accent-color: var(--card-healing-accent);
-    --card-text: var(--card-text-dark);
-}
-
-.warm-stories-container .story-card.fulfillment {
-    --card-theme-bg: var(--card-fulfillment-bg);
-    --accent-color: var(--card-fulfillment-accent);
-    --card-text: var(--card-text-dark);
-}
-
-.warm-stories-container .story-card.legacy {
-    --card-theme-bg: var(--card-legacy-bg);
-    --accent-color: var(--card-legacy-accent);
-    --card-text: var(--card-text-dark);
-}
-
-.warm-stories-container .story-card.reunion {
-    --card-theme-bg: var(--card-reunion-bg);
-    --accent-color: var(--card-reunion-accent);
-    --card-text: var(--card-text-dark);
-}
-
-/* Icon container */
-.warm-stories-container .story-icon {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 32px;
-    height: 32px;
+/* Vertical Text Title */
+.warm-stories-container .bookmark-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    /* Larger for vertical prominence */
+    font-weight: 600;
+    color: #fff;
+    writing-mode: vertical-rl;
+    /* Vertical Text */
+    text-orientation: mixed;
+    letter-spacing: 0.3em;
+    margin: 0 auto;
+    /* Center horizontally in flex column */
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    opacity: 0.9;
+    flex-grow: 1;
     display: flex;
     align-items: center;
+    /* Center vertically within the grow area */
     justify-content: center;
-    background: rgba(0, 0, 0, 0.02);
-    border-radius: 4px;
-    /* 图标容器也呼应古朴的方正感 */
-    transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-    z-index: 2;
+    border-right: 1px solid rgba(255, 255, 255, 0.2);
+    /* Decorative line next to text */
+    padding-right: 0.8rem;
+    height: 60%;
 }
 
-.warm-stories-container .story-card:hover .story-icon {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.05);
-    border-color: var(--accent-color);
+.warm-stories-container .bookmark-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
 }
 
-.warm-stories-container .story-icon svg {
-    width: 16px;
-    height: 16px;
-    stroke: var(--card-text);
-    fill: none;
-    stroke-width: 1.5;
-}
-
-.warm-stories-container .story-header {
-    padding: 0;
-    position: relative;
-    text-align: left;
-}
-
-.warm-stories-container .story-arrow {
-    position: absolute;
-    right: 1.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--accent-color);
-    opacity: 0;
-    transition: all 0.4s ease;
-}
-
-.warm-stories-container .story-arrow svg {
-    width: 20px;
-    height: 20px;
-}
-
-.warm-stories-container .story-card:hover .story-arrow {
-    opacity: 1;
-    transform: translateY(-50%) translateX(6px);
-}
-
-.warm-stories-container .story-tag {
-    display: inline-block;
-    font-size: 0.65rem;
-    letter-spacing: 0.2em;
+.warm-stories-container .bookmark-tag {
+    font-size: 0.6rem;
     text-transform: uppercase;
-    color: var(--accent-color);
-    margin-bottom: 1rem;
-    font-weight: 600;
+    letter-spacing: 0.15em;
+    color: var(--accent-thread);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
     opacity: 0.9;
 }
 
-.warm-stories-container .story-title {
-    font-family: var(--font-serif);
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-    color: var(--card-text);
-    transition: all 0.4s ease;
+.warm-stories-container .bookmark-icon svg {
+    width: 24px;
+    height: 24px;
+    stroke: #fff;
+    stroke-width: 1.5;
+    fill: none;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5));
 }
 
-.warm-stories-container .story-card:hover .story-title {
-    color: var(--accent-color);
+/* Individual Theme Colors for Threads/Accents */
+.warm-stories-container .healing .bookmark-thread,
+.warm-stories-container .healing .bookmark-knot {
+    --accent-thread: #6dd5c3;
 }
 
-.warm-stories-container .story-tagline {
-    font-size: 0.9rem;
-    color: var(--card-text);
-    font-weight: 400;
-    line-height: 1.6;
-    opacity: 0.8;
-    position: relative;
-    padding-left: 1rem;
-    transition: opacity 0.4s ease;
+.warm-stories-container .healing .bookmark-tag {
+    color: #6dd5c3;
 }
 
-.warm-stories-container .story-card:hover .story-tagline {
-    opacity: 1;
+.warm-stories-container .fulfillment .bookmark-thread,
+.warm-stories-container .fulfillment .bookmark-knot {
+    --accent-thread: #ffb3ba;
 }
 
-.warm-stories-container .story-tagline::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.35rem;
-    width: 2px;
-    height: 60%;
-    background: var(--accent-color);
-    border-radius: 1px;
-    opacity: 0.3;
+.warm-stories-container .fulfillment .bookmark-tag {
+    color: #ffb3ba;
+}
+
+.warm-stories-container .legacy .bookmark-thread,
+.warm-stories-container .legacy .bookmark-knot {
+    --accent-thread: #f4d5a6;
+}
+
+.warm-stories-container .legacy .bookmark-tag {
+    color: #f4d5a6;
+}
+
+.warm-stories-container .reunion .bookmark-thread,
+.warm-stories-container .reunion .bookmark-knot {
+    --accent-thread: #c4b5fd;
+}
+
+.warm-stories-container .reunion .bookmark-tag {
+    color: #c4b5fd;
+}
+
+.warm-stories-container .companion .bookmark-thread,
+.warm-stories-container .companion .bookmark-knot {
+    --accent-thread: #ffa94d;
+}
+
+.warm-stories-container .companion .bookmark-tag {
+    color: #ffa94d;
 }
 
 /* Story Detail Modal */
