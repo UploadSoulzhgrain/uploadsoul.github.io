@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         res.status(200).json({
             urls: data.Urls || data.urls,
             username: data.Username || data.username,
-            password: data.Password || data.password || data.credential
+            credential: data.Password || data.password || data.credential
         });
     } catch (error) {
         console.error('ICE Servers Error:', error.response?.data || error.message);
