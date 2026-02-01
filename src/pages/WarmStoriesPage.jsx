@@ -300,6 +300,7 @@ const WarmStoriesPage = () => {
                                     <div className="bookmark-knot"></div>
 
                                     <div className="bookmark-body">
+                                        <div className="bookmark-quote">{story.quote.replace(/"/g, '')}</div>
                                         <h3 className="bookmark-title">{story.title}</h3>
 
                                         <div className="bookmark-footer">
