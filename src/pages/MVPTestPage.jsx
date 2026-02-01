@@ -82,10 +82,11 @@ const MVPTestPage = () => {
       // Azure docs recommend using ONLY TURN servers from their API
       const turnUrls = iceServers.urls;
       const turnUsername = iceServers.username;
-      const turnCredential = iceServers.credential;
+      const turnCredential = iceServers.credential || iceServers.password;
 
       if (!turnUrls || !turnUsername || !turnCredential) {
-        throw new Error('ICE服务器配置不完整，请检查Azure凭证');
+        addDebug(`ICE Missing: urls=${!!turnUrls}, user=${!!turnUsername}, cred=${!!turnCredential}`);
+        throw new Error('ICE服务器配置获取失败，请确认Azure AI服务运行正常');
       }
 
       addDebug(`TURN server: ${Array.isArray(turnUrls) ? turnUrls[0] : turnUrls}`);
