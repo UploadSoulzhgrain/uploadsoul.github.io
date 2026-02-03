@@ -7,6 +7,20 @@ const SitemapPage = () => {
 
   const pages = [
     { path: '/', name: t('header.home') },
+    { path: '/our-stories', name: t('home.features.warmStories.title') },
+    { path: '/founder-column', name: t('home.features.founderColumn.title') },
+    { path: '/mvp-china', name: t('home.hero.mvpChina') },
+    { path: '/mvp-test', name: t('home.hero.mvpTest') },
+    { path: '/digital-immortality', name: t('header.digitalImmortality') },
+    { path: '/virtual-love', name: t('header.virtualLove') },
+    { path: '/companion', name: t('header.companion') },
+    { path: '/pet', name: t('header.pet') },
+    { path: '/digital-rebirth', name: t('header.digitalRebirth') },
+    { path: '/digital-rebirth/family-tree', name: t('header.familyTree') },
+    { path: '/digital-rebirth/reunion-space', name: t('header.reunionSpace') },
+    { path: '/digital-world', name: t('header.digitalWorld') },
+    { path: '/vr', name: t('header.vr') },
+    { path: '/shop', name: t('header.shop') },
     { path: '/about', name: t('header.about') },
     { path: '/team', name: t('header.team') },
     { path: '/contact', name: t('header.contact') },
@@ -14,17 +28,6 @@ const SitemapPage = () => {
     { path: '/privacy', name: t('footer.privacy') },
     { path: '/terms', name: t('footer.terms') },
     { path: '/sitemap', name: t('footer.sitemap') },
-    { path: '/digital-human', name: t('header.digitalHuman') },
-    { path: '/digital-rebirth', name: t('header.digitalRebirth') },
-    { path: '/digital-immortality', name: t('header.digitalImmortality') },
-    { path: '/virtual-love', name: t('header.virtualLove') },
-    { path: '/pet', name: t('header.pet') },
-    { path: '/vr', name: t('header.vr') },
-    { path: '/digital-world', name: t('header.digitalWorld') },
-    { path: '/family-tree', name: t('header.familyTree') },
-    { path: '/reunion-space', name: t('header.reunionSpace') },
-    { path: '/companion', name: t('header.companion') },
-    { path: '/shop', name: t('header.shop') },
   ];
 
   return (
