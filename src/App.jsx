@@ -1,6 +1,6 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { I18nextProvider } from 'react-i18next'
+import React, { useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useParams, useLocation } from 'react-router-dom'
+import { I18nextProvider, useTranslation } from 'react-i18next'
 import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -40,14 +40,86 @@ import UpdatePasswordPage from './pages/UpdatePasswordPage'
 import FounderColumnPage from './pages/FounderColumnPage'
 import AnalyticsTracker from './components/analytics/AnalyticsTracker'
 
+// Scroll to top on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
+
+const AppRoutes = () => {
+  const { lang } = useParams();
+  const { i18n: i18nInstance } = useTranslation();
+
+  useEffect(() => {
+    const supportedLangs = ['en', 'zh-TW', 'ja', 'ko', 'es'];
+    if (lang && supportedLangs.includes(lang)) {
+      if (i18nInstance.language !== lang) {
+        i18nInstance.changeLanguage(lang);
+      }
+    } else if (!lang) {
+      // Optional: Handle default language sync if needed
+    }
+  }, [lang, i18nInstance]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/update-password" element={<UpdatePasswordPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/companion" element={<CompanionPage />} />
+      <Route path="/pet" element={<PetPage />} />
+      <Route path="/virtual-love" element={<VirtualLovePage />} />
+      <Route path="/digital-immortality" element={<DigitalImmortalityPage />} />
+      <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
+      <Route path="/shop" element={<ShopPage />} />
+      <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
+      <Route path="/digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
+      <Route path="/digital-rebirth/family-tree" element={<FamilyTreePage />} />
+      <Route path="/start-experience" element={<DigitalHumanPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/digital-human-experience" element={<DigitalHumanExperiencePage />} />
+      <Route path="/team" element={<TeamPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/join" element={<JoinPage />} />
+      <Route path="/vr" element={<VRPage />} />
+      <Route path="/all-in-one" element={<AllInOnePage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/sitemap" element={<SitemapPage />} />
+      <Route path="/mvp-test" element={<MVPTestPage />} />
+      <Route path="/mvp-china" element={<MVPChinaPage />} />
+      <Route path="/digital-world" element={<DigitalWorldPage />} />
+      <Route path="/our-stories" element={<WarmStoriesPage />} />
+      <Route path="/founder-column" element={<FounderColumnPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
+  );
+};
+
 function App() {
+  const { t, i18n: i18nInstance } = useTranslation();
+
   return (
     <I18nextProvider i18n={i18n}>
       <Router>
+        <ScrollToTop />
         <div className="min-h-screen flex flex-col">
           <AnalyticsTracker />
           <Helmet>
-            <html lang={i18n.language} />
+            <html lang={i18nInstance.language} />
             <meta charSet="utf-8" />
             <meta name="viewport" content="width=device-width, initial-scale=1.0" />
             <link rel="canonical" href={window.location.href} />
@@ -55,45 +127,10 @@ function App() {
           <Header />
           <main className="flex-grow">
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/update-password" element={<UpdatePasswordPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/companion" element={<CompanionPage />} />
-              <Route path="/pet" element={<PetPage />} />
-              <Route path="/virtual-love" element={<VirtualLovePage />} />
-              <Route path="/digital-immortality" element={<DigitalImmortalityPage />} />
-              <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
-              <Route path="/digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
-              <Route path="/digital-rebirth/family-tree" element={<FamilyTreePage />} />
-              <Route path="/start-experience" element={<DigitalHumanPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/digital-human-experience" element={<DigitalHumanExperiencePage />} />
-              <Route path="/team" element={<TeamPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/join" element={<JoinPage />} />
-              <Route path="/vr" element={<VRPage />} />
-              <Route path="/all-in-one" element={<AllInOnePage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/sitemap" element={<SitemapPage />} />
-              <Route path="/mvp-test" element={<MVPTestPage />} />
-              <Route path="/mvp-china" element={<MVPChinaPage />} />
-              <Route path="/digital-world" element={<DigitalWorldPage />} />
-              <Route path="/our-stories" element={<WarmStoriesPage />} />
-              <Route path="/founder-column" element={<FounderColumnPage />} />
-              <Route path="*" element={<NotFoundPage />} />
+              {/* Support language prefixes */}
+              <Route path="/:lang/*" element={<AppRoutes />} />
+              {/* Default root routes */}
+              <Route path="/*" element={<AppRoutes />} />
             </Routes>
           </main>
           <Footer />

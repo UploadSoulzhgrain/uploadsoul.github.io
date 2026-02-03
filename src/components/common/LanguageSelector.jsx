@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const LanguageSelector = ({ onLanguageChange }) => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [currentLang, setCurrentLang] = useState(i18n.language);
 
@@ -27,27 +29,41 @@ const LanguageSelector = ({ onLanguageChange }) => {
   const changeLanguage = async (langCode) => {
     try {
       console.log('Changing language to:', langCode);
-      // 先设置localStorage
-      localStorage.setItem('i18nextLng', langCode);
 
-      // 然后改变i18n的语言
+      // Update i18n language
       await i18n.changeLanguage(langCode);
-
-      // 更新当前语言状态
+      localStorage.setItem('i18nextLng', langCode);
       setCurrentLang(langCode);
-
-      // 强制刷新语言设置
       document.documentElement.lang = langCode;
 
+      // Calculate new path based on language
+      const currentPath = location.pathname;
+      const supportedLangs = ['en', 'zh-TW', 'ja', 'ko', 'es'];
+      const langRegex = new RegExp(`^/(${supportedLangs.join('|')})(/|$)`);
+
+      let newPath = currentPath;
+
+      // Remove current lang prefix if exists
+      if (langRegex.test(currentPath)) {
+        newPath = currentPath.replace(langRegex, '/');
+      }
+
+      // Add new lang prefix if not default (zh-CN)
+      if (langCode !== 'zh-CN') {
+        newPath = `/${langCode}${newPath === '/' ? '' : newPath}`;
+      }
+
+      // Ensure newPath doesn't have trailing slash if not root
+      if (newPath.length > 1 && newPath.endsWith('/')) {
+        newPath = newPath.slice(0, -1);
+      }
+
+      console.log('Navigating to:', newPath);
+      navigate(newPath);
       setIsOpen(false);
 
       if (onLanguageChange) {
         onLanguageChange(langCode);
-      }
-
-      // 如果是开发环境，可以考虑重新加载页面以确保所有组件使用新语言
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Development mode: Consider page reload if translations are not updating');
       }
     } catch (error) {
       console.error('Error changing language:', error);
