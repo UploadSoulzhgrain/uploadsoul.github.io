@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
-import { I18nextProvider } from 'react-i18next'
+import { I18nextProvider, useTranslation } from 'react-i18next'
 import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -40,7 +40,7 @@ import UpdatePasswordPage from './pages/UpdatePasswordPage'
 import FounderColumnPage from './pages/FounderColumnPage'
 import AnalyticsTracker from './components/analytics/AnalyticsTracker'
 
-// Scroll to top on route change
+// 1. 自动回顶组件
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   useEffect(() => {
@@ -49,6 +49,24 @@ const ScrollToTop = () => {
   return null;
 };
 
+// 2. 语言同步逻辑组件 (必须在 Provider 内部)
+const LanguageSync = ({ lang }) => {
+  const { i18n: i18nInstance } = useTranslation();
+
+  useEffect(() => {
+    if (lang && i18nInstance.language !== lang) {
+      i18nInstance.changeLanguage(lang);
+    }
+  }, [lang, i18nInstance]);
+
+  return (
+    <Helmet>
+      <html lang={i18nInstance.language} />
+    </Helmet>
+  );
+};
+
+// 3. 核心内容组件 (提取出来复用)
 const AppContent = () => {
   return (
     <div className="min-h-screen flex flex-col">
@@ -96,14 +114,38 @@ const AppContent = () => {
 };
 
 function App() {
+  const supportedLangs = ['en', 'zh-TW', 'ja', 'ko', 'es'];
+
   return (
     <I18nextProvider i18n={i18n}>
       <Router>
         <ScrollToTop />
-        <Helmet>
-          <html lang={i18n.language} />
-        </Helmet>
-        <AppContent />
+        <Routes>
+          {/* A. 处理带前缀的路由 (例如: /en/about) */}
+          {supportedLangs.map(l => (
+            <Route
+              key={l}
+              path={`/${l}/*`}
+              element={
+                <>
+                  <LanguageSync lang={l} />
+                  <AppContent />
+                </>
+              }
+            />
+          ))}
+
+          {/* B. 处理默认根路由 (无前缀，默认为中文或当前检测语言) */}
+          <Route
+            path="/*"
+            element={
+              <>
+                <LanguageSync lang={i18n.language || 'zh-CN'} />
+                <AppContent />
+              </>
+            }
+          />
+        </Routes>
       </Router>
     </I18nextProvider>
   )

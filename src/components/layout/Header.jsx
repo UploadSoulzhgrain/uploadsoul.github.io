@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 import LanguageSelector from '../common/LanguageSelector';
 import Logo from '../common/Logo';
 
@@ -10,7 +11,7 @@ const Header = () => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { navigate, l } = useLocalizedNavigate();
 
   const handleLanguageChange = () => {
     setIsMenuOpen(false);
@@ -23,7 +24,7 @@ const Header = () => {
       console.error('Sign out error:', error);
     } finally {
       // 无论后端是否成功，前端必须清除状态并跳转
-      navigate('/');
+      navigate(l('/'));
       setIsUserMenuOpen(false);
       setIsMenuOpen(false);
     }
@@ -34,7 +35,7 @@ const Header = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between relative">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <Link to={l('/')} className="flex items-center hover:opacity-80 transition-opacity">
               <Logo size="md" variant="default" />
             </Link>
           </div>
@@ -52,7 +53,7 @@ const Header = () => {
             ].map((link) => (
               <Link
                 key={link.to}
-                to={link.to}
+                to={l(link.to)}
                 className="text-gray-400 hover:text-white text-sm font-medium transition-colors"
               >
                 {link.label}
@@ -82,7 +83,7 @@ const Header = () => {
                   <div className="absolute right-0 mt-2 w-48 bg-[#1A1A24] rounded-xl shadow-xl border border-white/10 py-1 z-50">
                     <div className="px-4 py-3 border-b border-white/5">
                       <p className="text-xs text-gray-500">已登录账号</p>
-                      <Link to="/dashboard" className="text-sm text-amber-500 hover:text-amber-400 truncate block mt-1 hover:underline">
+                      <Link to={l('/dashboard')} className="text-sm text-amber-500 hover:text-amber-400 truncate block mt-1 hover:underline">
                         我的仪表盘 &gt;
                       </Link>
                     </div>
@@ -98,7 +99,7 @@ const Header = () => {
               </div>
             ) : (
               <Link
-                to="/login"
+                to={l('/login')}
                 className="px-6 py-2 bg-white text-black text-sm font-bold rounded-full hover:bg-gray-200 transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
               >
                 {t('auth.login')} / {t('auth.signup')}
@@ -137,7 +138,7 @@ const Header = () => {
               ].map((link) => (
                 <Link
                   key={link.to}
-                  to={link.to}
+                  to={l(link.to)}
                   className="text-gray-400 hover:text-white text-lg font-medium transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
@@ -159,7 +160,7 @@ const Header = () => {
                           {user.user_metadata?.nickname || user.email}
                         </span>
                         <Link
-                          to="/dashboard"
+                          to={l('/dashboard')}
                           className="text-amber-500 text-xs hover:underline"
                           onClick={() => setIsMenuOpen(false)}
                         >
@@ -169,7 +170,7 @@ const Header = () => {
                     </div>
 
                     <Link
-                      to="/dashboard"
+                      to={l('/dashboard')}
                       className="w-full py-4 bg-amber-500/10 text-amber-500 border border-amber-500/30 text-center rounded-xl font-bold"
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -185,7 +186,7 @@ const Header = () => {
                   </div>
                 ) : (
                   <Link
-                    to="/login"
+                    to={l('/login')}
                     className="w-full py-4 bg-white text-black text-center text-lg font-bold rounded-2xl hover:bg-gray-200"
                     onClick={() => setIsMenuOpen(false)}
                   >

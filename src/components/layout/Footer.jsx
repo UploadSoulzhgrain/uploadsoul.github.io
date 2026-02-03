@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Logo from '../common/Logo';
 import WaveAnimation from '../animations/WaveAnimation';
+import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
 
 const Footer = () => {
   const { t } = useTranslation();
+  const { l } = useLocalizedNavigate();
 
   // Fade-in animation effect for footer content
   useEffect(() => {
@@ -57,27 +59,27 @@ const Footer = () => {
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.services.title')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/companion" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={l('/companion')} className="text-gray-300 hover:text-white transition-colors">
                   {t('footer.services.holographicCompanion')}
                 </Link>
               </li>
               <li>
-                <Link to="/digital-immortality" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={l('/digital-immortality')} className="text-gray-300 hover:text-white transition-colors">
                   {t('footer.services.digitalImmortality')}
                 </Link>
               </li>
               <li>
-                <Link to="/digital-rebirth" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={l('/digital-rebirth')} className="text-gray-300 hover:text-white transition-colors">
                   {t('footer.services.digitalRebirth')}
                 </Link>
               </li>
               <li>
-                <Link to="/vr" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={l('/vr')} className="text-gray-300 hover:text-white transition-colors">
                   {t('footer.services.vrDevice')}
                 </Link>
               </li>
               <li>
-                <Link to="/all-in-one" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={l('/all-in-one')} className="text-gray-300 hover:text-white transition-colors">
                   {t('footer.services.aiAllInOne')}
                 </Link>
               </li>
@@ -86,10 +88,10 @@ const Footer = () => {
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-300">
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.aboutUs')}</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.aboutCompany')}</Link></li>
-              <li><Link to="/team" className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.team')}</Link></li>
-              <li><Link to="/contact" className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.contact')}</Link></li>
-              <li><Link to="/join" className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.joinUs')}</Link></li>
+              <li><Link to={l('/about')} className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.aboutCompany')}</Link></li>
+              <li><Link to={l('/team')} className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.team')}</Link></li>
+              <li><Link to={l('/contact')} className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.contact')}</Link></li>
+              <li><Link to={l('/join')} className="hover:text-white hover:pl-1 transition-all duration-200">{t('footer.joinUs')}</Link></li>
             </ul>
           </div>
           <div className="footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-400">
@@ -149,9 +151,9 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-8 pt-6 text-sm text-center footer-animate opacity-0 translate-y-4 transition-all duration-700 delay-600">
           <p className="mb-3">© {new Date().getFullYear()} <span className="text-amber-500 font-medium">UploadSoul</span> {t('footer.platformName')}. {t('footer.copyright')}</p>
           <div className="flex justify-center space-x-6 text-gray-400">
-            <Link to="/privacy" className="hover:text-white transition-colors hover:underline">{t('footer.privacy')}</Link>
-            <Link to="/terms" className="hover:text-white transition-colors hover:underline">{t('footer.terms')}</Link>
-            <a href="/sitemap.xml" className="hover:text-white transition-colors hover:underline">{t('footer.sitemap')}</a>
+            <Link to={l('/privacy')} className="hover:text-white transition-colors hover:underline">{t('footer.privacy')}</Link>
+            <Link to={l('/terms')} className="hover:text-white transition-colors hover:underline">{t('footer.terms')}</Link>
+            <Link to={l('/sitemap')} className="hover:text-white transition-colors hover:underline">{t('footer.sitemap')}</Link>
           </div>
         </div>
       </div>
