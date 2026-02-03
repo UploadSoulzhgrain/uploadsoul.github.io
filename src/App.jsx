@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter as Router, Routes, Route, useParams, useLocation } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
 import { I18nextProvider, useTranslation } from 'react-i18next'
 import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
@@ -49,92 +49,99 @@ const ScrollToTop = () => {
   return null;
 };
 
-const AppRoutes = () => {
-  const { lang } = useParams();
+// Component to handle language sync from URL prop
+const LanguageSync = ({ lang }) => {
   const { i18n: i18nInstance } = useTranslation();
 
   useEffect(() => {
-    const supportedLangs = ['en', 'zh-TW', 'ja', 'ko', 'es'];
-    if (lang && supportedLangs.includes(lang)) {
-      if (i18nInstance.language !== lang) {
-        i18nInstance.changeLanguage(lang);
-      }
-    } else if (!lang) {
-      // Optional: Handle default language sync if needed
+    if (lang && i18nInstance.language !== lang) {
+      i18nInstance.changeLanguage(lang);
     }
   }, [lang, i18nInstance]);
 
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/update-password" element={<UpdatePasswordPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route path="/companion" element={<CompanionPage />} />
-      <Route path="/pet" element={<PetPage />} />
-      <Route path="/virtual-love" element={<VirtualLovePage />} />
-      <Route path="/digital-immortality" element={<DigitalImmortalityPage />} />
-      <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
-      <Route path="/shop" element={<ShopPage />} />
-      <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
-      <Route path="/digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
-      <Route path="/digital-rebirth/family-tree" element={<FamilyTreePage />} />
-      <Route path="/start-experience" element={<DigitalHumanPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/digital-human-experience" element={<DigitalHumanExperiencePage />} />
-      <Route path="/team" element={<TeamPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/join" element={<JoinPage />} />
-      <Route path="/vr" element={<VRPage />} />
-      <Route path="/all-in-one" element={<AllInOnePage />} />
-      <Route path="/privacy" element={<PrivacyPage />} />
-      <Route path="/terms" element={<TermsPage />} />
-      <Route path="/sitemap" element={<SitemapPage />} />
-      <Route path="/mvp-test" element={<MVPTestPage />} />
-      <Route path="/mvp-china" element={<MVPChinaPage />} />
-      <Route path="/digital-world" element={<DigitalWorldPage />} />
-      <Route path="/our-stories" element={<WarmStoriesPage />} />
-      <Route path="/founder-column" element={<FounderColumnPage />} />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <Helmet>
+      <html lang={i18nInstance.language} />
+    </Helmet>
+  );
+};
+
+const AppContent = () => {
+  return (
+    <div className="min-h-screen flex flex-col">
+      <AnalyticsTracker />
+      <Header />
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/update-password" element={<UpdatePasswordPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/companion" element={<CompanionPage />} />
+          <Route path="/pet" element={<PetPage />} />
+          <Route path="/virtual-love" element={<VirtualLovePage />} />
+          <Route path="/digital-immortality" element={<DigitalImmortalityPage />} />
+          <Route path="/digital-immortality/create" element={<CreateDigitalHumanPage />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
+          <Route path="/digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
+          <Route path="/digital-rebirth/family-tree" element={<FamilyTreePage />} />
+          <Route path="/start-experience" element={<DigitalHumanPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/digital-human-experience" element={<DigitalHumanExperiencePage />} />
+          <Route path="/team" element={<TeamPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/join" element={<JoinPage />} />
+          <Route path="/vr" element={<VRPage />} />
+          <Route path="/all-in-one" element={<AllInOnePage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/sitemap" element={<SitemapPage />} />
+          <Route path="/mvp-test" element={<MVPTestPage />} />
+          <Route path="/mvp-china" element={<MVPChinaPage />} />
+          <Route path="/digital-world" element={<DigitalWorldPage />} />
+          <Route path="/our-stories" element={<WarmStoriesPage />} />
+          <Route path="/founder-column" element={<FounderColumnPage />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+      <Footer />
+    </div>
   );
 };
 
 function App() {
-  const { t, i18n: i18nInstance } = useTranslation();
+  const supportedLangs = ['en', 'zh-TW', 'ja', 'ko', 'es'];
 
   return (
     <I18nextProvider i18n={i18n}>
       <Router>
         <ScrollToTop />
-        <div className="min-h-screen flex flex-col">
-          <AnalyticsTracker />
-          <Helmet>
-            <html lang={i18nInstance.language} />
-            <meta charSet="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <link rel="canonical" href={window.location.href} />
-          </Helmet>
-          <Header />
-          <main className="flex-grow">
-            <Routes>
-              {/* Support language prefixes */}
-              <Route path="/:lang/*" element={<AppRoutes />} />
-              {/* Default root routes */}
-              <Route path="/*" element={<AppRoutes />} />
-            </Routes>
-          </main>
-          <Footer />
-        </div>
+        <Routes>
+          {/* Explicitly handle supported language prefixes */}
+          {supportedLangs.map(lang => (
+            <Route
+              key={lang}
+              path={`/${lang}/*`}
+              element={
+                <>
+                  <LanguageSync lang={lang} />
+                  <AppContent />
+                </>
+              }
+            />
+          ))}
+
+          {/* Handle default root paths (zh-CN) */}
+          <Route path="/*" element={
+            <>
+              <LanguageSync lang="zh-CN" />
+              <AppContent />
+            </>
+          } />
+        </Routes>
       </Router>
     </I18nextProvider>
   )
