@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'
-import { I18nextProvider, useTranslation } from 'react-i18next'
+import { I18nextProvider } from 'react-i18next'
 import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
@@ -47,23 +47,6 @@ const ScrollToTop = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
   return null;
-};
-
-// Component to handle language sync from URL prop
-const LanguageSync = ({ lang }) => {
-  const { i18n: i18nInstance } = useTranslation();
-
-  useEffect(() => {
-    if (lang && i18nInstance.language !== lang) {
-      i18nInstance.changeLanguage(lang);
-    }
-  }, [lang, i18nInstance]);
-
-  return (
-    <Helmet>
-      <html lang={i18nInstance.language} />
-    </Helmet>
-  );
 };
 
 const AppContent = () => {
@@ -113,35 +96,14 @@ const AppContent = () => {
 };
 
 function App() {
-  const supportedLangs = ['en', 'zh-TW', 'ja', 'ko', 'es'];
-
   return (
     <I18nextProvider i18n={i18n}>
       <Router>
         <ScrollToTop />
-        <Routes>
-          {/* Explicitly handle supported language prefixes */}
-          {supportedLangs.map(lang => (
-            <Route
-              key={lang}
-              path={`/${lang}/*`}
-              element={
-                <>
-                  <LanguageSync lang={lang} />
-                  <AppContent />
-                </>
-              }
-            />
-          ))}
-
-          {/* Handle default root paths (zh-CN) */}
-          <Route path="/*" element={
-            <>
-              <LanguageSync lang="zh-CN" />
-              <AppContent />
-            </>
-          } />
-        </Routes>
+        <Helmet>
+          <html lang={i18n.language} />
+        </Helmet>
+        <AppContent />
       </Router>
     </I18nextProvider>
   )
