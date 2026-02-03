@@ -1,21 +1,21 @@
 import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import FeatureIllustrations from '../components/FeatureIllustrations';
 import { Helmet } from 'react-helmet-async';
+import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
 
 const DigitalImmortalityPage = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { navigate, l } = useLocalizedNavigate();
 
   const handleCreate = () => {
     if (user) {
       navigate('/digital-immortality/create');
     } else {
-      navigate('/login', { state: { from: { pathname: '/digital-immortality/create' } } });
+      navigate('/login', { state: { from: { pathname: l('/digital-immortality/create') } } });
     }
   };
 
