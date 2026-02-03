@@ -53,14 +53,15 @@ i18n
   // Initialize configuration
   .init({
     resources,
-    lng: 'zh-CN', // 设置默认语言为中文
-    fallbackLng: 'en',
+    // lng: 'zh-CN', // Remove or comment out to enable detection
+    fallbackLng: 'zh-CN', // Changed fallback to zh-CN as it's the primary market
     debug: false, // Set to false for production
     interpolation: {
       escapeValue: false // Not needed for React as it escapes by default
     },
     detection: {
-      order: ['localStorage', 'querystring', 'cookie', 'navigator'],
+      order: ['path', 'localStorage', 'querystring', 'cookie', 'navigator'],
+      lookupFromPathIndex: 0,
       lookupQuerystring: 'lang',
       lookupCookie: 'i18next',
       lookupLocalStorage: 'i18nextLng',
