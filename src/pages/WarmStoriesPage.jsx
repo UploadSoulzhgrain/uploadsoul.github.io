@@ -1,8 +1,9 @@
-http://127.0.0.1:5173/en/en/our-storiesimport React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { Helmet } from 'react-helmet-async';
 import './WarmStoriesPage.css';
 
 const WarmStoriesPage = () => {
@@ -318,7 +319,7 @@ const WarmStoriesPage = () => {
                                                 {story.id === 'companion' && <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A3,3 0 0,1 15,5A3,3 0 0,1 12,8A3,3 0 0,1 9,5A3,3 0 0,1 12,2M19,3A3,3 0 0,1 22,6A3,3 0 0,1 19,9A3,3 0 0,1 16,6A3,3 0 0,1 19,3M5,3A3,3 0 0,1 8,6A3,3 0 0,1 5,9A3,3 0 0,1 2,6A3,3 0 0,1 5,3M12,10.5C14.8,10.5 17.5,11.5 19.5,13.5C21.5,15.5 22.5,18.2 22.5,21H16.5C16.5,18.5 14.5,16.5 12,16.5C9.5,16.5 7.5,18.5 7.5,21H1.5C1.5,18.2 2.5,15.5 4.5,13.5C6.5,11.5 9.2,10.5 12,10.5Z" /></svg>}
                                             </div>
                                             <div className="bookmark-tag">
-                                                {story.tag.split('·')[0].trim()}
+                                                {story.tag.includes('·') ? story.tag.split('·')[1].trim() : story.tag}
                                             </div>
                                         </div>
                                     </div>
