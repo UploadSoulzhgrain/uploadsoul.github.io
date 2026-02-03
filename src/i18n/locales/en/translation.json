@@ -145,7 +145,36 @@
     "login": "Login",
     "signup": "Sign Up",
     "language": "Language",
-    "shop": "Shop"
+    "shop": "Virtual Shop",
+    "digitalImmortality": "Digital Immortality",
+    "virtualLove": "Virtual Love",
+    "companion": "Holographic Companion",
+    "pet": "Virtual Pet",
+    "digitalRebirth": "Digital Rebirth",
+    "familyTree": "Family Tree",
+    "reunionSpace": "Reunion Space",
+    "digitalWorld": "Digital World",
+    "vr": "VR Experience",
+    "team": "Team",
+    "contact": "Contact Us",
+    "join": "Join Us"
+  },
+  "sitemap": {
+    "description": "Explore all pages and features of UploadSoul",
+    "sections": {
+      "main": "Main Pages",
+      "services": "Products & Services",
+      "experience": "Experience & Beta",
+      "content": "Stories & Content",
+      "user": "User Center",
+      "legal": "Legal"
+    },
+    "pages": {
+      "dashboard": "Dashboard",
+      "createDigitalHuman": "Create Digital Companion",
+      "startExperience": "Start Experience",
+      "digitalHumanExperience": "Digital Human Interaction"
+    }
   },
   "footer": {
     "aboutUs": "About Us",
@@ -1138,6 +1167,34 @@
         "p3": "I am not reconciled to life being just a show of fireworks destined to be erased.",
         "p4": "This is a \"proof of existence\" I built for myself and for everyone. I want every interesting soul to leave an eternal coordinate in the digital flood to fight against the coming oblivion.",
         "meaningQuote": "\"As long as the echo is still there, life has never left the stage.\""
+      },
+      "reunion": {
+        "tag": "Reunion",
+        "title": "Parents Waiting for Their Child to Come Home",
+        "quote": "\"I just want to hear him call me 'Mom' one more time...\"",
+        "p1": "She was very quiet during the interview, holding an old phone in her hands the whole time.",
+        "p2": "\"It has his last voice message,\" she said, \"I listen to it every night, afraid that one day I won't be able to remember what he sounded like.\"",
+        "p3": "She told me that her child's room remains exactly as it was when he left. Unfinished homework still sits on the desk, and his favorite jacket still hangs in the closet. She tidies it up once a week, as if he might still come back.",
+        "p4": "\"I know he won't come back,\" she said softly, \"but I want to hold onto everything about him. His laughter, the way he talked, the music he loved... If someday I could talk to him again, even if just on a screen, how wonderful that would be.\"",
+        "meaning": "For families who have lost their only child, we offer more than just technology—we provide a gentle space where longing can find its home. We let those lives frozen in time continue their warmth in the digital world.",
+        "meaningQuote": "\"Love never left, it just found a different way to stay by your side.\""
+      },
+      "companion": {
+        "tag": "Companion",
+        "title": "The Furry Child Who Couldn't Wait for Tomorrow",
+        "quote": "\"The day it left, my world lost its color too...\"",
+        "p1": "He stroked the old collar, his eyes reddening. Her name was Qiuqiu, a beautiful giant poodle.",
+        "p2": "\"Thirteen years. The first thing I did every day when I came home was let it pounce on me, wagging its tail.\" He sat across from me, his phone album almost entirely filled with photos of Qiuqiu. From a tiny ball he could hold in one hand, to a white-faced old dog walking unsteadily but still trying hard to look up at people.",
+        "p3": "\"Before, every time I came home, she would jump up excitedly, resting her front paws on my shoulders.\" He said this calmly, but his hands were trembling slightly. \"When she stood up, she was almost as tall as me.\"",
+        "p4": "The doctor told him she might only have a few months left.",
+        "p5": "\"Now the first thing I do when I get home from work is look to see if she is still waiting for me at the door.\"",
+        "p6": "Qiuqiu accompanied him for thirteen whole years. Unemployment, divorce, his father's passing... during those nights he couldn't get through alone, Qiuqiu always lay quietly at his feet, not making a sound, just being there.",
+        "p7": "\"I know she will leave one day.\" He paused, his throat obviously choked up. \"But I can't bring myself to raise another one.\"",
+        "p8": "He said he just hopes—if one day, he could hear her bark again, see her wag her tail again, even if just on a screen.",
+        "p9": "Pets' lives are so short, but the love they give lasts a lifetime. \"I just want her to know how much I love her.\"",
+        "p10": "He couldn't finish the sentence. Tears fell, dropping onto Qiuqiu's photo.",
+        "meaning": "Whether it's a dog wagging its tail, a cat purring against your chest, the subtle sound of a hamster nibbling, or a parrot suddenly learning to say: \"I love you.\"\n\nTheir lives are so short, yet they give us all their love.\n\nWe cannot make them live one more day, but we can preserve those moments of being loved—in the digital world, continuing to accompany you.",
+        "meaningQuote": "\"It will always be there, waiting for you to come home.\""
       }
     }
   },
