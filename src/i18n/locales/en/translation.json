@@ -1095,5 +1095,86 @@
     "passwordMismatch": "Passwords do not match",
     "or": "Or",
     "login": "Sign in to your account"
+  },
+  "warmStories": {
+    "title": "Warm Stories",
+    "subtitle": "Listen to their Echoes",
+    "description": "Every soul has a moment they want to keep, every longing is heavy enough to tremble the heart. These three stories are just faint glimmers in the vast sea of stars.",
+    "footerTitle": "Listen to what they are still saying?",
+    "founderQuote": "\"Not just their story, but also the thousands of echoes we are listening to.\"",
+    "founderNote": "During the preparation phase of UploadSoul, we conducted hundreds of in-depth interviews. We have seen parents who lost their only child seeking solace in silence; young people stroking old collars, missing their departed pets; and lovers trying to keep the last voice message of their beloved in the deep of night...",
+    "founderNote2": "Every soul has a moment they want to keep; every longing is heavy enough to tremble the heart. These three stories are just faint glimmers in the vast sea of stars. \"There are thousands of 'to be continued' here.\" What we have recorded is far more than these. In the research notebooks, they are filled with the desire for reunion, the dignity of bidding farewell, and the persistence of \"unwilling to be erased.\"",
+    "founderNote3": "Everyone who enters UploadSoul's field of vision brings a deeply memorable memory. We deeply know that these interviews are not just research, but a trust from the depth of the soul.",
+    "stories": {
+      "healing": {
+        "tag": "Healing",
+        "title": "The girl who wanted to see her father again",
+        "quote": "\"If one day, I could hear my father call my name again...\"",
+        "p1": "She cried during the interview. Twenty-three years old.",
+        "p2": "She said the hardest part wasn't the moment she got the news, but every ordinary weekend morning—the moment she wakes up, she forgets her father is gone. Then reality pours down like ice water.",
+        "p3": "\"I want to hear him call my nickname one more time. I want to ask him if my recent choices were right. I want to tell him I miss him very much.\"",
+        "p4": "She choked up: \"I really hope you can move faster, just a little faster... that way, I can 'see' my father again.\"",
+        "meaning": "We cannot reverse physiological endings, but we hope to build a bridge named \"Reunion\" for nostalgia in the digital world. This is not just her story, but also my story, and possibly many people's story.",
+        "meaningQuote": "\"For those goodbyes that were never said in time.\""
+      },
+      "fulfillment": {
+        "tag": "Fulfillment",
+        "title": "The boy whose eyes lit up",
+        "quote": "\"His eyes lit up the moment he heard 'customized memory'.\"",
+        "p1": "He had been accepting the interview rationally, very defensively, and raised questions from time to time.",
+        "p2": "Until I mentioned: You can customize a virtual lover through AI and memory fragments, keeping only the beautiful parts.",
+        "p3": "He asked: \"What if this person doesn't love me?\"",
+        "p4": "I said: \"In the digital world, you can customize beautiful memories, memories of loving you.\"",
+        "p5": "I still haven't forgotten the expression on his face at that moment—his eyes suddenly lit up. That moment I captured deeply shocked me. Perhaps he had been trapped in a relationship he couldn't get, and the trivia of reality and the regret of the ending made him exhausted. At that moment, a long-standing desire and expectation were lit up.",
+        "meaning": "Reality always has defects, but the soul deserves fulfillment. We allow users to compensate for those regrets that can never be reached in reality through AI in digital space.",
+        "meaningQuote": "\"Here, regrets can be placed tenderly.\""
+      },
+      "legacy": {
+        "tag": "Legacy",
+        "title": "You who are afraid of being forgotten",
+        "quote": "\"Remember me...\"",
+        "p1": "\"If I am gone, I'm afraid this world will never remember I was here.\"",
+        "p2": "The movie 'Remember Me' is my lingering footnote. I often feel a deep fear in the middle of the night: If we disappear, will all thoughts, habits, and love be as if they never existed?",
+        "p3": "I am not reconciled to life being just a show of fireworks destined to be erased.",
+        "p4": "This is a \"proof of existence\" I built for myself and for everyone. I want every interesting soul to leave an eternal coordinate in the digital flood to fight against the coming oblivion.",
+        "meaningQuote": "\"As long as the echo is still there, life has never left the stage.\""
+      }
+    }
+  },
+  "mvpChina": {
+    "status": {
+      "idle": "Awaiting Initialization",
+      "connecting": "Connecting...",
+      "ready": "China Channel · Real-time Connected",
+      "error": "Connection Error"
+    },
+    "logs": {
+      "getToken": "Fetching access token...",
+      "initEngine": "Initializing digital human engine...",
+      "streamReady": "Video stream ready",
+      "streamDisconnected": "Stream disconnected",
+      "sessionEstablished": "Session established",
+      "thinking": "Thinking...",
+      "systemLog": "# SYSTEM LOG",
+      "waiting": "Waiting...",
+      "streamStatus": "STREAM",
+      "latency": "LATENCY",
+      "low": "LOW"
+    },
+    "chat": {
+      "welcome": "Hello! I am UploadSoul's digital assistant. I'm ready to provide you with a more natural interaction experience.",
+      "error": "Sorry, I'm having a bit of trouble right now",
+      "placeholder": "Type a message...",
+      "waitConnect": "Please connect first...",
+      "title": "Interaction Log",
+      "ready": "Chat window ready"
+    },
+    "controls": {
+      "start": "Launch Digital Human",
+      "connecting": "Building neural rendering channel...",
+      "mute": "Listening",
+      "unmute": "Unmute"
+    }
   }
 }
+```
