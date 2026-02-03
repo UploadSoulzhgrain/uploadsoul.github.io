@@ -1187,5 +1187,40 @@
       "p4": "这是我为自己、也为所有人建造的\"存在证明\"。我想让每一个有趣的灵魂，都能在数字洪流中留下永恒的坐标，对抗终将到来的遗忘。",
       "meaningQuote": "\"只要回响还在，生命便从未离场。\""
     }
+  },
+  "mvpChina": {
+    "status": {
+      "idle": "等待初始化",
+      "connecting": "正在连接...",
+      "ready": "国内通道 · 实时连接中",
+      "error": "连接出错"
+    },
+    "logs": {
+      "getToken": "正在获取访问令牌...",
+      "initEngine": "正在初始化数字人引擎...",
+      "streamReady": "视频流已就绪",
+      "streamDisconnected": "流连接已断开",
+      "sessionEstablished": "会话已建立",
+      "thinking": "正在思考回复...",
+      "systemLog": "# 系统日志",
+      "waiting": "等待中...",
+      "streamStatus": "流状态",
+      "latency": "延迟",
+      "low": "低"
+    },
+    "chat": {
+      "welcome": "您好！我是 UploadSoul 的数字助手。我已准备好为您提供更自然的交互体验了。",
+      "error": "抱歉，我现在出了一点小状况",
+      "placeholder": "输入消息...",
+      "waitConnect": "请先开启连接...",
+      "title": "交互对话日志",
+      "ready": "对话窗口已就绪"
+    },
+    "controls": {
+      "start": "启动数字人助手",
+      "connecting": "构建神经渲染通道...",
+      "mute": "正在收听",
+      "unmute": "取消静音"
+    }
   }
 }
