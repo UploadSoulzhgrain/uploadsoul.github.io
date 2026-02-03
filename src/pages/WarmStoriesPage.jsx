@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import './WarmStoriesPage.css';
 
 const WarmStoriesPage = () => {
@@ -260,6 +261,11 @@ const WarmStoriesPage = () => {
 
     return (
         <div className="warm-stories-container">
+            <Helmet>
+                <title>存在的意义 - 温情故事 | UploadSoul 传灵</title>
+                <meta name="description" content="那些关于思念、治愈与重逢的故事。每一个独特的灵魂，都值得被这个世界温柔地备份。" />
+                <meta name="keywords" content="温情故事, 情感记录, 数字记忆, 思念, 治愈, UploadSoul" />
+            </Helmet>
             {/* Hero Section */}
             <section className="hero">
                 <div className="hero-content">

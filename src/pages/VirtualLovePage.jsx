@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { FaHeart, FaUser, FaMicrophone, FaBrain, FaMemory } from 'react-icons/fa';
+import { Helmet } from 'react-helmet-async';
 
 const VirtualLove = () => {
   const { t } = useTranslation();
@@ -29,16 +30,21 @@ const VirtualLove = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 to-black text-white">
+      <Helmet>
+        <title>{t('virtualLove.title')} - UploadSoul 传灵</title>
+        <meta name="description" content={t('virtualLove.description')} />
+        <meta name="keywords" content="虚拟恋爱, AI女友, AI男友, 情感陪伴, 数字伴侣, UploadSoul, Virtual Love" />
+      </Helmet>
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-5xl font-bold mb-4"
         >
           {t('virtualLove.title')}
         </motion.h1>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -46,7 +52,7 @@ const VirtualLove = () => {
         >
           {t('virtualLove.subtitle')}
         </motion.p>
-        <motion.p 
+        <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -60,7 +66,7 @@ const VirtualLove = () => {
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">{t('virtualLove.features.title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -71,7 +77,7 @@ const VirtualLove = () => {
             <p className="text-gray-300">{t('virtualLove.features.customization.description')}</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -83,7 +89,7 @@ const VirtualLove = () => {
             <p className="text-gray-300">{t('virtualLove.features.aiTechnology.description')}</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -101,7 +107,7 @@ const VirtualLove = () => {
       <section className="container mx-auto px-4 py-16">
         <h2 className="text-3xl font-bold text-center mb-12">{t('virtualLove.companionTypes.title')}</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -112,7 +118,7 @@ const VirtualLove = () => {
             <p className="text-gray-300">{t('virtualLove.companionTypes.soulmate.description')}</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -124,7 +130,7 @@ const VirtualLove = () => {
             <p className="text-gray-300">{t('virtualLove.companionTypes.temporary.description')}</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import FeatureIllustrations from '../components/FeatureIllustrations';
+import { Helmet } from 'react-helmet-async';
 
 const DigitalImmortalityPage = () => {
   const { t } = useTranslation();
@@ -20,6 +21,11 @@ const DigitalImmortalityPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Helmet>
+        <title>{t('digitalImmortality.title')} - UploadSoul 传灵</title>
+        <meta name="description" content={t('digitalImmortality.description')} />
+        <meta name="keywords" content="数字永生, 记忆备份, 人格克隆, AI数字人, UploadSoul, Digital Immortality" />
+      </Helmet>
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">
           {t('digitalImmortality.title')}

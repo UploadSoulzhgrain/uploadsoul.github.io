@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 
 
 const HomePage = () => {
@@ -80,6 +81,10 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-tech-mesh text-white">
+      <Helmet>
+        <title>UploadSoul 传灵 - AI数字情感陪伴平台 | 首页</title>
+        <meta name="description" content="UploadSoul 传灵 - 全球领先的AI数字情感陪伴平台。提供数字永生、虚拟恋爱、AI伴侣、情感陪伴、心灵慰藉。让爱与记忆超越时间。" />
+      </Helmet>
       {/* Hero Section - 极简 */}
       <section className="relative min-h-[85vh] flex items-center justify-center px-4">
         {/* 背景装饰 */}
