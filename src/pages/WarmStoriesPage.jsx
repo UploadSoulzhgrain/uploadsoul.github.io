@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+http://127.0.0.1:5173/en/en/our-storiesimport React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 import './WarmStoriesPage.css';
 
 const WarmStoriesPage = () => {
+    const { t } = useTranslation();
     const [activeStory, setActiveStory] = useState(null);
     const [storyInput, setStoryInput] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
@@ -14,100 +15,99 @@ const WarmStoriesPage = () => {
     const stories = {
         healing: {
             id: 'healing',
-            tag: 'Healing · 治愈',
-            title: '那个想再见爸爸的女孩',
-            quote: '"如果有一天，我能再听到爸爸叫我的名字..."',
+            tag: t('warmStories.stories.healing.tag'),
+            title: t('warmStories.stories.healing.title'),
+            quote: t('warmStories.stories.healing.quote'),
             image: '/assets/story_healing.png',
             accent: '#6dd5c3',
             content: (
                 <>
-                    <p>她在访谈中哭了。二十三岁。</p>
-                    <p>她说最难受的不是得知消息的那一刻，而是每一个普通的周末早晨——醒来的瞬间，她会忘记爸爸已经不在了。然后现实像冰水一样浇下来。</p>
-                    <p>"我想再听一次他叫我小名的声音。想问他，我最近做的选择对不对。想告诉他，我很想他。"</p>
-                    <p>她哽咽着说："我真希望你们能快一点，再快一点……那样，我就能'再见到'爸爸了。"</p>
+                    <p>{t('warmStories.stories.healing.p1')}</p>
+                    <p>{t('warmStories.stories.healing.p2')}</p>
+                    <p>{t('warmStories.stories.healing.p3')}</p>
+                    <p>{t('warmStories.stories.healing.p4')}</p>
                 </>
             ),
-            meaning: '我们无法逆转生理的终结，但我们希望在数字世界里，为思念搭建一座名为"重逢"的桥。这不只是她的故事，也是我的故事，可能也是很多人的故事。',
-            meaningQuote: '"为了那些还没来得及说的再见。"'
+            meaning: t('warmStories.stories.healing.meaning'),
+            meaningQuote: t('warmStories.stories.healing.meaningQuote')
         },
         fulfillment: {
             id: 'fulfillment',
-            tag: 'Fulfillment · 圆满',
-            title: '那个眼睛亮了的男孩',
-            quote: '"他在听到\'定制记忆\'的那一刻，眼里有了光。"',
+            tag: t('warmStories.stories.fulfillment.tag'),
+            title: t('warmStories.stories.fulfillment.title'),
+            quote: t('warmStories.stories.fulfillment.quote'),
             image: '/assets/story_fulfillment.png',
             accent: '#ffb3ba',
             content: (
                 <>
-                    <p>他一直在理智地接受访问，防御性很强，也不时提出质疑。</p>
-                    <p>直到我提到：你可以通过 AI 与记忆的片段，为自己定制一个只保留美好的虚拟恋人。</p>
-                    <p>他问："那如果这个人不爱我呢？"</p>
-                    <p>我说："数字世界里，你可以定制美好的记忆，爱你的记忆。"</p>
-                    <p>我至今都无法忘记那一瞬间他的表情——他的眼睛忽然就亮了一下。被我捕捉到的那一瞬间，深深地震撼了我。也许他曾陷入一段求而不得的感情，现实的琐碎和结局的遗憾让他疲惫不堪。那一刻，某种长久的渴望和期待被点亮了。</p>
+                    <p>{t('warmStories.stories.fulfillment.p1')}</p>
+                    <p>{t('warmStories.stories.fulfillment.p2')}</p>
+                    <p>{t('warmStories.stories.fulfillment.p3')}</p>
+                    <p>{t('warmStories.stories.fulfillment.p4')}</p>
+                    <p>{t('warmStories.stories.fulfillment.p5')}</p>
                 </>
             ),
-            meaning: '现实总有残缺，但灵魂值得圆满。我们允许用户在数字时空里，通过 AI 弥补那些在现实中永远无法达成的遗憾。',
-            meaningQuote: '"在这里，遗憾可以被温柔地安放。"'
+            meaning: t('warmStories.stories.fulfillment.meaning'),
+            meaningQuote: t('warmStories.stories.fulfillment.meaningQuote')
         },
         legacy: {
             id: 'legacy',
-            tag: 'Legacy · 延续',
-            title: '怕被遗忘的你',
-            quote: '"Remember me..."',
+            tag: t('warmStories.stories.legacy.tag'),
+            title: t('warmStories.stories.legacy.title'),
+            quote: t('warmStories.stories.legacy.quote'),
             image: '/assets/story_legacy.png',
             accent: '#f4d5a6',
             content: (
                 <>
-                    <p>"如果我不在了，我怕这个世界从未记得我来过。"</p>
-                    <p>电影《Remember Me》是我挥之不去的注脚。我时常在深夜感到一种深刻的恐惧：如果我们消失了，所有的思绪、习惯和爱，是否就像从未存在过一样？</p>
-                    <p>我不甘心生命只是一场注定被抹除的烟火。</p>
+                    <p>{t('warmStories.stories.legacy.p1')}</p>
+                    <p>{t('warmStories.stories.legacy.p2')}</p>
+                    <p>{t('warmStories.stories.legacy.p3')}</p>
+                    <p>{t('warmStories.stories.legacy.p4')}</p>
                 </>
             ),
-            meaning: '这是我为自己、也为所有人建造的"存在证明"。我想让每一个有趣的灵魂，都能在数字洪流中留下永恒的坐标，对抗终将到来的遗忘。',
-            meaningQuote: '"只要回响还在，生命便从未离场。"'
+            meaningQuote: t('warmStories.stories.legacy.meaningQuote')
         },
         reunion: {
             id: 'reunion',
-            tag: 'Reunion · 重聚',
-            title: '等待孩子回家的父母',
-            quote: '"我只是想，再听他喊一声妈妈......"',
+            tag: t('warmStories.stories.reunion.tag'),
+            title: t('warmStories.stories.reunion.title'),
+            quote: t('warmStories.stories.reunion.quote'),
             image: '/assets/story_reunion.png',
             accent: '#c4b5fd',
             content: (
                 <>
-                    <p>她在访谈时很安静，手里一直握着一个旧手机。</p>
-                    <p>"里面有他最后留下的语音，"她说，"每天晚上我都要听一遍，怕有一天连这个声音也记不清了。"</p>
-                    <p>她告诉我，孩子的房间保持着他离开时的样子。书桌上还摆着没做完的作业，衣柜里挂着他最喜欢的那件外套。她每周都会去整理一次，就像他还会回来一样。</p>
-                    <p>"我知道他不会再回来了，"她轻声说，"但是我想留住关于他的一切。他的笑声，他说话的方式，他喜欢的音乐......如果有一天，我可以再和他说说话，哪怕只是在屏幕里，那该多好。"</p>
+                    <p>{t('warmStories.stories.reunion.p1')}</p>
+                    <p>{t('warmStories.stories.reunion.p2')}</p>
+                    <p>{t('warmStories.stories.reunion.p3')}</p>
+                    <p>{t('warmStories.stories.reunion.p4')}</p>
                 </>
             ),
-            meaning: '对于失独家庭来说，我们提供的不只是技术，而是一个可以安放思念的温柔空间。让那些永远定格的生命，在数字世界里延续他们的温度。',
-            meaningQuote: '"爱从未离开，只是换了一种方式陪伴。"'
+            meaning: t('warmStories.stories.reunion.meaning'),
+            meaningQuote: t('warmStories.stories.reunion.meaningQuote')
         },
         companion: {
             id: 'companion',
-            tag: 'Companion · 陪伴',
-            title: '等不到明天的毛孩子',
-            quote: '"我只想让它知道，我有多爱它......"',
+            tag: t('warmStories.stories.companion.tag'),
+            title: t('warmStories.stories.companion.title'),
+            quote: t('warmStories.stories.companion.quote'),
             image: 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=1200&q=80',
             accent: '#ffa94d',
             content: (
                 <>
-                    <p>她叫球球，是一只十四岁的橘黄色巨型贵宾。</p>
-                    <p>他坐在我对面，手机相册里几乎全是球球的照片。从最初小小的一团，被他一只手就能托起来；到现在满脸白毛，走路有些蹒跚，却依然努力抬头看人。</p>
-                    <p>"以前每次我回家，它都会兴奋地跳起来，前爪搭在我肩膀上。"他说这句话的时候语气很平静，手却一直在轻轻发抖。"它站起来的时候，几乎和我一样高。"</p>
-                    <p>医生告诉他，可能只剩下几个月了。</p>
-                    <p>"现在我每天下班回家的第一件事，就是看它还在不在门口等我。"</p>
-                    <p>球球陪了他整整十四年。失业、离婚、父亲去世……那些他一个人熬不过去的夜晚，球球总是安静地趴在他的脚边，不吵、不闹，只是在那里。</p>
-                    <p>"我知道它总有一天会走。"他停了一下，喉咙明显哽住了。"但我做不到再养一只了。"</p>
-                    <p>他说，他只是希望——如果有一天，他还能再摸摸它的头，再听它"汪"一声，哪怕只是通过手机。</p>
-                    <p>"我只想让它知道，我有多爱它。"</p>
-                    <p>他没能把这句话说完。眼泪落下来，滴在了球球的照片上。</p>
+                    <p>{t('warmStories.stories.companion.p1')}</p>
+                    <p>{t('warmStories.stories.companion.p2')}</p>
+                    <p>{t('warmStories.stories.companion.p3')}</p>
+                    <p>{t('warmStories.stories.companion.p4')}</p>
+                    <p>{t('warmStories.stories.companion.p5')}</p>
+                    <p>{t('warmStories.stories.companion.p6')}</p>
+                    <p>{t('warmStories.stories.companion.p7')}</p>
+                    <p>{t('warmStories.stories.companion.p8')}</p>
+                    <p>{t('warmStories.stories.companion.p9')}</p>
+                    <p>{t('warmStories.stories.companion.p10')}</p>
                 </>
             ),
             meaning: (
                 <>
-                    <p>无论是狗摇动的尾巴，猫贴着你胸口的呼噜声，仓鼠啃食时细碎的声响，还是鹦鹉忽然学会的一句："我爱你。"</p>
                     <p>它们的生命那么短，却把一生的爱都给了我们。</p>
                     <p>我们不能让它们多活一天，但我们可以把那些被爱过的瞬间留下来——在数字世界里，继续陪伴你。</p>
                 </>

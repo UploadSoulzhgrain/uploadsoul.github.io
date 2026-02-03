@@ -38,18 +38,18 @@ const MVPChinaPage = () => {
 
     setStatus('connecting');
     try {
-      addDebug('正在获取访问令牌...');
+      addDebug(t('mvpChina.logs.getToken'));
       const response = await fetch('/api/heygen-token');
       const { token } = await response.json();
 
-      if (!token) throw new Error('未能获取令牌');
+      if (!token) throw new Error(t('mvpChina.logs.error'));
 
-      addDebug('正在初始化数字人引擎...');
+      addDebug(t('mvpChina.logs.initEngine'));
       avatarRef.current = new StreamingAvatar({ token });
 
       // 绑定流准备就绪事件
       avatarRef.current.on('stream_ready', (event) => {
-        addDebug('视频流已就绪');
+        addDebug(t('mvpChina.logs.streamReady'));
         if (videoRef.current) {
           videoRef.current.srcObject = event.detail;
           videoRef.current.oncanplay = () => {
@@ -60,7 +60,7 @@ const MVPChinaPage = () => {
       });
 
       avatarRef.current.on('stream_disconnected', () => {
-        addDebug('流连接已断开');
+        addDebug(t('mvpChina.logs.streamDisconnected'));
         setHasVideoTrack(false);
         setStatus('idle');
         avatarRef.current = null;
@@ -72,12 +72,12 @@ const MVPChinaPage = () => {
         quality: AvatarQuality.Low, // 快速演示建议用 Low
       });
 
-      addDebug('会话已建立');
+      addDebug(t('mvpChina.logs.sessionEstablished'));
       setStatus('ready');
-      addBotMessage("您好！我是 UploadSoul 的数字助手。我已准备好为您提供更自然的交互体验了。");
+      addBotMessage(t('mvpChina.chat.welcome'));
 
     } catch (error) {
-      addDebug(`初始化失败: ${error.message}`);
+      addDebug(`${t('mvpChina.status.error')}: ${error.message}`);
       console.error('HeyGen Error:', error);
       setStatus('error');
     }
@@ -100,7 +100,7 @@ const MVPChinaPage = () => {
     setIsTalking(true);
 
     try {
-      addDebug('正在思考回复...');
+      addDebug(t('mvpChina.logs.thinking'));
       // 1. 获取 GPT 回复 (复用现有的后端 API)
       const chatRes = await fetch('/api/chat', {
         method: 'POST',
@@ -116,7 +116,7 @@ const MVPChinaPage = () => {
 
         // 2. 让 HeyGen 数字人说话
         if (avatarRef.current) {
-          addDebug('正在生成语音及表情...');
+          addDebug(t('mvpChina.logs.thinking'));
           await avatarRef.current.speak({
             text: reply,
             task_type: TaskType.REPEAT
@@ -125,7 +125,7 @@ const MVPChinaPage = () => {
       }
     } catch (error) {
       console.error('Chat Error:', error);
-      addBotMessage(`抱歉，我现在出了一点小状况 (${error.message})`);
+      addBotMessage(`${t('mvpChina.chat.error')} (${error.message})`);
     } finally {
       setIsTalking(false);
     }
@@ -148,7 +148,7 @@ const MVPChinaPage = () => {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
               <span className={`w-2 h-2 rounded-full ${status === 'ready' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
               <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
-                {status === 'ready' ? '国内通道 · 实时连接中' : '等待初始化'}
+                {status === 'ready' ? t('mvpChina.status.ready') : t('mvpChina.status.idle')}
               </span>
             </div>
           </div>
@@ -169,14 +169,14 @@ const MVPChinaPage = () => {
                   onClick={initAvatar}
                   className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95 z-20"
                 >
-                  启动数字人助手
+                  {t('mvpChina.controls.start')}
                 </button>
               )}
 
               {status === 'connecting' && (
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-400 animate-pulse font-light tracking-widest text-sm">构建神经渲染通道...</p>
+                  <p className="text-gray-400 animate-pulse font-light tracking-widest text-sm">{t('mvpChina.controls.connecting')}</p>
                 </div>
               )}
 
@@ -205,7 +205,7 @@ const MVPChinaPage = () => {
                       : 'bg-amber-500 text-black animate-pulse shadow-amber-500/20'
                       }`}
                   >
-                    <span>{videoRef.current?.muted ? '取消静音' : '正在收听'}</span>
+                    <span>{videoRef.current?.muted ? t('mvpChina.controls.unmute') : t('mvpChina.controls.mute')}</span>
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       {videoRef.current?.muted ? (
                         <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
@@ -225,7 +225,7 @@ const MVPChinaPage = () => {
           <div className="p-6 border-b border-white/5">
             <h3 className="font-bold flex items-center gap-2 text-amber-500 uppercase tracking-widest text-sm">
               <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-              交互对话日志
+              {t('mvpChina.chat.title')}
             </h3>
           </div>
 
@@ -233,7 +233,7 @@ const MVPChinaPage = () => {
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-600 text-center px-4">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 opacity-20">💬</div>
-                <p className="text-xs tracking-wider">对话窗口已就绪</p>
+                <p className="text-xs tracking-wider">{t('mvpChina.chat.ready')}</p>
               </div>
             ) : (
               messages.map((msg, i) => (
@@ -258,7 +258,7 @@ const MVPChinaPage = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={status === 'ready' ? "输入消息..." : "请先开启连接..."}
+                placeholder={status === 'ready' ? t('mvpChina.chat.placeholder') : t('mvpChina.chat.waitConnect')}
                 disabled={status !== 'ready' || isTalking}
                 className="w-full bg-gray-900/50 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
               />
