@@ -60,8 +60,7 @@ i18n
       escapeValue: false // Not needed for React as it escapes by default
     },
     detection: {
-      order: ['path', 'localStorage', 'querystring', 'cookie', 'navigator'],
-      lookupFromPathIndex: 0,
+      order: ['localStorage', 'querystring', 'cookie', 'navigator'],
       lookupQuerystring: 'lang',
       lookupCookie: 'i18next',
       lookupLocalStorage: 'i18nextLng',
