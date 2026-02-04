@@ -157,7 +157,7 @@ const HomePage = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => handleAction('/our-stories')}
+              onClick={() => navigate(l('/our-stories'))}
               className="relative w-48 h-16 cursor-pointer group"
             >
               {/* 左卷轴轴头 - 深色紫檀木质感 */}
@@ -196,7 +196,7 @@ const HomePage = () => {
             <motion.div
               whileHover={{ scale: 1.05, rotate: 2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => handleAction('/founder-column')}
+              onClick={() => navigate(l('/founder-column'))}
               className="relative w-48 h-16 bg-[#D7CCC8] shadow-[0_4px_12px_rgba(0,0,0,0.4)] cursor-pointer overflow-hidden flex items-center justify-center group"
               style={{
                 clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
@@ -308,14 +308,14 @@ const HomePage = () => {
       <section className="py-12 px-4 border-t border-white/5">
         <div className="max-w-4xl mx-auto flex flex-wrap justify-center gap-3">
           {[
-            { to: '/shop', label: t('header.shop'), icon: '🛒' },
-            { to: '/vr', label: t('home.features.vrExperience.title'), icon: '🥽' },
-            { to: '/about', label: t('header.about'), icon: '📖' },
-            { to: '/register', label: t('home.cta.freeRegister'), icon: '✨' }
+            { to: '/shop', label: t('header.shop'), icon: '🛒', protected: true },
+            { to: '/vr', label: t('home.features.vrExperience.title'), icon: '🥽', protected: true },
+            { to: '/about', label: t('header.about'), icon: '📖', protected: false },
+            { to: '/register', label: t('home.cta.freeRegister'), icon: '✨', protected: true }
           ].map((item) => (
             <button
               key={item.to}
-              onClick={() => handleAction(item.to)}
+              onClick={() => item.protected ? handleAction(item.to) : navigate(l(item.to))}
               className="px-5 py-2.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all text-sm flex items-center gap-2 focus:outline-none"
             >
               <span>{item.icon}</span>
