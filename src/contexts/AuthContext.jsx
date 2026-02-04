@@ -38,6 +38,8 @@ export const AuthProvider = ({ children }) => {
             }
         }),
         signOut: () => supabase.auth.signOut(),
+        signInWithOtp: (data) => supabase.auth.signInWithOtp(data),
+        verifyOtp: (data) => supabase.auth.verifyOtp(data),
         user,
         session,
         loading

@@ -6,19 +6,72 @@ import Logo from '../components/common/Logo';
 
 const RegisterPage = () => {
   const { t } = useTranslation();
-  const { signUp, signInWithGoogle } = useAuth();
+  const { signUp, signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
   const navigate = useNavigate();
 
   const [method, setMethod] = useState('email'); // 'email' or 'phone'
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
+
+  // Phone Auth States
+  const [countryCode, setCountryCode] = useState('+86');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [message, setMessage] = useState(null);
+
+  // Country Options
+  const countryOptions = [
+    { code: '+86', label: '🇨🇳 中国 (+86)' },
+    { code: '+1', label: '🇺🇸 USA (+1)' },
+    { code: '+44', label: '🇬🇧 UK (+44)' },
+    { code: '+81', label: '🇯🇵 Japan (+81)' },
+    { code: '+82', label: '🇰🇷 Korea (+82)' },
+    { code: '+852', label: '🇭🇹 Hong Kong (+852)' },
+    { code: '+886', label: '🇹🇼 Taiwan (+886)' },
+  ];
+
+  const handleSendOtp = async () => {
+    if (!phone) {
+      setError('请输入手机号码');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const fullPhone = `${countryCode}${phone}`;
+      const { error } = await signInWithOtp({
+        phone: fullPhone,
+      });
+
+      if (error) throw error;
+
+      setOtpSent(true);
+      setMessage('验证码已发送，请查收');
+      setCountdown(60);
+      // Start countdown timer
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      console.error('OTP Send Error:', err);
+      setError(err.message || '发送验证码失败，请检查号码是否正确');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -27,11 +80,38 @@ const RegisterPage = () => {
     setMessage(null);
 
     if (method === 'phone') {
-      setError('手机注册功能暂未开放，请使用邮箱注册（免费且即时）');
-      setLoading(false);
+      if (!otpSent) {
+        // User hit generic submit instead of send code, or logic flow
+        // Treat as "Send OTP" if not sent yet
+        await handleSendOtp();
+        return;
+      }
+
+      // Verify OTP
+      try {
+        const fullPhone = `${countryCode}${phone}`;
+        const { data, error } = await verifyOtp({
+          phone: fullPhone,
+          token: code,
+          type: 'sms'
+        });
+
+        if (error) throw error;
+
+        // Success
+        if (data.session) {
+          navigate('/dashboard');
+        }
+      } catch (err) {
+        console.error('Verify Error:', err);
+        setError(err.message || '验证码错误或已过期');
+      } finally {
+        setLoading(false);
+      }
       return;
     }
 
+    // Email Register Flow
     try {
       const { data, error } = await signUp({
         email,
@@ -208,9 +288,16 @@ const RegisterPage = () => {
                     手机号码
                   </label>
                   <div className="mt-1 flex">
-                    <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-700 bg-gray-800 text-gray-400 sm:text-sm">
-                      +86
-                    </span>
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="appearance-none bg-gray-800 border border-gray-700 border-r-0 text-white rounded-l-xl px-3 py-3 pr-8 focus:outline-none focus:border-amber-500 cursor-pointer"
+                      style={{ minWidth: '100px' }}
+                    >
+                      {countryOptions.map(opt => (
+                        <option key={opt.code} value={opt.code}>{opt.code}</option>
+                      ))}
+                    </select>
                     <input
                       id="phone"
                       name="phone"
@@ -219,28 +306,38 @@ const RegisterPage = () => {
                       onChange={(e) => setPhone(e.target.value)}
                       className="flex-1 appearance-none block w-full px-3 py-3 border border-gray-700 rounded-r-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
                       placeholder="13800000000"
+                      disabled={otpSent}
                     />
                   </div>
                 </div>
-                <div>
-                  <label htmlFor="code" className="block text-sm font-medium text-gray-300">
-                    验证码
-                  </label>
-                  <div className="mt-1 flex gap-2">
-                    <input
-                      id="code"
-                      name="code"
-                      type="text"
-                      className="flex-1 appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-                    />
-                    <button
-                      type="button"
-                      className="px-4 py-2 border border-gray-700 rounded-xl text-sm font-medium text-amber-500 hover:bg-gray-800 focus:outline-none transition-colors"
-                    >
-                      获取验证码
-                    </button>
+                {otpSent && (
+                  <div key="otp-input-field">
+                    <label htmlFor="code" className="block text-sm font-medium text-gray-300">
+                      验证码
+                    </label>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        id="code"
+                        name="code"
+                        type="text"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        className="flex-1 appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                        placeholder="输入6位验证码"
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={loading || !phone}
+                    className="w-full py-3 border border-gray-700 rounded-xl text-sm font-medium text-amber-500 hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                  >
+                    {loading ? '发送中...' : '发送验证码'}
+                  </button>
+                )}
               </>
             )}
 
@@ -262,8 +359,18 @@ const RegisterPage = () => {
                 disabled={loading}
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white btn-premium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
-                {loading ? '处理中...' : (method === 'email' ? '立即注册' : '下一步')}
+                {loading ? '验证中...' : (method === 'email' ? '立即注册' : (otpSent ? '验证并注册' : '请先发送验证码'))}
               </button>
+              {otpSent && countdown > 0 && (
+                <div className="mt-2 text-center text-xs text-gray-500">
+                  {countdown}秒后可重试
+                </div>
+              )}
+              {otpSent && countdown === 0 && (
+                <div className="mt-2 text-center text-xs">
+                  <span onClick={handleSendOtp} className="text-amber-500 cursor-pointer hover:underline">重新发送</span>
+                </div>
+              )}
             </div>
           </form>
 

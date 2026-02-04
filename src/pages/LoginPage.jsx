@@ -6,20 +6,108 @@ import Logo from '../components/common/Logo';
 
 const LoginPage = () => {
   const { t } = useTranslation();
-  const { signIn, signInWithGoogle } = useAuth();
+  const { signIn, signInWithGoogle, signInWithOtp, verifyOtp } = useAuth();
   const navigate = useNavigate();
+
+  const [method, setMethod] = useState('email'); // 'email' or 'phone'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Phone Auth States
+  const [countryCode, setCountryCode] = useState('+86');
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [countdown, setCountdown] = useState(0);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState(null);
 
   const { state } = useLocation();
+
+  // Country Options
+  const countryOptions = [
+    { code: '+86', label: '🇨🇳 中国 (+86)' },
+    { code: '+1', label: '🇺🇸 USA (+1)' },
+    { code: '+44', label: '🇬🇧 UK (+44)' },
+    { code: '+81', label: '🇯🇵 Japan (+81)' },
+    { code: '+82', label: '🇰🇷 Korea (+82)' },
+    { code: '+852', label: '🇭🇹 Hong Kong (+852)' },
+    { code: '+886', label: '🇹🇼 Taiwan (+886)' },
+  ];
+
+  const handleSendOtp = async () => {
+    if (!phone) {
+      setError('请输入手机号码');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+
+    try {
+      const fullPhone = `${countryCode}${phone}`;
+      const { error } = await signInWithOtp({
+        phone: fullPhone,
+      });
+
+      if (error) throw error;
+
+      setOtpSent(true);
+      setMessage('验证码已发送，请查收');
+      setCountdown(60);
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } catch (err) {
+      console.error('OTP Send Error:', err);
+      setError(err.message || '发送验证码失败');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setMessage(null);
 
+    if (method === 'phone') {
+      if (!otpSent) {
+        await handleSendOtp();
+        return;
+      }
+
+      try {
+        const fullPhone = `${countryCode}${phone}`;
+        const { data, error } = await verifyOtp({
+          phone: fullPhone,
+          token: code,
+          type: 'sms'
+        });
+
+        if (error) throw error;
+
+        if (data.session) {
+          navigate(state?.from?.pathname || '/dashboard');
+        }
+      } catch (err) {
+        console.error('Verify Error:', err);
+        setError(err.message || '验证码错误或已过期');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Email Login
     try {
       const { error } = await signIn({ email, password });
       if (error) throw error;
@@ -95,51 +183,142 @@ const LoginPage = () => {
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-2 bg-[#1A1A24] text-gray-500">
-                或使用邮箱登录
+                或使用其他方式
               </span>
             </div>
           </div>
 
-          <form className="space-y-6" onSubmit={handleLogin}>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                邮箱地址
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-                />
-              </div>
-            </div>
+          {/* Method Toggle */}
+          <div className="flex rounded-lg bg-gray-900/50 p-1 mb-6 border border-gray-700">
+            <button
+              onClick={() => setMethod('email')}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${method === 'email'
+                ? 'bg-amber-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              邮箱登录
+            </button>
+            <button
+              onClick={() => setMethod('phone')}
+              className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${method === 'phone'
+                ? 'bg-amber-500 text-white shadow-lg'
+                : 'text-gray-400 hover:text-white'
+                }`}
+            >
+              手机登录
+            </button>
+          </div>
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                密码
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
-                />
-              </div>
-            </div>
+          <form className="space-y-6" onSubmit={handleLogin}>
+            {method === 'email' ? (
+              <>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                    邮箱地址
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                    密码
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Phone Login UI */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-300">
+                    手机号码
+                  </label>
+                  <div className="mt-1 flex">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="appearance-none bg-gray-800 border border-gray-700 border-r-0 text-white rounded-l-xl px-3 py-3 pr-8 focus:outline-none focus:border-amber-500 cursor-pointer"
+                      style={{ minWidth: '100px' }}
+                    >
+                      {countryOptions.map(opt => (
+                        <option key={opt.code} value={opt.code}>{opt.code}</option>
+                      ))}
+                    </select>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="flex-1 appearance-none block w-full px-3 py-3 border border-gray-700 rounded-r-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                      placeholder="13800000000"
+                      disabled={otpSent}
+                    />
+                  </div>
+                </div>
+                {otpSent && (
+                  <div key="otp-input-field">
+                    <label htmlFor="code" className="block text-sm font-medium text-gray-300">
+                      验证码
+                    </label>
+                    <div className="mt-1 flex gap-2">
+                      <input
+                        id="code"
+                        name="code"
+                        type="text"
+                        value={code}
+                        onChange={(e) => setCode(e.target.value)}
+                        className="flex-1 appearance-none block w-full px-3 py-3 border border-gray-700 rounded-xl bg-gray-900/50 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-colors"
+                        placeholder="输入6位验证码"
+                      />
+                    </div>
+                  </div>
+                )}
+                {!otpSent && (
+                  <button
+                    type="button"
+                    onClick={handleSendOtp}
+                    disabled={loading || !phone}
+                    className="w-full py-3 border border-gray-700 rounded-xl text-sm font-medium text-amber-500 hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                  >
+                    {loading ? '发送中...' : '发送验证码'}
+                  </button>
+                )}
+              </>
+            )}
 
             {error && (
               <div className="text-red-400 text-sm text-center bg-red-900/20 py-2 rounded-lg border border-red-900/50">
                 {error}
+              </div>
+            )}
+
+            {message && (
+              <div className="text-green-400 text-sm text-center bg-green-900/20 py-2 rounded-lg border border-green-900/50">
+                {message}
               </div>
             )}
 
@@ -157,8 +336,18 @@ const LoginPage = () => {
                 disabled={loading}
                 className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white btn-premium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? '处理中...' : '立即登录'}
+                {loading ? '处理中...' : (method === 'email' ? '立即登录' : (otpSent ? '验证并登录' : '请先发送验证码'))}
               </button>
+              {otpSent && countdown > 0 && (
+                <div className="mt-2 text-center text-xs text-gray-500">
+                  {countdown}秒后可重试
+                </div>
+              )}
+              {otpSent && countdown === 0 && (
+                <div className="mt-2 text-center text-xs">
+                  <span onClick={handleSendOtp} className="text-amber-500 cursor-pointer hover:underline">重新发送</span>
+                </div>
+              )}
             </div>
           </form>
 
