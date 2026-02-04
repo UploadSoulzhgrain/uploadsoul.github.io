@@ -1,13 +1,25 @@
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Logo from '../common/Logo';
 import WaveAnimation from '../animations/WaveAnimation';
 import { useLocalizedNavigate } from '../../hooks/useLocalizedNavigate';
+import { useAuth } from '../../contexts/AuthContext';
 
 const Footer = () => {
   const { t } = useTranslation();
   const { l } = useLocalizedNavigate();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProtectedNav = (path) => {
+    const localizedPath = l(path);
+    if (user) {
+      navigate(localizedPath);
+    } else {
+      navigate(l('/login'), { state: { from: { pathname: localizedPath } } });
+    }
+  };
 
   // Fade-in animation effect for footer content
   useEffect(() => {
@@ -59,29 +71,44 @@ const Footer = () => {
             <h4 className="text-white font-medium mb-4 border-b border-gray-700 pb-2">{t('footer.services.title')}</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to={l('/companion')} className="text-gray-300 hover:text-white transition-colors">
+                <button
+                  onClick={() => handleProtectedNav('/companion')}
+                  className="text-gray-300 hover:text-white transition-colors text-left"
+                >
                   {t('footer.services.holographicCompanion')}
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to={l('/digital-immortality')} className="text-gray-300 hover:text-white transition-colors">
+                <button
+                  onClick={() => handleProtectedNav('/digital-immortality')}
+                  className="text-gray-300 hover:text-white transition-colors text-left"
+                >
                   {t('footer.services.digitalImmortality')}
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to={l('/digital-rebirth')} className="text-gray-300 hover:text-white transition-colors">
+                <button
+                  onClick={() => handleProtectedNav('/digital-rebirth')}
+                  className="text-gray-300 hover:text-white transition-colors text-left"
+                >
                   {t('footer.services.digitalRebirth')}
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to={l('/vr')} className="text-gray-300 hover:text-white transition-colors">
+                <button
+                  onClick={() => handleProtectedNav('/vr')}
+                  className="text-gray-300 hover:text-white transition-colors text-left"
+                >
                   {t('footer.services.vrDevice')}
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to={l('/all-in-one')} className="text-gray-300 hover:text-white transition-colors">
+                <button
+                  onClick={() => handleProtectedNav('/all-in-one')}
+                  className="text-gray-300 hover:text-white transition-colors text-left"
+                >
                   {t('footer.services.aiAllInOne')}
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
