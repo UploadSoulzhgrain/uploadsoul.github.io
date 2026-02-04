@@ -13,6 +13,10 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { navigate, l } = useLocalizedNavigate();
 
+  const handleLanguageChange = () => {
+    setIsMenuOpen(false);
+  };
+
   const handleNav = (path) => {
     const localizedPath = l(path);
     if (user || path === '/') {
