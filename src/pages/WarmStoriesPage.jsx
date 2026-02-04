@@ -4,10 +4,12 @@ import { supabase } from '../lib/supabaseClient';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
+import { useSearchParams } from 'react-router-dom';
 import './WarmStoriesPage.css';
 
 const WarmStoriesPage = () => {
     const { t } = useTranslation();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [activeStory, setActiveStory] = useState(null);
     const [storyInput, setStoryInput] = useState('');
     const [showSuccess, setShowSuccess] = useState(false);
@@ -143,6 +145,25 @@ const WarmStoriesPage = () => {
     const [hoveredStory, setHoveredStory] = useState(null);
     // 新增：用于存储所有气泡和星星的视觉属性
     const [visualParticles, setVisualParticles] = useState([]);
+
+    // 监听 URL 参数变化，自动打开对应故事
+    useEffect(() => {
+        const storyId = searchParams.get('story');
+        if (storyId && stories[storyId]) {
+            setActiveStory(stories[storyId]);
+        } else {
+            setActiveStory(null);
+        }
+    }, [searchParams]);
+
+    // 更新 setActiveStory 逻辑，同时更新 URL
+    const updateActiveStory = (story) => {
+        if (story) {
+            setSearchParams({ story: story.id });
+        } else {
+            setSearchParams({});
+        }
+    };
 
     // 【新增修复】初始化时，同时从数据库和本地加载星星
     useEffect(() => {
@@ -294,7 +315,7 @@ const WarmStoriesPage = () => {
                             <div
                                 key={story.id}
                                 className={`bookmark-wrapper ${story.id}`}
-                                onClick={() => setActiveStory(story)}
+                                onClick={() => updateActiveStory(story)}
                             >
                                 <div className="bookmark-thread"></div>
 
@@ -424,8 +445,8 @@ const WarmStoriesPage = () => {
 
             {/* Story Detail Modal */}
             {activeStory && (
-                <div className="story-modal active" onClick={() => setActiveStory(null)}>
-                    <div className="story-close" onClick={() => setActiveStory(null)}>
+                <div className="story-modal active" onClick={() => updateActiveStory(null)}>
+                    <div className="story-close" onClick={() => updateActiveStory(null)}>
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                             <path d="M18 6L6 18M6 6l12 12" />
                         </svg>
