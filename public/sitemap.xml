@@ -5,7 +5,7 @@
   <!-- Home -->
   <url>
     <loc>https://uploadsoul.com/</loc>
-    <lastmod>2024-02-03</lastmod>
+    <lastmod>2026-02-03</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://uploadsoul.com/"/>
@@ -14,49 +14,47 @@
     <xhtml:link rel="alternate" hreflang="ja" href="https://uploadsoul.com/ja"/>
   </url>
 
+  <!-- Warm Stories (Individual Stories for Enhanced SEO) -->
+  <url><loc>https://uploadsoul.com/our-stories?story=healing</loc><lastmod>2026-02-03</lastmod><priority>0.85</priority></url>
+  <url><loc>https://uploadsoul.com/our-stories?story=fulfillment</loc><lastmod>2026-02-03</lastmod><priority>0.85</priority></url>
+  <url><loc>https://uploadsoul.com/our-stories?story=legacy</loc><lastmod>2026-02-03</lastmod><priority>0.85</priority></url>
+  <url><loc>https://uploadsoul.com/our-stories?story=reunion</loc><lastmod>2026-02-03</lastmod><priority>0.85</priority></url>
+  <url><loc>https://uploadsoul.com/our-stories?story=companion</loc><lastmod>2026-02-03</lastmod><priority>0.85</priority></url>
+
   <!-- Main Pages -->
-  <url><loc>https://uploadsoul.com/about</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  <url><loc>https://uploadsoul.com/team</loc><lastmod>2024-02-03</lastmod><priority>0.6</priority></url>
-  <url><loc>https://uploadsoul.com/contact</loc><lastmod>2024-02-03</lastmod><priority>0.6</priority></url>
-  <url><loc>https://uploadsoul.com/join</loc><lastmod>2024-02-03</lastmod><priority>0.6</priority></url>
+  <url><loc>https://uploadsoul.com/about</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/team</loc><lastmod>2026-02-03</lastmod><priority>0.6</priority></url>
+  <url><loc>https://uploadsoul.com/contact</loc><lastmod>2026-02-03</lastmod><priority>0.6</priority></url>
+  <url><loc>https://uploadsoul.com/join</loc><lastmod>2026-02-03</lastmod><priority>0.6</priority></url>
 
   <!-- Core Services -->
-  <url>
-    <loc>https://uploadsoul.com/digital-immortality</loc>
-    <lastmod>2024-02-03</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url><loc>https://uploadsoul.com/digital-immortality/create</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  
-  <url><loc>https://uploadsoul.com/companion</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  <url><loc>https://uploadsoul.com/pet</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  <url><loc>https://uploadsoul.com/virtual-love</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  
-  <url><loc>https://uploadsoul.com/digital-rebirth</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  <url><loc>https://uploadsoul.com/digital-rebirth/reunion-space</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  <url><loc>https://uploadsoul.com/digital-rebirth/family-tree</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  
-  <url><loc>https://uploadsoul.com/vr</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  <url><loc>https://uploadsoul.com/all-in-one</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  <url><loc>https://uploadsoul.com/digital-world</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  <url><loc>https://uploadsoul.com/shop</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/digital-immortality</loc><lastmod>2026-02-03</lastmod><priority>0.9</priority></url>
+  <url><loc>https://uploadsoul.com/digital-immortality/create</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/companion</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/pet</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/virtual-love</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/digital-rebirth</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/digital-rebirth/reunion-space</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/digital-rebirth/family-tree</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/vr</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/all-in-one</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/digital-world</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/shop</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
 
   <!-- Experience & MVP -->
-  <url><loc>https://uploadsoul.com/start-experience</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  <url><loc>https://uploadsoul.com/digital-human-experience</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  <url><loc>https://uploadsoul.com/mvp-china</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
-  <url><loc>https://uploadsoul.com/mvp-test</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/start-experience</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/digital-human-experience</loc><lastmod>2026-02-03</lastmod><priority>0.8</priority></url>
+  <url><loc>https://uploadsoul.com/mvp-china</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/mvp-test</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
 
   <!-- Content -->
-  <url><loc>https://uploadsoul.com/our-stories</loc><lastmod>2024-02-03</lastmod><priority>0.8</priority></url>
-  <url><loc>https://uploadsoul.com/founder-column</loc><lastmod>2024-02-03</lastmod><priority>0.7</priority></url>
+  <url><loc>https://uploadsoul.com/our-stories</loc><lastmod>2026-02-03</lastmod><priority>0.9</priority></url>
+  <url><loc>https://uploadsoul.com/founder-column</loc><lastmod>2026-02-03</lastmod><priority>0.7</priority></url>
 
   <!-- User & Legal -->
-  <url><loc>https://uploadsoul.com/login</loc><lastmod>2024-02-03</lastmod><priority>0.4</priority></url>
-  <url><loc>https://uploadsoul.com/register</loc><lastmod>2024-02-03</lastmod><priority>0.4</priority></url>
-  <url><loc>https://uploadsoul.com/dashboard</loc><lastmod>2024-02-03</lastmod><priority>0.5</priority></url>
-  <url><loc>https://uploadsoul.com/privacy</loc><lastmod>2024-02-03</lastmod><priority>0.3</priority></url>
-  <url><loc>https://uploadsoul.com/terms</loc><lastmod>2024-02-03</lastmod><priority>0.3</priority></url>
-  <url><loc>https://uploadsoul.com/sitemap</loc><lastmod>2024-02-03</lastmod><priority>0.3</priority></url>
+  <url><loc>https://uploadsoul.com/login</loc><lastmod>2026-02-03</lastmod><priority>0.5</priority></url>
+  <url><loc>https://uploadsoul.com/register</loc><lastmod>2026-02-03</lastmod><priority>0.5</priority></url>
+  <url><loc>https://uploadsoul.com/dashboard</loc><lastmod>2026-02-03</lastmod><priority>0.6</priority></url>
+  <url><loc>https://uploadsoul.com/privacy</loc><lastmod>2026-02-03</lastmod><priority>0.3</priority></url>
+  <url><loc>https://uploadsoul.com/terms</loc><lastmod>2026-02-03</lastmod><priority>0.3</priority></url>
 </urlset>
