@@ -126,7 +126,7 @@ const HomePage = () => {
           {/* CTA - 只保留关键出口 */}
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <div
-              onClick={() => navigate(l('/mvp-china'))}
+              onClick={() => handleAction('/mvp-china')}
               className="btn-premium inline-flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10"
             >
               <span className="relative flex h-2 w-2 mr-1">
@@ -157,7 +157,7 @@ const HomePage = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate(l('/our-stories'))}
+              onClick={() => handleAction('/our-stories')}
               className="relative w-48 h-16 cursor-pointer group"
             >
               {/* 左卷轴轴头 - 深色紫檀木质感 */}
@@ -196,7 +196,7 @@ const HomePage = () => {
             <motion.div
               whileHover={{ scale: 1.05, rotate: 2 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate(l('/founder-column'))}
+              onClick={() => handleAction('/founder-column')}
               className="relative w-48 h-16 bg-[#D7CCC8] shadow-[0_4px_12px_rgba(0,0,0,0.4)] cursor-pointer overflow-hidden flex items-center justify-center group"
               style={{
                 clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
@@ -313,14 +313,14 @@ const HomePage = () => {
             { to: '/about', label: t('header.about'), icon: '📖' },
             { to: '/register', label: t('home.cta.freeRegister'), icon: '✨' }
           ].map((item) => (
-            <Link
+            <button
               key={item.to}
-              to={l(item.to)}
-              className="px-5 py-2.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all text-sm flex items-center gap-2"
+              onClick={() => handleAction(item.to)}
+              className="px-5 py-2.5 rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/30 hover:bg-white/5 transition-all text-sm flex items-center gap-2 focus:outline-none"
             >
               <span>{item.icon}</span>
               <span>{item.label}</span>
-            </Link>
+            </button>
           ))}
         </div>
       </section>

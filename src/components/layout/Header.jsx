@@ -13,7 +13,14 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { navigate, l } = useLocalizedNavigate();
 
-  const handleLanguageChange = () => {
+  const handleNav = (path) => {
+    const localizedPath = l(path);
+    if (user || path === '/') {
+      navigate(path);
+    } else {
+      // 保存来源路径，以便登录后跳转回来
+      navigate('/login', { state: { from: { pathname: localizedPath } } });
+    }
     setIsMenuOpen(false);
   };
 
@@ -51,13 +58,13 @@ const Header = () => {
               { to: '/digital-immortality', label: t('digitalImmortality.title') },
               { to: '/digital-rebirth', label: t('digitalRebirth.title') }
             ].map((link) => (
-              <Link
+              <button
                 key={link.to}
-                to={l(link.to)}
-                className="text-gray-400 hover:text-white text-sm font-medium transition-colors"
+                onClick={() => handleNav(link.to)}
+                className="text-gray-400 hover:text-white text-sm font-medium transition-colors focus:outline-none"
               >
                 {link.label}
-              </Link>
+              </button>
             ))}
           </nav>
 
@@ -136,14 +143,13 @@ const Header = () => {
                 { to: '/digital-immortality', label: t('digitalImmortality.title') },
                 { to: '/digital-rebirth', label: t('digitalRebirth.title') }
               ].map((link) => (
-                <Link
+                <button
                   key={link.to}
-                  to={l(link.to)}
-                  className="text-gray-400 hover:text-white text-lg font-medium transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => handleNav(link.to)}
+                  className="text-gray-400 hover:text-white text-lg font-medium transition-colors text-left"
                 >
                   {link.label}
-                </Link>
+                </button>
               ))}
               <div className="h-px bg-white/5"></div>
               <div className="flex flex-col space-y-4">
