@@ -261,7 +261,14 @@ const MVPTestPage = () => {
 
       addDebug('会话已开启');
       setStatus('ready');
-      addBotMessage("您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。");
+
+      const welcome = "您好！我是 UploadSoul 的数字助手。我已经准备好为您提供陪伴了。";
+      addBotMessage(welcome);
+
+      // 启动后自动朗读欢迎词 (Azure Avatar uses speakTextAsync)
+      if (synthesizerRef.current) {
+        synthesizerRef.current.speakTextAsync(welcome).catch(err => console.error('[Avatar] Welcome speech failed:', err));
+      }
     } catch (error) {
       addDebug(`初始化失败: ${error.message}`);
       console.error('Detailed Error:', error);
@@ -434,41 +441,56 @@ const MVPTestPage = () => {
               )}
 
               {status === 'ready' && (
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
-                  <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono w-64">
-                    <div className="text-gray-400 flex justify-between">
-                      <span># DIAGNOSTICS</span>
-                      <span className="text-[8px] opacity-50">{webrtcState}</span>
-                    </div>
-                    <div className="flex flex-col gap-1 overflow-hidden">
-                      <div className="flex gap-3">
-                        <span>ICE: <b className={(iceState === 'connected' || iceState === 'completed') ? 'text-green-400' : 'text-amber-400'}>{iceState}</b></span>
-                        <span>V: <b className={hasVideoTrack ? 'text-green-400' : 'text-red-400'}>{hasVideoTrack ? 'OK' : 'NO'}</b></span>
-                        <span>A: <b className={hasAudioTrack ? 'text-green-400' : 'text-red-400'}>{hasAudioTrack ? 'OK' : 'NO'}</b></span>
+                <>
+                  <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
+                    <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono w-64">
+                      <div className="text-gray-400 flex justify-between">
+                        <span># DIAGNOSTICS</span>
+                        <span className="text-[8px] opacity-50">{webrtcState}</span>
                       </div>
-                      <div className="text-gray-500 text-[9px] truncate">
-                        {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting...'}
+                      <div className="flex flex-col gap-1 overflow-hidden">
+                        <div className="flex gap-3">
+                          <span>ICE: <b className={(iceState === 'connected' || iceState === 'completed') ? 'text-green-400' : 'text-amber-400'}>{iceState}</b></span>
+                          <span>V: <b className={hasVideoTrack ? 'text-green-400' : 'text-red-400'}>{hasVideoTrack ? 'OK' : 'NO'}</b></span>
+                          <span>A: <b className={hasAudioTrack ? 'text-green-400' : 'text-red-400'}>{hasAudioTrack ? 'OK' : 'NO'}</b></span>
+                        </div>
+                        <div className="text-gray-500 text-[9px] truncate">
+                          {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting...'}
+                        </div>
                       </div>
                     </div>
+
+                    <button
+                      onClick={toggleMute}
+                      className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
+                        ? 'bg-gray-700 text-white'
+                        : 'bg-amber-500 text-black shadow-amber-500/20'
+                        }`}
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        {videoRef.current?.muted ? (
+                          <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
+                        ) : (
+                          <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        )}
+                      </svg>
+                      <span>{videoRef.current?.muted ? '取消静音' : '静音声音'}</span>
+                    </button>
                   </div>
 
-                  <button
-                    onClick={toggleMute}
-                    className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
-                      ? 'bg-gray-700 text-white'
-                      : 'bg-amber-500 text-black'
-                      }`}
-                  >
-                    <span>{videoRef.current?.muted ? '取消静音' : '正在收听'}</span>
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      {videoRef.current?.muted ? (
-                        <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
-                      ) : (
-                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                      )}
-                    </svg>
-                  </button>
-                </div>
+                  {/* 对话启动按钮 */}
+                  {!isListening && !isTalking && (
+                    <button
+                      onClick={toggleVoiceInput}
+                      className="absolute inset-x-0 mx-auto w-fit bottom-32 bg-amber-500/90 hover:bg-amber-400 text-black px-8 py-3 rounded-full font-bold shadow-2xl transition-all active:scale-95 flex items-center gap-3 animate-bounce z-30"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                      </svg>
+                      点击开始说话
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
