@@ -10,10 +10,14 @@ const MVPChinaPage = () => {
   const [isTalking, setIsTalking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [continuousMode, setContinuousMode] = useState(true); // 连续对话模式
 
   const videoRef = useRef(null);
   const avatarRef = useRef(null);
   const chatEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const sendMessageRef = useRef(null);
+  const isTalkingRef = useRef(false); // 存储最新的 isTalking 状态
   const [debugLog, setDebugLog] = useState([]);
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
 
@@ -37,8 +41,12 @@ const MVPChinaPage = () => {
 
       recognitionInstance.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        setInputValue(transcript);
-        setIsListening(false);
+        console.log('[Voice] Recognized:', transcript);
+
+        // 直接调用 ref 中的发送函数，避免闭包问题
+        if (transcript.trim() && sendMessageRef.current) {
+          sendMessageRef.current(transcript.trim());
+        }
       };
 
       recognitionInstance.onerror = (event) => {
@@ -51,9 +59,15 @@ const MVPChinaPage = () => {
         setIsListening(false);
       };
 
+      recognitionRef.current = recognitionInstance;
       setRecognition(recognitionInstance);
     }
   }, []);
+
+  // 同步 isTalking 状态到 ref
+  useEffect(() => {
+    isTalkingRef.current = isTalking;
+  }, [isTalking]);
 
   // 清理函数
   useEffect(() => {
@@ -125,17 +139,21 @@ const MVPChinaPage = () => {
     setMessages(prev => [...prev, { role: 'user', text }]);
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || status !== 'ready' || isTalking) return;
+  const handleSendMessage = async (messageText) => {
+    if (!messageText || status !== 'ready' || isTalking) {
+      console.log('[Send] Blocked:', { messageText, status, isTalking });
+      return;
+    }
 
-    const text = inputValue;
+    const text = messageText;
     setInputValue('');
     addUserMessage(text);
     setIsTalking(true);
+    setIsListening(false); // 确保停止监听
 
     try {
       addDebug(t('mvpChina.logs.thinking'));
-      // 1. 获取 GPT 回复 (复用现有的后端 API)
+      // 1. 获取 GPT 回复
       const chatRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -162,8 +180,29 @@ const MVPChinaPage = () => {
       addBotMessage(`${t('mvpChina.chat.error')} (${error.message})`);
     } finally {
       setIsTalking(false);
+
+      // 连续对话模式：数字人回复完毕后自动重新开启麦克风
+      if (continuousMode && recognitionRef.current && status === 'ready') {
+        setTimeout(() => {
+          // 使用 ref 访问最新状态，避免闭包问题
+          if (!isTalkingRef.current) {
+            try {
+              recognitionRef.current.start();
+              setIsListening(true);
+              addDebug('连续对话：自动重新开启麦克风');
+            } catch (e) {
+              console.error('Failed to restart mic:', e);
+            }
+          }
+        }, 1000); // 等待 1 秒再开启，确保数字人说完
+      }
     }
   };
+
+  // 更新 ref，确保语音识别回调能访问最新的函数
+  useEffect(() => {
+    sendMessageRef.current = handleSendMessage;
+  }, [status, isTalking, continuousMode]);
 
   const toggleMute = () => {
     if (videoRef.current) {
@@ -183,9 +222,14 @@ const MVPChinaPage = () => {
       setIsListening(false);
     } else {
       setInputValue('');
-      recognition.start();
-      setIsListening(true);
-      addDebug('正在监听您的语音...');
+      try {
+        recognition.start();
+        setIsListening(true);
+        addDebug('正在监听您的语音...');
+      } catch (error) {
+        console.error('Failed to start recognition:', error);
+        setIsListening(false);
+      }
     }
   };
 
@@ -308,7 +352,7 @@ const MVPChinaPage = () => {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onKeyPress={(e) => e.key === 'Enter' && !isTalking && handleSendMessage(inputValue.trim())}
                 placeholder={status === 'ready' ? (isListening ? '正在监听...' : t('mvpChina.chat.placeholder')) : t('mvpChina.chat.waitConnect')}
                 disabled={status !== 'ready' || isTalking}
                 className="w-full bg-gray-900/50 border border-white/10 rounded-2xl px-5 py-4 pr-24 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
@@ -318,8 +362,8 @@ const MVPChinaPage = () => {
                   onClick={toggleVoiceInput}
                   disabled={status !== 'ready' || isTalking}
                   className={`p-2 rounded-full transition-all ${isListening
-                      ? 'bg-red-500 text-white animate-pulse'
-                      : 'text-gray-400 hover:text-amber-400'
+                    ? 'bg-red-500 text-white animate-pulse'
+                    : 'text-gray-400 hover:text-amber-400'
                     } disabled:text-gray-600 disabled:cursor-not-allowed`}
                   title={isListening ? '停止录音' : '语音输入'}
                 >
@@ -328,7 +372,7 @@ const MVPChinaPage = () => {
                   </svg>
                 </button>
                 <button
-                  onClick={handleSend}
+                  onClick={() => handleSendMessage(inputValue.trim())}
                   disabled={status !== 'ready' || isTalking || !inputValue.trim()}
                   className="p-2 text-amber-500 hover:text-amber-400 disabled:text-gray-600 transition-colors"
                 >

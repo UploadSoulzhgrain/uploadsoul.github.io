@@ -12,10 +12,14 @@ const MVPTestPage = () => {
   const [isTalking, setIsTalking] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
+  const [continuousMode, setContinuousMode] = useState(true);
 
   const videoRef = useRef(null);
   const synthesizerRef = useRef(null);
   const chatEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const sendMessageRef = useRef(null);
+  const isTalkingRef = useRef(false);
   const [debugLog, setDebugLog] = useState([]);
   const [webrtcState, setWebrtcState] = useState('new');
   const [iceState, setIceState] = useState('new');
@@ -44,8 +48,11 @@ const MVPTestPage = () => {
 
       recognitionInstance.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
-        setInputValue(transcript);
-        setIsListening(false);
+        console.log('[Voice] Recognized:', transcript);
+
+        if (transcript.trim() && sendMessageRef.current) {
+          sendMessageRef.current(transcript.trim());
+        }
       };
 
       recognitionInstance.onerror = (event) => {
@@ -58,6 +65,7 @@ const MVPTestPage = () => {
         setIsListening(false);
       };
 
+      recognitionRef.current = recognitionInstance;
       setRecognition(recognitionInstance);
     }
 
@@ -67,6 +75,11 @@ const MVPTestPage = () => {
       }
     };
   }, []);
+
+  // 同步 isTalking 状态到 ref
+  useEffect(() => {
+    isTalkingRef.current = isTalking;
+  }, [isTalking]);
 
   const initAvatar = async () => {
     if (synthesizerRef.current) return;
@@ -260,9 +273,14 @@ const MVPTestPage = () => {
       setIsListening(false);
     } else {
       setInputValue('');
-      recognition.start();
-      setIsListening(true);
-      addDebug('正在监听您的语音...');
+      try {
+        recognition.start();
+        setIsListening(true);
+        addDebug('正在监听您的语音...');
+      } catch (error) {
+        console.error('Failed to start recognition:', error);
+        setIsListening(false);
+      }
     }
   };
 
@@ -274,13 +292,17 @@ const MVPTestPage = () => {
     setMessages(prev => [...prev, { role: 'user', text }]);
   };
 
-  const handleSend = async () => {
-    if (!inputValue.trim() || status !== 'ready') return;
+  const handleSendMessage = async (messageText) => {
+    if (!messageText || status !== 'ready' || isTalking) {
+      console.log('[Send] Blocked:', { messageText, status, isTalking });
+      return;
+    }
 
-    const text = inputValue;
+    const text = messageText;
     setInputValue('');
     addUserMessage(text);
     setIsTalking(true);
+    setIsListening(false);
 
     try {
       const chatRes = await fetch('/api/chat', {
@@ -303,8 +325,26 @@ const MVPTestPage = () => {
       addBotMessage(`抱歉，我现在出了一点小状况 (${error.message})`);
     } finally {
       setIsTalking(false);
+
+      if (continuousMode && recognitionRef.current && status === 'ready') {
+        setTimeout(() => {
+          if (!isTalkingRef.current) {
+            try {
+              recognitionRef.current.start();
+              setIsListening(true);
+              addDebug('连续对话：自动重新开启麦克风');
+            } catch (e) {
+              console.error('Failed to restart mic:', e);
+            }
+          }
+        }, 1000);
+      }
     }
   };
+
+  useEffect(() => {
+    sendMessageRef.current = handleSendMessage;
+  }, [status, isTalking, continuousMode]);
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col pt-20">
@@ -427,7 +467,7 @@ const MVPTestPage = () => {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                onKeyPress={(e) => e.key === 'Enter' && !isTalking && handleSendMessage(inputValue.trim())}
                 placeholder={status === 'ready' ? (isListening ? '正在监听...' : "发送消息...") : "请先开启连接..."}
                 disabled={status !== 'ready' || isTalking}
                 className="w-full bg-gray-900 border border-white/10 rounded-2xl px-5 py-4 pr-24 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
@@ -437,8 +477,8 @@ const MVPTestPage = () => {
                   onClick={toggleVoiceInput}
                   disabled={status !== 'ready' || isTalking}
                   className={`p-2 rounded-full transition-all ${isListening
-                      ? 'bg-red-500 text-white animate-pulse'
-                      : 'text-gray-400 hover:text-amber-400'
+                    ? 'bg-red-500 text-white animate-pulse'
+                    : 'text-gray-400 hover:text-amber-400'
                     } disabled:text-gray-600 disabled:cursor-not-allowed`}
                   title={isListening ? '停止录音' : '语音输入'}
                 >
@@ -447,7 +487,7 @@ const MVPTestPage = () => {
                   </svg>
                 </button>
                 <button
-                  onClick={handleSend}
+                  onClick={() => handleSendMessage(inputValue.trim())}
                   disabled={status !== 'ready' || isTalking || !inputValue.trim()}
                   className="p-2 text-amber-500 hover:text-amber-400 disabled:text-gray-600 transition-colors"
                 >
