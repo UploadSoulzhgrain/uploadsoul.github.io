@@ -55,7 +55,7 @@ const Header = () => {
           <nav className="hidden lg:flex space-x-8">
             {[
               { to: '/', label: t('header.home') },
-              { to: '/companion', label: t('header.companions') },
+              { to: '/companion', label: t('header.companion') },
 
               { to: '/pet', label: t('home.features.virtualPet.title') },
               { to: '/virtual-love', label: t('header.virtualLove') },
