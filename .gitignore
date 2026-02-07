@@ -80,3 +80,8 @@ backend/**/.idea
 
 # Local backend directory
 backend_local/
+
+# Lint output files
+lint_output.txt
+full_lint_output.txt
+*_lint_output.txt
