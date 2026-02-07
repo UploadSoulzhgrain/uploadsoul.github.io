@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { AzureOpenAI } from "openai";
 import dotenv from 'dotenv';
 dotenv.config();
