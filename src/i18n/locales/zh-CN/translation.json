@@ -6,19 +6,16 @@
   "header": {
     "home": "首页",
     "explore": "探索",
-    "companions": "情感陪伴",
+    "companion": "情感陪伴",
     "virtualLove": "虚拟恋爱",
-    "digitalLife": "数字永生",
+    "digitalImmortality": "数字永生",
+    "pet": "虚拟宠物",
+    "digitalRebirth": "数字重生",
     "about": "关于",
     "login": "登录",
     "signup": "注册",
     "language": "语言",
     "shop": "虚拟商城",
-    "digitalImmortality": "数字永生",
-    "virtualLove": "虚拟恋爱",
-    "companion": "情感陪伴",
-    "pet": "虚拟宠物",
-    "digitalRebirth": "数字重生",
     "familyTree": "家谱",
     "reunionSpace": "重逢空间",
     "digitalWorld": "数字世界",
@@ -49,8 +46,6 @@
     "aboutUs": "关于我们",
     "privacyPolicy": "隐私政策",
     "termsOfService": "服务条款",
-    "privacy": "隐私政策",
-    "terms": "服务条款",
     "sitemap": "网站地图",
     "contactUs": "联系我们",
     "copyright": "版权所有。",
@@ -1281,8 +1276,8 @@
     "controls": {
       "start": "启动数字人助手",
       "connecting": "构建神经渲染通道...",
-      "mute": "正在收听",
-      "unmute": "取消静音"
+      "mute": "开启声音",
+      "unmute": "静音声音"
     }
   }
 }
