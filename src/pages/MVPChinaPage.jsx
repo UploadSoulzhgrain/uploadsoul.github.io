@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import StreamingAvatar, { AvatarQuality, TaskType } from "@heygen/streaming-avatar";
 
 const MVPChinaPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [status, setStatus] = useState('idle'); // idle, connecting, ready, error
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -26,6 +26,60 @@ const MVPChinaPage = () => {
     setDebugLog(prev => [...prev.slice(-4), msg]);
   };
 
+  // 根据语言选择 Voice ID
+  // 根据语言选择 Voice ID
+  const getVoiceId = () => {
+    const lang = i18n.language;
+    console.log('[Voice Config] Current i18n language:', lang);
+    if (lang.startsWith('zh')) {
+      console.log('[Voice Config] Selected: Mandarin Chinese voice');
+      // 中文 - 标准普通话女声
+      return '867e42cd03df44929a6744e8fa663884';
+    } else {
+      console.log('[Voice Config] Selected: English voice');
+      // 英文 - 使用默认英语女声
+      return '1bd001e7e50f421d891986aad5158bc8'; // HeyGen 英语女声
+    }
+  };
+
+  // 启动语音识别的辅助函数，带错误恢复
+  const startVoiceRecognition = useCallback(() => {
+    if (!recognitionRef.current || isTalkingRef.current) {
+      console.log('[Voice] Cannot start - no recognition or is talking');
+      return;
+    }
+
+    try {
+      // 动态同步识别语言
+      const currentLang = i18n.language.startsWith('zh') ? 'zh-CN' : 'en-US';
+      if (recognitionRef.current.lang !== currentLang) {
+        console.log(`[Voice] Updating recognition language to: ${currentLang}`);
+        recognitionRef.current.lang = currentLang;
+      }
+
+      console.log('[Voice] Starting recognition...');
+      recognitionRef.current.start();
+      setIsListening(true);
+      console.log('[Voice] ✅ Recognition started successfully');
+    } catch (error) {
+      console.error('[Voice] ❌ Start recognition error:', error);
+
+      // 如果是"already started"错误，先停止再重启
+      if (error.message && error.message.includes('already started')) {
+        console.log('[Voice] Already started detected, stopping and restarting...');
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          console.error('[Voice] Error stopping:', e);
+        }
+        setTimeout(() => startVoiceRecognition(), 300);
+      } else {
+        console.log(`[Voice] Failed to start: ${error.message || error}`);
+        setIsListening(false);
+      }
+    }
+  }, [i18n.language]);
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -37,7 +91,8 @@ const MVPChinaPage = () => {
       const recognitionInstance = new SpeechRecognition();
       recognitionInstance.continuous = false;
       recognitionInstance.interimResults = false;
-      recognitionInstance.lang = 'zh-CN';
+      // 初始语言设置，后续在 startVoiceRecognition 中动态同步
+      recognitionInstance.lang = i18n.language.startsWith('zh') ? 'zh-CN' : 'en-US';
 
       recognitionInstance.onresult = (event) => {
         const transcript = event.results[0][0].transcript;
@@ -52,17 +107,23 @@ const MVPChinaPage = () => {
       recognitionInstance.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
         setIsListening(false);
-        addDebug(`语音识别错误: ${event.error}`);
+        addDebug(`${t('mvpChina.chat.error')}: ${event.error}`);
       };
 
       recognitionInstance.onend = () => {
+        console.log('[Voice] Recognition ended');
         setIsListening(false);
+      };
+
+      recognitionInstance.onnomatch = () => {
+        console.log('[Voice] No match - please speak clearly');
+        addDebug('未能识别，请再说一遍');
       };
 
       recognitionRef.current = recognitionInstance;
       setRecognition(recognitionInstance);
     }
-  }, []);
+  }, [t, i18n.language]);
 
   // 同步 isTalking 状态到 ref
   useEffect(() => {
@@ -75,11 +136,11 @@ const MVPChinaPage = () => {
       if (avatarRef.current) {
         avatarRef.current.stopAvatar();
       }
-      if (recognition) {
-        recognition.stop();
+      if (recognitionRef.current) { // 修正为正确的 ref 名称
+        recognitionRef.current.stop();
       }
     };
-  }, [recognition]);
+  }, []);
 
   const initAvatar = async () => {
     if (avatarRef.current) return;
@@ -88,7 +149,8 @@ const MVPChinaPage = () => {
     try {
       addDebug(t('mvpChina.logs.getToken'));
       const response = await fetch('/api/heygen-token');
-      const { token } = await response.json();
+      const data = await response.json();
+      const { token } = data;
 
       if (!token) throw new Error(t('mvpChina.logs.error'));
 
@@ -101,7 +163,7 @@ const MVPChinaPage = () => {
         if (videoRef.current) {
           videoRef.current.srcObject = event.detail;
           videoRef.current.oncanplay = () => {
-            videoRef.current.play().catch(console.error);
+            videoRef.current.play().catch(err => console.error('[Avatar] Play error:', err));
             setHasVideoTrack(true);
           };
         }
@@ -115,9 +177,15 @@ const MVPChinaPage = () => {
       });
 
       // 启动正式会话
+      const selectedVoiceId = getVoiceId();
+      console.log('[Avatar] Starting session with voice_id:', selectedVoiceId);
+
       await avatarRef.current.createStartAvatar({
         avatarName: "Anna_public_3_20240108", // 精选的高质量演示角色
         quality: AvatarQuality.Low, // 快速演示建议用 Low
+        voice: {
+          voice_id: selectedVoiceId // 根据语言动态选择语音
+        }
       });
 
       addDebug(t('mvpChina.logs.sessionEstablished'));
@@ -125,8 +193,8 @@ const MVPChinaPage = () => {
       addBotMessage(t('mvpChina.chat.welcome'));
 
     } catch (error) {
+      console.error('[Avatar] Initialization failed:', error);
       addDebug(`${t('mvpChina.status.error')}: ${error.message}`);
-      console.error('HeyGen Error:', error);
       setStatus('error');
     }
   };
@@ -168,11 +236,12 @@ const MVPChinaPage = () => {
 
         // 2. 让 HeyGen 数字人说话
         if (avatarRef.current) {
-          addDebug(t('mvpChina.logs.thinking'));
+          addDebug(`[Avatar] Start speaking: ${reply.substring(0, 20)}...`);
           await avatarRef.current.speak({
             text: reply,
             task_type: TaskType.REPEAT
           });
+          addDebug('[Avatar] Finished speaking');
         }
       }
     } catch (error) {
@@ -183,18 +252,16 @@ const MVPChinaPage = () => {
 
       // 连续对话模式：数字人回复完毕后自动重新开启麦克风
       if (continuousMode && recognitionRef.current && status === 'ready') {
+        console.log('[Voice] Scheduling mic restart in continuous mode');
         setTimeout(() => {
           // 使用 ref 访问最新状态，避免闭包问题
+          console.log('[Voice] Attempting to restart mic, isTalking:', isTalkingRef.current);
           if (!isTalkingRef.current) {
-            try {
-              recognitionRef.current.start();
-              setIsListening(true);
-              addDebug('连续对话：自动重新开启麦克风');
-            } catch (e) {
-              console.error('Failed to restart mic:', e);
-            }
+            startVoiceRecognition();
+          } else {
+            console.log('[Voice] Still talking, skipping restart');
           }
-        }, 1000); // 等待 1 秒再开启，确保数字人说完
+        }, 2000); // 增加延迟到 2 秒，确保语音播放物理层面结束
       }
     }
   };
@@ -256,7 +323,7 @@ const MVPChinaPage = () => {
                 className="w-full h-full object-contain"
                 playsInline
                 autoPlay
-                muted={true}
+                muted={false}
               />
 
               {status === 'idle' && (

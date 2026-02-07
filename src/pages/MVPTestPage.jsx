@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Logo from '../components/common/Logo';
 
 const MVPTestPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [status, setStatus] = useState('idle'); // idle, connecting, ready, error
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
@@ -62,7 +62,13 @@ const MVPTestPage = () => {
       };
 
       recognitionInstance.onend = () => {
+        console.log('[Voice] Recognition ended');
         setIsListening(false);
+      };
+
+      recognitionInstance.onnomatch = () => {
+        console.log('[Voice] No match - please speak clearly');
+        addDebug('未能识别，请再说一遍');
       };
 
       recognitionRef.current = recognitionInstance;
@@ -111,8 +117,16 @@ const MVPTestPage = () => {
       const iceServers = await iceRes.json();
 
       const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
-      speechConfig.speechSynthesisLanguage = "zh-CN";
-      speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural";
+
+      // 根据语言选择语音
+      const lang = i18n.language;
+      if (lang.startsWith('zh')) {
+        speechConfig.speechSynthesisLanguage = "zh-CN";
+        speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural"; // 中文普通话女声
+      } else {
+        speechConfig.speechSynthesisLanguage = "en-US";
+        speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural"; // 英文女声
+      }
 
       // Azure Avatar valid characters for REAL-TIME API:
       // Lisa: ONLY casual-sitting (graceful/technical styles are batch-only!)
@@ -327,15 +341,13 @@ const MVPTestPage = () => {
       setIsTalking(false);
 
       if (continuousMode && recognitionRef.current && status === 'ready') {
+        console.log('[Voice] Scheduling mic restart in continuous mode');
         setTimeout(() => {
+          console.log('[Voice] Attempting to restart mic, isTalking:', isTalkingRef.current);
           if (!isTalkingRef.current) {
-            try {
-              recognitionRef.current.start();
-              setIsListening(true);
-              addDebug('连续对话：自动重新开启麦克风');
-            } catch (e) {
-              console.error('Failed to restart mic:', e);
-            }
+            startVoiceRecognition();
+          } else {
+            console.log('[Voice] Still talking, skipping restart');
           }
         }, 1000);
       }
@@ -345,6 +357,36 @@ const MVPTestPage = () => {
   useEffect(() => {
     sendMessageRef.current = handleSendMessage;
   }, [status, isTalking, continuousMode]);
+
+  // 启动语音识别的辅助函数，带错误恢复
+  const startVoiceRecognition = () => {
+    if (!recognitionRef.current || isTalkingRef.current) {
+      console.log('[Voice] Cannot start - no recognition or is talking');
+      return;
+    }
+
+    try {
+      recognitionRef.current.start();
+      setIsListening(true);
+      addDebug('麦克风已启动');
+      console.log('[Voice] Recognition started successfully');
+    } catch (error) {
+      console.error('[Voice] Start recognition error:', error);
+
+      if (error.message && error.message.includes('already started')) {
+        console.log('[Voice] Already started, stopping and restarting...');
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          console.error('[Voice] Error stopping:', e);
+        }
+        setTimeout(() => startVoiceRecognition(), 300);
+      } else {
+        addDebug(`语音启动失败: ${error.message}`);
+        setIsListening(false);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col pt-20">
@@ -366,7 +408,7 @@ const MVPTestPage = () => {
                 className="w-full h-full object-cover"
                 playsInline
                 autoPlay
-                muted={true}
+                muted={false}
               />
 
               {status === 'idle' && (
