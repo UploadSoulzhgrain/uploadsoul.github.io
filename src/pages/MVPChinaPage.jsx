@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import StreamingAvatar, { AvatarQuality, TaskType } from "@heygen/streaming-avatar";
+import StreamingAvatar from "@heygen/streaming-avatar";
 
 const MVPChinaPage = () => {
   const { t, i18n } = useTranslation();
@@ -182,7 +182,7 @@ const MVPChinaPage = () => {
 
       await avatarRef.current.createStartAvatar({
         avatarName: "Anna_public_3_20240108", // 精选的高质量演示角色
-        quality: AvatarQuality.Low, // 快速演示建议用 Low
+        quality: 'low', // 快速演示建议用 low
         voice: {
           voice_id: selectedVoiceId // 根据语言动态选择语音
         }
@@ -198,7 +198,7 @@ const MVPChinaPage = () => {
       if (avatarRef.current) {
         avatarRef.current.speak({
           text: welcome,
-          task_type: TaskType.REPEAT
+          task_type: 'repeat'
         }).catch(err => console.error('[Avatar] Welcome speech failed:', err));
       }
 
@@ -249,7 +249,7 @@ const MVPChinaPage = () => {
           addDebug(`[Avatar] Start speaking: ${reply.substring(0, 20)}...`);
           await avatarRef.current.speak({
             text: reply,
-            task_type: TaskType.REPEAT
+            task_type: 'repeat'
           });
           addDebug('[Avatar] Finished speaking');
         }
