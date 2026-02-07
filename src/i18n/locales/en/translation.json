@@ -1224,7 +1224,8 @@
       "placeholder": "Type a message...",
       "waitConnect": "Please connect first...",
       "title": "Interaction Log",
-      "ready": "Chat window ready"
+      "ready": "Chat window ready",
+      "startVoiceChat": "Click to Start Talking"
     },
     "controls": {
       "start": "Launch Digital Human",

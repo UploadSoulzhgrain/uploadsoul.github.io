@@ -1271,7 +1271,8 @@
       "placeholder": "输入消息...",
       "waitConnect": "请先开启连接...",
       "title": "交互对话日志",
-      "ready": "对话窗口已就绪"
+      "ready": "对话窗口已就绪",
+      "startVoiceChat": "点击开始说话"
     },
     "controls": {
       "start": "启动数字人助手",
