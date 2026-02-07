@@ -8,6 +8,8 @@ const MVPChinaPage = () => {
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTalking, setIsTalking] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState(null);
 
   const videoRef = useRef(null);
   const avatarRef = useRef(null);
@@ -24,14 +26,46 @@ const MVPChinaPage = () => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 初始化语音识别
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognitionInstance = new SpeechRecognition();
+      recognitionInstance.continuous = false;
+      recognitionInstance.interimResults = false;
+      recognitionInstance.lang = 'zh-CN';
+
+      recognitionInstance.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInputValue(transcript);
+        setIsListening(false);
+      };
+
+      recognitionInstance.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+        addDebug(`语音识别错误: ${event.error}`);
+      };
+
+      recognitionInstance.onend = () => {
+        setIsListening(false);
+      };
+
+      setRecognition(recognitionInstance);
+    }
+  }, []);
+
   // 清理函数
   useEffect(() => {
     return () => {
       if (avatarRef.current) {
         avatarRef.current.stopAvatar();
       }
+      if (recognition) {
+        recognition.stop();
+      }
     };
-  }, []);
+  }, [recognition]);
 
   const initAvatar = async () => {
     if (avatarRef.current) return;
@@ -135,6 +169,23 @@ const MVPChinaPage = () => {
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
       addDebug(`Audio: ${videoRef.current.muted ? 'Muted' : 'Unmuted'}`);
+    }
+  };
+
+  const toggleVoiceInput = () => {
+    if (!recognition) {
+      addDebug('您的浏览器不支持语音识别');
+      return;
+    }
+
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      setInputValue('');
+      recognition.start();
+      setIsListening(true);
+      addDebug('正在监听您的语音...');
     }
   };
 
@@ -258,19 +309,34 @@ const MVPChinaPage = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-                placeholder={status === 'ready' ? t('mvpChina.chat.placeholder') : t('mvpChina.chat.waitConnect')}
+                placeholder={status === 'ready' ? (isListening ? '正在监听...' : t('mvpChina.chat.placeholder')) : t('mvpChina.chat.waitConnect')}
                 disabled={status !== 'ready' || isTalking}
-                className="w-full bg-gray-900/50 border border-white/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
+                className="w-full bg-gray-900/50 border border-white/10 rounded-2xl px-5 py-4 pr-24 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
               />
-              <button
-                onClick={handleSend}
-                disabled={status !== 'ready' || isTalking}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-amber-500 hover:text-amber-400 disabled:text-gray-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                </svg>
-              </button>
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                <button
+                  onClick={toggleVoiceInput}
+                  disabled={status !== 'ready' || isTalking}
+                  className={`p-2 rounded-full transition-all ${isListening
+                      ? 'bg-red-500 text-white animate-pulse'
+                      : 'text-gray-400 hover:text-amber-400'
+                    } disabled:text-gray-600 disabled:cursor-not-allowed`}
+                  title={isListening ? '停止录音' : '语音输入'}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                  </svg>
+                </button>
+                <button
+                  onClick={handleSend}
+                  disabled={status !== 'ready' || isTalking || !inputValue.trim()}
+                  className="p-2 text-amber-500 hover:text-amber-400 disabled:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
