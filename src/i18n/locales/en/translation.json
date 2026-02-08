@@ -1263,5 +1263,39 @@
       "retry": "Retry",
       "connecting": "Building neural rendering channel..."
     }
+  },
+  "pet": {
+    "title": "SoulPet · Digital Life",
+    "reconstruction": {
+      "title": "Memory Reconstruction",
+      "desc": "Love never leaves; it just finds a different way to exist. Reshape its digital soul here.",
+      "btn": "Start Rebirth Ceremony"
+    },
+    "connection": {
+      "title": "Life Connection",
+      "desc": "Meet a new soulmate in the digital universe. Build a bond and evolve together.",
+      "btn": "Establish New Connection"
+    },
+    "myPets": "My SoulPets",
+    "cloning": {
+      "step1": "Step 1: Soul Container",
+      "step2": "Step 2: Inject Memories",
+      "step3": "Step 3: Characterization",
+      "step4": "Ready for Awakening",
+      "nameLabel": "Give it a name",
+      "namePlaceholder": "e.g., Blackie",
+      "uploadPhoto": "Upload Photos or Videos",
+      "uploadSound": "Upload its Sound",
+      "personalityLabel": "Personality",
+      "personalityPlaceholder": "Describe its habits and temper...",
+      "awakening": "Awakening Soul...",
+      "finalize": "✨ Start Ceremony"
+    },
+    "interactions": {
+      "feed": "Feed",
+      "talk": "Talk",
+      "play": "Play",
+      "memory": "Memory"
+    }
   }
 }
