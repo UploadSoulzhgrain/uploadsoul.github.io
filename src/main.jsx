@@ -10,9 +10,6 @@ import './i18n/i18n.js' // Import i18n configuration
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <div style={{ position: 'fixed', top: 0, left: 0, background: 'red', color: 'white', zIndex: 99999 }}>
-      SYSTEM CHECK: main.jsx loaded
-    </div>
     <Provider store={store}>
       <HelmetProvider>
         <AuthProvider>
