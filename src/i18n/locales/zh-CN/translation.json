@@ -1310,5 +1310,39 @@
       "retry": "重试",
       "connecting": "建立神经渲染通道..."
     }
+  },
+  "pet": {
+    "title": "SoulPet · 灵宠",
+    "reconstruction": {
+      "title": "记忆重构",
+      "desc": "爱从未离开，只是换了一种存在方式。在这里，重塑它的数字灵魂。",
+      "btn": "开启重生仪式"
+    },
+    "connection": {
+      "title": "生命链接",
+      "desc": "在数字宇宙中，邂逅一个新的灵魂伴侣。建立羁绊，共同进化。",
+      "btn": "建立新连接"
+    },
+    "myPets": "我的灵宠",
+    "cloning": {
+      "step1": "第一步：选择容器",
+      "step2": "第二步：注入记忆",
+      "step3": "第三步：刻画性格",
+      "step4": "准备就绪",
+      "nameLabel": "给它起个名字",
+      "namePlaceholder": "例如：小黑",
+      "uploadPhoto": "上传照片或视频",
+      "uploadSound": "上传它的叫声",
+      "personalityLabel": "性格特征",
+      "personalityPlaceholder": "描述它的脾气和习惯...",
+      "awakening": "灵魂唤醒中...",
+      "finalize": "✨ 开启仪式"
+    },
+    "interactions": {
+      "feed": "喂食",
+      "talk": "交流",
+      "play": "玩耍",
+      "memory": "记忆"
+    }
   }
 }
