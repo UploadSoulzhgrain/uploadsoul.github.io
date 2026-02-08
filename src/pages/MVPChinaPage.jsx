@@ -11,6 +11,9 @@ const MVPChinaPage = () => {
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [continuousMode, setContinuousMode] = useState(true); // 连续对话模式
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isCameraOn, setIsCameraOn] = useState(false);
+  const [cameraStream, setCameraStream] = useState(null);
 
   const videoRef = useRef(null);
   const avatarRef = useRef(null);
@@ -18,6 +21,8 @@ const MVPChinaPage = () => {
   const recognitionRef = useRef(null);
   const sendMessageRef = useRef(null);
   const isTalkingRef = useRef(false); // 存储最新的 isTalking 状态
+  const videoContainerRef = useRef(null);
+  const userVideoRef = useRef(null);
   const [debugLog, setDebugLog] = useState([]);
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
 
@@ -41,6 +46,71 @@ const MVPChinaPage = () => {
       return '1bd001e7e50f421d891986aad5158bc8'; // HeyGen 英语女声
     }
   };
+
+  // 全屏切换功能
+  const toggleFullscreen = useCallback(() => {
+    if (!videoContainerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      videoContainerRef.current.requestFullscreen().then(() => {
+        setIsFullscreen(true);
+      }).catch(err => {
+        console.error('Fullscreen error:', err);
+        addDebug(`全屏失败: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen().then(() => {
+        setIsFullscreen(false);
+      });
+    }
+  }, []);
+
+  // 监听全屏状态变化
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  // 摄像头开关功能
+  const toggleCamera = useCallback(async () => {
+    if (isCameraOn && cameraStream) {
+      // 关闭摄像头
+      cameraStream.getTracks().forEach(track => track.stop());
+      setCameraStream(null);
+      setIsCameraOn(false);
+      if (userVideoRef.current) {
+        userVideoRef.current.srcObject = null;
+      }
+    } else {
+      // 开启摄像头
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { width: 320, height: 240, facingMode: 'user' },
+          audio: false
+        });
+        setCameraStream(stream);
+        setIsCameraOn(true);
+        if (userVideoRef.current) {
+          userVideoRef.current.srcObject = stream;
+        }
+      } catch (err) {
+        console.error('Camera error:', err);
+        addDebug(`摄像头失败: ${err.message}`);
+      }
+    }
+  }, [isCameraOn, cameraStream]);
+
+  // 清理摄像头
+  useEffect(() => {
+    return () => {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [cameraStream]);
 
   // 启动语音识别的辅助函数，带错误恢复
   const startVoiceRecognition = useCallback(() => {
@@ -315,14 +385,37 @@ const MVPChinaPage = () => {
       <div className="flex-1 container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8 max-w-7xl">
 
         {/* 左侧：数字人视频区 */}
-        <div className="flex-1 bg-[#12121A] rounded-3xl border border-white/5 overflow-hidden relative shadow-2xl flex flex-col">
-          <div className="absolute top-6 left-6 z-10">
+        <div
+          ref={videoContainerRef}
+          className="flex-1 bg-[#12121A] rounded-3xl border border-white/5 overflow-hidden relative shadow-2xl flex flex-col"
+        >
+          {/* 顶部状态栏 */}
+          <div className="absolute top-6 left-6 right-6 z-10 flex justify-between items-start">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
               <span className={`w-2 h-2 rounded-full ${status === 'ready' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
               <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
                 {status === 'ready' ? t('mvpChina.status.ready') : t('mvpChina.status.idle')}
               </span>
             </div>
+
+            {/* 全屏按钮 */}
+            {status === 'ready' && (
+              <button
+                onClick={toggleFullscreen}
+                className="p-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-black/60 transition-all"
+                title={isFullscreen ? '退出全屏' : '全屏显示'}
+              >
+                {isFullscreen ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                )}
+              </button>
+            )}
           </div>
 
           <div className="flex-1 flex items-center justify-center relative bg-black/40">
@@ -353,61 +446,40 @@ const MVPChinaPage = () => {
               )}
 
               {status === 'ready' && (
-                <>
-                  <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
-                    <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono w-64">
-                      <div className="text-gray-400 flex justify-between">
-                        <span># SYSTEM_LOG</span>
-                        <span className="text-[8px] opacity-50 tracking-tighter">CHINA_v2</span>
+                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
+                  <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono w-64">
+                    <div className="text-gray-400 flex justify-between">
+                      <span># SYSTEM_LOG</span>
+                      <span className="text-[8px] opacity-50 tracking-tighter">CHINA_v2</span>
+                    </div>
+                    <div className="flex flex-col gap-1 overflow-hidden">
+                      <div className="text-gray-500 text-[9px] truncate">
+                        {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting...'}
                       </div>
-                      <div className="flex flex-col gap-1 overflow-hidden">
-                        <div className="text-gray-500 text-[9px] truncate">
-                          {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting...'}
-                        </div>
-                        <div className="flex gap-2 text-amber-500/60 text-[8px]">
-                          <span>STREAM: {hasVideoTrack ? 'ACTIVE' : 'READY'}</span>
-                          <span>LATENCY: LOW</span>
-                        </div>
+                      <div className="flex gap-2 text-amber-500/60 text-[8px]">
+                        <span>STREAM: {hasVideoTrack ? 'ACTIVE' : 'READY'}</span>
+                        <span>LATENCY: LOW</span>
                       </div>
                     </div>
-
-                    <button
-                      onClick={toggleMute}
-                      className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
-                        ? 'bg-gray-700 text-white'
-                        : 'bg-amber-500 text-black animate-pulse shadow-amber-500/20'
-                        }`}
-                    >
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        {videoRef.current?.muted ? (
-                          <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
-                        ) : (
-                          <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                        )}
-                      </svg>
-                      <span>{videoRef.current?.muted ? '取消静音' : '静音声音'}</span>
-                    </button>
                   </div>
 
-                  {/* 核心修复：更显著、始终置顶的对话控制层 */}
-                  <div className="absolute inset-0 pointer-events-none z-30 flex flex-col items-center justify-end pb-32">
-                    {!isListening && !isTalking && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleVoiceInput();
-                        }}
-                        className="pointer-events-auto bg-amber-500 hover:bg-amber-400 text-black px-10 py-4 rounded-full font-bold shadow-[0_0_30px_rgba(245,158,11,0.4)] transition-all active:scale-95 flex items-center gap-3 animate-bounce-subtle box-glow"
-                      >
-                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-lg">{t('mvpChina.chat.startVoiceChat')}</span>
-                      </button>
-                    )}
-                  </div>
-                  {/* v2.1.2_FIX */}
-                </>
+                  <button
+                    onClick={toggleMute}
+                    className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
+                      ? 'bg-gray-700 text-white'
+                      : 'bg-amber-500 text-black animate-pulse shadow-amber-500/20'
+                      }`}
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      {videoRef.current?.muted ? (
+                        <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
+                      ) : (
+                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                      )}
+                    </svg>
+                    <span>{videoRef.current?.muted ? '取消静音' : '静音声音'}</span>
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -415,7 +487,72 @@ const MVPChinaPage = () => {
 
         {/* 右侧：聊天对话区 */}
         <div className="w-full md:w-[400px] flex flex-col bg-[#12121A] rounded-3xl border border-white/5 shadow-2xl relative">
-          <div className="p-6 border-b border-white/5">
+          {/* 摄像头和语音控制区 */}
+          <div className="p-4 border-b border-white/5 space-y-4">
+            {/* 摄像头控制 */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={toggleCamera}
+                className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${isCameraOn
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                    : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
+                  }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                {isCameraOn ? '关闭摄像头' : '开启摄像头'}
+              </button>
+            </div>
+
+            {/* 用户摄像头画面 */}
+            {isCameraOn && (
+              <div className="relative rounded-xl overflow-hidden bg-black/40 border border-white/10">
+                <video
+                  ref={userVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-32 object-cover"
+                />
+                <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 rounded text-[10px] text-gray-400">
+                  您的画面
+                </div>
+              </div>
+            )}
+
+            {/* 语音控制按钮 - 从左侧移到这里 */}
+            {status === 'ready' && !isListening && !isTalking && (
+              <button
+                onClick={toggleVoiceInput}
+                className="w-full bg-amber-500 hover:bg-amber-400 text-black py-4 rounded-xl font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+              >
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                </svg>
+                <span className="text-lg">{t('mvpChina.chat.startVoiceChat')}</span>
+              </button>
+            )}
+
+            {status === 'ready' && isListening && (
+              <div className="w-full bg-red-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 animate-pulse">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                </svg>
+                <span className="text-lg">正在聆听...</span>
+              </div>
+            )}
+
+            {status === 'ready' && isTalking && (
+              <div className="w-full bg-amber-500/20 text-amber-400 py-4 rounded-xl font-medium flex items-center justify-center gap-3 border border-amber-500/30">
+                <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                <span>数字人正在回复...</span>
+              </div>
+            )}
+          </div>
+
+          {/* 聊天标题 */}
+          <div className="p-4 border-b border-white/5">
             <h3 className="font-bold flex items-center gap-2 text-amber-500 uppercase tracking-widest text-sm">
               <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
               {t('mvpChina.chat.title')}
