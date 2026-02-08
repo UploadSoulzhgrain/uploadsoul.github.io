@@ -23,6 +23,7 @@ const MVPChinaPage = () => {
   const isTalkingRef = useRef(false); // 存储最新的 isTalking 状态
   const videoContainerRef = useRef(null);
   const userVideoRef = useRef(null);
+  const chatContainerRef = useRef(null);
   const [debugLog, setDebugLog] = useState([]);
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
 
@@ -155,7 +156,9 @@ const MVPChinaPage = () => {
   }, [i18n.language]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   // 初始化语音识别
@@ -295,6 +298,7 @@ const MVPChinaPage = () => {
       console.error('[Avatar] Initialization failed:', error);
       addDebug(`${t('mvpChina.status.error')}: ${error.message}`);
       setStatus('error');
+      avatarRef.current = null; // 允许用户点击「启动」重试
     }
   };
 
@@ -461,13 +465,20 @@ const MVPChinaPage = () => {
                 muted={false}
               />
 
-              {status === 'idle' && (
-                <button
-                  onClick={initAvatar}
-                  className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95 z-20"
-                >
-                  {t('mvpChina.controls.start')}
-                </button>
+              {(status === 'idle' || status === 'error') && (
+                <div className="flex flex-col items-center gap-3 z-20">
+                  {status === 'error' && debugLog.length > 0 && (
+                    <p className="text-red-400/90 text-sm max-w-md text-center px-4">
+                      {debugLog[debugLog.length - 1]}
+                    </p>
+                  )}
+                  <button
+                    onClick={initAvatar}
+                    className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
+                  >
+                    {status === 'error' ? t('mvpChina.controls.retry') || '重试' : t('mvpChina.controls.start')}
+                  </button>
+                </div>
               )}
 
               {status === 'connecting' && (
@@ -591,7 +602,10 @@ const MVPChinaPage = () => {
             </h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+          <div
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
+          >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-600 text-center px-4">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 opacity-20">💬</div>
@@ -609,7 +623,6 @@ const MVPChinaPage = () => {
                 </div>
               ))
             )}
-            <div ref={chatEndRef} />
           </div>
 
           {/* 输入框 */}
