@@ -26,26 +26,44 @@ const MVPChinaPage = () => {
   const chatContainerRef = useRef(null);
   const [debugLog, setDebugLog] = useState([]);
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
+  // 数字人当前说话语言：普通话（默认）、英文、粤语，用户可随时切换
+  const [avatarLang, setAvatarLang] = useState('mandarin');
 
   const addDebug = (msg) => {
     console.log(`[AVATAR_DEBUG] ${msg}`);
     setDebugLog(prev => [...prev.slice(-4), msg]);
   };
 
-  // 根据语言选择 Voice ID
-  // 根据语言选择 Voice ID
-  const getVoiceId = () => {
-    const lang = i18n.language;
-    console.log('[Voice Config] Current i18n language:', lang);
-    if (lang.startsWith('zh')) {
-      console.log('[Voice Config] Selected: Mandarin Chinese voice');
-      // 中文 - 标准普通话女声
-      return '867e42cd03df44929a6744e8fa663884';
-    } else {
-      console.log('[Voice Config] Selected: English voice');
-      // 英文 - 使用默认英语女声
-      return '1bd001e7e50f421d891986aad5158bc8'; // HeyGen 英语女声
+  // HeyGen 三种语音 ID（普通话 / 英文 / 粤语）。普通话/粤语可从 HeyGen 后台或 GET /v2/voices 按 zh-CN/zh-HK 获取
+  const HEYGEN_VOICE_IDS = {
+    mandarin: '6b4b654c8f2a4f3e9c8d7e6f5a4b3c2d', // 普通话 zh-CN，若无效请从 HeyGen 控制台替换
+    english: '1bd001e7e50f421d891986aad5158bc8',
+    cantonese: '867e42cd03df44929a6744e8fa663884'  // 粤语
+  };
+
+  // 像真人：你要求什么语言就什么语言，或你说什么语言就同样用什么语言（无按钮，全由内容决定）
+  const resolveAvatarLang = (text) => {
+    const t = (text || '').trim();
+    // 1) 显式要求：用粤语/说英文/用普通话 等
+    if (/\b(用|说|讲|切换?成?)\s*(粤语|廣東話|广东话|Cantonese)\b/i.test(t)) {
+      setAvatarLang('cantonese');
+      return 'cantonese';
     }
+    if (/\b(用|说|讲|切换?成?)\s*(英文|英语|English)\b/i.test(t) || /\b(switch to|in) english\b/i.test(t)) {
+      setAvatarLang('english');
+      return 'english';
+    }
+    if (/\b(用|说|讲|切换?成?)\s*(普通话|国语|Mandarin)\b/i.test(t)) {
+      setAvatarLang('mandarin');
+      return 'mandarin';
+    }
+    // 2) 无显式要求：根据用户输入语言推断（你说英文就回英文，说中文就回普通话）
+    const enCount = (t.match(/[a-zA-Z]/g) || []).length;
+    const cjkCount = (t.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) || []).length;
+    const isMostlyEnglish = enCount >= cjkCount && (enCount + cjkCount) > 0;
+    const lang = isMostlyEnglish ? 'english' : 'mandarin';
+    setAvatarLang(lang);
+    return lang;
   };
 
   // 全屏切换功能
@@ -269,16 +287,14 @@ const MVPChinaPage = () => {
         avatarRef.current = null;
       });
 
-      // 启动正式会话
-      const selectedVoiceId = getVoiceId();
-      console.log('[Avatar] Starting session with voice_id:', selectedVoiceId);
+      // 固定普通话语音，一个数字人不因语言切换重启（HeyGen 无多语言单一声源，普通话优先）
+      const selectedVoiceId = HEYGEN_VOICE_IDS.mandarin;
+      console.log('[Avatar] Starting session with voice_id (Mandarin):', selectedVoiceId);
 
       await avatarRef.current.createStartAvatar({
-        avatarName: "Anna_public_3_20240108", // 精选的高质量演示角色
-        quality: 'low', // 快速演示建议用 low
-        voice: {
-          voice_id: selectedVoiceId // 根据语言动态选择语音
-        }
+        avatarName: "Anna_public_3_20240108",
+        quality: 'low',
+        voice: { voice_id: selectedVoiceId }
       });
 
       addDebug(t('mvpChina.logs.sessionEstablished'));
@@ -286,8 +302,6 @@ const MVPChinaPage = () => {
 
       const welcome = t('mvpChina.chat.welcome');
       addBotMessage(welcome);
-
-      // 启动后自动朗读欢迎词
       if (avatarRef.current) {
         avatarRef.current.speak({
           text: welcome,
@@ -323,13 +337,16 @@ const MVPChinaPage = () => {
     setIsTalking(true);
     setIsListening(false); // 确保停止监听
 
+    const effectiveLang = resolveAvatarLang(text);
+    // 国内通道固定普通话语音，不因切换语言重启，避免重连失败；LLM 仍按 preferred_language 回复
+
     try {
       addDebug(t('mvpChina.logs.thinking'));
-      // 1. 获取 GPT 回复
+      // 1. 获取 GPT 回复（按当前选择的语言）
       const chatRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ message: text, preferred_language: effectiveLang })
       });
 
       let data;
@@ -386,7 +403,7 @@ const MVPChinaPage = () => {
   // 更新 ref，确保语音识别回调能访问最新的函数
   useEffect(() => {
     sendMessageRef.current = handleSendMessage;
-  }, [status, isTalking, continuousMode]);
+  }, [status, isTalking, continuousMode, avatarLang]);
 
   const toggleMute = () => {
     if (videoRef.current) {

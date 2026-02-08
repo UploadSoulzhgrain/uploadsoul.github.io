@@ -65,6 +65,7 @@ const MVPTestPage = () => {
   const [gathState, setGathState] = useState('new');
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
   const [hasAudioTrack, setHasAudioTrack] = useState(false);
+  const [avatarLang, setAvatarLang] = useState('mandarin'); // 普通话（默认）/ 英文 / 粤语
 
   const addDebug = (msg) => {
     console.log(`[AVATAR_DEBUG] ${msg}`);
@@ -197,6 +198,29 @@ const MVPTestPage = () => {
     isTalkingRef.current = isTalking;
   }, [isTalking]);
 
+  // 像真人：要求什么语言就什么语言，或你说什么语言就同样用什么语言（无按钮）
+  const resolveAvatarLang = (text) => {
+    const t = (text || '').trim();
+    if (/\b(用|说|讲|切换?成?)\s*(粤语|廣東話|广东话|Cantonese)\b/i.test(t)) {
+      setAvatarLang('cantonese');
+      return 'cantonese';
+    }
+    if (/\b(用|说|讲|切换?成?)\s*(英文|英语|English)\b/i.test(t) || /\b(switch to|in) english\b/i.test(t)) {
+      setAvatarLang('english');
+      return 'english';
+    }
+    if (/\b(用|说|讲|切换?成?)\s*(普通话|国语|Mandarin)\b/i.test(t)) {
+      setAvatarLang('mandarin');
+      return 'mandarin';
+    }
+    const enCount = (t.match(/[a-zA-Z]/g) || []).length;
+    const cjkCount = (t.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) || []).length;
+    const isMostlyEnglish = enCount >= cjkCount && (enCount + cjkCount) > 0;
+    const lang = isMostlyEnglish ? 'english' : 'mandarin';
+    setAvatarLang(lang);
+    return lang;
+  };
+
   const initAvatar = async () => {
     if (synthesizerRef.current) return;
 
@@ -246,15 +270,10 @@ const MVPTestPage = () => {
 
       const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
 
-      // 根据语言选择语音
-      const lang = i18n.language;
-      if (lang.startsWith('zh')) {
-        speechConfig.speechSynthesisLanguage = "zh-CN";
-        speechConfig.speechSynthesisVoiceName = "zh-CN-XiaoxiaoNeural"; // 中文普通话女声
-      } else {
-        speechConfig.speechSynthesisLanguage = "en-US";
-        speechConfig.speechSynthesisVoiceName = "en-US-JennyNeural"; // 英文女声
-      }
+      // 使用多语言语音：一个数字人即可中英粤混说，无需因切换语言而重启（避免重连失败）
+      speechConfig.speechSynthesisLanguage = "en-US";
+      speechConfig.speechSynthesisVoiceName = "en-US-JennyMultilingualNeural";
+      addDebug('Avatar 语音: 多语言 (中/英自动识别)');
 
       // Azure Avatar valid characters for REAL-TIME API:
       // Lisa: ONLY casual-sitting (graceful/technical styles are batch-only!)
@@ -392,8 +411,6 @@ const MVPTestPage = () => {
 
       const welcome = t('mvpChina.chat.welcome');
       addBotMessage(welcome);
-
-      // 启动后自动朗读欢迎词 (Azure Avatar uses speakTextAsync)，只读正文不读描述
       if (synthesizerRef.current) {
         synthesizerRef.current.speakTextAsync(textForSpeechOnly(welcome)).catch(err => console.error('[Avatar] Welcome speech failed:', err));
       }
@@ -454,11 +471,14 @@ const MVPTestPage = () => {
     setIsTalking(true);
     setIsListening(false);
 
+    const effectiveLang = resolveAvatarLang(text);
+    // 海外通道使用多语言语音，不因切换语言重启数字人，避免重连失败
+
     try {
       const chatRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text })
+        body: JSON.stringify({ message: text, preferred_language: effectiveLang })
       });
 
       let data;
@@ -506,7 +526,7 @@ const MVPTestPage = () => {
 
   useEffect(() => {
     sendMessageRef.current = handleSendMessage;
-  }, [status, isTalking, continuousMode]);
+  }, [status, isTalking, continuousMode, avatarLang]);
 
   // 启动语音识别的辅助函数，带错误恢复
   const startVoiceRecognition = () => {
