@@ -1219,7 +1219,7 @@
       "low": "LOW"
     },
     "chat": {
-      "welcome": "Hello! I am UploadSoul's digital assistant. I'm ready to provide you with a more natural interaction experience.",
+      "welcome": "Are you here?",
       "error": "Sorry, I'm having a bit of trouble right now",
       "placeholder": "Type a message...",
       "waitConnect": "Please connect first...",
@@ -1229,9 +1229,39 @@
     },
     "controls": {
       "start": "Launch Digital Human",
+      "retry": "Retry",
       "connecting": "Building neural rendering channel...",
       "mute": "Listening",
       "unmute": "Unmute"
+    }
+  },
+  "mvpTest": {
+    "status": {
+      "idle": "Ready to Connect",
+      "connecting": "Connecting...",
+      "ready": "Overseas Channel · Real-time Connected",
+      "error": "Connection Error"
+    },
+    "logs": {
+      "getToken": "Fetching access token...",
+      "initEngine": "Initializing digital human engine...",
+      "streamReady": "Video stream ready",
+      "streamDisconnected": "Stream disconnected",
+      "sessionEstablished": "Session established",
+      "thinking": "Thinking..."
+    },
+    "chat": {
+      "welcome": "Are you here?",
+      "error": "Sorry, I'm having a bit of trouble right now",
+      "placeholder": "Type a message...",
+      "waitConnect": "Please connect first...",
+      "title": "Overseas Interaction Log",
+      "ready": "Waiting for session to start..."
+    },
+    "controls": {
+      "start": "Launch Digital Human",
+      "retry": "Retry",
+      "connecting": "Building neural rendering channel..."
     }
   }
 }

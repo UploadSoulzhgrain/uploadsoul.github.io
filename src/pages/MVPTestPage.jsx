@@ -2,6 +2,40 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as SpeechSDK from 'microsoft-cognitiveservices-speech-sdk';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * 从 TTS 朗读文本中移除不应读出的内容：括号/星号内的描述、表情动作短语、emoji。
+ * 聊天界面仍显示完整原文，仅朗读时使用清洗后的文本。
+ */
+function textForSpeechOnly(rawText) {
+  if (!rawText || typeof rawText !== 'string') return rawText || '';
+  let t = rawText;
+  // 移除各类括号及星号内的描述性文字
+  t = t.replace(/\*[^*]*\*/g, '');
+  t = t.replace(/（[^）]*）/g, '');
+  t = t.replace(/【[^】]*】/g, '');
+  t = t.replace(/\([^)]*\)/g, '');
+  t = t.replace(/\[[^\]]*\]/g, '');
+  t = t.replace(/「[^」]*」/g, '');
+  t = t.replace(/『[^』]*』/g, '');
+  // 移除常见表情/动作描述短语（独立成段或前后有标点/空格）
+  const actionPhrases = [
+    '眼角含笑', '微微一笑', '点点头', '摇摇头', '叹了口气', '笑着', '轻声', '柔声',
+    '笑道', '说道', '问道', '答道', '心想', '心道', '暗道', '皱眉', '蹙眉', '莞尔',
+    '笑盈盈', '笑呵呵', '笑眯眯', '笑而不语', '笑而不答', '含笑', '浅笑', '苦笑',
+    '点头', '摇头', '叹息', '沉吟', '顿了顿', '顿了顿说', '顿了顿道', '缓缓说道',
+    '淡淡说道', '冷冷说道', '轻声说道', '柔声说到', '笑着说道', '笑着说到',
+    '微笑着', '微笑着说道', '微笑着说', '微笑着说到'
+  ];
+  actionPhrases.forEach(phrase => {
+    const re = new RegExp(`[\\s，。、；：！？]*${phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s，。、；：！？]*`, 'g');
+    t = t.replace(re, ' ');
+  });
+  // 移除常见 emoji 范围（保留中文等）
+  t = t.replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+  t = t.replace(/\s{2,}/g, ' ').trim();
+  return t;
+}
+
 const MVPTestPage = () => {
   const { t, i18n } = useTranslation();
   const [status, setStatus] = useState('idle'); // idle, connecting, ready, error
@@ -23,6 +57,7 @@ const MVPTestPage = () => {
   const isTalkingRef = useRef(false);
   const videoContainerRef = useRef(null);
   const userVideoRef = useRef(null);
+  const chatContainerRef = useRef(null);
   const [debugLog, setDebugLog] = useState([]);
   const [webrtcState, setWebrtcState] = useState('new');
   const [iceState, setIceState] = useState('new');
@@ -106,7 +141,9 @@ const MVPTestPage = () => {
   }, [cameraStream]);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
   }, [messages]);
 
   // 初始化语音识别
@@ -355,14 +392,15 @@ const MVPTestPage = () => {
       const welcome = t('mvpChina.chat.welcome');
       addBotMessage(welcome);
 
-      // 启动后自动朗读欢迎词 (Azure Avatar uses speakTextAsync)
+      // 启动后自动朗读欢迎词 (Azure Avatar uses speakTextAsync)，只读正文不读描述
       if (synthesizerRef.current) {
-        synthesizerRef.current.speakTextAsync(welcome).catch(err => console.error('[Avatar] Welcome speech failed:', err));
+        synthesizerRef.current.speakTextAsync(textForSpeechOnly(welcome)).catch(err => console.error('[Avatar] Welcome speech failed:', err));
       }
     } catch (error) {
       addDebug(`初始化失败: ${error.message}`);
       console.error('Detailed Error:', error);
       setStatus('error');
+      synthesizerRef.current = null; // 允许用户点击「启动」重试
     }
   };
 
@@ -441,7 +479,8 @@ const MVPTestPage = () => {
       if (reply) {
         addBotMessage(reply);
         if (synthesizerRef.current) {
-          await synthesizerRef.current.speakTextAsync(reply);
+          const toSpeak = textForSpeechOnly(reply);
+          if (toSpeak) await synthesizerRef.current.speakTextAsync(toSpeak);
         }
       }
     } catch (error) {
@@ -553,13 +592,20 @@ const MVPTestPage = () => {
                 muted={false}
               />
 
-              {status === 'idle' && (
-                <button
-                  onClick={initAvatar}
-                  className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
-                >
-                  {t('mvpTest.controls.start')}
-                </button>
+              {(status === 'idle' || status === 'error') && (
+                <div className="flex flex-col items-center gap-3">
+                  {status === 'error' && debugLog.length > 0 && (
+                    <p className="text-red-400/90 text-sm max-w-md text-center px-4">
+                      {debugLog[debugLog.length - 1]}
+                    </p>
+                  )}
+                  <button
+                    onClick={initAvatar}
+                    className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
+                  >
+                    {status === 'error' ? (t('mvpTest.controls.retry') || '重试') : t('mvpTest.controls.start')}
+                  </button>
+                </div>
               )}
 
               {status === 'connecting' && (
@@ -690,7 +736,10 @@ const MVPTestPage = () => {
             </h3>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+          <div
+            ref={chatContainerRef}
+            className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
+          >
             {messages.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-gray-600 text-center px-4">
                 <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4">💬</div>
@@ -708,7 +757,6 @@ const MVPTestPage = () => {
                 </div>
               ))
             )}
-            <div ref={chatEndRef} />
           </div>
 
           <div className="p-6 bg-black/20 rounded-b-3xl">
