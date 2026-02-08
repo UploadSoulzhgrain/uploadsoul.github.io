@@ -94,18 +94,19 @@ const MVPChinaPage = () => {
         });
         setCameraStream(stream);
         setIsCameraOn(true);
-        if (userVideoRef.current) {
-          userVideoRef.current.srcObject = stream;
-          // 确保视频播放
-          userVideoRef.current.play().catch(e => {
-            console.log('Video autoplay blocked:', e);
-          });
-        }
+        // 不在此处给 ref 赋值：此时 <video> 尚未挂载（isCameraOn 刚变为 true），由 useEffect 在挂载后绑定
       } catch (err) {
         console.error('Camera error:', err);
         addDebug(`摄像头失败: ${err.message}`);
       }
     }
+  }, [isCameraOn, cameraStream]);
+
+  // 摄像头流就绪后绑定到 video 元素（video 在 isCameraOn 为 true 时才挂载，需在 effect 里赋值）
+  useEffect(() => {
+    if (!isCameraOn || !cameraStream || !userVideoRef.current) return;
+    userVideoRef.current.srcObject = cameraStream;
+    userVideoRef.current.play().catch((e) => console.log('User video autoplay:', e));
   }, [isCameraOn, cameraStream]);
 
   // 清理摄像头
@@ -550,13 +551,13 @@ const MVPChinaPage = () => {
 
             {/* 用户摄像头画面 */}
             {isCameraOn && (
-              <div className="relative rounded-xl overflow-hidden bg-black/40 border border-white/10">
+              <div className="relative rounded-xl overflow-hidden bg-black/40 border border-white/10 aspect-video min-h-[200px]">
                 <video
                   ref={userVideoRef}
                   autoPlay
                   playsInline
                   muted
-                  className="w-full h-32 object-cover"
+                  className="w-full h-full min-h-[200px] object-contain"
                 />
                 <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 rounded text-[10px] text-gray-400">
                   您的画面
