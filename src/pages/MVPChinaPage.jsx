@@ -95,6 +95,10 @@ const MVPChinaPage = () => {
         setIsCameraOn(true);
         if (userVideoRef.current) {
           userVideoRef.current.srcObject = stream;
+          // 确保视频播放
+          userVideoRef.current.play().catch(e => {
+            console.log('Video autoplay blocked:', e);
+          });
         }
       } catch (err) {
         console.error('Camera error:', err);
@@ -219,7 +223,22 @@ const MVPChinaPage = () => {
     try {
       addDebug(t('mvpChina.logs.getToken'));
       const response = await fetch('/api/heygen-token');
-      const data = await response.json();
+
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error('HeyGen Token API Error:', errText);
+        throw new Error(`Token API Failed (${response.status}): ${errText.substring(0, 50)}...`);
+      }
+
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        const errText = await response.text();
+        console.error('HeyGen Token JSON Error:', e, 'Response:', errText);
+        throw new Error('Token API returned invalid JSON');
+      }
+
       const { token } = data;
 
       if (!token) throw new Error(t('mvpChina.logs.error'));
@@ -308,7 +327,20 @@ const MVPChinaPage = () => {
         body: JSON.stringify({ message: text })
       });
 
-      const data = await chatRes.json();
+      let data;
+      const contentType = chatRes.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await chatRes.json();
+      } else {
+        const text = await chatRes.text();
+        console.error('Chat API Non-JSON Response:', text);
+        throw new Error(`Server Error: ${text.substring(0, 50)}...`);
+      }
+
+      if (!chatRes.ok) {
+        throw new Error(data.error || `Chat API Failed (${chatRes.status})`);
+      }
+
       const reply = data.reply;
 
       if (reply) {
@@ -494,8 +526,8 @@ const MVPChinaPage = () => {
               <button
                 onClick={toggleCamera}
                 className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${isCameraOn
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                    : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                  : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
                   }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

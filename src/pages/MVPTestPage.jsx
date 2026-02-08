@@ -84,6 +84,10 @@ const MVPTestPage = () => {
         setIsCameraOn(true);
         if (userVideoRef.current) {
           userVideoRef.current.srcObject = stream;
+          // 确保视频播放
+          userVideoRef.current.play().catch(e => {
+            console.log('Video autoplay blocked:', e);
+          });
         }
       } catch (err) {
         console.error('Camera error:', err);
@@ -171,7 +175,7 @@ const MVPTestPage = () => {
         const errText = await tokenRes.text();
         addDebug(`Token API Error: ${tokenRes.status} ${tokenRes.statusText}`);
         console.error('Token API Response:', errText);
-        throw new Error(`Token API Failed (${tokenRes.status})`);
+        throw new Error(`Token API Failed (${tokenRes.status}): ${errText.substring(0, 50)}...`);
       }
 
       if (!iceRes.ok) {
@@ -181,8 +185,26 @@ const MVPTestPage = () => {
         throw new Error(`ICE API Failed (${iceRes.status})`);
       }
 
-      const { token, region } = await tokenRes.json();
-      const iceServers = await iceRes.json();
+      let token, region;
+      try {
+        const tokenData = await tokenRes.json();
+        token = tokenData.token;
+        region = tokenData.region;
+      } catch (e) {
+        const errText = await tokenRes.text().catch(() => 'Cannot read text');
+        console.error('Token JSON Parse Error:', e, 'Response:', errText);
+        addDebug(`Token JSON Error: ${e.message}`);
+        throw new Error('Token API returned invalid JSON');
+      }
+
+      let iceServers;
+      try {
+        iceServers = await iceRes.json();
+      } catch (e) {
+        console.error('ICE JSON Parse Error:', e);
+        addDebug(`ICE JSON Error: ${e.message}`);
+        throw new Error('ICE API returned invalid JSON');
+      }
 
       const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
 
@@ -400,8 +422,21 @@ const MVPTestPage = () => {
         body: JSON.stringify({ message: text })
       });
 
-      const data = await chatRes.json();
+      let data;
+      const contentType = chatRes.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") !== -1) {
+        data = await chatRes.json();
+      } else {
+        const text = await chatRes.text();
+        console.error('Chat API Non-JSON Response:', text);
+        throw new Error(`Server Error: ${text.substring(0, 50)}...`);
+      }
+
       const reply = data.reply;
+
+      if (!chatRes.ok) {
+        throw new Error(data.error || `Chat API Failed (${chatRes.status})`);
+      }
 
       if (reply) {
         addBotMessage(reply);
@@ -590,8 +625,8 @@ const MVPTestPage = () => {
               <button
                 onClick={toggleCamera}
                 className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${isCameraOn
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                    : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
+                  ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
+                  : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
                   }`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
