@@ -67,8 +67,8 @@ i18n
       caches: ['localStorage', 'cookie']
     },
     react: {
-      useSuspense: true, // Use React Suspense for lazy loading
-      wait: true // Wait for translations to be loaded
+      useSuspense: false, // Set to false if not using Suspense boundary
+      wait: true
     }
   });
 
