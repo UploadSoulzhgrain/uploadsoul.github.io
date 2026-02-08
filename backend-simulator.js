@@ -83,9 +83,9 @@ app.get('/api/ice-servers', async (req, res) => {
     }
 });
 
-// Chat API
+// Chat API (preferred_language: mandarin | english | cantonese，数字人回复语言)
 app.post('/api/chat', async (req, res) => {
-    const { message } = req.body;
+    const { message, preferred_language } = req.body;
     const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
     const azureApiKey = process.env.AZURE_OPENAI_KEY;
     const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4';
@@ -108,9 +108,14 @@ app.post('/api/chat', async (req, res) => {
         console.log(`Deployment: ${deploymentName}`);
         console.log(`API Version: ${apiVersion}`);
 
+        const langHint = preferred_language === 'cantonese'
+            ? '请用粤语回复。'
+            : preferred_language === 'english'
+                ? 'Please reply in English.'
+                : '请用普通话回复。';
         const result = await client.chat.completions.create({
             messages: [
-                { role: "system", content: "你是一个名为 UploadSoul 传灵的数字人助理。你亲切、专业，旨在为用户提供情感陪伴和数字永生咨询。请保持回答简短。" },
+                { role: "system", content: `你是一个名为 UploadSoul 传灵的数字人助理。你亲切、专业，旨在为用户提供情感陪伴和数字永生咨询。请保持回答简短。${langHint}` },
                 { role: "user", content: message }
             ],
             model: deploymentName,
