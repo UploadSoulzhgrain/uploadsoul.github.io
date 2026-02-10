@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Mic, Camera, MessageSquare, BookOpen, Zap } from 'lucide-react';
+import { Mic, Camera, MessageSquare, BookOpen, Zap, User } from 'lucide-react';
 
-const DigitalImmortalityPage = () => {
-  const [hasAvatar, setHasAvatar] = useState(false); // 是否已创建化身
-  const [showGenesis, setShowGenesis] = useState(false); // 是否显示创建流程
-  const [genesisStep, setGenesisStep] = useState(1); // 创建步骤: 1-生物特征, 2-性格铭刻, 3-核心记忆, 4-生成中
+const UploadSoul = () => {
+  const [showGenesisModal, setShowGenesisModal] = useState(false); // 创建化身模态框
+  const [genesisStep, setGenesisStep] = useState(1); // 创建步骤
   const [genesisData, setGenesisData] = useState({
     photos: [],
     voice: null,
@@ -37,12 +36,8 @@ const DigitalImmortalityPage = () => {
     if (!canvas) return;
 
     const ctx = canvas.getContext('2d');
-    const updateSize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', updateSize);
-    updateSize();
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
 
     const particles = Array.from({ length: 80 }, () => ({
       x: Math.random() * canvas.width,
@@ -85,10 +80,7 @@ const DigitalImmortalityPage = () => {
       animationId = requestAnimationFrame(animate);
     };
     animate();
-    return () => {
-      window.removeEventListener('resize', updateSize);
-      cancelAnimationFrame(animationId);
-    }
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
   const createSpark = (count = 1) => {
@@ -202,9 +194,13 @@ const DigitalImmortalityPage = () => {
     handleAIResponse('text');
   };
 
-  const startGenesisFlow = () => {
-    setShowGenesis(true);
+  const openGenesisModal = () => {
+    setShowGenesisModal(true);
     setGenesisStep(1);
+  };
+
+  const closeGenesisModal = () => {
+    setShowGenesisModal(false);
   };
 
   const handleGenesisFileUpload = (e, type) => {
@@ -232,10 +228,10 @@ const DigitalImmortalityPage = () => {
       setTimeout(() => {
         setGenesisStep(4);
         setTimeout(() => {
-          setHasAvatar(true);
-          setShowGenesis(false);
+          setShowGenesisModal(false);
           setSystemLog('> 身外化身创建完成！');
           createSpark(10);
+          setEvolutionProgress(100);
           setTimeout(() => setSystemLog(''), 3000);
         }, 4000);
       }, 500);
@@ -253,29 +249,12 @@ const DigitalImmortalityPage = () => {
     <div className="uploadsoul-container">
       <canvas ref={canvasRef} className="particle-canvas" />
 
-      {/* Welcome Screen - First Time User */}
-      {!hasAvatar && !showGenesis && (
-        <div className="welcome-screen">
-          <div className="welcome-content">
-            <div className="welcome-title">UPLOADSOUL</div>
-            <div className="welcome-subtitle">身外化身 · DIGITAL IMMORTALITY</div>
-            <div className="welcome-description">
-              在无尽的数据流中，创造一个永恒的你。<br />
-              通过照片、声音、记忆，让AI学习你的灵魂，<br />
-              构建一个能够思考、感受、交流的数字化身。<br /><br />
-              当时间流逝，这个身外化身将永远记得此刻的你。
-            </div>
-            <button className="create-avatar-btn" onClick={startGenesisFlow}>
-              启动灵魂备份 / Start Genesis
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Genesis Flow - Avatar Creation */}
-      {showGenesis && (
+      {/* 创建化身模态框 */}
+      {showGenesisModal && (
         <div className="genesis-overlay">
           <div className="genesis-container">
+            <button className="genesis-close" onClick={closeGenesisModal}>×</button>
+
             <div className="genesis-step-indicator">
               <div className={`step-dot ${genesisStep >= 1 ? 'active' : ''} ${genesisStep > 1 ? 'completed' : ''}`} />
               <div className={`step-dot ${genesisStep >= 2 ? 'active' : ''} ${genesisStep > 2 ? 'completed' : ''}`} />
@@ -284,7 +263,7 @@ const DigitalImmortalityPage = () => {
 
             {genesisStep === 1 && (
               <>
-                <div className="genesis-title">生物特征上传</div>
+                <div className="genesis-title">生物体征上传</div>
                 <div className="genesis-subtitle">BIOMETRIC UPLOADS / 让我看见你</div>
 
                 <div className="upload-zone" onClick={() => document.getElementById('photo-upload').click()}>
@@ -334,26 +313,15 @@ const DigitalImmortalityPage = () => {
                 <div className="genesis-title">灵魂铭刻</div>
                 <div className="genesis-subtitle">MIND INSCRIPTION / 告诉我你是谁</div>
 
-                <div style={{ marginBottom: '20px' }}>
-                  <div style={{ color: 'rgba(224, 230, 255, 0.8)', marginBottom: '10px', fontSize: '14px' }}>
+                <div className="personality-options">
+                  <div className="personality-question">
                     面对冲突时，你倾向于？
                   </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div className="personality-buttons">
                     {['理性分析', '情感表达', '回避'].map(option => (
                       <button
                         key={option}
-                        style={{
-                          flex: 1,
-                          padding: '12px',
-                          background: genesisData.personality.conflict === option
-                            ? 'rgba(100, 200, 255, 0.3)'
-                            : 'rgba(100, 200, 255, 0.05)',
-                          border: '1px solid rgba(100, 200, 255, 0.3)',
-                          borderRadius: '8px',
-                          color: '#e0e6ff',
-                          cursor: 'pointer',
-                          fontSize: '13px'
-                        }}
+                        className={`personality-btn ${genesisData.personality.conflict === option ? 'selected' : ''}`}
                         onClick={() => setGenesisData(prev => ({
                           ...prev,
                           personality: { ...prev.personality, conflict: option }
@@ -365,26 +333,15 @@ const DigitalImmortalityPage = () => {
                   </div>
                 </div>
 
-                <div style={{ marginBottom: '20px' }}>
-                  <div style={{ color: 'rgba(224, 230, 255, 0.8)', marginBottom: '10px', fontSize: '14px' }}>
+                <div className="personality-options">
+                  <div className="personality-question">
                     你更倾向于？
                   </div>
-                  <div style={{ display: 'flex', gap: '10px' }}>
+                  <div className="personality-buttons">
                     {['独处思考', '社交互动'].map(option => (
                       <button
                         key={option}
-                        style={{
-                          flex: 1,
-                          padding: '12px',
-                          background: genesisData.personality.social === option
-                            ? 'rgba(100, 200, 255, 0.3)'
-                            : 'rgba(100, 200, 255, 0.05)',
-                          border: '1px solid rgba(100, 200, 255, 0.3)',
-                          borderRadius: '8px',
-                          color: '#e0e6ff',
-                          cursor: 'pointer',
-                          fontSize: '13px'
-                        }}
+                        className={`personality-btn ${genesisData.personality.social === option ? 'selected' : ''}`}
                         onClick={() => setGenesisData(prev => ({
                           ...prev,
                           personality: { ...prev.personality, social: option }
@@ -458,48 +415,32 @@ const DigitalImmortalityPage = () => {
         </div>
       )}
 
-      {/* Main Interface - Only show when avatar exists */}
-      {hasAvatar && (
-        <>
+      {/* 原有主界面 */}
 
-          <style>{`
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500&display=swap');
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; }
         .uploadsoul-container {
-          width: 100%;
-          height: calc(100vh - 80px); /* 适配顶部导航栏高度 */
+          width: 100vw; height: 100vh;
           background: linear-gradient(135deg, #050814 0%, #0a1128 50%, #1a0b2e 100%);
           color: #e0e6ff;
           font-family: 'Noto Sans SC', sans-serif;
-          position: relative;
-          overflow: hidden;
+          position: relative; overflow: hidden;
         }
-
-        .uploadsoul-container * {
-          box-sizing: border-box;
-        }
-
         .particle-canvas {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 1;
+          position: absolute; top: 0; left: 0;
+          width: 100%; height: 100%;
+          pointer-events: none; z-index: 1;
         }
         .soul-title {
-          position: absolute;
-          top: 30px;
-          left: 40px;
-          z-index: 5;
+          position: absolute; top: 40px; left: 40px; z-index: 5;
           font-family: 'Orbitron', monospace;
-          font-size: 28px;
-          font-weight: 900;
+          font-size: 28px; font-weight: 900;
           background: linear-gradient(135deg, #64c8ff, #8a2be2, #00ff88);
           -webkit-background-clip: text;
-          background-clip: text;
           -webkit-text-fill-color: transparent;
+          background-clip: text;
           letter-spacing: 4px;
           animation: titleGlow 3s ease-in-out infinite;
         }
@@ -649,15 +590,10 @@ const DigitalImmortalityPage = () => {
           50% { box-shadow: 0 0 35px rgba(0, 255, 136, 0.7), 0 0 70px rgba(0, 255, 136, 0.3); }
         }
         .interaction-deck {
-          position: absolute;
-          right: 0;
-          top: 0;
-          width: 38%;
-          height: 100%;
-          z-index: 3;
-          display: flex;
-          flex-direction: column;
-          padding: 40px 25px 40px 25px;
+          position: absolute; right: 0; top: 0;
+          width: 38%; height: 100%; z-index: 3;
+          display: flex; flex-direction: column;
+          padding: 85px 25px 40px 25px;
           backdrop-filter: blur(20px);
           background: linear-gradient(135deg, rgba(10, 17, 40, 0.4) 0%, rgba(26, 11, 46, 0.3) 100%);
           border-left: 1px solid rgba(100, 200, 255, 0.2);
@@ -918,8 +854,7 @@ const DigitalImmortalityPage = () => {
         }
         .memory-corridor-btn {
           position: absolute;
-          top: 30px;
-          right: 30px;
+          top: 30px; right: 30px;
           z-index: 6;
           width: 44px; height: 44px;
           border-radius: 10px;
@@ -947,82 +882,65 @@ const DigitalImmortalityPage = () => {
           letter-spacing: 2px;
           z-index: 2;
         }
-        .welcome-screen {
-          position: absolute;
-          inset: 0;
-          z-index: 10;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, #050814 0%, #0a1128 50%, #1a0b2e 100%);
-        }
-        .welcome-content {
-          text-align: center;
-          max-width: 600px;
-          padding: 40px;
-        }
-        .welcome-title {
-          font-family: 'Orbitron', monospace;
-          font-size: 48px;
-          font-weight: 900;
-          background: linear-gradient(135deg, #64c8ff, #8a2be2, #00ff88);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin-bottom: 20px;
-          animation: titleGlow 3s ease-in-out infinite;
-        }
-        .welcome-subtitle {
-          font-size: 18px;
-          color: rgba(100, 200, 255, 0.8);
-          letter-spacing: 4px;
-          margin-bottom: 40px;
-          font-family: 'Orbitron', monospace;
-        }
-        .welcome-description {
-          font-size: 16px;
-          color: rgba(224, 230, 255, 0.7);
-          line-height: 1.8;
-          margin-bottom: 50px;
-        }
         .create-avatar-btn {
-          padding: 18px 48px;
-          background: linear-gradient(135deg, #64c8ff, #8a2be2);
-          border: none;
-          border-radius: 12px;
-          color: white;
-          font-family: 'Orbitron', monospace;
-          font-size: 16px;
-          letter-spacing: 3px;
-          cursor: pointer;
-          transition: all 0.4s ease;
-          text-transform: uppercase;
-          box-shadow: 0 8px 32px rgba(100, 200, 255, 0.3);
+          position: absolute;
+          top: 30px; right: 95px;
+          z-index: 6;
+          width: 44px; height: 44px;
+          border-radius: 10px;
+          border: 1px solid rgba(138, 43, 226, 0.4);
+          background: rgba(26, 11, 46, 0.6);
+          backdrop-filter: blur(20px);
+          color: #8a2be2;
+          display: flex;
+          align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.3s ease;
         }
         .create-avatar-btn:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 48px rgba(100, 200, 255, 0.5);
+          background: rgba(138, 43, 226, 0.2);
+          border-color: rgba(138, 43, 226, 0.6);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(138, 43, 226, 0.4);
         }
         .genesis-overlay {
-          position: absolute;
+          position: fixed;
           inset: 0;
-          z-index: 10;
+          z-index: 100;
           background: rgba(5, 8, 20, 0.95);
           backdrop-filter: blur(20px);
           display: flex;
-          align-items: center;
-          justify-content: center;
+          align-items: center; justify-content: center;
         }
         .genesis-container {
           width: 80%;
           max-width: 900px;
-          background: rgba(10, 17, 40, 0.8);
+          max-height: 85vh;
+          overflow-y: auto;
+          background: rgba(10, 17, 40, 0.9);
           border: 1px solid rgba(100, 200, 255, 0.3);
           border-radius: 20px;
           padding: 50px;
           backdrop-filter: blur(30px);
           box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+          position: relative;
+        }
+        .genesis-close {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          width: 32px; height: 32px;
+          border: none;
+          background: rgba(100, 200, 255, 0.1);
+          color: #64c8ff;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 20px;
+          line-height: 1;
+          transition: all 0.3s ease;
+        }
+        .genesis-close:hover {
+          background: rgba(100, 200, 255, 0.2);
+          transform: rotate(90deg);
         }
         .genesis-title {
           font-family: 'Orbitron', monospace;
@@ -1045,8 +963,7 @@ const DigitalImmortalityPage = () => {
           margin-bottom: 40px;
         }
         .step-dot {
-          width: 12px;
-          height: 12px;
+          width: 12px; height: 12px;
           border-radius: 50%;
           background: rgba(100, 200, 255, 0.2);
           transition: all 0.3s ease;
@@ -1073,7 +990,6 @@ const DigitalImmortalityPage = () => {
         }
         .upload-zone-icon {
           font-size: 48px;
-          color: rgba(100, 200, 255, 0.5);
           margin-bottom: 15px;
         }
         .upload-zone-text {
@@ -1087,8 +1003,7 @@ const DigitalImmortalityPage = () => {
           margin-top: 20px;
         }
         .preview-item {
-          width: 80px;
-          height: 80px;
+          width: 80px; height: 80px;
           border-radius: 8px;
           object-fit: cover;
           border: 1px solid rgba(100, 200, 255, 0.3);
@@ -1129,8 +1044,12 @@ const DigitalImmortalityPage = () => {
           min-height: 100px;
           margin-bottom: 15px;
         }
-        .memory-input::placeholder { color: rgba(224, 230, 255, 0.3); }
-        .memory-list { margin-top: 20px; }
+        .memory-input::placeholder {
+          color: rgba(224, 230, 255, 0.3);
+        }
+        .memory-list {
+          margin-top: 20px;
+        }
         .memory-item {
           background: rgba(100, 200, 255, 0.05);
           border: 1px solid rgba(100, 200, 255, 0.2);
@@ -1139,6 +1058,37 @@ const DigitalImmortalityPage = () => {
           margin-bottom: 10px;
           font-size: 13px;
           color: rgba(224, 230, 255, 0.8);
+        }
+        .personality-options {
+          margin-bottom: 20px;
+        }
+        .personality-question {
+          color: rgba(224, 230, 255, 0.8);
+          margin-bottom: 10px;
+          font-size: 14px;
+        }
+        .personality-buttons {
+          display: flex;
+          gap: 10px;
+        }
+        .personality-btn {
+          flex: 1;
+          padding: 12px;
+          background: rgba(100, 200, 255, 0.05);
+          border: 1px solid rgba(100, 200, 255, 0.3);
+          border-radius: 8px;
+          color: #e0e6ff;
+          cursor: pointer;
+          font-size: 13px;
+          transition: all 0.3s ease;
+        }
+        .personality-btn:hover {
+          background: rgba(100, 200, 255, 0.15);
+        }
+        .personality-btn.selected {
+          background: rgba(100, 200, 255, 0.3);
+          border-color: rgba(100, 200, 255, 0.6);
+          box-shadow: 0 0 15px rgba(100, 200, 255, 0.3);
         }
         .generating-animation {
           text-align: center;
@@ -1166,167 +1116,169 @@ const DigitalImmortalityPage = () => {
         }
       `}</style>
 
-          <div className="soul-title">
-            UPLOADSOUL
-            <div className="soul-subtitle">身外化身 · DIGITAL IMMORTALITY</div>
-          </div>
+      <div className="soul-title">
+        UPLOADSOUL
+        <div className="soul-subtitle">身外化身 · DIGITAL IMMORTALITY</div>
+      </div>
 
-          <div className="main-viewport">
-            <div className="avatar-container">
-              <div className="avatar-figure">
-                <div className="avatar-glow" />
-                <div className="avatar-core" />
-                <div className="avatar-silhouette" />
-                <div className="data-streams">
-                  <div className="data-stream" />
-                  <div className="data-stream" />
-                  <div className="data-stream" />
-                  <div className="data-stream" />
-                </div>
-                {sparks.map(spark => (
-                  <div
-                    key={spark.id}
-                    className="memory-spark"
+      <div className="main-viewport">
+        <div className="avatar-container">
+          <div className="avatar-figure">
+            <div className="avatar-glow" />
+            <div className="avatar-core" />
+            <div className="avatar-silhouette" />
+            <div className="data-streams">
+              <div className="data-stream" />
+              <div className="data-stream" />
+              <div className="data-stream" />
+              <div className="data-stream" />
+            </div>
+            {sparks.map(spark => (
+              <div
+                key={spark.id}
+                className="memory-spark"
+                style={{
+                  left: `${spark.x}%`,
+                  top: `${spark.y}%`,
+                  '--tx': `${Math.random() * 200 - 100}px`,
+                  '--ty': `${-200 - Math.random() * 100}px`
+                }}
+              />
+            ))}
+          </div>
+          <div className={`avatar-state-indicator ${avatarState}`}>
+            {avatarState === 'listening' && '● 聆听中 / LISTENING'}
+            {avatarState === 'thinking' && '◉ 思考中 / THINKING'}
+            {avatarState === 'responding' && '◈ 共鸣中 / RESONATING'}
+          </div>
+        </div>
+        <div className="reality-label">REALITY: 数字虚空 / DIGITAL VOID</div>
+      </div>
+
+      <button className="memory-corridor-btn" title="记忆回廊">
+        <BookOpen size={20} />
+      </button>
+
+      <button className="create-avatar-btn" title="创建数字人" onClick={openGenesisModal}>
+        <User size={20} />
+      </button>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        style={{ display: 'none' }}
+        accept="image/*"
+        onChange={handleFileUpload}
+      />
+
+      <div className="interaction-deck">
+        <div className="deck-header">
+          <div className="deck-title">灵魂日志 / Soul Log</div>
+          {systemLog && <div className="system-log">{systemLog}</div>}
+        </div>
+
+        <div className="dialogue-stream">
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`message ${msg.type}`}>
+              <div className="message-header">
+                <div className="message-avatar" />
+                <span className="message-sender">
+                  {msg.type === 'user' ? '你' : msg.type === 'ai-observation' ? '观察日记' : '身外化身'}
+                </span>
+                <span className="message-timestamp">{msg.timestamp}</span>
+              </div>
+              <div className="message-content">
+                {msg.text}
+                {msg.attachment && msg.attachment.startsWith('data:image') && (
+                  <img
+                    src={msg.attachment}
+                    alt="uploaded"
                     style={{
-                      left: `${spark.x}%`,
-                      top: `${spark.y}%`,
-                      '--tx': `${Math.random() * 200 - 100}px`,
-                      '--ty': `${-200 - Math.random() * 100}px`
+                      maxWidth: '100%',
+                      marginTop: '10px',
+                      borderRadius: '8px',
+                      border: '1px solid rgba(100, 200, 255, 0.2)'
                     }}
                   />
-                ))}
-              </div>
-              <div className={`avatar-state-indicator ${avatarState}`}>
-                {avatarState === 'listening' && '● 聆听中 / LISTENING'}
-                {avatarState === 'thinking' && '◉ 思考中 / THINKING'}
-                {avatarState === 'responding' && '◈ 共鸣中 / RESONATING'}
+                )}
               </div>
             </div>
-            <div className="reality-label">REALITY: 数字虚空 / DIGITAL VOID</div>
-          </div>
+          ))}
+          {isTyping && (
+            <div className="message ai">
+              <div className="message-header">
+                <div className="message-avatar" />
+                <span className="message-sender">身外化身</span>
+              </div>
+              <div className="typing-indicator">
+                <div className="typing-dot" />
+                <div className="typing-dot" />
+                <div className="typing-dot" />
+              </div>
+            </div>
+          )}
+        </div>
 
-          <button className="memory-corridor-btn" title="记忆回廊">
-            <BookOpen size={20} />
-          </button>
-
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept="image/*"
-            onChange={handleFileUpload}
+        <div className="whisper-field">
+          <div className="input-prompt">今天过得怎么样？有什么想告诉未来的自己吗？</div>
+          <textarea
+            className="input-area"
+            placeholder="此刻你在想什么..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendMessage();
+              }
+            }}
+            disabled={activeInputMode === 'voice'}
           />
-
-          <div className="interaction-deck">
-            <div className="deck-header">
-              <div className="deck-title">灵魂日志 / Soul Log</div>
-              {systemLog && <div className="system-log">{systemLog}</div>}
+          <div className="input-controls">
+            <div className="input-modes">
+              <button
+                className={`mode-button ${activeInputMode === 'voice' ? 'active' : ''}`}
+                title="语音输入"
+                onClick={handleVoiceInput}
+              >
+                <Mic size={18} />
+              </button>
+              <button
+                className={`mode-button ${activeInputMode === 'image' ? 'active' : ''}`}
+                title="上传照片"
+                onClick={handleImageUpload}
+              >
+                <Camera size={18} />
+              </button>
+              <button
+                className={`mode-button ${activeInputMode === 'text' ? 'active' : ''}`}
+                title="文字输入"
+                onClick={() => setActiveInputMode('text')}
+              >
+                <MessageSquare size={18} />
+              </button>
             </div>
-
-            <div className="dialogue-stream">
-              {messages.map((msg, idx) => (
-                <div key={idx} className={`message ${msg.type}`}>
-                  <div className="message-header">
-                    <div className="message-avatar" />
-                    <span className="message-sender">
-                      {msg.type === 'user' ? '你' : msg.type === 'ai-observation' ? '观察日记' : '身外化身'}
-                    </span>
-                    <span className="message-timestamp">{msg.timestamp}</span>
-                  </div>
-                  <div className="message-content">
-                    {msg.text}
-                    {msg.attachment && msg.attachment.startsWith('data:image') && (
-                      <img
-                        src={msg.attachment}
-                        alt="uploaded"
-                        style={{
-                          maxWidth: '100%',
-                          marginTop: '10px',
-                          borderRadius: '8px',
-                          border: '1px solid rgba(100, 200, 255, 0.2)'
-                        }}
-                      />
-                    )}
-                  </div>
-                </div>
-              ))}
-              {isTyping && (
-                <div className="message ai">
-                  <div className="message-header">
-                    <div className="message-avatar" />
-                    <span className="message-sender">身外化身</span>
-                  </div>
-                  <div className="typing-indicator">
-                    <div className="typing-dot" />
-                    <div className="typing-dot" />
-                    <div className="typing-dot" />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="whisper-field">
-              <div className="input-prompt">今天过得怎么样？有什么想告诉未来的自己吗？</div>
-              <textarea
-                className="input-area"
-                placeholder="此刻你在想什么..."
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSendMessage();
-                  }
-                }}
-                disabled={activeInputMode === 'voice'}
-              />
-              <div className="input-controls">
-                <div className="input-modes">
-                  <button
-                    className={`mode-button ${activeInputMode === 'voice' ? 'active' : ''}`}
-                    title="语音输入"
-                    onClick={handleVoiceInput}
-                  >
-                    <Mic size={18} />
-                  </button>
-                  <button
-                    className={`mode-button ${activeInputMode === 'image' ? 'active' : ''}`}
-                    title="上传照片"
-                    onClick={handleImageUpload}
-                  >
-                    <Camera size={18} />
-                  </button>
-                  <button
-                    className={`mode-button ${activeInputMode === 'text' ? 'active' : ''}`}
-                    title="文字输入"
-                    onClick={() => setActiveInputMode('text')}
-                  >
-                    <MessageSquare size={18} />
-                  </button>
-                </div>
-                <button className="send-button" onClick={handleSendMessage}>
-                  发送
-                </button>
-              </div>
-            </div>
+            <button className="send-button" onClick={handleSendMessage}>
+              发送
+            </button>
           </div>
+        </div>
+      </div>
 
-          <div className="evolution-engine">
-            <div className="evolution-label">
-              <Zap size={12} />
-              进化状态 / EVOLUTION STATUS
-            </div>
-            <div className="dna-helix">
-              <div className="dna-progress" style={{ width: `${evolutionProgress}%` }} />
-            </div>
-            <div className="evolution-status">
-              情感模拟拟合度: {evolutionProgress.toFixed(1)}% · 已学习新的对话模式
-            </div>
-          </div>
-        </>
-      )}
+      <div className="evolution-engine">
+        <div className="evolution-label">
+          <Zap size={12} />
+          进化状态 / EVOLUTION STATUS
+        </div>
+        <div className="dna-helix">
+          <div className="dna-progress" style={{ width: `${evolutionProgress}%` }} />
+        </div>
+        <div className="evolution-status">
+          情感模拟拟合度: {evolutionProgress.toFixed(1)}% · 已学习新的对话模式
+        </div>
+      </div>
     </div>
   );
 };
 
-export default DigitalImmortalityPage;
+export default UploadSoul;
