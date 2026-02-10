@@ -250,7 +250,7 @@ const DigitalImmortalityPage = () => {
   };
 
   return (
-    <div className="uploadsoul-container pt-16">
+    <div className="uploadsoul-container">
       <canvas ref={canvasRef} className="particle-canvas" />
 
       {/* Welcome Screen - First Time User */}
@@ -466,25 +466,40 @@ const DigitalImmortalityPage = () => {
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500&display=swap');
         
         .uploadsoul-container {
-          width: 100vw; height: 100vh;
+          width: 100%;
+          height: calc(100vh - 80px); /* 适配顶部导航栏高度 */
           background: linear-gradient(135deg, #050814 0%, #0a1128 50%, #1a0b2e 100%);
           color: #e0e6ff;
           font-family: 'Noto Sans SC', sans-serif;
-          position: relative; overflow: hidden;
+          position: relative;
+          overflow: hidden;
         }
+
+        .uploadsoul-container * {
+          box-sizing: border-box;
+        }
+
         .particle-canvas {
-          position: absolute; top: 0; left: 0;
-          width: 100%; height: 100%;
-          pointer-events: none; z-index: 1;
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 1;
         }
         .soul-title {
-          position: absolute; top: 100px; left: 40px; z-index: 5;
+          position: absolute;
+          top: 30px;
+          left: 40px;
+          z-index: 5;
           font-family: 'Orbitron', monospace;
-          font-size: 28px; font-weight: 900;
+          font-size: 28px;
+          font-weight: 900;
           background: linear-gradient(135deg, #64c8ff, #8a2be2, #00ff88);
           -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
           background-clip: text;
+          -webkit-text-fill-color: transparent;
           letter-spacing: 4px;
           animation: titleGlow 3s ease-in-out infinite;
         }
@@ -634,10 +649,15 @@ const DigitalImmortalityPage = () => {
           50% { box-shadow: 0 0 35px rgba(0, 255, 136, 0.7), 0 0 70px rgba(0, 255, 136, 0.3); }
         }
         .interaction-deck {
-          position: absolute; right: 0; top: 0;
-          width: 38%; height: 100%; z-index: 3;
-          display: flex; flex-direction: column;
-          padding: 100px 25px 40px 25px;
+          position: absolute;
+          right: 0;
+          top: 0;
+          width: 38%;
+          height: 100%;
+          z-index: 3;
+          display: flex;
+          flex-direction: column;
+          padding: 40px 25px 40px 25px;
           backdrop-filter: blur(20px);
           background: linear-gradient(135deg, rgba(10, 17, 40, 0.4) 0%, rgba(26, 11, 46, 0.3) 100%);
           border-left: 1px solid rgba(100, 200, 255, 0.2);
@@ -898,7 +918,8 @@ const DigitalImmortalityPage = () => {
         }
         .memory-corridor-btn {
           position: absolute;
-          top: 100px; right: 30px;
+          top: 30px;
+          right: 30px;
           z-index: 6;
           width: 44px; height: 44px;
           border-radius: 10px;
