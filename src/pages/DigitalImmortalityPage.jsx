@@ -552,11 +552,11 @@ const UploadSoul = () => {
         }
         .avatar-state-indicator {
           position: absolute;
-          bottom: -60px; left: 50%;
+          bottom: 20px; left: 50%;
           transform: translateX(-50%);
           font-family: 'Orbitron', monospace;
-          font-size: 14px; color: #64c8ff;
-          letter-spacing: 3px;
+          font-size: 13px; color: #64c8ff;
+          letter-spacing: 2.5px;
           text-transform: uppercase;
           opacity: 1; padding: 10px 24px;
           background: rgba(10, 17, 40, 0.9);
@@ -566,6 +566,7 @@ const UploadSoul = () => {
           box-shadow: 0 0 20px rgba(100, 200, 255, 0.3);
           animation: stateGlow 2s ease-in-out infinite;
           white-space: nowrap;
+          z-index: 10;
         }
         @keyframes stateGlow {
           0%, 100% { box-shadow: 0 0 20px rgba(100, 200, 255, 0.3), 0 0 40px rgba(100, 200, 255, 0.1); }
@@ -806,7 +807,7 @@ const UploadSoul = () => {
         }
         .evolution-engine {
           position: absolute;
-          bottom: 120px;
+          bottom: 160px;
           left: 20px;
           width: 380px;
           padding: 15px 18px;
@@ -874,12 +875,12 @@ const UploadSoul = () => {
         }
         .reality-label {
           position: absolute;
-          bottom: 40px; left: 50%;
+          bottom: 100px; left: 50%;
           transform: translateX(-50%);
           font-family: 'Orbitron', monospace;
-          font-size: 10px;
+          font-size: 11px;
           color: rgba(100, 200, 255, 0.5);
-          letter-spacing: 2px;
+          letter-spacing: 2.5px;
           z-index: 2;
         }
         .create-avatar-btn {
