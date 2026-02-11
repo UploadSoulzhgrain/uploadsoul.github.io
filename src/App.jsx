@@ -29,6 +29,11 @@ import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
 import ReunionSpacePage from './pages/ReunionSpacePage'
 import FamilyTreePage from './pages/FamilyTreePage'
+import FamilyGalaxyPage from './pages/FamilyGalaxyPage'
+import HistoryHallPage from './pages/HistoryHallPage'
+import HistoryDialoguePage from './pages/HistoryDialoguePage'
+import HistoryCreatorPage from './pages/HistoryCreatorPage'
+import MemoryWorkshopPage from './pages/MemoryWorkshopPage'
 import DigitalWorldPage from './pages/DigitalWorldPage'
 import NotFoundPage from './pages/NotFoundPage'
 import SitemapPage from './pages/SitemapPage'
@@ -105,6 +110,11 @@ const BusinessRoutes = () => (
     <Route path="digital-rebirth" element={<DigitalRebirthPage />} />
     <Route path="digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
     <Route path="digital-rebirth/family-tree" element={<FamilyTreePage />} />
+    <Route path="digital-rebirth/family-galaxy" element={<FamilyGalaxyPage />} />
+    <Route path="digital-rebirth/history-hall" element={<HistoryHallPage />} />
+    <Route path="digital-rebirth/history-dialogue/:id" element={<HistoryDialoguePage />} />
+    <Route path="digital-rebirth/history-creator" element={<HistoryCreatorPage />} />
+    <Route path="digital-rebirth/create" element={<MemoryWorkshopPage />} />
     <Route path="start-experience" element={<DigitalHumanPage />} />
     <Route path="about" element={<AboutPage />} />
     <Route path="digital-human-experience" element={<DigitalHumanExperiencePage />} />
