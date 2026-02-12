@@ -20,9 +20,25 @@
     "reunionSpace": "重逢空间",
     "digitalWorld": "数字世界",
     "vr": "VR体验",
+    "traces": "留痕",
+    "tracesShort": "留痕",
+    "petArchive": "萌宠档案馆",
+    "babyResume": "萌宝简历",
+    "speakBar": "说吧SayIt",
+    "soul": "伴侣",
+    "soulShort": "伴侣",
+    "petRoot": "萌宠",
+    "petShort": "萌宠",
+    "life": "永生",
+    "lifeShort": "永生",
     "team": "团队成员",
     "contact": "联系我们",
     "join": "加入我们"
+  },
+  "traces": {
+    "petArchiveSubtitle": "记录爱宠的点点滴滴",
+    "babyResumeSubtitle": "记录宝贝成长的每一个脚印",
+    "speakBarSubtitle": "开始你的说吧SayIt之旅"
   },
   "sitemap": {
     "description": "探索 UploadSoul 的所有页面和功能",

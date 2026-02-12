@@ -13,6 +13,22 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { navigate, l } = useLocalizedNavigate();
 
+  const navItems = [
+    { to: '/companion', label: t('header.companion', '情感陪伴') },
+    { to: '/pet', label: t('header.pet', '虚拟宠物') },
+    { to: '/virtual-love', label: t('header.virtualLove', '虚拟恋爱') },
+    { to: '/digital-immortality', label: t('digitalImmortality.title', '数字永生') },
+    { to: '/digital-rebirth', label: t('digitalRebirth.title', '数字重生') },
+    {
+      label: t('header.traces', '留痕'),
+      children: [
+        { to: '/pet-archive', label: t('header.petArchive', '萌宠档案馆') },
+        { to: '/baby-resume', label: t('header.babyResume', '萌宝简历') },
+        { to: '/speak-bar', label: t('header.speakBar', '说吧SayIt') }
+      ]
+    }
+  ];
+
   const handleLanguageChange = () => {
     setIsMenuOpen(false);
   };
@@ -52,28 +68,41 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex space-x-8">
-            {[
-              { to: '/', label: t('header.home') },
-              { to: '/companion', label: t('header.companion') },
-
-              { to: '/pet', label: t('home.features.virtualPet.title') },
-              { to: '/virtual-love', label: t('header.virtualLove') },
-              { to: '/digital-immortality', label: t('digitalImmortality.title') },
-              { to: '/digital-rebirth', label: t('digitalRebirth.title') }
-            ].map((link) => (
-              <button
-                key={link.to}
-                onClick={() => handleNav(link.to)}
-                className="text-gray-400 hover:text-white text-sm font-medium transition-colors focus:outline-none"
-              >
-                {link.label}
-              </button>
+          <nav className="hidden lg:flex space-x-4">
+            {navItems.map((link) => (
+              <div key={link.label} className="relative group flex items-center">
+                {link.children ? (
+                  <>
+                    <button className="text-gray-400 hover:text-white text-sm font-medium transition-colors focus:outline-none flex items-center gap-1 py-2">
+                      {link.short || link.label}
+                      <svg className="w-3 h-3 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div className="absolute left-0 top-full mt-0 w-48 bg-[#1A1A24] rounded-xl shadow-xl border border-white/10 py-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 transform origin-top-left z-50">
+                      {link.children.map((child) => (
+                        <button
+                          key={child.to}
+                          onClick={() => handleNav(child.to)}
+                          className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+                        >
+                          {child.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => handleNav(link.to)}
+                    className="text-gray-400 hover:text-white text-sm font-medium transition-colors focus:outline-none px-2"
+                  >
+                    {link.short || link.label}
+                  </button>
+                )}
+              </div>
             ))}
           </nav>
 
           {/* User Section */}
-          <div className="hidden lg:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-4">
             <LanguageSelector onLanguageChange={handleLanguageChange} />
 
             {user ? (
@@ -138,22 +167,32 @@ const Header = () => {
         {isMenuOpen && (
           <nav className="mt-4 lg:hidden bg-[#12121A] border border-white/5 rounded-2xl shadow-2xl p-6 animate-fadeIn">
             <div className="flex flex-col space-y-6">
-              {[
-                { to: '/', label: t('header.home') },
-                { to: '/companion', label: t('header.companions') },
-
-                { to: '/pet', label: t('home.features.virtualPet.title') },
-                { to: '/virtual-love', label: t('header.virtualLove') },
-                { to: '/digital-immortality', label: t('digitalImmortality.title') },
-                { to: '/digital-rebirth', label: t('digitalRebirth.title') }
-              ].map((link) => (
-                <button
-                  key={link.to}
-                  onClick={() => handleNav(link.to)}
-                  className="text-gray-400 hover:text-white text-lg font-medium transition-colors text-left"
-                >
-                  {link.label}
-                </button>
+              {navItems.map((link) => (
+                <div key={link.label}>
+                  {link.children ? (
+                    <div className="flex flex-col space-y-4">
+                      <span className="text-gray-400 text-lg font-medium">{link.label}</span>
+                      <div className="flex flex-col space-y-4 pl-4 border-l border-white/10">
+                        {link.children.map((child) => (
+                          <button
+                            key={child.to}
+                            onClick={() => handleNav(child.to)}
+                            className="text-gray-400 hover:text-white text-base font-medium transition-colors text-left"
+                          >
+                            {child.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => handleNav(link.to)}
+                      className="text-gray-400 hover:text-white text-lg font-medium transition-colors text-left"
+                    >
+                      {link.label}
+                    </button>
+                  )}
+                </div>
               ))}
               <div className="h-px bg-white/5"></div>
               <div className="flex flex-col space-y-4">

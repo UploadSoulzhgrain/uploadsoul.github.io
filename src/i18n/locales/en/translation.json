@@ -155,9 +155,25 @@
     "reunionSpace": "Reunion Space",
     "digitalWorld": "Digital World",
     "vr": "VR Experience",
+    "traces": "Logs",
+    "tracesShort": "Logs",
+    "petArchive": "Pet Archive",
+    "babyResume": "Baby Resume",
+    "speakBar": "Speak Bar",
+    "soul": "Soul",
+    "soulShort": "Soul",
+    "petRoot": "Pets",
+    "petShort": "Pets",
+    "life": "Life",
+    "lifeShort": "Life",
     "team": "Team",
     "contact": "Contact Us",
     "join": "Join Us"
+  },
+  "traces": {
+    "petArchiveSubtitle": "Record every moment of your pet",
+    "babyResumeSubtitle": "Record every step of your baby's growth",
+    "speakBarSubtitle": "Speak your heart out"
   },
   "sitemap": {
     "description": "Explore all pages and features of UploadSoul",
