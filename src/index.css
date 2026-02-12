@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -182,4 +184,106 @@
 
 ::-webkit-scrollbar-corner {
   display: none;
+}
+
+/* ========================================= */
+/* Pet Archive Specific Styles (from PWA)    */
+/* ========================================= */
+
+@layer components {
+
+  /* Editorial Card */
+  .editorial-card {
+    @apply rounded-2xl overflow-hidden shadow-editorial border border-latte-200 bg-white;
+  }
+
+  .dark .editorial-card {
+    @apply shadow-editorial-dark border-twilight-100 bg-twilight-100;
+  }
+
+  /* Glass Effect */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/30 border border-white/50;
+  }
+
+  .dark .glass-effect {
+    @apply bg-twilight-100/30 border-twilight-50/50;
+  }
+
+  /* Text Shadow for Photos */
+  .text-photo-overlay {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Gradient Overlay */
+  .gradient-overlay {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
+  }
+
+  /* Button Styles */
+  .btn-primary {
+    @apply px-6 py-3 rounded-full bg-charcoal-300 text-white font-medium hover:bg-charcoal-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
+  }
+
+  .dark .btn-primary {
+    @apply bg-ice-300 text-twilight-200 hover:bg-ice-400;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-full border-2 border-charcoal-300 text-charcoal-300 hover:bg-charcoal-300 hover:text-white transition-all duration-300;
+  }
+
+  .dark .btn-secondary {
+    @apply border-ice-300 text-ice-300 hover:bg-ice-300 hover:text-twilight-200;
+  }
+
+  /* Input Styles */
+  .input-editorial {
+    @apply w-full px-4 py-3 rounded-lg border-2 border-latte-300 bg-white focus:border-charcoal-300 focus:outline-none transition-colors duration-200 font-mono text-sm;
+  }
+
+  .dark .input-editorial {
+    @apply border-twilight-100 bg-twilight-100 focus:border-ice-300;
+  }
+
+  /* Typography */
+  .magazine-title {
+    @apply font-serif font-black tracking-tight leading-tight;
+  }
+
+  .metric-label {
+    @apply font-mono text-xs uppercase tracking-wider;
+  }
+}
+
+/* SayIt Specific Utility Styles */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+}
+
+.vintage-border {
+  border: 1px solid rgba(198, 155, 61, 0.3);
+  box-shadow: 0 4px 15px rgba(62, 39, 35, 0.05);
+}
+
+.photo-shadow {
+  box-shadow: 2px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.album-border {
+  border: 8px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.paper-texture {
+  background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuC7sXr75bE0n_JqYuAPzt_8flW29bNHHB-B-XOoeQ7F8mrzTqOlPBbbc0jmrQm69UfE5_L_5IaCiDw0HmYp8xrE4jAJ4s-apZf0eh-FqFzWXjc7NZL4ziS01s8cQvmlDM49FE2h6FBlhXZB6N0Ig172wFfgWSh2f_Gtq7Kr-63z5j_fDLrf0X5jFWeXiV8uY4ccVi8eiQXJBIMG9rXvAA_39CHfhZY8B9qf818eEZIdAerwL-1fN08Y5d3jgmCwm57TAAVIycNFurnS);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

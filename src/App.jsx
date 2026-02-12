@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, useParams, Outlet } from 'react-router-dom'
 import { I18nextProvider, useTranslation } from 'react-i18next'
 import i18n from './i18n/i18n'
@@ -43,7 +43,14 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import UpdatePasswordPage from './pages/UpdatePasswordPage'
 import FounderColumnPage from './pages/FounderColumnPage'
+import PetArchivePage from './pages/PetArchivePage' // Deprecated, keeping for ref if needed, but likely replaced
+import PetLandingPage from './pages/PetLandingPage'
+import PetDashboardPage from './pages/PetDashboardPage'
+import PetDetailPage from './pages/PetDetailPage'
+import BabyResumePage from './pages/BabyResumePage'
+import SpeakBarPage from './pages/SpeakBarPage'
 import AnalyticsTracker from './components/analytics/AnalyticsTracker'
+import OfflinePage from './pages/OfflinePage'
 
 // 1. 自动回顶组件
 const ScrollToTop = () => {
@@ -78,6 +85,9 @@ const LanguageSync = ({ lang }) => {
 // 3. 通用布局外框
 const AppLayout = () => {
   const { lang } = useParams();
+  const location = useLocation();
+  const hideFooterRoutes = ['/speak-bar'];
+  const shouldHideFooter = hideFooterRoutes.some(route => location.pathname.includes(route));
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -87,7 +97,7 @@ const AppLayout = () => {
       <main className="flex-grow">
         <Outlet />
       </main>
-      <Footer />
+      {!shouldHideFooter && <Footer />}
     </div>
   );
 };
@@ -103,6 +113,11 @@ const BusinessRoutes = () => (
     <Route path="register" element={<RegisterPage />} />
     <Route path="companion" element={<CompanionPage />} />
     <Route path="pet" element={<PetPage />} />
+    <Route path="pet-archive" element={<PetLandingPage />} />
+    <Route path="pet-archive/dashboard" element={<ProtectedRoute><PetDashboardPage /></ProtectedRoute>} />
+    <Route path="pet-archive/p/:slug" element={<PetDetailPage />} />
+    <Route path="baby-resume" element={<BabyResumePage />} />
+    <Route path="speak-bar" element={<SpeakBarPage />} />
     <Route path="virtual-love" element={<VirtualLovePage />} />
     <Route path="digital-immortality" element={<DigitalImmortalityPage />} />
     <Route path="digital-immortality/create" element={<CreateDigitalHumanPage />} />
@@ -136,6 +151,25 @@ const BusinessRoutes = () => (
 );
 
 function App() {
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  if (!isOnline) {
+    return <OfflinePage />;
+  }
+
   return (
     <I18nextProvider i18n={i18n}>
       <Router>

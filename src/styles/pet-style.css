@@ -1,0 +1,81 @@
+
+/* Pet Style Theme (Warm/Latte) */
+.pet-style-bg {
+  background-color: #F9F3E5; /* Cream background */
+  background-image: radial-gradient(#E5D9C8 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.pet-card-white {
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(141, 110, 99, 0.08); /* Soft brown shadow */
+  border: 1px solid #F5F0E9;
+  transition: all 0.3s ease;
+}
+
+.pet-card-white:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(141, 110, 99, 0.12);
+}
+
+.pet-btn-primary {
+  background: linear-gradient(135deg, #FF7043 0%, #FFAB91 100%);
+  color: white;
+  border-radius: 9999px; /* Pill shape */
+  padding: 8px 24px;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(255, 112, 67, 0.3);
+  transition: all 0.3s ease;
+}
+
+.pet-btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 15px rgba(255, 112, 67, 0.4);
+}
+
+.pet-btn-secondary {
+  background: #FFFFFF;
+  color: #5D4037; /* Dark Brown */
+  border: 1px solid #D7CCC8;
+  border-radius: 9999px;
+  padding: 8px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.pet-btn-secondary:hover {
+  background: #FBE9E7;
+  border-color: #FFAB91;
+}
+
+.pet-title-serif {
+  font-family: 'Playfair Display', serif;
+  color: #3E2723; /* Very Dark Brown */
+}
+
+.pet-text-body {
+  color: #5D4037; /* Medium Brown */
+}
+
+.pet-text-muted {
+  color: #8D6E63; /* Light Brown/Grey */
+}
+
+.pet-badge-gold {
+  background: linear-gradient(135deg, #FFD54F 0%, #FFCA28 100%);
+  color: #3E2723;
+  font-weight: bold;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.pet-tag {
+  background-color: #FBE9E7; /* Light Orange Bg */
+  color: #D84315; /* Deep Orange Text */
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
