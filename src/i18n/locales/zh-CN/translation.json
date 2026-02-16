@@ -95,6 +95,11 @@
       "founderQuote": "“我怕有一天，世界忘了我来过。”",
       "founderLabel": "创始人语"
     },
+    "videoDemo": {
+      "title": "产品演示",
+      "subtitle": "观看我们的数字重生故事，感受AI如何让记忆永存",
+      "playHint": "点击播放"
+    },
     "features": {
       "title": "平台特色",
       "description": "全维度数字灵魂体验，让每一次互动充满温度与情感",

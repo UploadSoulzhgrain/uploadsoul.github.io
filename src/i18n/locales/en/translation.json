@@ -234,6 +234,11 @@
       "founderQuote": "\"I fear that one day, the world will forget I was ever here.\"",
       "founderLabel": "Founder"
     },
+    "videoDemo": {
+      "title": "Product Demo",
+      "subtitle": "Watch our Digital Rebirth Story and see how AI preserves memories forever",
+      "playHint": "Click to play"
+    },
     "features": {
       "title": "Platform Features",
       "description": "Full-dimensional digital soul experience, making every interaction warm and emotional",

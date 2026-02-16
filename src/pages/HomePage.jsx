@@ -240,6 +240,53 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Video Demo Section */}
+      <section className="video-demo-section py-20 px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="max-w-4xl mx-auto text-center"
+        >
+          {/* Section Title */}
+          <h2 className="text-3xl md:text-4xl font-semibold mb-4">
+            {t('home.videoDemo.title')}
+          </h2>
+          <p className="text-white/50 max-w-xl mx-auto mb-10">
+            {t('home.videoDemo.subtitle')}
+          </p>
+
+          {/* Video Container */}
+          <div className="video-demo-container relative">
+            {/* Ambient Glow */}
+            <div className="video-demo-glow" />
+
+            {/* Video Player */}
+            <div className="video-demo-player relative rounded-2xl overflow-hidden shadow-2xl shadow-amber-500/10 border border-white/10 bg-black/40 backdrop-blur-sm">
+              <video
+                controls
+                loop
+                preload="metadata"
+                playsInline
+                className="w-full aspect-video"
+                poster=""
+              >
+                <source
+                  src="https://res.cloudinary.com/dj2eotipq/video/upload/v1771177153/数字重生故事_p0brpq.mov"
+                  type="video/quicktime"
+                />
+                <source
+                  src="https://res.cloudinary.com/dj2eotipq/video/upload/v1771177153/数字重生故事_p0brpq.mp4"
+                  type="video/mp4"
+                />
+                {t('home.videoDemo.playHint')}
+              </video>
+            </div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* 功能区 - 极简卡片 */}
       <section className="py-24 px-4">
         <div className="max-w-6xl mx-auto">
