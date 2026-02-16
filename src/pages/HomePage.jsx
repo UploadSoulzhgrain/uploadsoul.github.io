@@ -265,10 +265,11 @@ const HomePage = () => {
             {/* Video Player */}
             <div className="video-demo-player relative rounded-2xl overflow-hidden shadow-2xl shadow-amber-500/10 border border-white/10 bg-black/40 backdrop-blur-sm">
               <video
-                controls
+                autoPlay
+                muted
                 loop
-                preload="metadata"
                 playsInline
+                controls
                 className="w-full aspect-video"
                 poster=""
               >
