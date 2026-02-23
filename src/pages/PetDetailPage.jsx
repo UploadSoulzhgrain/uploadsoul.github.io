@@ -56,8 +56,8 @@ export default function PetDetailPage() {
     return (
       <div className="min-h-screen flex items-center justify-center pet-style-bg">
         <div className="relative w-20 h-20">
-            <div className="absolute inset-0 border-4 border-[#D7CCC8] rounded-full" />
-            <div className="absolute inset-0 border-4 border-[#FF7043] border-t-transparent rounded-full animate-spin" />
+          <div className="absolute inset-0 border-4 border-[#D7CCC8] rounded-full" />
+          <div className="absolute inset-0 border-4 border-[#FF7043] border-t-transparent rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -73,7 +73,7 @@ export default function PetDetailPage() {
           <p className="text-[#8D6E63]">
             该页面可能不存在或尚未公开
           </p>
-          <button onClick={() => navigate('/pet-archive')} className="mt-8 pet-btn-secondary">
+          <button onClick={() => navigate('/pet')} className="mt-8 pet-btn-secondary">
             返回档案馆
           </button>
         </div>
@@ -92,77 +92,77 @@ export default function PetDetailPage() {
 
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 p-6 flex justify-between items-center">
-        <button 
-            onClick={() => navigate('/pet-archive/dashboard')}
-            className="flex items-center gap-2 text-[#5D4037] hover:text-[#3E2723] transition-colors bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-[#D7CCC8] shadow-sm"
+        <button
+          onClick={() => navigate('/pet')}
+          className="flex items-center gap-2 text-[#5D4037] hover:text-[#3E2723] transition-colors bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-[#D7CCC8] shadow-sm"
         >
-            <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm font-medium">返回</span>
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-sm font-medium">返回</span>
         </button>
-        <button 
-            onClick={() => setShowQR(true)}
-            className="p-2 rounded-full bg-white/80 backdrop-blur-md border border-[#D7CCC8] text-[#5D4037] hover:text-[#3E2723] shadow-sm transition-all"
+        <button
+          onClick={() => setShowQR(true)}
+          className="p-2 rounded-full bg-white/80 backdrop-blur-md border border-[#D7CCC8] text-[#5D4037] hover:text-[#3E2723] shadow-sm transition-all"
         >
-            <QrCodeIcon className="w-5 h-5" />
+          <QrCodeIcon className="w-5 h-5" />
         </button>
       </nav>
 
       {/* Hero Header */}
       <div className="relative h-[60vh] w-full overflow-hidden bg-[#F5F0E9]">
         {pet.cover_image_url ? (
-            <motion.img 
-                initial={{ scale: 1.1, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.5 }}
-                src={pet.cover_image_url} 
-                className="w-full h-full object-cover"
-            />
+          <motion.img
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5 }}
+            src={pet.cover_image_url}
+            className="w-full h-full object-cover"
+          />
         ) : (
-            <div className="w-full h-full flex items-center justify-center bg-[#FBE9E7]">
-                <Heart className="w-24 h-24 text-[#D7CCC8]" />
-            </div>
+          <div className="w-full h-full flex items-center justify-center bg-[#FBE9E7]">
+            <Heart className="w-24 h-24 text-[#D7CCC8]" />
+          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#F9F3E5] via-[#F9F3E5]/50 to-transparent" />
-        
+
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-16 text-center">
-            <motion.div 
-                initial={{ y: 50, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-                className="max-w-4xl mx-auto"
-            >
-                <div className="flex items-center justify-center gap-4 mb-4">
-                    <span className="px-3 py-1 rounded-full border border-[#FFAB91] bg-[#FBE9E7] text-[#D84315] text-xs font-medium tracking-wider uppercase">
-                        Digital Soul
-                    </span>
-                    {pet.personality && (
-                        <span className="px-3 py-1 rounded-full border border-[#D7CCC8] bg-white text-[#5D4037] text-xs font-medium">
-                            {pet.personality}
-                        </span>
-                    )}
+          <motion.div
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="max-w-4xl mx-auto"
+          >
+            <div className="flex items-center justify-center gap-4 mb-4">
+              <span className="px-3 py-1 rounded-full border border-[#FFAB91] bg-[#FBE9E7] text-[#D84315] text-xs font-medium tracking-wider uppercase">
+                Digital Soul
+              </span>
+              {pet.personality && (
+                <span className="px-3 py-1 rounded-full border border-[#D7CCC8] bg-white text-[#5D4037] text-xs font-medium">
+                  {pet.personality}
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-5xl md:text-7xl font-serif text-[#3E2723] mb-6 leading-tight">
+              {pet.name}
+            </h1>
+
+            <div className="flex flex-wrap justify-center gap-8 text-[#8D6E63] text-sm">
+              {pet.birth_date && (
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-[#FF7043]" />
+                  <span>Born {new Date(pet.birth_date).getFullYear()}</span>
                 </div>
-                
-                <h1 className="text-5xl md:text-7xl font-serif text-[#3E2723] mb-6 leading-tight">
-                    {pet.name}
-                </h1>
-                
-                <div className="flex flex-wrap justify-center gap-8 text-[#8D6E63] text-sm">
-                    {pet.birth_date && (
-                        <div className="flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-[#FF7043]" />
-                            <span>Born {new Date(pet.birth_date).getFullYear()}</span>
-                        </div>
-                    )}
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="w-4 h-4 text-[#FF7043]" />
-                        <span>Level {pet.power_level || 1}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Heart className="w-4 h-4 text-[#FF7043]" />
-                        <span>{memories.length} Memories</span>
-                    </div>
-                </div>
-            </motion.div>
+              )}
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#FF7043]" />
+                <span>Level {pet.power_level || 1}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Heart className="w-4 h-4 text-[#FF7043]" />
+                <span>{memories.length} Memories</span>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </div>
 
@@ -170,42 +170,42 @@ export default function PetDetailPage() {
       <div className="max-w-7xl mx-auto px-4 py-16">
         {/* Memory Gallery */}
         <div className="mb-20">
-            <h2 className="text-3xl font-serif text-[#3E2723] mb-8 flex items-center justify-center gap-3">
-                <span className="w-8 h-[2px] bg-[#D7CCC8]" />
-                Memory Gallery
-                <span className="w-8 h-[2px] bg-[#D7CCC8]" />
-            </h2>
-            
-            <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                {memories.map((memory, i) => (
-                    <motion.div
-                        key={memory.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        className="pet-card-white overflow-hidden break-inside-avoid"
-                    >
-                        {memory.type === 'photo' && (
-                            <img src={memory.media_url} className="w-full h-auto" loading="lazy" />
-                        )}
-                        {memory.caption && (
-                            <div className="p-4 bg-white">
-                                <p className="text-[#5D4037] italic font-serif">"{memory.caption}"</p>
-                                <p className="text-xs text-[#8D6E63] mt-2 font-medium">
-                                    {new Date(memory.date).toLocaleDateString()}
-                                </p>
-                            </div>
-                        )}
-                    </motion.div>
-                ))}
+          <h2 className="text-3xl font-serif text-[#3E2723] mb-8 flex items-center justify-center gap-3">
+            <span className="w-8 h-[2px] bg-[#D7CCC8]" />
+            Memory Gallery
+            <span className="w-8 h-[2px] bg-[#D7CCC8]" />
+          </h2>
+
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
+            {memories.map((memory, i) => (
+              <motion.div
+                key={memory.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="pet-card-white overflow-hidden break-inside-avoid"
+              >
+                {memory.type === 'photo' && (
+                  <img src={memory.media_url} className="w-full h-auto" loading="lazy" />
+                )}
+                {memory.caption && (
+                  <div className="p-4 bg-white">
+                    <p className="text-[#5D4037] italic font-serif">"{memory.caption}"</p>
+                    <p className="text-xs text-[#8D6E63] mt-2 font-medium">
+                      {new Date(memory.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          {memories.length === 0 && (
+            <div className="text-center py-20 border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50">
+              <p className="text-[#8D6E63]">No memories uploaded yet.</p>
             </div>
-            
-            {memories.length === 0 && (
-                <div className="text-center py-20 border border-dashed border-[#D7CCC8] rounded-2xl bg-white/50">
-                    <p className="text-[#8D6E63]">No memories uploaded yet.</p>
-                </div>
-            )}
+          )}
         </div>
       </div>
 
@@ -228,13 +228,13 @@ export default function PetDetailPage() {
             >
               <h3 className="text-2xl font-serif text-[#3E2723] mb-2">Soul Card</h3>
               <p className="text-[#8D6E63] text-sm mb-8">Scan to visit {pet.name}'s archive</p>
-              
+
               <div className="bg-[#F9F3E5] p-4 rounded-xl inline-block mb-8">
                 <QRCodeSVG value={currentUrl} size={200} fgColor="#3E2723" bgColor="#F9F3E5" />
               </div>
 
               <div className="flex gap-4 justify-center">
-                <button 
+                <button
                   onClick={() => setShowQR(false)}
                   className="pet-btn-secondary py-2 px-6"
                 >

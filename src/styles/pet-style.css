@@ -1,7 +1,7 @@
-
-/* Pet Style Theme (Warm/Latte) */
+/* Pet Style Theme (Warm/Latte) - Used by PetLandingPage */
 .pet-style-bg {
-  background-color: #F9F3E5; /* Cream background */
+  background-color: #F9F3E5;
+  /* Cream background */
   background-image: radial-gradient(#E5D9C8 1px, transparent 1px);
   background-size: 20px 20px;
 }
@@ -9,7 +9,8 @@
 .pet-card-white {
   background: #FFFFFF;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(141, 110, 99, 0.08); /* Soft brown shadow */
+  box-shadow: 0 4px 12px rgba(141, 110, 99, 0.08);
+  /* Soft brown shadow */
   border: 1px solid #F5F0E9;
   transition: all 0.3s ease;
 }
@@ -22,7 +23,8 @@
 .pet-btn-primary {
   background: linear-gradient(135deg, #FF7043 0%, #FFAB91 100%);
   color: white;
-  border-radius: 9999px; /* Pill shape */
+  border-radius: 9999px;
+  /* Pill shape */
   padding: 8px 24px;
   font-weight: 600;
   box-shadow: 0 4px 10px rgba(255, 112, 67, 0.3);
@@ -36,7 +38,8 @@
 
 .pet-btn-secondary {
   background: #FFFFFF;
-  color: #5D4037; /* Dark Brown */
+  color: #5D4037;
+  /* Dark Brown */
   border: 1px solid #D7CCC8;
   border-radius: 9999px;
   padding: 8px 24px;
@@ -51,15 +54,18 @@
 
 .pet-title-serif {
   font-family: 'Playfair Display', serif;
-  color: #3E2723; /* Very Dark Brown */
+  color: #3E2723;
+  /* Very Dark Brown */
 }
 
 .pet-text-body {
-  color: #5D4037; /* Medium Brown */
+  color: #5D4037;
+  /* Medium Brown */
 }
 
 .pet-text-muted {
-  color: #8D6E63; /* Light Brown/Grey */
+  color: #8D6E63;
+  /* Light Brown/Grey */
 }
 
 .pet-badge-gold {
@@ -72,10 +78,231 @@
 }
 
 .pet-tag {
-  background-color: #FBE9E7; /* Light Orange Bg */
-  color: #D84315; /* Deep Orange Text */
+  background-color: #FBE9E7;
+  /* Light Orange Bg */
+  color: #D84315;
+  /* Deep Orange Text */
   padding: 4px 12px;
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 500;
+}
+
+/* ============================================
+   Pet Dashboard - Golden Theme (Scoped)
+   ============================================ */
+
+.pet-dashboard {
+  --pet-primary: #ecb613;
+  --pet-bg-dark: #12100a;
+  --pet-surface-dark: #1c1910;
+  --pet-border-dark: #3d3621;
+  --pet-primary-rgb: 236, 182, 19;
+
+  font-family: 'Manrope', 'Noto Sans SC', sans-serif;
+  background-color: var(--pet-bg-dark);
+  color: #e2e8f0;
+}
+
+.pet-dashboard .pd-sidebar {
+  background: rgba(28, 25, 16, 0.5);
+  border-right: 1px solid var(--pet-border-dark);
+}
+
+.pet-dashboard .pd-header {
+  border-bottom: 1px solid var(--pet-border-dark);
+  background: rgba(18, 16, 10, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.pet-dashboard .pd-glass {
+  background: rgba(28, 25, 16, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(236, 182, 19, 0.1);
+  border-radius: 1rem;
+}
+
+.pet-dashboard .pd-card {
+  background: var(--pet-surface-dark);
+  border: 1px solid var(--pet-border-dark);
+  border-radius: 1.5rem;
+}
+
+.pet-dashboard .pd-input {
+  background: var(--pet-bg-dark);
+  border: 1px solid var(--pet-border-dark);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  color: #e2e8f0;
+  outline: none;
+  transition: all 0.2s;
+  font-size: 0.875rem;
+}
+
+.pet-dashboard .pd-input:focus {
+  border-color: var(--pet-primary);
+  box-shadow: 0 0 0 1px var(--pet-primary);
+}
+
+.pet-dashboard .pd-btn-primary {
+  background: var(--pet-primary);
+  color: var(--pet-bg-dark);
+  font-weight: 800;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+  box-shadow: 0 0 20px rgba(var(--pet-primary-rgb), 0.3);
+  transition: all 0.2s;
+}
+
+.pet-dashboard .pd-btn-primary:hover {
+  background: rgba(var(--pet-primary-rgb), 0.9);
+}
+
+.pet-dashboard .pd-btn-outline {
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 0.875rem;
+  transition: color 0.2s;
+}
+
+.pet-dashboard .pd-btn-outline:hover {
+  color: #fff;
+}
+
+.pet-dashboard .pd-accent {
+  color: var(--pet-primary);
+}
+
+.pet-dashboard .pd-badge {
+  background: rgba(var(--pet-primary-rgb), 0.1);
+  color: var(--pet-primary);
+  border: 1px solid rgba(var(--pet-primary-rgb), 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.pet-dashboard .pd-tag {
+  background: rgba(var(--pet-primary-rgb), 0.1);
+  color: var(--pet-primary);
+  border: 1px solid rgba(var(--pet-primary-rgb), 0.2);
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.pet-dashboard .pd-tag:hover {
+  background: rgba(var(--pet-primary-rgb), 0.2);
+}
+
+/* Nav items */
+.pet-dashboard .pd-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  transition: all 0.3s;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.pet-dashboard .pd-nav-item:hover {
+  background: rgba(var(--pet-primary-rgb), 0.1);
+  color: var(--pet-primary);
+}
+
+.pet-dashboard .pd-nav-item.active {
+  background: rgba(var(--pet-primary-rgb), 0.2);
+  color: var(--pet-primary);
+  border: 1px solid rgba(var(--pet-primary-rgb), 0.2);
+  box-shadow: 0 0 20px rgba(var(--pet-primary-rgb), 0.05);
+  font-weight: 700;
+}
+
+/* Material Symbols helper */
+.pet-dashboard .material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+.pet-dashboard .pd-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.pet-dashboard .pd-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.pet-dashboard .pd-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--pet-border-dark);
+  border-radius: 10px;
+}
+
+/* Upload zone */
+.pet-dashboard .pd-upload-zone {
+  border: 2px dashed rgba(var(--pet-primary-rgb), 0.3);
+  background: rgba(var(--pet-primary-rgb), 0.05);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.pet-dashboard .pd-upload-zone:hover {
+  border-color: rgba(var(--pet-primary-rgb), 0.6);
+}
+
+/* Toggle switch */
+.pet-dashboard .pd-toggle {
+  width: 2.5rem;
+  height: 1.25rem;
+  background: var(--pet-primary);
+  border-radius: 9999px;
+  position: relative;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.pet-dashboard .pd-toggle::after {
+  content: '';
+  position: absolute;
+  right: 0.25rem;
+  top: 0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background: var(--pet-bg-dark);
+  border-radius: 9999px;
+}
+
+/* Glow effects */
+.pet-dashboard .pd-glow-dot {
+  box-shadow: 0 0 8px rgba(var(--pet-primary-rgb), 0.8);
+}
+
+/* Preview card hover */
+.pet-dashboard .pd-preview-card img {
+  transition: transform 0.7s;
+}
+
+.pet-dashboard .pd-preview-card:hover img {
+  transform: scale(1.05);
 }
