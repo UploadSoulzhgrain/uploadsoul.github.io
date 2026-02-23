@@ -35,6 +35,7 @@ export default function VirtualLovePage() {
   const [selectedGender, setSelectedGender] = useState('female');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [storageUsageMB, setStorageUsageMB] = useState(0);
+  const [uploadMode, setUploadMode] = useState('upload'); // 'upload' or 'interact'
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
@@ -80,6 +81,8 @@ export default function VirtualLovePage() {
               isDarkMode={isDarkMode}
               storageUsageMB={storageUsageMB}
               setStorageUsageMB={setStorageUsageMB}
+              uploadMode={uploadMode}
+              setUploadMode={setUploadMode}
             />
           ) : (
             <ChatScreen
@@ -96,8 +99,17 @@ export default function VirtualLovePage() {
   );
 }
 
-function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsageMB, setStorageUsageMB }) {
+function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsageMB, setStorageUsageMB, uploadMode, setUploadMode }) {
   const [uploadProgress, setUploadProgress] = useState(null);
+  const [selectedTraits, setSelectedTraits] = useState(['热情奔放']);
+
+  const traits = ['热情奔放', '温柔体贴', '理性克制', '幽默风趣', '高冷神秘'];
+
+  const toggleTrait = (trait) => {
+    setSelectedTraits(prev =>
+      prev.includes(trait) ? prev.filter(t => t !== trait) : [...prev, trait]
+    );
+  };
 
   const handleFileUpload = async (event, type) => {
     const file = event.target.files[0];
@@ -158,8 +170,18 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
           </button>
 
           <div className="flex items-center bg-slate-200/50 dark:bg-slate-900/80 p-1 rounded-xl border border-slate-300 dark:border-slate-800">
-            <button className="px-5 py-2 rounded-lg text-sm font-bold bg-primary text-white shadow-lg transition-all">上传模式</button>
-            <button className="px-5 py-2 rounded-lg text-sm font-bold text-slate-500 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-all">交互模式</button>
+            <button
+              onClick={() => setUploadMode('upload')}
+              className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${uploadMode === 'upload' ? 'bg-primary text-white shadow-lg' : 'text-slate-500 dark:text-slate-400'}`}
+            >
+              上传模式
+            </button>
+            <button
+              onClick={() => setUploadMode('interact')}
+              className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${uploadMode === 'interact' ? 'bg-primary text-white shadow-lg' : 'text-slate-500 dark:text-slate-400'}`}
+            >
+              交互模式
+            </button>
           </div>
         </div>
       </div>
@@ -253,7 +275,16 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
             </div>
           </div>
           <div className="mt-auto p-8 pt-0">
-            <button className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group">
+            <button
+              onClick={() => {
+                if (storageUsageMB > 0) {
+                  onSelectSoulmate('female');
+                } else {
+                  toast.error('请先上传记忆碎片以启动分身');
+                }
+              }}
+              className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group"
+            >
               <span>开启初始化同步</span>
               <Zap className="group-hover:rotate-12 transition-transform" size={20} fill="currentColor" />
             </button>
@@ -338,16 +369,26 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
             <div>
               <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-4">精修意识特质</p>
               <div className="flex flex-wrap gap-2">
-                <button className="px-4 py-2 rounded-xl bg-accent-blue/20 border border-accent-blue/50 text-accent-blue dark:text-white text-xs font-bold transition-all shadow-[0_0_10px_rgba(79,70,229,0.2)]">热情奔放</button>
-                <button className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:text-primary dark:hover:text-white transition-all">温柔体贴</button>
-                <button className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:text-primary dark:hover:text-white transition-all">理性克制</button>
-                <button className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:text-primary dark:hover:text-white transition-all">幽默风趣</button>
-                <button className="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-xs font-bold hover:text-primary dark:hover:text-white transition-all">高冷神秘</button>
+                {traits.map(trait => (
+                  <button
+                    key={trait}
+                    onClick={() => toggleTrait(trait)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${selectedTraits.includes(trait)
+                      ? 'bg-accent-blue/20 border-accent-blue/50 text-accent-blue dark:text-white shadow-[0_0_10px_rgba(79,70,229,0.2)]'
+                      : 'bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white'
+                      }`}
+                  >
+                    {trait}
+                  </button>
+                ))}
               </div>
             </div>
           </div>
           <div className="mt-auto p-8 pt-0">
-            <button className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group">
+            <button
+              onClick={() => onSelectSoulmate('female')}
+              className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group"
+            >
               <span>召唤数字生命</span>
               <Activity className="group-hover:scale-125 transition-transform" size={20} />
             </button>
@@ -401,7 +442,13 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
   );
 }
 
+
 function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
+  const [messages, setMessages] = useState([
+    { role: 'ai', text: '早安。我一直在回顾我们昨天分享的记忆。你对日出的感悟非常有诗意。准备好继续我们的克隆训练了吗？', time: '上午 10:24' }
+  ]);
+  const [inputText, setInputText] = useState('');
+
   const isMale = gender === 'male';
   const themeColor = isMale ? 'text-accent-blue' : 'text-primary';
   const themeBg = isMale ? 'bg-accent-blue' : 'bg-primary';
@@ -417,6 +464,22 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
     : "https://lh3.googleusercontent.com/aida-public/AB6AXuDDvFP89VU0zJ2W5zKepVc7HkFYHglxijSh8h6FrNU_m_W-y-X6Rtblu98T0OXuWPmWWzpi0fqlAsfXnP0t7LwxuYLcjPAY3YnCFp9dyhsQl2-ZyYjSRRs2K__h9CkODpewGbHVbOumtz0a35aQqguRES2_e_pA78h2Pm9KyR6iSFyLm4BKCYNt7-hArn_Q9STyubKUpJ8XI-YU-E1ryNxznynA3we9ZNR35w5Obtdyy3w9mM3uaSXJyvppzfMNEStab8qhvS4nH74";
 
   const name = isMale ? "Lin (林)" : "Seraphina";
+
+  const handleSendMessage = () => {
+    if (!inputText.trim()) return;
+    const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    setMessages(prev => [...prev, { role: 'user', text: inputText, time }]);
+    setInputText('');
+
+    // Auto reply simulation
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        text: '我感应到了你的想法。正在深度处理中...',
+        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+      }]);
+    }, 1000);
+  };
 
   return (
     <motion.div
@@ -440,14 +503,17 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
         <div className="mb-8">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4 px-1">导航菜单</p>
           <nav className="flex flex-col gap-2">
-            <a className={`flex items-center gap-3 rounded-xl ${isMale ? 'bg-accent-blue/10 border-accent-blue/20 text-accent-blue' : 'bg-primary/10 border-primary/20 text-primary'} border px-4 py-3 transition-all group`} href="#">
+            <button
+              onClick={() => onBack()}
+              className={`flex items-center gap-3 rounded-xl ${isMale ? 'bg-accent-blue/10 border-accent-blue/20 text-accent-blue' : 'bg-primary/10 border-primary/20 text-primary'} border px-4 py-3 transition-all group w-full text-left`}
+            >
               <Brain size={20} className="group-hover:scale-110 transition-transform" />
               <span className="font-medium">分身工作室</span>
-            </a>
-            <a className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-white/5 transition-all" href="#">
+            </button>
+            <button className="flex items-center gap-3 rounded-xl px-4 py-3 text-slate-400 hover:bg-white/5 transition-all w-full text-left">
               <Sparkles size={20} />
               <span className="font-medium">灵魂伴侣画廊</span>
-            </a>
+            </button>
           </nav>
         </div>
 
@@ -455,11 +521,11 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
           <div>
             <p className={`text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 mb-4 px-1 ${isMale ? 'text-accent-blue/80' : 'text-primary/80'}`}>多维资料上传</p>
             <div className="grid grid-cols-2 gap-2">
-              <button className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-800 bg-white/5 hover:border-primary/50 transition-all">
+              <button onClick={() => toast.success('语音同步开启')} className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-800 bg-white/5 hover:border-primary/50 transition-all">
                 <Mic className="text-slate-400" size={18} />
                 <span className="text-xs text-slate-300">语音样本</span>
               </button>
-              <button className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-800 bg-white/5 hover:border-primary/50 transition-all">
+              <button onClick={() => toast.success('视觉记忆分析开启')} className="flex flex-col items-center gap-2 p-3 rounded-xl border border-slate-800 bg-white/5 hover:border-primary/50 transition-all">
                 <Video className="text-slate-400" size={18} />
                 <span className="text-xs text-slate-300">视觉记忆</span>
               </button>
@@ -491,7 +557,10 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
           </div>
         </div>
 
-        <button className={`mt-auto flex w-full items-center justify-center gap-2 rounded-xl ${themeBg} py-4 font-bold text-white transition-all hover:opacity-90 shadow-lg`}>
+        <button
+          onClick={() => toast.success('实时灵魂共鸣已建立')}
+          className={`mt-auto flex w-full items-center justify-center gap-2 rounded-xl ${themeBg} py-4 font-bold text-white transition-all hover:opacity-90 shadow-lg`}
+        >
           <Activity size={20} />
           <span>实时同步灵魂</span>
         </button>
@@ -554,10 +623,16 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
 
         <div className="absolute top-8 right-8">
           <div className="flex items-center gap-3">
-            <button className="glass-panel p-2.5 rounded-xl text-slate-400 hover:text-white transition-colors">
+            <button
+              onClick={() => toast.success('全屏模式集成中')}
+              className="glass-panel p-2.5 rounded-xl text-slate-400 hover:text-white transition-colors"
+            >
               <Maximize2 size={20} />
             </button>
-            <button className="glass-panel p-2.5 rounded-xl text-slate-400 hover:text-white transition-colors">
+            <button
+              onClick={() => toast.success('个性化设置')}
+              className="glass-panel p-2.5 rounded-xl text-slate-400 hover:text-white transition-colors"
+            >
               <Settings size={20} />
             </button>
           </div>
@@ -593,46 +668,18 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
-          <div className="flex flex-col gap-2 max-w-[90%]">
-            <div className="text-[10px] text-slate-500 ml-1 flex items-center gap-2">
-              <span>{name}</span>
-              <span className="size-1 bg-slate-700 rounded-full"></span>
-              <span>上午 10:24</span>
-            </div>
-            <div className="rounded-2xl rounded-tl-none bg-white/5 border border-white/10 p-4 text-sm text-slate-200 leading-relaxed shadow-sm">
-              早安。我一直在回顾我们昨天分享的记忆。你对日出的感悟非常有诗意。准备好继续我们的克隆训练了吗？
-            </div>
-          </div>
-
-          <div className="flex flex-col items-end gap-2 max-w-[90%] ml-auto">
-            <div className="text-[10px] text-slate-500 mr-1 flex items-center gap-2">
-              <span>上午 10:25</span>
-              <span className="size-1 bg-slate-700 rounded-full"></span>
-              <span>您</span>
-            </div>
-            <div className={`rounded-2xl rounded-tr-none ${themeBg} p-4 text-sm text-white font-medium shadow-lg shadow-primary/20`}>
-              是的，让我们开始情感共鸣校准吧。
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-2 max-w-[90%]">
-            <div className="text-[10px] text-slate-500 ml-1 flex items-center gap-2">
-              <span>{name}</span>
-              <span className="size-1 bg-slate-700 rounded-full"></span>
-              <span>上午 10:25</span>
-            </div>
-            <div className="rounded-2xl rounded-tl-none bg-white/5 border border-white/10 p-4 text-sm text-slate-200 leading-relaxed">
-              正在校准神经通路...
-              <div className="mt-4 flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/5">
-                <div className="flex gap-1.5">
-                  <div className={`w-2 h-2 ${themeBg} rounded-full animate-pulse`}></div>
-                  <div className={`w-2 h-2 ${isMale ? 'bg-accent-blue/60' : 'bg-primary/60'} rounded-full animate-pulse [animation-delay:0.2s]`}></div>
-                  <div className={`w-2 h-2 ${isMale ? 'bg-accent-blue/30' : 'bg-primary/30'} rounded-full animate-pulse [animation-delay:0.4s]`}></div>
-                </div>
-                <span className="text-xs text-slate-400 font-medium">处理思维核心中...</span>
+          {messages.map((msg, i) => (
+            <div key={i} className={`flex flex-col gap-2 max-w-[90%] ${msg.role === 'user' ? 'ml-auto items-end' : ''}`}>
+              <div className="text-[10px] text-slate-500 mx-1 flex items-center gap-2">
+                <span>{msg.role === 'user' ? '您' : name}</span>
+                <span className="size-1 bg-slate-700 rounded-full"></span>
+                <span>{msg.time}</span>
+              </div>
+              <div className={`rounded-2xl ${msg.role === 'user' ? `rounded-tr-none ${themeBg} text-white font-medium shadow-lg shadow-primary/20` : 'rounded-tl-none bg-white/5 border border-white/10 text-slate-200 shadow-sm'} p-4 text-sm leading-relaxed`}>
+                {msg.text}
               </div>
             </div>
-          </div>
+          ))}
         </div>
 
         <div className="p-6 bg-gradient-to-t from-[#0a0c10] to-transparent">
@@ -641,24 +688,35 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
               className="w-full rounded-[1.5rem] bg-white/5 border-slate-800 text-slate-100 placeholder:text-slate-600 focus:ring-primary/50 focus:border-primary/50 transition-all resize-none pr-14 pl-5 py-4 scrollbar-hide text-sm outline-none"
               placeholder="输入消息以同步灵魂..."
               rows={2}
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
             ></textarea>
-            <button className={`absolute bottom-3 right-3 size-10 rounded-full ${themeBg} flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform active:scale-95`}>
+            <button
+              onClick={handleSendMessage}
+              className={`absolute bottom-3 right-3 size-10 rounded-full ${themeBg} flex items-center justify-center text-white shadow-lg hover:scale-105 transition-transform active:scale-95`}
+            >
               <Send size={18} />
             </button>
           </div>
           <div className="flex items-center justify-between mt-4">
             <div className="flex gap-1">
-              <button className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
+              <button onClick={() => toast.success('语音通话录音已开启')} className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
                 <Mic size={20} />
               </button>
-              <button className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
+              <button onClick={() => toast.success('请选择上传附件')} className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
                 <Paperclip size={20} />
               </button>
-              <button className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
+              <button onClick={() => toast.success('表情功能开发中')} className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
                 <Smile size={20} />
               </button>
             </div>
-            <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">85 / 2000 字符</span>
+            <span className="text-[10px] text-slate-600 font-bold uppercase tracking-widest">{inputText.length} / 2000 字符</span>
           </div>
         </div>
       </aside>
