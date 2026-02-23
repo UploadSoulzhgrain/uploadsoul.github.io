@@ -5,6 +5,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        // digital-consciousness Palette
+        'primary': '#ec13a4',
+        'accent-blue': '#4f46e5',
         // Day Mode - Creamy Latte Palette
         'latte': {
           50: '#FDFCFB',
