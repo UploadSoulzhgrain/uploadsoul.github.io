@@ -216,5 +216,29 @@
       "explore": "探索型號",
       "preorder": "立即預訂"
     }
+  },
+  "virtualLove": {
+    "title": "虛擬戀人",
+    "awakening": "喚醒你的靈魂伴侶",
+    "persona": {
+      "title": "性格基調",
+      "sweet": "溫柔體貼",
+      "mature": "深沉優雅",
+      "intel": "博學理智",
+      "mystic": "神秘變幻"
+    },
+    "creation": {
+      "nameLabel": "稱呼 / Name",
+      "namePlaceholder": "給你的伴侶起個名字...",
+      "biometrics": "形象特徵 / Biometrics",
+      "uploadPhoto": "上傳參考照片",
+      "cloneVoice": "克隆聲音樣本",
+      "building": "正在構建數據晶格伴侶...",
+      "activating": "寫入性格矩陣 · 渲染面部拓扑 · 激活情感響應"
+    },
+    "chat": {
+      "inputPlaceholder": "想對對方說些什麼...",
+      "online": "在線"
+    }
   }
 }

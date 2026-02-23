@@ -1318,5 +1318,29 @@
       "play": "Play",
       "memory": "Memory"
     }
+  },
+  "virtualLove": {
+    "title": "Virtual Lover",
+    "awakening": "Awaken Your Soulmate",
+    "persona": {
+      "title": "Persona Type",
+      "sweet": "Sweet & Tender",
+      "mature": "Elegant & Mature",
+      "intel": "Intellectual & Rational",
+      "mystic": "Mysterious & Ever-changing"
+    },
+    "creation": {
+      "nameLabel": "Name",
+      "namePlaceholder": "Give your partner a name...",
+      "biometrics": "Biometrics",
+      "uploadPhoto": "Upload Reference Photo",
+      "cloneVoice": "Clone Voice Sample",
+      "building": "Constructing Data-Lattice Companion...",
+      "activating": "Writing Personality Matrix · Rendering Facial Topology · Activating Emotional Response"
+    },
+    "chat": {
+      "inputPlaceholder": "Say something...",
+      "online": "Online"
+    }
   }
 }
