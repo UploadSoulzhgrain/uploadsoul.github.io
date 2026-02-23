@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { MediaService } from '../services/mediaService';
+import { useAuth } from '../contexts/AuthContext';
 
 const CreateDigitalHumanPage = () => {
   const { t } = useTranslation();
@@ -13,17 +15,39 @@ const CreateDigitalHumanPage = () => {
     memories: '',
     voice: null
   });
+  const { user } = useAuth();
+  const [uploadProgress, setUploadProgress] = useState(null);
 
-  const handlePhotoUpload = (e) => {
+  const handlePhotoUpload = async (e) => {
     const files = Array.from(e.target.files);
-    if (files.length > 5) {
+    if (!user) {
+      toast.error(t('auth.loginRequired') || '请先登录');
+      return;
+    }
+
+    if (formData.photos.length + files.length > 5) {
       toast.error(t('digitalRebirth.form.uploadHint'));
       return;
     }
-    setFormData(prev => ({
-      ...prev,
-      photos: files
-    }));
+
+    for (const file of files) {
+      try {
+        setUploadProgress(0);
+        const url = await MediaService.uploadMedia(file, user.id, (progress) => {
+          setUploadProgress(progress);
+        });
+
+        setFormData(prev => ({
+          ...prev,
+          photos: [...prev.photos, url]
+        }));
+        toast.success(`${file.name} 上传成功`);
+      } catch (error) {
+        toast.error(`${file.name} 上传失败: ${error.message}`);
+      } finally {
+        setUploadProgress(null);
+      }
+    }
   };
 
   const handleSubmit = (e) => {
@@ -47,15 +71,13 @@ const CreateDigitalHumanPage = () => {
         <div className="flex justify-between mb-8">
           {[1, 2, 3].map((step) => (
             <div key={step} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep >= step ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'
-              }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${currentStep >= step ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'
+                }`}>
                 {step}
               </div>
               {step < 3 && (
-                <div className={`w-16 h-0.5 mx-2 ${
-                  currentStep > step ? 'bg-purple-600' : 'bg-gray-200'
-                }`} />
+                <div className={`w-16 h-0.5 mx-2 ${currentStep > step ? 'bg-purple-600' : 'bg-gray-200'
+                  }`} />
               )}
             </div>
           ))}
@@ -116,6 +138,21 @@ const CreateDigitalHumanPage = () => {
                       <p className="pl-1">{t('digitalRebirth.form.orDragDrop')}</p>
                     </div>
                     <p className="text-xs text-gray-500">{t('digitalRebirth.form.uploadHint')}</p>
+                    {uploadProgress !== null && (
+                      <div className="mt-4">
+                        <div className="text-xs text-purple-600 mb-1">正在上传: {uploadProgress}%</div>
+                        <div className="w-full bg-gray-200 rounded-full h-1.5">
+                          <div className="bg-purple-600 h-1.5 rounded-full" style={{ width: `${uploadProgress}%` }}></div>
+                        </div>
+                      </div>
+                    )}
+                    {formData.photos.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-2 justify-center">
+                        {formData.photos.map((url, i) => (
+                          <img key={i} src={url} alt="Uploaded" className="w-12 h-12 object-cover rounded border" />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
