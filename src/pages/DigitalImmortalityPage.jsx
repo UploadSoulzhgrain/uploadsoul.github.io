@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Camera, MessageSquare, BookOpen, Zap, User } from 'lucide-react';
 import { MediaService } from '../services/mediaService';
 import { useAuth } from '../contexts/AuthContext';
