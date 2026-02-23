@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Camera, MessageSquare, BookOpen, Zap, User } from 'lucide-react';
+import { MediaService } from '../services/mediaService';
+import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const UploadSoul = () => {
   const [showGenesisModal, setShowGenesisModal] = useState(false); // 创建化身模态框
@@ -29,6 +31,16 @@ const UploadSoul = () => {
   const [activeInputMode, setActiveInputMode] = useState('text');
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
+  const { user } = useAuth();
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const [storageUsageMB, setStorageUsageMB] = useState(0);
+
+  // Initial quota check
+  useEffect(() => {
+    if (user) {
+      MediaService.checkQuota(user.id, 0).then(res => setStorageUsageMB(res.currentUsageMB));
+    }
+  }, [user]);
 
   // Particle system
   useEffect(() => {
@@ -97,26 +109,49 @@ const UploadSoul = () => {
     }
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = async (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const timestamp = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-        setMessages(prev => [...prev, {
-          type: 'user',
-          text: '[上传了照片]',
-          timestamp,
-          attachment: event.target.result
-        }]);
-        createSpark(3);
-        setSystemLog('> 正在分析图像内容...');
-        setTimeout(() => {
-          setSystemLog('> 提取情感特征: "温暖" "怀旧"');
-          handleAIResponse('image');
-        }, 1500);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    if (!user) {
+      toast.error('请先登录以进行上传');
+      return;
+    }
+
+    try {
+      setUploadProgress(0);
+      setSystemLog('> 正在初始化上传安全通道...');
+
+      const mediaUrl = await MediaService.uploadMedia(file, user.id, (progress) => {
+        setUploadProgress(progress);
+        setSystemLog(`> 正在同步灵魂数据... ${progress}%`);
+      });
+
+      const timestamp = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      setMessages(prev => [...prev, {
+        type: 'user',
+        text: '[上传了照片]',
+        timestamp,
+        attachment: mediaUrl
+      }]);
+
+      createSpark(3);
+      setSystemLog('> 正在分析图像内容...');
+
+      // Update local storage usage
+      const newUsage = await MediaService.checkQuota(user.id, 0);
+      setStorageUsageMB(newUsage.currentUsageMB);
+
+      setTimeout(() => {
+        setSystemLog('> 提取情感特征: "温暖" "怀旧"');
+        handleAIResponse('image');
+      }, 1500);
+
+    } catch (error) {
+      toast.error(error.message || '上传失败');
+      setSystemLog(`> 错误: ${error.message}`);
+    } finally {
+      setUploadProgress(null);
     }
   };
 
@@ -203,20 +238,37 @@ const UploadSoul = () => {
     setShowGenesisModal(false);
   };
 
-  const handleGenesisFileUpload = (e, type) => {
+  const handleGenesisFileUpload = async (e, type) => {
     const files = Array.from(e.target.files);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
+    if (!user) {
+      toast.error('请先登录以进行上传');
+      return;
+    }
+
+    for (const file of files) {
+      try {
+        setUploadProgress(0);
+        const mediaUrl = await MediaService.uploadMedia(file, user.id, (progress) => {
+          setUploadProgress(progress);
+        });
+
         setGenesisData(prev => ({
           ...prev,
           [type]: type === 'photos' || type === 'videos'
-            ? [...prev[type], event.target.result]
-            : event.target.result
+            ? [...prev[type], mediaUrl]
+            : mediaUrl
         }));
-      };
-      reader.readAsDataURL(file);
-    });
+
+        // Update storage usage
+        const newUsage = await MediaService.checkQuota(user.id, 0);
+        setStorageUsageMB(newUsage.currentUsageMB);
+        toast.success(`${file.name} 上传成功`);
+      } catch (error) {
+        toast.error(`${file.name} 上传失败: ${error.message}`);
+      } finally {
+        setUploadProgress(null);
+      }
+    }
   };
 
   const nextGenesisStep = () => {
@@ -1276,6 +1328,22 @@ const UploadSoul = () => {
         </div>
         <div className="evolution-status">
           情感模拟拟合度: {evolutionProgress.toFixed(1)}% · 已学习新的对话模式
+        </div>
+
+        {/* Storage Quota Display */}
+        <div style={{ marginTop: '12px', borderTop: '1px solid rgba(100, 200, 255, 0.1)', paddingTop: '10px' }}>
+          <div className="evolution-label">
+            存储空间 / STORAGE ({storageUsageMB.toFixed(1)}MB / 100MB)
+          </div>
+          <div className="dna-helix" style={{ height: '6px' }}>
+            <div
+              className="dna-progress"
+              style={{
+                width: `${Math.min((storageUsageMB / 100) * 100, 100)}%`,
+                background: storageUsageMB > 90 ? '#ef4444' : 'linear-gradient(90deg, #64c8ff, #8a2be2)'
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

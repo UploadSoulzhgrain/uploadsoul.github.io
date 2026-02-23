@@ -1,114 +1,151 @@
-import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { MediaService } from '../services/mediaService';
+import { useAuth } from '../contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 const MemoryWorkshopPage = () => {
-    const navigate = useNavigate();
-    const [currentStep, setCurrentStep] = useState(1);
-    const totalSteps = 4;
+  const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 4;
 
-    const [formData, setFormData] = useState({
-        name: '',
-        relation: '祖父',
-        birthDate: '',
-        deathDate: '',
-        hometown: '',
-        occupation: '',
-        biography: '',
-        memories: {
-            deepEvent: '',
-            catchphrase: '',
-            hobbies: '',
-            attitude: ''
+  const [formData, setFormData] = useState({
+    name: '',
+    relation: '祖父',
+    birthDate: '',
+    deathDate: '',
+    hometown: '',
+    occupation: '',
+    biography: '',
+    memories: {
+      deepEvent: '',
+      catchphrase: '',
+      hobbies: '',
+      attitude: ''
+    }
+  });
+
+  const [uploadedFiles, setUploadedFiles] = useState({
+    photo: [],
+    video: [],
+    audio: [],
+    letter: [],
+    diary: [],
+    other: []
+  });
+
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [invitedEmail, setInvitedEmail] = useState('');
+  const [invitedEmails, setInvitedEmails] = useState([]);
+  const [isFinishing, setIsFinishing] = useState(false);
+  const { user } = useAuth();
+  const [uploadingType, setUploadingType] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(null);
+  const [storageUsageMB, setStorageUsageMB] = useState(0);
+
+  // Initial quota check
+  React.useEffect(() => {
+    if (user) {
+      MediaService.checkQuota(user.id, 0).then(res => setStorageUsageMB(res.currentUsageMB));
+    }
+  }, [user]);
+
+  // File Input Refs
+  const fileRefs = {
+    photo: useRef(null),
+    video: useRef(null),
+    audio: useRef(null),
+    letter: useRef(null),
+    diary: useRef(null),
+    other: useRef(null)
+  };
+
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handleFileUpload = async (e, type) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    if (!user) {
+      toast.error('请先登录以进行上传');
+      return;
+    }
+
+    for (const file of files) {
+      try {
+        setUploadingType(type);
+        setUploadProgress(0);
+
+        const url = await MediaService.uploadMedia(file, user.id, (progress) => {
+          setUploadProgress(progress);
+        });
+
+        setUploadedFiles(prev => ({
+          ...prev,
+          [type]: [...prev[type], url]
+        }));
+
+        if (type === 'photo') {
+          setPhotoPreview(url);
         }
-    });
 
-    const [uploadedFiles, setUploadedFiles] = useState({
-        photo: [],
-        video: [],
-        audio: [],
-        letter: [],
-        diary: [],
-        other: []
-    });
+        // Update storage usage
+        const newUsage = await MediaService.checkQuota(user.id, 0);
+        setStorageUsageMB(newUsage.currentUsageMB);
+        toast.success(`${file.name} 同步成功`);
+      } catch (error) {
+        toast.error(`${file.name} 同步失败: ${error.message}`);
+      } finally {
+        setUploadingType(null);
+        setUploadProgress(null);
+      }
+    }
+  };
 
-    const [photoPreview, setPhotoPreview] = useState(null);
-    const [invitedEmail, setInvitedEmail] = useState('');
-    const [invitedEmails, setInvitedEmails] = useState([]);
-    const [isFinishing, setIsFinishing] = useState(false);
+  const addInvitee = () => {
+    const email = invitedEmail.trim();
+    if (email && email.includes('@')) {
+      if (!invitedEmails.includes(email)) {
+        setInvitedEmails(prev => [...prev, email]);
+      }
+      setInvitedEmail('');
+    } else {
+      alert('请输入有效的邮箱地址');
+    }
+  };
 
-    // File Input Refs
-    const fileRefs = {
-        photo: useRef(null),
-        video: useRef(null),
-        audio: useRef(null),
-        letter: useRef(null),
-        diary: useRef(null),
-        other: useRef(null)
-    };
+  const removeInvitee = (emailToRemove) => {
+    setInvitedEmails(prev => prev.filter(email => email !== emailToRemove));
+  };
 
-    const nextStep = () => {
-        if (currentStep < totalSteps) {
-            setCurrentStep(prev => prev + 1);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
+  const finishCreation = () => {
+    if (!formData.name) {
+      alert('请填写姓名');
+      setCurrentStep(1);
+      return;
+    }
 
-    const prevStep = () => {
-        if (currentStep > 1) {
-            setCurrentStep(prev => prev - 1);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-    };
+    setIsFinishing(true);
 
-    const handleFileUpload = (e, type) => {
-        const files = Array.from(e.target.files);
-        if (files.length > 0) {
-            setUploadedFiles(prev => ({
-                ...prev,
-                [type]: [...prev[type], ...files]
-            }));
+    setTimeout(() => {
+      navigate('/digital-rebirth/family-galaxy');
+    }, 3000);
+  };
 
-            if (type === 'photo' && files[0].type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = (event) => setPhotoPreview(event.target.result);
-                reader.readAsDataURL(files[0]);
-            }
-        }
-    };
-
-    const addInvitee = () => {
-        const email = invitedEmail.trim();
-        if (email && email.includes('@')) {
-            if (!invitedEmails.includes(email)) {
-                setInvitedEmails(prev => [...prev, email]);
-            }
-            setInvitedEmail('');
-        } else {
-            alert('请输入有效的邮箱地址');
-        }
-    };
-
-    const removeInvitee = (emailToRemove) => {
-        setInvitedEmails(prev => prev.filter(email => email !== emailToRemove));
-    };
-
-    const finishCreation = () => {
-        if (!formData.name) {
-            alert('请填写姓名');
-            setCurrentStep(1);
-            return;
-        }
-
-        setIsFinishing(true);
-
-        setTimeout(() => {
-            navigate('/digital-rebirth/family-galaxy');
-        }, 3000);
-    };
-
-    return (
-        <div className="memory-workshop-wrapper">
-            <style>{`
+  return (
+    <div className="memory-workshop-wrapper">
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;700&display=swap');
 
         .memory-workshop-wrapper {
@@ -491,254 +528,281 @@ const MemoryWorkshopPage = () => {
         }
       `}</style>
 
-            {/* 虚拟导航栏 */}
-            <nav className="workshop-navbar">
-                <div className="workshop-navbar-left">
-                    <Link to="/digital-rebirth/family-galaxy" className="back-btn">
-                        <span>◀</span> 返回家族星系
-                    </Link>
-                    <h1>记忆重塑工坊</h1>
-                </div>
-            </nav>
-
-            {/* 进度条 */}
-            <div className="workshop-progress-bar">
-                {[
-                    { id: 1, label: '基础信息' },
-                    { id: 2, label: '记忆拾取' },
-                    { id: 3, label: '众包记忆' },
-                    { id: 4, label: '性格微调' }
-                ].map((step, idx) => (
-                    <React.Fragment key={step.id}>
-                        <div className={`workshop-step ${currentStep === step.id ? 'active' : ''} ${currentStep > step.id ? 'completed' : ''}`}>
-                            <div className="workshop-step-number">{step.id}</div>
-                            <div className="workshop-step-label">{step.label}</div>
-                        </div>
-                        {idx < 3 && <div className="workshop-step-arrow">→</div>}
-                    </React.Fragment>
-                ))}
-            </div>
-
-            <div className="workshop-main-container">
-                {/* Step 1 */}
-                <div className={`workshop-step-content ${currentStep === 1 ? 'active' : ''}`}>
-                    <h2 className="workshop-section-title">基础信息</h2>
-                    <p className="workshop-section-subtitle">请填写亲人的基本信息，这将帮助我们建立初始档案</p>
-                    <div className="workshop-form-grid">
-                        <div className="workshop-form-group">
-                            <label className="workshop-form-label">姓名 *</label>
-                            <input
-                                type="text"
-                                className="workshop-form-input"
-                                value={formData.name}
-                                onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                placeholder="请输入姓名"
-                            />
-                        </div>
-                        <div className="workshop-form-group">
-                            <label className="workshop-form-label">与您的关系 *</label>
-                            <select
-                                className="workshop-form-select"
-                                value={formData.relation}
-                                onChange={e => setFormData({ ...formData, relation: e.target.value })}
-                            >
-                                {['祖父', '祖母', '外祖父', '外祖母', '父亲', '母亲', '其他'].map(r => (
-                                    <option key={r} value={r}>{r}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="workshop-form-group">
-                            <label className="workshop-form-label">出生日期 *</label>
-                            <input
-                                type="date"
-                                className="workshop-form-input"
-                                value={formData.birthDate}
-                                onChange={e => setFormData({ ...formData, birthDate: e.target.value })}
-                            />
-                        </div>
-                        <div className="workshop-form-group">
-                            <label className="workshop-form-label">离世日期</label>
-                            <input
-                                type="date"
-                                className="workshop-form-input"
-                                value={formData.deathDate}
-                                onChange={e => setFormData({ ...formData, deathDate: e.target.value })}
-                            />
-                        </div>
-                        <div className="workshop-form-group">
-                            <label className="workshop-form-label">籍贯</label>
-                            <input
-                                type="text"
-                                className="workshop-form-input"
-                                value={formData.hometown}
-                                onChange={e => setFormData({ ...formData, hometown: e.target.value })}
-                                placeholder="例：江苏苏州"
-                            />
-                        </div>
-                        <div className="workshop-form-group">
-                            <label className="workshop-form-label">职业</label>
-                            <input
-                                type="text"
-                                className="workshop-form-input"
-                                value={formData.occupation}
-                                onChange={e => setFormData({ ...formData, occupation: e.target.value })}
-                                placeholder="例：教师"
-                            />
-                        </div>
-                        <div className="workshop-form-group full-width">
-                            <label className="workshop-form-label">生平简介</label>
-                            <textarea
-                                className="workshop-form-textarea"
-                                value={formData.biography}
-                                onChange={e => setFormData({ ...formData, biography: e.target.value })}
-                                placeholder="请简要描述他/她的人生历程、主要成就等..."
-                            />
-                        </div>
-                    </div>
-                    <div className="workshop-nav-buttons">
-                        <div />
-                        <button className="workshop-btn" onClick={nextStep}>下一步 →</button>
-                    </div>
-                </div>
-
-                {/* Step 2 */}
-                <div className={`workshop-step-content ${currentStep === 2 ? 'active' : ''}`}>
-                    <h2 className="workshop-section-title">记忆拾取</h2>
-                    <p className="workshop-section-subtitle">上传照片、视频、音频或文字资料，AI 将学习并重现他们的音容笑貌</p>
-                    <div className="workshop-upload-grid">
-                        {[
-                            { type: 'photo', icon: '📷', title: '照片', desc: '支持 JPG, PNG\nAI 将自动修复上色' },
-                            { type: 'video', icon: '🎥', title: '视频', desc: '支持 MP4, AVI\n提取声纹和表情' },
-                            { type: 'audio', icon: '🎤', title: '语音', desc: '支持 MP3, WAV\n学习声音特征' },
-                            { type: 'letter', icon: '✉️', title: '手写信件', desc: '支持扫描件\n学习字迹和语调' },
-                            { type: 'diary', icon: '📖', title: '日记/文章', desc: '支持 TXT, PDF\n理解思想和情感' },
-                            { type: 'other', icon: '📦', title: '其他资料', desc: '任何有价值的\n珍贵资料' }
-                        ].map(item => (
-                            <div
-                                key={item.type}
-                                className="workshop-upload-card"
-                                onClick={() => fileRefs[item.type].current.click()}
-                            >
-                                <div className="workshop-upload-icon">{item.icon}</div>
-                                <div className="workshop-upload-title">{item.title}</div>
-                                <div className="workshop-upload-desc">{item.desc}</div>
-                                <input
-                                    type="file"
-                                    style={{ display: 'none' }}
-                                    ref={fileRefs[item.type]}
-                                    multiple
-                                    onChange={(e) => handleFileUpload(e, item.type)}
-                                />
-                                {uploadedFiles[item.type].length > 0 && (
-                                    <div className="workshop-file-count">{uploadedFiles[item.type].length}</div>
-                                )}
-                                {item.type === 'photo' && photoPreview && (
-                                    <div className="workshop-file-preview">
-                                        <img src={photoPreview} alt="Preview" />
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                    <div className="workshop-nav-buttons">
-                        <button className="workshop-btn" onClick={prevStep}>← 上一步</button>
-                        <button className="workshop-btn" onClick={nextStep}>下一步 →</button>
-                    </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className={`workshop-step-content ${currentStep === 3 ? 'active' : ''}`}>
-                    <h2 className="workshop-section-title">众包记忆</h2>
-                    <p className="workshop-section-subtitle">邀请家族成员共同编辑，让记忆更加立体完整</p>
-
-                    <div style={{ background: 'rgba(20,20,20,0.8)', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.2)', marginBottom: '20px' }}>
-                        <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>邀请家族成员参与</h3>
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <input
-                                type="email"
-                                className="workshop-form-input"
-                                style={{ flex: 1 }}
-                                placeholder="输入家族成员的邮箱地址"
-                                value={invitedEmail}
-                                onChange={e => setInvitedEmail(e.target.value)}
-                            />
-                            <button className="workshop-btn" onClick={addInvitee}>+ 添加</button>
-                        </div>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '15px' }}>
-                            {invitedEmails.map(email => (
-                                <div key={email} className="invited-tag">
-                                    {email} <span className="remove" onClick={() => removeInvitee(email)}>✕</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="workshop-form-grid">
-                        <div className="workshop-form-group full-width">
-                            <label className="workshop-form-label">您印象最深的一件事是什么？</label>
-                            <textarea
-                                className="workshop-form-textarea"
-                                placeholder="请详细描述..."
-                                value={formData.memories.deepEvent}
-                                onChange={e => setFormData({ ...formData, memories: { ...formData.memories, deepEvent: e.target.value } })}
-                            />
-                        </div>
-                        <div className="workshop-form-group full-width">
-                            <label className="workshop-form-label">他/她常说的口头禅或名言是什么？</label>
-                            <textarea
-                                className="workshop-form-textarea"
-                                placeholder="例如：「吃亏是福」「做人要诚实」"
-                                value={formData.memories.catchphrase}
-                                onChange={e => setFormData({ ...formData, memories: { ...formData.memories, catchphrase: e.target.value } })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="workshop-nav-buttons">
-                        <button className="workshop-btn" onClick={prevStep}>← 上一步</button>
-                        <button className="workshop-btn" onClick={nextStep}>下一步 →</button>
-                    </div>
-                </div>
-
-                {/* Step 4 */}
-                <div className={`workshop-step-content ${currentStep === 4 ? 'active' : ''}`}>
-                    <h2 className="workshop-section-title">性格微调</h2>
-                    <p className="workshop-section-subtitle">如果上传的资料不足，您可以通过滑块手动调整性格倾向</p>
-                    <div className="workshop-trait-sliders">
-                        {[
-                            { left: '严肃', right: '慈祥' },
-                            { left: '寡言', right: '健谈' },
-                            { left: '传统', right: '开明' },
-                            { left: '理性', right: '感性' },
-                            { left: '严格', right: '宽容' },
-                            { left: '保守', right: '幽默' }
-                        ].map(pair => (
-                            <div key={pair.left} className="workshop-trait-item">
-                                <div className="workshop-trait-labels">
-                                    <span style={{ color: '#8b7355' }}>{pair.left}</span>
-                                    <span style={{ color: '#d4af37' }}>{pair.right}</span>
-                                </div>
-                                <input type="range" className="workshop-slider" />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="workshop-nav-buttons">
-                        <button className="workshop-btn" onClick={prevStep}>← 上一步</button>
-                        <button className="workshop-btn workshop-btn-finish" onClick={finishCreation}>完成创建 ✓</button>
-                    </div>
-                </div>
-            </div>
-
-            {isFinishing && (
-                <div className="finishing-overlay">
-                    <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem', animation: 'workshop-spin 2s linear infinite' }}>⚙️</div>
-                    <h2 style={{ fontSize: '2rem', color: '#d4af37', marginBottom: '0.8rem', letterSpacing: '0.2rem' }}>正在重塑记忆...</h2>
-                    <p style={{ color: '#8b7355', fontSize: '1.1rem' }}>AI 正在学习和整合所有资料</p>
-                    <p style={{ color: '#666', marginTop: '0.8rem', fontSize: '0.9rem' }}>这可能需要几分钟时间</p>
-                </div>
-            )}
+      {/* 虚拟导航栏 */}
+      <nav className="workshop-navbar">
+        <div className="workshop-navbar-left">
+          <Link to="/digital-rebirth/family-galaxy" className="back-btn">
+            <span>◀</span> 返回家族星系
+          </Link>
+          <h1>记忆重塑工坊</h1>
         </div>
-    );
+        {user && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ textAlign: 'right' }}>
+              <div style={{ fontSize: '0.75rem', color: '#8b7355', marginBottom: '4px' }}>
+                已用空间: {storageUsageMB.toFixed(1)}MB / 100MB
+              </div>
+              <div style={{ width: '150px', height: '4px', background: 'rgba(212, 175, 55, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    width: `${Math.min((storageUsageMB / 100) * 100, 100)}%`,
+                    height: '100%',
+                    background: storageUsageMB > 90 ? '#ff6b6b' : '#d4af37',
+                    transition: 'width 0.3s'
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* 进度条 */}
+      <div className="workshop-progress-bar">
+        {[
+          { id: 1, label: '基础信息' },
+          { id: 2, label: '记忆拾取' },
+          { id: 3, label: '众包记忆' },
+          { id: 4, label: '性格微调' }
+        ].map((step, idx) => (
+          <React.Fragment key={step.id}>
+            <div className={`workshop-step ${currentStep === step.id ? 'active' : ''} ${currentStep > step.id ? 'completed' : ''}`}>
+              <div className="workshop-step-number">{step.id}</div>
+              <div className="workshop-step-label">{step.label}</div>
+            </div>
+            {idx < 3 && <div className="workshop-step-arrow">→</div>}
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="workshop-main-container">
+        {/* Step 1 */}
+        <div className={`workshop-step-content ${currentStep === 1 ? 'active' : ''}`}>
+          <h2 className="workshop-section-title">基础信息</h2>
+          <p className="workshop-section-subtitle">请填写亲人的基本信息，这将帮助我们建立初始档案</p>
+          <div className="workshop-form-grid">
+            <div className="workshop-form-group">
+              <label className="workshop-form-label">姓名 *</label>
+              <input
+                type="text"
+                className="workshop-form-input"
+                value={formData.name}
+                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                placeholder="请输入姓名"
+              />
+            </div>
+            <div className="workshop-form-group">
+              <label className="workshop-form-label">与您的关系 *</label>
+              <select
+                className="workshop-form-select"
+                value={formData.relation}
+                onChange={e => setFormData({ ...formData, relation: e.target.value })}
+              >
+                {['祖父', '祖母', '外祖父', '外祖母', '父亲', '母亲', '其他'].map(r => (
+                  <option key={r} value={r}>{r}</option>
+                ))}
+              </select>
+            </div>
+            <div className="workshop-form-group">
+              <label className="workshop-form-label">出生日期 *</label>
+              <input
+                type="date"
+                className="workshop-form-input"
+                value={formData.birthDate}
+                onChange={e => setFormData({ ...formData, birthDate: e.target.value })}
+              />
+            </div>
+            <div className="workshop-form-group">
+              <label className="workshop-form-label">离世日期</label>
+              <input
+                type="date"
+                className="workshop-form-input"
+                value={formData.deathDate}
+                onChange={e => setFormData({ ...formData, deathDate: e.target.value })}
+              />
+            </div>
+            <div className="workshop-form-group">
+              <label className="workshop-form-label">籍贯</label>
+              <input
+                type="text"
+                className="workshop-form-input"
+                value={formData.hometown}
+                onChange={e => setFormData({ ...formData, hometown: e.target.value })}
+                placeholder="例：江苏苏州"
+              />
+            </div>
+            <div className="workshop-form-group">
+              <label className="workshop-form-label">职业</label>
+              <input
+                type="text"
+                className="workshop-form-input"
+                value={formData.occupation}
+                onChange={e => setFormData({ ...formData, occupation: e.target.value })}
+                placeholder="例：教师"
+              />
+            </div>
+            <div className="workshop-form-group full-width">
+              <label className="workshop-form-label">生平简介</label>
+              <textarea
+                className="workshop-form-textarea"
+                value={formData.biography}
+                onChange={e => setFormData({ ...formData, biography: e.target.value })}
+                placeholder="请简要描述他/她的人生历程、主要成就等..."
+              />
+            </div>
+          </div>
+          <div className="workshop-nav-buttons">
+            <div />
+            <button className="workshop-btn" onClick={nextStep}>下一步 →</button>
+          </div>
+        </div>
+
+        {/* Step 2 */}
+        <div className={`workshop-step-content ${currentStep === 2 ? 'active' : ''}`}>
+          <h2 className="workshop-section-title">记忆拾取</h2>
+          <p className="workshop-section-subtitle">上传照片、视频、音频或文字资料，AI 将学习并重现他们的音容笑貌</p>
+          <div className="workshop-upload-grid">
+            {[
+              { type: 'photo', icon: '📷', title: '照片', desc: '支持 JPG, PNG\nAI 将自动修复上色' },
+              { type: 'video', icon: '🎥', title: '视频', desc: '支持 MP4, AVI\n提取声纹和表情' },
+              { type: 'audio', icon: '🎤', title: '语音', desc: '支持 MP3, WAV\n学习声音特征' },
+              { type: 'letter', icon: '✉️', title: '手写信件', desc: '支持扫描件\n学习字迹和语调' },
+              { type: 'diary', icon: '📖', title: '日记/文章', desc: '支持 TXT, PDF\n理解思想和情感' },
+              { type: 'other', icon: '📦', title: '其他资料', desc: '任何有价值的\n珍贵资料' }
+            ].map(item => (
+              <div
+                key={item.type}
+                className="workshop-upload-card"
+                onClick={() => fileRefs[item.type].current.click()}
+              >
+                <div className="workshop-upload-icon">{item.icon}</div>
+                <div className="workshop-upload-title">{item.title}</div>
+                <div className="workshop-upload-desc">{item.desc}</div>
+                <input
+                  type="file"
+                  style={{ display: 'none' }}
+                  ref={fileRefs[item.type]}
+                  multiple
+                  onChange={(e) => handleFileUpload(e, item.type)}
+                />
+                {uploadedFiles[item.type].length > 0 && (
+                  <div className="workshop-file-count">{uploadedFiles[item.type].length}</div>
+                )}
+                {uploadingType === item.type && (
+                  <div style={{ marginTop: '10px' }}>
+                    <div style={{ fontSize: '12px', marginBottom: '4px' }}>同步中: {uploadProgress}%</div>
+                    <div style={{ height: '2px', background: 'rgba(212,175,55,0.2)', width: '100%' }}>
+                      <div style={{ height: '100%', background: '#d4af37', width: `${uploadProgress}%` }}></div>
+                    </div>
+                  </div>
+                )}
+                {item.type === 'photo' && photoPreview && (
+                  <div className="workshop-file-preview">
+                    <img src={photoPreview} alt="Preview" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="workshop-nav-buttons">
+            <button className="workshop-btn" onClick={prevStep}>← 上一步</button>
+            <button className="workshop-btn" onClick={nextStep}>下一步 →</button>
+          </div>
+        </div>
+
+        {/* Step 3 */}
+        <div className={`workshop-step-content ${currentStep === 3 ? 'active' : ''}`}>
+          <h2 className="workshop-section-title">众包记忆</h2>
+          <p className="workshop-section-subtitle">邀请家族成员共同编辑，让记忆更加立体完整</p>
+
+          <div style={{ background: 'rgba(20,20,20,0.8)', padding: '1.5rem', borderRadius: '10px', border: '1px solid rgba(212,175,55,0.2)', marginBottom: '20px' }}>
+            <h3 style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>邀请家族成员参与</h3>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <input
+                type="email"
+                className="workshop-form-input"
+                style={{ flex: 1 }}
+                placeholder="输入家族成员的邮箱地址"
+                value={invitedEmail}
+                onChange={e => setInvitedEmail(e.target.value)}
+              />
+              <button className="workshop-btn" onClick={addInvitee}>+ 添加</button>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '15px' }}>
+              {invitedEmails.map(email => (
+                <div key={email} className="invited-tag">
+                  {email} <span className="remove" onClick={() => removeInvitee(email)}>✕</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="workshop-form-grid">
+            <div className="workshop-form-group full-width">
+              <label className="workshop-form-label">您印象最深的一件事是什么？</label>
+              <textarea
+                className="workshop-form-textarea"
+                placeholder="请详细描述..."
+                value={formData.memories.deepEvent}
+                onChange={e => setFormData({ ...formData, memories: { ...formData.memories, deepEvent: e.target.value } })}
+              />
+            </div>
+            <div className="workshop-form-group full-width">
+              <label className="workshop-form-label">他/她常说的口头禅或名言是什么？</label>
+              <textarea
+                className="workshop-form-textarea"
+                placeholder="例如：「吃亏是福」「做人要诚实」"
+                value={formData.memories.catchphrase}
+                onChange={e => setFormData({ ...formData, memories: { ...formData.memories, catchphrase: e.target.value } })}
+              />
+            </div>
+          </div>
+
+          <div className="workshop-nav-buttons">
+            <button className="workshop-btn" onClick={prevStep}>← 上一步</button>
+            <button className="workshop-btn" onClick={nextStep}>下一步 →</button>
+          </div>
+        </div>
+
+        {/* Step 4 */}
+        <div className={`workshop-step-content ${currentStep === 4 ? 'active' : ''}`}>
+          <h2 className="workshop-section-title">性格微调</h2>
+          <p className="workshop-section-subtitle">如果上传的资料不足，您可以通过滑块手动调整性格倾向</p>
+          <div className="workshop-trait-sliders">
+            {[
+              { left: '严肃', right: '慈祥' },
+              { left: '寡言', right: '健谈' },
+              { left: '传统', right: '开明' },
+              { left: '理性', right: '感性' },
+              { left: '严格', right: '宽容' },
+              { left: '保守', right: '幽默' }
+            ].map(pair => (
+              <div key={pair.left} className="workshop-trait-item">
+                <div className="workshop-trait-labels">
+                  <span style={{ color: '#8b7355' }}>{pair.left}</span>
+                  <span style={{ color: '#d4af37' }}>{pair.right}</span>
+                </div>
+                <input type="range" className="workshop-slider" />
+              </div>
+            ))}
+          </div>
+          <div className="workshop-nav-buttons">
+            <button className="workshop-btn" onClick={prevStep}>← 上一步</button>
+            <button className="workshop-btn workshop-btn-finish" onClick={finishCreation}>完成创建 ✓</button>
+          </div>
+        </div>
+      </div>
+
+      {isFinishing && (
+        <div className="finishing-overlay">
+          <div style={{ fontSize: '3.5rem', marginBottom: '1.5rem', animation: 'workshop-spin 2s linear infinite' }}>⚙️</div>
+          <h2 style={{ fontSize: '2rem', color: '#d4af37', marginBottom: '0.8rem', letterSpacing: '0.2rem' }}>正在重塑记忆...</h2>
+          <p style={{ color: '#8b7355', fontSize: '1.1rem' }}>AI 正在学习和整合所有资料</p>
+          <p style={{ color: '#666', marginTop: '0.8rem', fontSize: '0.9rem' }}>这可能需要几分钟时间</p>
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default MemoryWorkshopPage;
