@@ -24,14 +24,28 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
+import { useAuth } from '../contexts/AuthContext';
+import { MediaService } from '../services/mediaService';
+import toast, { Toaster } from 'react-hot-toast';
 import './VirtualLovePage.css';
 
 export default function VirtualLovePage() {
+  const { user } = useAuth();
   const [screen, setScreen] = useState('hub');
   const [selectedGender, setSelectedGender] = useState('female');
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [storageUsageMB, setStorageUsageMB] = useState(0);
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
+
+  // Load initial quota
+  useEffect(() => {
+    if (user) {
+      MediaService.checkQuota(user.id, 0).then(res => {
+        setStorageUsageMB(res.currentUsageMB);
+      });
+    }
+  }, [user]);
 
   // Synchronize with site-wide dark mode if applicable, but for this specific design 
   // dark mode is the core aesthetic.
@@ -52,16 +66,20 @@ export default function VirtualLovePage() {
       </div>
 
       <div className="relative z-10 pt-16 md:pt-20">
+        <Toaster position="top-center" />
         <AnimatePresence mode="wait">
           {screen === 'hub' ? (
             <HubScreen
               key="hub"
+              user={user}
               onSelectSoulmate={(gender) => {
                 setSelectedGender(gender);
                 setScreen('chat');
               }}
               toggleTheme={toggleTheme}
               isDarkMode={isDarkMode}
+              storageUsageMB={storageUsageMB}
+              setStorageUsageMB={setStorageUsageMB}
             />
           ) : (
             <ChatScreen
@@ -78,7 +96,35 @@ export default function VirtualLovePage() {
   );
 }
 
-function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode }) {
+function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsageMB, setStorageUsageMB }) {
+  const [uploadProgress, setUploadProgress] = useState(null);
+
+  const handleFileUpload = async (event, type) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!user) {
+      toast.error('请先登录以进行上传');
+      return;
+    }
+
+    try {
+      const url = await MediaService.uploadMedia(file, user.id, (progress) => {
+        setUploadProgress(progress);
+      });
+
+      toast.success(`${type} 上传成功！`);
+
+      // Update usage
+      const newUsage = await MediaService.checkQuota(user.id, 0);
+      setStorageUsageMB(newUsage.currentUsageMB);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast.error(error.message || '上传失败，请稍后重试');
+    } finally {
+      setUploadProgress(null);
+    }
+  };
   return (
     <motion.main
       initial={{ opacity: 0, y: 20 }}
@@ -137,16 +183,19 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode }) {
 
             <div className="space-y-4 mb-8">
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-primary/5 border-2 border-dashed border-primary/30 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-primary/60 transition-all">
+                <label className="bg-primary/5 border-2 border-dashed border-primary/30 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-primary/60 transition-all relative overflow-hidden">
+                  <input type="file" className="hidden" accept="image/*,video/*" onChange={(e) => handleFileUpload(e, '照片/视频')} />
                   <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center group-hover/zone:scale-110 transition-transform">
                     <Video className="text-primary" size={20} />
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-bold text-slate-800 dark:text-white">照片 / 视频</p>
-                    <p className="text-[10px] text-slate-500 mt-1">支持 JPG, MP4, MOV</p>
+                    <p className="text-[10px] text-slate-500 mt-1">支持图片与视频</p>
                   </div>
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all">
+                </label>
+
+                <label className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all relative overflow-hidden">
+                  <input type="file" className="hidden" accept="audio/*" onChange={(e) => handleFileUpload(e, '录音/音频')} />
                   <div className="size-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center group-hover/zone:scale-110 transition-transform">
                     <Mic className="text-slate-500 dark:text-slate-400" size={20} />
                   </div>
@@ -154,37 +203,51 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode }) {
                     <p className="text-sm font-bold text-slate-800 dark:text-white">录音 / 音频</p>
                     <p className="text-[10px] text-slate-500 mt-1">语音克隆样本</p>
                   </div>
-                </div>
+                </label>
               </div>
 
-              <div className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex items-center justify-between group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all">
+              <label className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex items-center justify-between group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all">
+                <input type="file" className="hidden" accept=".txt,.pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, '记忆/性格描述')} />
                 <div className="flex items-center gap-4">
                   <div className="size-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center group-hover/zone:scale-110 transition-transform">
                     <FileText className="text-slate-500 dark:text-slate-400" size={20} />
                   </div>
                   <div>
                     <p className="text-sm font-bold text-slate-800 dark:text-white">记忆 / 性格描述</p>
-                    <p className="text-[10px] text-slate-500 mt-1">输入聊天记录、日记或人物生平...</p>
+                    <p className="text-[10px] text-slate-500 mt-1">上传聊天记录、文档等</p>
                   </div>
                 </div>
                 <PlusCircle className="text-slate-400 dark:text-slate-600" size={20} />
-              </div>
+              </label>
+
+              {/* Upload Progress Overlay */}
+              {uploadProgress && (
+                <div className="bg-black/60 backdrop-blur-md border border-primary/30 rounded-2xl p-4 flex flex-col gap-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-bold text-primary uppercase animate-pulse">{uploadProgress.message}</span>
+                    <span className="text-xs text-white">{Math.round(uploadProgress.percentage || 0)}%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-full bg-primary transition-all duration-300" style={{ width: `${uploadProgress.percentage || 0}%` }}></div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="bg-white/50 dark:bg-black/40 rounded-2xl p-5 border border-slate-200 dark:border-slate-800/50 relative overflow-hidden">
               <div className="flex justify-between items-end mb-3">
                 <div>
-                  <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">神经同步进度</p>
-                  <p className="text-slate-800 dark:text-white text-sm font-semibold italic">正在深度学习中...</p>
+                  <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-1">存储空间已使用</p>
+                  <p className="text-slate-800 dark:text-white text-sm font-semibold italic">剩余 {(100 - storageUsageMB).toFixed(1)}MB / 100MB</p>
                 </div>
-                <p className="text-2xl font-black text-slate-800 dark:text-white italic">64%</p>
+                <p className="text-2xl font-black text-slate-800 dark:text-white italic">{Math.round(storageUsageMB)}%</p>
               </div>
               <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={{ width: '64%' }}
+                  animate={{ width: `${storageUsageMB}%` }}
                   transition={{ duration: 1.5, ease: "easeOut" }}
-                  className="h-full bg-gradient-to-r from-primary to-accent-blue shadow-[0_0_15px_#ec13a4] rounded-full"
+                  className={`h-full bg-gradient-to-r from-primary to-accent-blue shadow-[0_0_15px_#ec13a4] rounded-full ${storageUsageMB > 90 ? 'from-red-500 to-red-400' : ''}`}
                 ></motion.div>
               </div>
             </div>
