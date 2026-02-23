@@ -23,7 +23,7 @@ const AppRouter = () => {
           <Route path="/digital-human" element={<DigitalHumanPage />} />
           <Route path="/digital-human/family-tree/:digitalHumanId?" element={<FamilyTreePage />} />
           <Route path="/digital-rebirth" element={<DigitalRebirthPage />} />
-          <Route path="/pet-archive" element={<PetArchivePage />} />
+          <Route path="/pet" element={<PetArchivePage />} />
           <Route path="/baby-resume" element={<BabyResumePage />} />
           <Route path="/speak-bar" element={<SpeakBarPage />} />
           <Route path="/digital-human/create" element={<DigitalHumanPage create={true} />} />

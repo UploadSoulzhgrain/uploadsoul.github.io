@@ -112,10 +112,9 @@ const BusinessRoutes = () => (
     <Route path="update-password" element={<UpdatePasswordPage />} />
     <Route path="register" element={<RegisterPage />} />
     <Route path="companion" element={<CompanionPage />} />
-    <Route path="pet" element={<PetPage />} />
-    <Route path="pet-archive" element={<PetLandingPage />} />
-    <Route path="pet-archive/dashboard" element={<ProtectedRoute><PetDashboardPage /></ProtectedRoute>} />
-    <Route path="pet-archive/p/:slug" element={<PetDetailPage />} />
+    <Route path="virtual-pet" element={<PetPage />} />
+    <Route path="pet" element={<ProtectedRoute><PetDashboardPage /></ProtectedRoute>} />
+    <Route path="pet/p/:slug" element={<PetDetailPage />} />
     <Route path="baby-resume" element={<BabyResumePage />} />
     <Route path="speak-bar" element={<SpeakBarPage />} />
     <Route path="virtual-love" element={<VirtualLovePage />} />

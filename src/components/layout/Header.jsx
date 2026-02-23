@@ -15,14 +15,14 @@ const Header = () => {
 
   const navItems = [
     { to: '/companion', label: t('header.companion', '情感陪伴') },
-    { to: '/pet', label: t('header.pet', '虚拟宠物') },
+    { to: '/virtual-pet', label: t('header.pet', '虚拟宠物') },
     { to: '/virtual-love', label: t('header.virtualLove', '虚拟恋爱') },
     { to: '/digital-immortality', label: t('digitalImmortality.title', '数字永生') },
     { to: '/digital-rebirth', label: t('digitalRebirth.title', '数字重生') },
     {
       label: t('header.traces', '留痕'),
       children: [
-        { to: '/pet-archive', label: t('header.petArchive', '萌宠档案馆') },
+        { to: '/pet', label: t('header.petArchive', '萌宠档案馆') },
         { to: '/baby-resume', label: t('header.babyResume', '萌宝简历') },
         { to: '/speak-bar', label: t('header.speakBar', '说吧SayIt') }
       ]

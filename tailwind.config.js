@@ -8,6 +8,10 @@ export default {
         // digital-consciousness Palette
         'primary': '#ec13a4',
         'accent-blue': '#4f46e5',
+        // Pet Archive Dashboard Dark Theme
+        'background-dark': '#0a0a0f',
+        'surface-dark': '#14141f',
+        'border-dark': '#1e1e2e',
         // Day Mode - Creamy Latte Palette
         'latte': {
           50: '#FDFCFB',

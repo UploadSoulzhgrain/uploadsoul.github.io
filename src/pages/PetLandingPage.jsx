@@ -11,9 +11,9 @@ export default function PetLandingPage() {
 
   const handleStart = () => {
     if (user) {
-      navigate('/pet-archive/dashboard');
+      navigate('/pet');
     } else {
-      navigate('/login', { state: { from: { pathname: '/pet-archive/dashboard' } } });
+      navigate('/login', { state: { from: { pathname: '/pet' } } });
     }
   };
 
@@ -50,36 +50,36 @@ export default function PetLandingPage() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-32">
-        
+
         {/* Hero Section */}
-        <motion.div 
+        <motion.div
           className="text-center max-w-4xl mx-auto mb-24"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
           <motion.div variants={itemVariants} className="mb-6 inline-block">
-             <div className="flex items-center gap-2 justify-center mb-2">
-                 <Camera className="w-6 h-6 text-[#5D4037]" />
-                 <span className="text-[#8D6E63] font-medium tracking-widest uppercase text-sm">Pet Memory</span>
-             </div>
+            <div className="flex items-center gap-2 justify-center mb-2">
+              <Camera className="w-6 h-6 text-[#5D4037]" />
+              <span className="text-[#8D6E63] font-medium tracking-widest uppercase text-sm">Pet Memory</span>
+            </div>
           </motion.div>
 
-          <motion.h1 
+          <motion.h1
             variants={itemVariants}
             className="text-6xl md:text-8xl font-serif text-[#3E2723] mb-6 tracking-tight"
           >
             PET ARCHIVE
           </motion.h1>
-          
+
           <motion.h2
             variants={itemVariants}
             className="text-2xl md:text-3xl text-[#5D4037] font-medium mb-8"
           >
-             时尚造型 · 让爱宠更出众
+            时尚造型 · 让爱宠更出众
           </motion.h2>
 
-          <motion.p 
+          <motion.p
             variants={itemVariants}
             className="text-lg text-[#8D6E63] mb-12 max-w-2xl mx-auto leading-relaxed"
           >
@@ -88,14 +88,14 @@ export default function PetLandingPage() {
           </motion.p>
 
           <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <button 
+            <button
               onClick={handleStart}
               className="pet-btn-primary flex items-center gap-2 text-lg px-8 py-3"
             >
               <Heart className="w-5 h-5 fill-current" />
               <span>开始记录</span>
             </button>
-            <button 
+            <button
               onClick={() => navigate('/about')}
               className="pet-btn-secondary flex items-center gap-2 text-lg px-8 py-3"
             >
@@ -105,7 +105,7 @@ export default function PetLandingPage() {
         </motion.div>
 
         {/* Features Grid */}
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-8"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -147,17 +147,17 @@ export default function PetLandingPage() {
         </motion.div>
 
         {/* Trust/Stats Section (Styled like "Tags" in the image) */}
-        <motion.div 
+        <motion.div
           className="mt-32 pt-12 border-t border-[#D7CCC8]/50 flex flex-wrap justify-center gap-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
         >
-            {["10,000+ 萌宠入住", "50TB+ 记忆存储", "5.0 评分", "专业守护"].map((tag, i) => (
-                <span key={i} className="px-6 py-2 bg-white rounded-full text-[#5D4037] shadow-sm border border-[#EFEBE9] text-sm font-medium">
-                    {tag}
-                </span>
-            ))}
+          {["10,000+ 萌宠入住", "50TB+ 记忆存储", "5.0 评分", "专业守护"].map((tag, i) => (
+            <span key={i} className="px-6 py-2 bg-white rounded-full text-[#5D4037] shadow-sm border border-[#EFEBE9] text-sm font-medium">
+              {tag}
+            </span>
+          ))}
         </motion.div>
 
       </div>
