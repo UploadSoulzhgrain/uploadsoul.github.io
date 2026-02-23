@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Settings, Download, Upload as UploadIcon, Cat, Search } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { MediaService } from '../services/mediaService';
 import UploadModal from '../components/pet-archive/UploadModal';
 import PetCard from '../components/pet-archive/PetCard';
 import CreatePetModal from '../components/pet-archive/CreatePetModal';
@@ -17,9 +18,13 @@ export default function PetDashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedPet, setSelectedPet] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [storageUsageMB, setStorageUsageMB] = useState(0);
 
   useEffect(() => {
     loadPets();
+    if (user) {
+      MediaService.checkQuota(user.id, 0).then(res => setStorageUsageMB(res.currentUsageMB));
+    }
   }, [user]);
 
   const loadPets = async () => {
@@ -53,17 +58,17 @@ export default function PetDashboardPage() {
 
       const petIds = petsData.map(p => p.id);
       let memoriesData = [];
-      
+
       if (petIds.length > 0) {
         const { data: memories, error: memoriesError } = await supabase
           .from('memories')
           .select('*')
           .in('pet_id', petIds);
-          
+
         if (memoriesError) throw memoriesError;
         memoriesData = memories;
       }
-      
+
       const exportData = {
         version: '1.0.0',
         timestamp: new Date().toISOString(),
@@ -72,8 +77,8 @@ export default function PetDashboardPage() {
         memories: memoriesData
       };
 
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-        type: 'application/json' 
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
+        type: 'application/json'
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -99,7 +104,7 @@ export default function PetDashboardPage() {
       </Helmet>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-[#D7CCC8] pb-6">
           <div>
@@ -110,23 +115,43 @@ export default function PetDashboardPage() {
               管理您的 {pets.length} 个永恒灵魂档案
             </p>
           </div>
-          
-          <div className="flex gap-4 mt-6 md:mt-0">
-             <button 
-              onClick={handleExportData}
-              className="pet-btn-secondary flex items-center gap-2 text-sm py-2 px-4"
-              title="Backup Data"
-            >
-              <Download className="w-4 h-4" />
-              <span>备份数据</span>
-            </button>
-            <button 
-              onClick={() => setShowCreateModal(true)}
-              className="pet-btn-primary flex items-center gap-2 text-sm py-2 px-6"
-            >
-              <Plus className="w-4 h-4" />
-              <span>新建档案</span>
-            </button>
+
+
+          <div className="flex flex-col md:flex-row gap-6 mt-6 md:mt-0 items-end">
+            {user && (
+              <div className="w-full md:w-64">
+                <div className="flex justify-between text-xs text-[#8D6E63] mb-1.5 font-sans">
+                  <span>存储容量已用</span>
+                  <span className="font-medium">{storageUsageMB.toFixed(1)}MB / 100MB</span>
+                </div>
+                <div className="w-full h-2 bg-[#D7CCC8]/30 rounded-full overflow-hidden border border-[#D7CCC8]/20">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min((storageUsageMB / 100) * 100, 100)}%` }}
+                    className={`h-full rounded-full ${storageUsageMB > 90 ? 'bg-red-400' : 'bg-[#FF7043]'}`}
+                    style={{ boxShadow: storageUsageMB > 90 ? '0 0 10px rgba(248,113,113,0.4)' : 'none' }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-4">
+              <button
+                onClick={handleExportData}
+                className="pet-btn-secondary flex items-center gap-2 text-sm py-2 px-4"
+                title="Backup Data"
+              >
+                <Download className="w-4 h-4" />
+                <span>备份数据</span>
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="pet-btn-primary flex items-center gap-2 text-sm py-2 px-6"
+              >
+                <Plus className="w-4 h-4" />
+                <span>新建档案</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -140,7 +165,7 @@ export default function PetDashboardPage() {
           </div>
         ) : pets.length === 0 ? (
           /* Empty State */
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center justify-center h-96 pet-card-white border-dashed border-2 border-[#D7CCC8] bg-transparent shadow-none"
@@ -152,7 +177,7 @@ export default function PetDashboardPage() {
             <p className="text-[#8D6E63] mb-8 max-w-md text-center">
               创建一个档案，开始为您心爱的宠物记录永恒的记忆。
             </p>
-            <button 
+            <button
               onClick={() => setShowCreateModal(true)}
               className="pet-btn-primary flex items-center gap-2"
             >
@@ -171,8 +196,8 @@ export default function PetDashboardPage() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <PetCard 
-                    pet={pet} 
+                  <PetCard
+                    pet={pet}
                     onUpload={() => handleUpload(pet)}
                   />
                 </motion.div>
@@ -183,8 +208,8 @@ export default function PetDashboardPage() {
       </div>
 
       {/* Modals */}
-      <CreatePetModal 
-        isOpen={showCreateModal} 
+      <CreatePetModal
+        isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={() => {
           loadPets();
@@ -193,7 +218,7 @@ export default function PetDashboardPage() {
       />
 
       {selectedPet && (
-        <UploadModal 
+        <UploadModal
           isOpen={showUploadModal}
           onClose={() => setShowUploadModal(false)}
           pet={selectedPet}
