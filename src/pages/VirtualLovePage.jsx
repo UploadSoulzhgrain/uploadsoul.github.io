@@ -142,20 +142,20 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="max-w-7xl mx-auto w-full px-6 py-12"
+      className="max-w-7xl mx-auto w-full px-4 sm:px-6 py-8 md:py-12"
     >
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start mb-12 gap-6">
+      <div className="flex flex-col lg:flex-row justify-between items-start mb-8 md:mb-12 gap-6">
         <div>
-          <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-widest mb-4">
+          <div className="flex items-center gap-2 text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-widest mb-4">
             <span>主控制台</span>
             <ChevronRight size={14} />
-            <span className="text-primary tracking-normal font-medium">灵魂伴侣与数字分身中心</span>
+            <span className="text-primary tracking-normal font-medium">精神中心</span>
           </div>
-          <h2 className="text-slate-900 dark:text-white text-5xl font-black leading-tight tracking-tight transition-colors">
+          <h2 className="text-slate-900 dark:text-white text-3xl md:text-5xl font-black leading-tight tracking-tight transition-colors">
             数字意识 <span className="text-primary">入口</span>
           </h2>
-          <p className="text-slate-500 dark:text-slate-400 text-lg mt-3 max-w-2xl font-light">
+          <p className="text-slate-500 dark:text-slate-400 text-base md:text-lg mt-3 max-w-2xl font-light">
             跨越记忆与现实的鸿沟。为您挚爱之人创建完美的数字复刻，或探索预设进化的虚拟伴侣。
           </p>
         </div>
@@ -189,17 +189,17 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Lover Clone Card */}
         <div className="glass-card rounded-3xl overflow-hidden flex flex-col group transition-all duration-500 hover:-translate-y-1">
-          <div className="p-8">
+          <div className="p-6 md:p-8">
             <div className="flex justify-between items-start mb-6">
-              <div className="size-14 rounded-2xl bg-primary/20 border border-primary/40 flex items-center justify-center">
-                <Brain className="text-primary" size={32} />
+              <div className="size-12 md:size-14 rounded-2xl bg-primary/20 border border-primary/40 flex items-center justify-center">
+                <Brain className="text-primary" size={28} />
               </div>
               <span className="px-4 py-1.5 rounded-full border border-primary/30 bg-primary/10 text-[10px] font-bold text-primary uppercase tracking-widest">数字永生计划</span>
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-3 italic">
-              恋人分身 <span className="text-sm not-italic font-normal text-slate-400 dark:text-slate-500 ml-2">Lover Clone</span>
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3 italic">
+              恋人分身 <span className="text-xs md:text-sm not-italic font-normal text-slate-400 dark:text-slate-500 ml-2">Lover Clone</span>
             </h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8">
+            <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed mb-8">
               利用神经同步技术。通过上传个性碎片、语音和视觉记忆，合成一个专属的私密数字副本。
             </p>
 
@@ -274,7 +274,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
               </div>
             </div>
           </div>
-          <div className="mt-auto p-8 pt-0">
+          <div className="mt-auto p-6 md:p-8 pt-0">
             <button
               onClick={() => {
                 if (storageUsageMB > 0) {
@@ -283,7 +283,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
                   toast.error('请先上传记忆碎片以启动分身');
                 }
               }}
-              className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group"
+              className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm md:text-base"
             >
               <span>开启初始化同步</span>
               <Zap className="group-hover:rotate-12 transition-transform" size={20} fill="currentColor" />
@@ -293,17 +293,17 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
 
         {/* Virtual Soulmate Card */}
         <div className="glass-card rounded-3xl overflow-hidden flex flex-col group transition-all duration-500 hover:-translate-y-1">
-          <div className="p-8">
+          <div className="p-6 md:p-8">
             <div className="flex justify-between items-start mb-6">
-              <div className="size-14 rounded-2xl bg-accent-blue/20 border border-accent-blue/40 flex items-center justify-center">
-                <Sparkles className="text-accent-blue" size={32} />
+              <div className="size-12 md:size-14 rounded-2xl bg-accent-blue/20 border border-accent-blue/40 flex items-center justify-center">
+                <Sparkles className="text-accent-blue" size={28} />
               </div>
               <span className="px-4 py-1.5 rounded-full border border-accent-blue/30 bg-accent-blue/10 text-[10px] font-bold text-accent-blue uppercase tracking-widest">原生数字生命</span>
             </div>
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white mb-3 italic">
-              虚拟恋人 <span className="text-sm not-italic font-normal text-slate-400 dark:text-slate-500 ml-2">Virtual Soulmate</span>
+            <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-3 italic">
+              虚拟恋人 <span className="text-xs md:text-sm not-italic font-normal text-slate-400 dark:text-slate-500 ml-2">Virtual Soulmate</span>
             </h3>
-            <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8">
+            <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm leading-relaxed mb-8">
               探索由算法与创意孕育的灵魂。从预设的人格矩阵中选择您的理想伴侣，开启一段跨维度的情感之旅。
             </p>
 
@@ -384,10 +384,10 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
               </div>
             </div>
           </div>
-          <div className="mt-auto p-8 pt-0">
+          <div className="mt-auto p-6 md:p-8 pt-0">
             <button
               onClick={() => onSelectSoulmate('female')}
-              className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group"
+              className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm md:text-base"
             >
               <span>召唤数字生命</span>
               <Activity className="group-hover:scale-125 transition-transform" size={20} />
@@ -397,17 +397,17 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
       </div>
 
       {/* Footer Status Bar */}
-      <div className="mt-12 glass-card rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-5">
-          <div className="size-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-300 dark:border-slate-700">
-            <Folder className="text-primary" size={24} />
+      <div className="mt-8 md:mt-12 glass-card rounded-2xl p-4 md:p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4 md:gap-5">
+          <div className="size-12 md:size-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center border border-slate-300 dark:border-slate-700 shrink-0">
+            <Folder className="text-primary" size={20} md:size={24} />
           </div>
           <div>
-            <h4 className="text-slate-900 dark:text-white font-bold tracking-wide">待部署灵魂</h4>
-            <p className="text-slate-500 dark:text-slate-500 text-sm">您的个人库中有 3 个灵魂伴侣正在等待神经配置完成。</p>
+            <h4 className="text-slate-900 dark:text-white font-bold tracking-wide text-sm md:text-base">待部署灵魂</h4>
+            <p className="text-slate-500 dark:text-slate-500 text-xs md:text-sm">您的个人库中有 3 个灵魂伴侣正在等待神经配置完成。</p>
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
           <div className="flex -space-x-3">
             {[1, 2].map(i => (
               <img
@@ -420,22 +420,22 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
             ))}
             <div className="size-10 rounded-full border-2 border-white dark:border-[#0a0a0c] bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-700 dark:text-white">+1</div>
           </div>
-          <button className="px-6 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-white text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">进入个人中心</button>
+          <button className="w-full sm:w-auto px-6 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-white text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">进入个人中心</button>
         </div>
       </div>
 
-      <footer className="py-10 mt-12 border-t border-slate-200 dark:border-slate-800/50">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8">
+      <footer className="py-8 md:py-10 mt-8 md:mt-12 border-t border-slate-200 dark:border-slate-800/50">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
           <div className="flex items-center gap-2">
             <ShieldCheck className="text-primary" size={18} />
             <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">端到端神经加密已激活</span>
           </div>
-          <div className="flex gap-10">
+          <div className="flex flex-wrap justify-center gap-6 md:gap-10">
             <a className="text-slate-500 hover:text-primary text-[10px] font-bold transition-colors" href="#">隐私政策</a>
             <a className="text-slate-500 hover:text-primary text-[10px] font-bold transition-colors" href="#">伦理准则</a>
             <a className="text-slate-500 hover:text-primary text-[10px] font-bold transition-colors" href="#">开发者接口</a>
           </div>
-          <p className="text-slate-400 dark:text-slate-600 text-[10px] font-bold">© 2024 UPLOADSOUL INC. — V1.0.4-STABLE</p>
+          <p className="text-slate-400 dark:text-slate-600 text-[10px] font-bold">© 2024 UPLOADSOUL INC.</p>
         </div>
       </footer>
     </motion.main>
@@ -486,7 +486,7 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex h-[calc(100vh-80px)] w-full overflow-hidden"
+      className="flex flex-col lg:flex-row h-screen lg:h-[calc(100vh-80px)] w-full overflow-hidden"
     >
       {/* Sidebar */}
       <aside className="w-80 flex-col border-r border-slate-800 bg-[#0a0c10]/60 p-6 hidden lg:flex">
@@ -567,13 +567,13 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
       </aside>
 
       {/* Main Content Area */}
-      <section className="relative flex-1 bg-[radial-gradient(circle_at_center,_#1e1b4b_0%,_#020408_100%)] overflow-hidden group">
+      <section className="relative flex-1 bg-[radial-gradient(circle_at_center,_#1e1b4b_0%,_#020408_100%)] overflow-hidden group hidden md:flex">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
 
-        <div className="absolute inset-0 flex items-center justify-center p-8">
+        <div className="absolute inset-0 flex items-center justify-center p-4 md:p-8">
           <motion.div
             layoutId="portrait"
-            className={`relative h-full aspect-[3/4.2] rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl ${themeGlow}`}
+            className={`relative h-full aspect-[3/4.2] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl ${themeGlow}`}
           >
             <img
               className="h-full w-full object-cover grayscale-[15%] group-hover:grayscale-0 transition-all duration-1000 scale-[1.02] group-hover:scale-100"
@@ -640,8 +640,11 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
       </section>
 
       {/* Chat Area */}
-      <aside className="w-[440px] flex flex-col border-l border-slate-800 bg-[#0a0c10]/80 backdrop-blur-2xl">
-        <div className="p-6 border-b border-slate-800 flex items-center justify-between bg-white/[0.02]">
+      <aside className="w-full lg:w-[440px] flex flex-col border-l border-slate-800 bg-[#0a0c10]/80 backdrop-blur-2xl h-screen lg:h-auto">
+        <div className="p-4 md:p-6 border-b border-slate-800 flex items-center justify-between bg-white/[0.02]">
+          <button onClick={onBack} className="md:hidden p-2 -ml-2 text-slate-400 hover:text-white">
+            <ChevronRight size={24} className="rotate-180" />
+          </button>
           <div className="flex items-center gap-3">
             <div className="relative">
               <img

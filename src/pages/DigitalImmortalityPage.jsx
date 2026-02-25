@@ -305,8 +305,8 @@ const UploadSoul = () => {
       {/* 创建化身模态框 */}
       {showGenesisModal && (
         <div className="genesis-overlay">
-          <div className="genesis-container">
-            <button className="genesis-close" onClick={closeGenesisModal}>×</button>
+          <div className="genesis-container p-4 md:p-8">
+            <button className="genesis-close top-2 right-4 md:top-4 md:right-8" onClick={closeGenesisModal}>×</button>
 
             <div className="genesis-step-indicator">
               <div className={`step-dot ${genesisStep >= 1 ? 'active' : ''} ${genesisStep > 1 ? 'completed' : ''}`} />
@@ -509,16 +509,27 @@ const UploadSoul = () => {
           -webkit-text-fill-color: rgba(100, 200, 255, 0.7);
         }
         .main-viewport {
-          position: absolute; left: 0; top: 0;
-          width: 62%; height: 100%;
+          position: relative;
+          width: 100%; height: auto; min-height: 100vh;
           display: flex; flex-direction: column;
           align-items: center; justify-content: center;
-          z-index: 2;
+          z-index: 2; padding: 100px 20px 40px 20px;
+        }
+        @media (min-width: 1024px) {
+          .main-viewport {
+            position: absolute; left: 0; top: 0;
+            width: 62%; height: 100%; padding: 0;
+          }
         }
         .avatar-container {
           position: relative;
-          width: 400px; height: 500px;
+          width: 280px; height: 350px;
           perspective: 1000px;
+        }
+        @media (min-width: 640px) {
+          .avatar-container {
+            width: 400px; height: 500px;
+          }
         }
         .avatar-figure {
           position: relative;
@@ -644,14 +655,25 @@ const UploadSoul = () => {
           50% { box-shadow: 0 0 35px rgba(0, 255, 136, 0.7), 0 0 70px rgba(0, 255, 136, 0.3); }
         }
         .interaction-deck {
-          position: absolute; right: 0; top: 0;
-          width: 38%; height: 100%; z-index: 3;
+          position: relative;
+          width: 100%; height: auto; min-height: 100vh; z-index: 3;
           display: flex; flex-direction: column;
-          padding: 85px 25px 40px 25px;
+          padding: 40px 20px;
           backdrop-filter: blur(20px);
           background: linear-gradient(135deg, rgba(10, 17, 40, 0.4) 0%, rgba(26, 11, 46, 0.3) 100%);
-          border-left: 1px solid rgba(100, 200, 255, 0.2);
-          box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+          border-left: none;
+          border-top: 1px solid rgba(100, 200, 255, 0.2);
+          box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
+        }
+        @media (min-width: 1024px) {
+          .interaction-deck {
+            position: absolute; right: 0; top: 0;
+            width: 38%; height: 100%;
+            padding: 85px 25px 40px 25px;
+            border-left: 1px solid rgba(100, 200, 255, 0.2);
+            border-top: none;
+            box-shadow: -5px 0 30px rgba(0, 0, 0, 0.5);
+          }
         }
         .deck-header { margin-bottom: 20px; }
         .deck-title {
@@ -1170,184 +1192,160 @@ const UploadSoul = () => {
         }
       `}</style>
 
-      <div className="soul-title">
-        UPLOADSOUL
-        <div className="soul-subtitle">身外化身 · DIGITAL IMMORTALITY</div>
-      </div>
-
-      <div className="main-viewport">
-        <div className="avatar-container">
-          <div className="avatar-figure">
-            <div className="avatar-glow" />
-            <div className="avatar-core" />
-            <div className="avatar-silhouette" />
-            <div className="data-streams">
-              <div className="data-stream" />
-              <div className="data-stream" />
-              <div className="data-stream" />
-              <div className="data-stream" />
-            </div>
-            {sparks.map(spark => (
-              <div
-                key={spark.id}
-                className="memory-spark"
-                style={{
-                  left: `${spark.x}%`,
-                  top: `${spark.y}%`,
-                  '--tx': `${Math.random() * 200 - 100}px`,
-                  '--ty': `${-200 - Math.random() * 100}px`
-                }}
-              />
-            ))}
-          </div>
-          <div className={`avatar-state-indicator ${avatarState}`}>
-            {avatarState === 'listening' && '● 聆听中 / LISTENING'}
-            {avatarState === 'thinking' && '◉ 思考中 / THINKING'}
-            {avatarState === 'responding' && '◈ 共鸣中 / RESONATING'}
-          </div>
-        </div>
-        <div className="reality-label">REALITY: 数字虚空 / DIGITAL VOID</div>
-      </div>
-
-      <button className="memory-corridor-btn" title="记忆回廊">
-        <BookOpen size={20} />
-      </button>
-
-      <button className="create-avatar-btn" title="创建数字人" onClick={openGenesisModal}>
-        <User size={20} />
-      </button>
-
-      <input
-        type="file"
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        accept="image/*"
-        onChange={handleFileUpload}
-      />
-
-      <div className="interaction-deck">
-        <div className="deck-header">
-          <div className="deck-title">灵魂日志 / Soul Log</div>
-          {systemLog && <div className="system-log">{systemLog}</div>}
+      <div className="uploadsoul-root overflow-y-auto lg:overflow-hidden h-screen">
+        <div className="soul-title scale-75 md:scale-100 origin-top-left">
+          UPLOADSOUL
+          <div className="soul-subtitle uppercase italic tracking-[0.2em]">身外化身 · DIGITAL IMMORTALITY</div>
         </div>
 
-        <div className="dialogue-stream">
-          {messages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.type}`}>
-              <div className="message-header">
-                <div className="message-avatar" />
-                <span className="message-sender">
-                  {msg.type === 'user' ? '你' : msg.type === 'ai-observation' ? '观察日记' : '身外化身'}
-                </span>
-                <span className="message-timestamp">{msg.timestamp}</span>
-              </div>
-              <div className="message-content">
-                {msg.text}
-                {msg.attachment && msg.attachment.startsWith('data:image') && (
-                  <img
-                    src={msg.attachment}
-                    alt="uploaded"
+        <div className="flex flex-col lg:flex-row min-h-screen">
+          <div className="main-viewport">
+            <div className="avatar-container">
+              <div className="avatar-figure">
+                <div className="avatar-glow" />
+                <div className="avatar-core" />
+                <div className="avatar-silhouette" />
+                <div className="data-streams">
+                  <div className="data-stream" />
+                  <div className="data-stream" />
+                  <div className="data-stream" />
+                  <div className="data-stream" />
+                </div>
+                {sparks.map(spark => (
+                  <div
+                    key={spark.id}
+                    className="memory-spark"
                     style={{
-                      maxWidth: '100%',
-                      marginTop: '10px',
-                      borderRadius: '8px',
-                      border: '1px solid rgba(100, 200, 255, 0.2)'
+                      left: `${spark.x}%`,
+                      top: `${spark.y}%`,
+                      '--tx': `${Math.random() * 200 - 100}px`,
+                      '--ty': `${-200 - Math.random() * 100}px`
                     }}
                   />
-                )}
+                ))}
+              </div>
+              <div className={`avatar-state-indicator ${avatarState}`}>
+                {avatarState === 'listening' && '● 聆听中 / LISTENING'}
+                {avatarState === 'thinking' && '◉ 思考中 / THINKING'}
+                {avatarState === 'responding' && '◈ 共鸣中 / RESONATING'}
               </div>
             </div>
-          ))}
-          {isTyping && (
-            <div className="message ai">
-              <div className="message-header">
-                <div className="message-avatar" />
-                <span className="message-sender">身外化身</span>
-              </div>
-              <div className="typing-indicator">
-                <div className="typing-dot" />
-                <div className="typing-dot" />
-                <div className="typing-dot" />
-              </div>
-            </div>
-          )}
-        </div>
+            <div className="reality-label hidden md:block mt-8">REALITY: 数字虚空 / DIGITAL VOID</div>
 
-        <div className="whisper-field">
-          <div className="input-prompt">今天过得怎么样？有什么想告诉未来的自己吗？</div>
-          <textarea
-            className="input-area"
-            placeholder="此刻你在想什么..."
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSendMessage();
-              }
-            }}
-            disabled={activeInputMode === 'voice'}
-          />
-          <div className="input-controls">
-            <div className="input-modes">
-              <button
-                className={`mode-button ${activeInputMode === 'voice' ? 'active' : ''}`}
-                title="语音输入"
-                onClick={handleVoiceInput}
-              >
-                <Mic size={18} />
-              </button>
-              <button
-                className={`mode-button ${activeInputMode === 'image' ? 'active' : ''}`}
-                title="上传照片"
-                onClick={handleImageUpload}
-              >
-                <Camera size={18} />
-              </button>
-              <button
-                className={`mode-button ${activeInputMode === 'text' ? 'active' : ''}`}
-                title="文字输入"
-                onClick={() => setActiveInputMode('text')}
-              >
-                <MessageSquare size={18} />
-              </button>
+            <div className="mt-12 w-full max-w-sm px-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-[10px] font-bold text-[#64c8ff] uppercase tracking-widest">神经同步率</span>
+                <span className="text-xl font-bold italic">{Math.round(evolutionProgress)}%</span>
+              </div>
+              <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-[#64c8ff] to-[#8a2be2] transition-all duration-1000" style={{ width: `${evolutionProgress}%` }}></div>
+              </div>
             </div>
-            <button className="send-button" onClick={handleSendMessage}>
-              发送
+
+            <button
+              onClick={openGenesisModal}
+              className="mt-10 px-8 py-3 bg-[#64c8ff]/10 border border-[#64c8ff]/30 text-[#64c8ff] text-xs font-bold uppercase tracking-[0.3em] rounded-full hover:bg-[#64c8ff]/20 transition-all shadow-[0_0_30px_rgba(100,200,255,0.2)]"
+            >
+              重新初始化 / Re-Initialize
             </button>
           </div>
-        </div>
-      </div>
 
-      <div className="evolution-engine">
-        <div className="evolution-label">
-          <Zap size={12} />
-          进化状态 / EVOLUTION STATUS
-        </div>
-        <div className="dna-helix">
-          <div className="dna-progress" style={{ width: `${evolutionProgress}%` }} />
-        </div>
-        <div className="evolution-status">
-          情感模拟拟合度: {evolutionProgress.toFixed(1)}% · 已学习新的对话模式
+          <div className="interaction-deck">
+            <div className="deck-header">
+              <div className="deck-title">灵魂日志 / SOUL LOG</div>
+              {systemLog && <div className="system-log">{systemLog}</div>}
+            </div>
+
+            <div className="dialogue-stream flex-1">
+              {messages.map((msg, idx) => (
+                <div key={idx} className={`message ${msg.type}`}>
+                  <div className="message-header">
+                    <div className="message-avatar" />
+                    <span className="message-sender">
+                      {msg.type === 'user' ? 'ME / 观察者' : msg.type === 'ai-observation' ? 'THE RECORD / 观察日志' : 'THE SELF / 化身'}
+                    </span>
+                    <span className="message-timestamp">{msg.timestamp}</span>
+                  </div>
+                  <div className="message-content">
+                    {msg.text}
+                    {msg.attachment && (msg.attachment.startsWith('data:image') || msg.attachment.startsWith('http')) && (
+                      <img
+                        src={msg.attachment}
+                        alt="uploaded"
+                        className="mt-3 rounded-xl max-w-full h-auto border border-white/10"
+                      />
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isTyping && (
+                <div className="message ai">
+                  <div className="message-header">
+                    <div className="message-avatar" />
+                    <span className="message-sender">THE SELF</span>
+                  </div>
+                  <div className="typing-indicator mt-2">
+                    <div className="typing-dot" />
+                    <div className="typing-dot" />
+                    <div className="typing-dot" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="whisper-field mt-6">
+              <div className="input-prompt text-[10px] text-[#64c8ff]/60 uppercase tracking-widest mb-3">
+                {activeInputMode === 'voice' ? '正在采集中...' : '输入思维碎片或记忆细节...'}
+              </div>
+              <textarea
+                className="input-area w-full bg-transparent border-none text-[#e0e6ff] resize-none focus:outline-none min-h-[80px]"
+                placeholder="在此输入您的意识流..."
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), handleSendMessage())}
+                disabled={activeInputMode === 'voice'}
+              />
+              <div className="flex justify-between items-center mt-4">
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleVoiceInput}
+                    className={`p-2.5 rounded-xl border transition-all ${activeInputMode === 'voice' ? 'bg-[#64c8ff]/20 border-[#64c8ff] text-[#64c8ff]' : 'border-white/10 hover:border-white/20 text-white/40 hover:text-white/70'}`}
+                  >
+                    <Mic size={18} />
+                  </button>
+                  <button
+                    onClick={handleImageUpload}
+                    className={`p-2.5 rounded-xl border border-white/10 hover:border-white/20 text-white/40 hover:text-white/70 transition-all`}
+                  >
+                    <Camera size={18} />
+                  </button>
+                  <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
+                </div>
+                <button
+                  onClick={handleSendMessage}
+                  className="px-8 py-2.5 bg-gradient-to-r from-[#64c8ff] to-[#8a2be2] text-white text-xs font-bold rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all uppercase tracking-widest"
+                >
+                  发送 / SEND
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Storage Quota Display */}
-        <div style={{ marginTop: '12px', borderTop: '1px solid rgba(100, 200, 255, 0.1)', paddingTop: '10px' }}>
+        <div className="evolution-engine hidden lg:block">
           <div className="evolution-label">
-            存储空间 / STORAGE ({storageUsageMB.toFixed(1)}MB / 100MB)
+            <Zap size={12} className="text-[#64c8ff]" />
+            进化状态 / EVOLUTION STATUS
           </div>
-          <div className="dna-helix" style={{ height: '6px' }}>
-            <div
-              className="dna-progress"
-              style={{
-                width: `${Math.min((storageUsageMB / 100) * 100, 100)}%`,
-                background: storageUsageMB > 90 ? '#ef4444' : 'linear-gradient(90deg, #64c8ff, #8a2be2)'
-              }}
-            />
+          <div className="dna-helix mt-2">
+            <div className="dna-progress" style={{ width: `${evolutionProgress}%` }} />
+          </div>
+          <div className="evolution-status mt-2">
+            拟合度: {evolutionProgress.toFixed(1)}% · 系统稳定运行中
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
