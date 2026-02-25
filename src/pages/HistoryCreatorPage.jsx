@@ -68,8 +68,14 @@ const HistoryCreatorPage = () => {
           backdrop-filter: blur(10px);
           display: flex;
           align-items: center;
-          padding: 0 2rem;
+          padding: 0 1rem;
           z-index: 1000;
+        }
+
+        @media (min-width: 768px) {
+          .creator-navbar {
+            padding: 0 2rem;
+          }
         }
 
         .creator-back-btn {
@@ -96,10 +102,17 @@ const HistoryCreatorPage = () => {
         }
 
         .creator-title {
-          font-size: 2.2rem;
-          letter-spacing: 0.3rem;
-          margin-bottom: 0.8rem;
+          font-size: 1.5rem;
+          letter-spacing: 0.15rem;
+          margin-bottom: 0.6rem;
           text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+
+        @media (min-width: 768px) {
+          .creator-title {
+            font-size: 2.2rem;
+            letter-spacing: 0.3rem;
+          }
         }
 
         .creator-subtitle {
@@ -131,8 +144,15 @@ const HistoryCreatorPage = () => {
 
         .creator-form-grid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1.5rem;
+          grid-template-columns: 1fr;
+          gap: 1.2rem;
+        }
+
+        @media (min-width: 768px) {
+          .creator-form-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+          }
         }
 
         .creator-form-group { display: flex; flex-direction: column; }

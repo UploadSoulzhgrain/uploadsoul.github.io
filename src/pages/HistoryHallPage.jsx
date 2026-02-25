@@ -72,7 +72,10 @@ const HistoryHallPage = () => {
         }
 
         .hall-back-btn:hover { color: #f4d03f; }
-        .hall-navbar h1 { font-size: 1.4rem; letter-spacing: 0.2rem; margin: 0; }
+        .hall-navbar h1 { font-size: 1.1rem; letter-spacing: 0.1rem; margin: 0; }
+        @media (min-width: 768px) {
+          .hall-navbar h1 { font-size: 1.4rem; letter-spacing: 0.2rem; }
+        }
 
         .hall-hero-section {
           height: 220px;
@@ -94,11 +97,18 @@ const HistoryHallPage = () => {
         }
 
         .hall-hero-title {
-          font-size: 3rem;
-          letter-spacing: 0.4rem;
+          font-size: 2rem;
+          letter-spacing: 0.2rem;
           margin-bottom: 0.6rem;
           text-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
           position: relative;
+        }
+
+        @media (min-width: 768px) {
+          .hall-hero-title {
+            font-size: 3rem;
+            letter-spacing: 0.4rem;
+          }
         }
 
         .hall-hero-subtitle {
@@ -111,13 +121,23 @@ const HistoryHallPage = () => {
         .hall-filter-section {
           background: rgba(10, 10, 10, 0.95);
           border-bottom: 1px solid rgba(212, 175, 55, 0.1);
-          padding: 1.5rem 2rem;
+          padding: 1rem;
           display: flex;
-          gap: 1.5rem;
-          align-items: center;
+          flex-direction: column;
+          gap: 1rem;
+          align-items: stretch;
           position: sticky;
           top: 60px;
           z-index: 999;
+        }
+
+        @media (min-width: 768px) {
+          .hall-filter-section {
+            padding: 1.5rem 2rem;
+            flex-direction: row;
+            align-items: center;
+            gap: 1.5rem;
+          }
         }
 
         .hall-search-box { flex: 1; position: relative; }
@@ -134,26 +154,60 @@ const HistoryHallPage = () => {
         .hall-search-input:focus { outline: none; border-color: #d4af37; }
         .hall-search-icon { position: absolute; right: 0.8rem; top: 50%; transform: translateY(-50%); color: #8b7355; }
 
-        .hall-filter-group { display: flex; gap: 0.8rem; }
+        .hall-filter-group { 
+          display: flex; 
+          gap: 0.5rem; 
+          overflow-x: auto; 
+          padding-bottom: 4px;
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .hall-filter-group::-webkit-scrollbar { display: none; }
+
+        @media (min-width: 768px) {
+          .hall-filter-group {
+            gap: 0.8rem;
+            overflow-x: visible;
+            padding-bottom: 0;
+          }
+        }
+
         .hall-filter-btn {
           background: rgba(212, 175, 55, 0.1);
           border: 1px solid rgba(212, 175, 55, 0.3);
           color: #d4af37;
-          padding: 0.5rem 1.2rem;
+          padding: 0.4rem 0.8rem;
           border-radius: 6px;
           cursor: pointer;
           transition: 0.3s;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
+          white-space: nowrap;
         }
+
+        @media (min-width: 768px) {
+          .hall-filter-btn {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+          }
+        }
+
         .hall-filter-btn.active { background: rgba(212, 175, 55, 0.25); border-color: #d4af37; }
 
         .hall-grid {
-          padding: 2.5rem;
+          padding: 1rem;
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 2rem;
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+          gap: 1.5rem;
           max-width: 1400px;
           margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+          .hall-grid {
+            padding: 2.5rem;
+            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          }
         }
 
         .hall-card {

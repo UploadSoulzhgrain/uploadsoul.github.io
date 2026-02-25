@@ -140,74 +140,123 @@ const ReunionSpacePage = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 2rem;
+          padding: 0 1rem;
           z-index: 1000;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-top-bar {
+            padding: 0 2rem;
+          }
         }
 
         .reunion-top-left {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-top-left {
+            gap: 1.5rem;
+          }
         }
 
         .reunion-back-btn {
           color: #d4af37;
           text-decoration: none;
-          font-size: 0.9rem;
+          font-size: 0.85rem;
           transition: all 0.3s;
           display: flex;
           align-items: center;
-          gap: 0.4rem;
+          gap: 0.3rem;
         }
 
-        .reunion-back-btn:hover {
-          color: #f4d03f;
+        @media (min-width: 768px) {
+          .reunion-back-btn {
+             font-size: 0.9rem;
+             gap: 0.4rem;
+          }
         }
 
         .reunion-member-info {
           display: flex;
           align-items: center;
-          gap: 0.8rem;
+          gap: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-member-info {
+            gap: 0.8rem;
+          }
         }
 
         .reunion-member-avatar-small {
-          width: 36px;
-          height: 36px;
+          width: 32px;
+          height: 32px;
           border-radius: 50%;
           background: radial-gradient(circle, #d4af37, #8b7355);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 1rem;
+          font-size: 0.9rem;
           color: #000;
           font-weight: bold;
           border: 1.5px solid #d4af37;
         }
 
+        @media (min-width: 768px) {
+          .reunion-member-avatar-small {
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+          }
+        }
+
         .reunion-member-name-small {
-          font-size: 1.1rem;
-          letter-spacing: 0.1rem;
+          font-size: 0.9rem;
+          letter-spacing: 0.05rem;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-member-name-small {
+            font-size: 1.1rem;
+            letter-spacing: 0.1rem;
+          }
         }
 
         .reunion-member-dates-small {
-          font-size: 0.75rem;
+          font-size: 0.7rem;
           color: #8b7355;
         }
 
         .reunion-mode-switch {
           display: flex;
-          gap: 0.8rem;
+          gap: 0.4rem;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-mode-switch {
+            gap: 0.8rem;
+          }
         }
 
         .reunion-mode-btn {
-          padding: 0.4rem 1.2rem;
+          padding: 0.3rem 0.6rem;
           background: rgba(212, 175, 55, 0.1);
           border: 1px solid rgba(212, 175, 55, 0.3);
           color: #d4af37;
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.3s;
-          font-size: 0.85rem;
+          font-size: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-mode-btn {
+            padding: 0.4rem 1.2rem;
+            font-size: 0.85rem;
+          }
         }
 
         .reunion-mode-btn.active {
@@ -227,17 +276,30 @@ const ReunionSpacePage = () => {
         /* 日常模式 */
         .reunion-chat-mode {
           display: flex;
+          flex-direction: column;
           width: 100%;
           height: 100%;
+        }
+
+        @media (min-width: 1024px) {
+          .reunion-chat-mode {
+            flex-direction: row;
+          }
         }
 
         .reunion-chat-mode.hidden { display: none; }
 
         .reunion-scene-preview {
-          flex: 1;
+          flex: 0 0 40%;
           background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
           position: relative;
           overflow: hidden;
+        }
+
+        @media (min-width: 1024px) {
+          .reunion-scene-preview {
+            flex: 1;
+          }
         }
 
         .reunion-scene-background {
@@ -288,11 +350,20 @@ const ReunionSpacePage = () => {
         }
 
         .reunion-chat-panel {
-          width: 420px;
+          flex: 1;
           background: rgba(10, 10, 10, 0.98);
-          border-left: 1px solid rgba(212, 175, 55, 0.2);
+          border-top: 1px solid rgba(212, 175, 55, 0.2);
           display: flex;
           flex-direction: column;
+        }
+
+        @media (min-width: 1024px) {
+          .reunion-chat-panel {
+            width: 420px;
+            flex: none;
+            border-top: none;
+            border-left: 1px solid rgba(212, 175, 55, 0.2);
+          }
         }
 
         .reunion-chat-header {
@@ -556,39 +627,72 @@ const ReunionSpacePage = () => {
 
         .reunion-memorial-controls {
           position: absolute;
-          bottom: 2.5rem;
-          right: 2.5rem;
+          bottom: 1.5rem;
+          left: 50%;
+          transform: translateX(-50%);
           display: flex;
-          flex-direction: column;
-          gap: 0.8rem;
+          align-items: center;
+          gap: 1rem;
+          width: 100%;
+          justify-content: center;
+          padding: 0 1rem;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-memorial-controls {
+            bottom: 2.5rem;
+            right: 2.5rem;
+            left: auto;
+            transform: none;
+            flex-direction: column;
+            width: auto;
+            padding: 0;
+          }
         }
 
         .reunion-control-btn {
           background: rgba(212, 175, 55, 0.1);
           border: 1px solid rgba(212, 175, 55, 0.3);
           color: #d4af37;
-          padding: 0.7rem 1.4rem;
+          padding: 0.5rem 0.8rem;
           border-radius: 6px;
           cursor: pointer;
-          font-size: 0.9rem;
+          font-size: 0.8rem;
           transition: all 0.3s;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-control-btn {
+            padding: 0.7rem 1.4rem;
+            font-size: 0.9rem;
+          }
         }
 
         .reunion-control-btn:hover { background: rgba(212, 175, 55, 0.2); }
 
         .reunion-mic-btn {
-          width: 50px;
-          height: 50px;
+          width: 44px;
+          height: 44px;
           border-radius: 50%;
           background: linear-gradient(135deg, #d4af37, #f4d03f);
           border: none;
           color: #000;
-          font-size: 1.4rem;
+          font-size: 1.2rem;
           cursor: pointer;
-          align-self: center;
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-shrink: 0;
+        }
+
+        @media (min-width: 768px) {
+          .reunion-mic-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.4rem;
+            align-self: center;
+          }
         }
 
         .reunion-mic-btn.active {
