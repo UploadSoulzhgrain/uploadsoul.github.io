@@ -1,0 +1,35 @@
+{
+  "appTitle": "数字化身平台",
+  "welcome": "欢迎使用数字化身平台",
+  "language": "语言",
+  "navigation": {
+    "home": "首页",
+    "avatars": "我的形象",
+    "conversations": "对话历史",
+    "settings": "设置"
+  },
+  "actions": {
+    "start": "开始对话",
+    "create": "创建形象",
+    "manage": "管理形象",
+    "upload": "上传语音样本",
+    "settings": "账户设置"
+  },
+  "footer": {
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "help": "帮助中心",
+    "about": "关于我们"
+  },
+  "speech": {
+    "startListening": "开始聆听",
+    "stopListening": "停止聆听",
+    "transcribing": "正在转录...",
+    "speaking": "形象正在说话..."
+  },
+  "errors": {
+    "apiError": "API错误：{{message}}",
+    "microphonePermission": "需要麦克风权限",
+    "networkError": "网络错误。请检查您的连接。"
+  }
+}

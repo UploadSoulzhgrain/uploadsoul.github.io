@@ -1,0 +1,35 @@
+{
+  "appTitle": "Digital Avatar Platform",
+  "welcome": "Welcome to the Digital Avatar Platform",
+  "language": "Language",
+  "navigation": {
+    "home": "Home",
+    "avatars": "My Avatars",
+    "conversations": "Conversations",
+    "settings": "Settings"
+  },
+  "actions": {
+    "start": "Start Conversation",
+    "create": "Create Avatar",
+    "manage": "Manage Avatars",
+    "upload": "Upload Voice Samples",
+    "settings": "Account Settings"
+  },
+  "footer": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "help": "Help Center",
+    "about": "About Us"
+  },
+  "speech": {
+    "startListening": "Start Listening",
+    "stopListening": "Stop Listening",
+    "transcribing": "Transcribing...",
+    "speaking": "Avatar is speaking..."
+  },
+  "errors": {
+    "apiError": "API Error: {{message}}",
+    "microphonePermission": "Microphone permission is required",
+    "networkError": "Network error. Please check your connection."
+  }
+}

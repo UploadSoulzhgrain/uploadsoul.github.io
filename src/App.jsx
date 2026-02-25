@@ -8,6 +8,9 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import CompanionPage from './pages/CompanionPage'
+import DailyCompanionPage from './pages/DailyCompanionPage'
+import SeniorCarePage from './pages/SeniorCarePage'
+import MentalWellnessPage from './pages/MentalWellnessPage'
 import PetPage from './pages/PetPage'
 import DigitalHumanPage from './pages/DigitalHumanPage'
 import ShopPage from './pages/ShopPage'
@@ -86,18 +89,18 @@ const LanguageSync = ({ lang }) => {
 const AppLayout = () => {
   const { lang } = useParams();
   const location = useLocation();
-  const hideFooterRoutes = ['/speak-bar'];
-  const shouldHideFooter = hideFooterRoutes.some(route => location.pathname.includes(route));
+  const hideHeaderFooterRoutes = ['/companion', '/speak-bar'];
+  const shouldHideHeaderFooter = hideHeaderFooterRoutes.some(route => location.pathname.includes(route));
 
   return (
     <div className="min-h-screen flex flex-col">
       <LanguageSync lang={lang} />
       <AnalyticsTracker />
-      <Header />
+      {!shouldHideHeaderFooter && <Header />}
       <main className="flex-grow">
         <Outlet />
       </main>
-      {!shouldHideFooter && <Footer />}
+      {!shouldHideHeaderFooter && <Footer />}
     </div>
   );
 };
@@ -112,6 +115,9 @@ const BusinessRoutes = () => (
     <Route path="update-password" element={<UpdatePasswordPage />} />
     <Route path="register" element={<RegisterPage />} />
     <Route path="companion" element={<CompanionPage />} />
+    <Route path="companion/daily" element={<DailyCompanionPage />} />
+    <Route path="companion/senior" element={<SeniorCarePage />} />
+    <Route path="companion/mental" element={<MentalWellnessPage />} />
     <Route path="virtual-pet" element={<PetPage />} />
     <Route path="pet" element={<ProtectedRoute><PetDashboardPage /></ProtectedRoute>} />
     <Route path="pet/p/:slug" element={<PetDetailPage />} />
