@@ -202,18 +202,8 @@ const CompanionPage = () => {
                 <div>
                   <h4 className="font-bold text-lg mb-6">联系我们</h4>
                   <ul className="space-y-4 text-gray-400">
-                    <li className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-sm">mail</span>
-                      contact@uploadsoul.com
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-sm">call</span>
-                      400-888-情感
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <span className="material-symbols-outlined text-sm">location_on</span>
-                      上海市静安区城市核心区
-                    </li>
+                    <li className="flex items-center gap-2 font-display uppercase tracking-tight"><span className="material-symbols-outlined text-xs">mail</span> contact@uploadsoul.com</li>
+                    <li className="flex items-center gap-2"><span className="material-symbols-outlined text-xs">location_on</span> Vancouver, Canada</li>
                   </ul>
                 </div>
                 <div>
