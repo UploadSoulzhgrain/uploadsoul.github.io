@@ -92,63 +92,63 @@
   <meta name="google-site-verification" content="G-YOUR-ACTUAL-CODE" />
   <meta name="msvalidate.01" content="BING-YOUR-ACTUAL-CODE" />
 
-  <!-- JSON-LD Structured Data -->
+  <!-- JSON-LD Structured Data - Advanced AI-Friendly Schema -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "UploadSoul 传灵",
-    "alternateName": ["UploadSoul", "传灵", "Upload Soul"],
-    "url": "https://uploadsoul.com",
-    "logo": "https://uploadsoul.com/logo.png",
-    "description": "全球领先的AI数字情感陪伴平台，提供数字永生、虚拟恋爱、AI伴侣、情感陪伴等创新服务。",
-    "foundingDate": "2024",
-    "foundingLocation": "Vancouver, Canada",
-    "sameAs": [
-      "https://github.com/UploadSoulzhgrain/uploadsoul.github.io"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "email": "contact@uploadsoul.com",
-      "contactType": "customer service",
-      "availableLanguage": ["Chinese", "English", "Japanese", "Korean"]
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "UploadSoul 传灵",
-    "alternateName": "传灵数字情感陪伴平台",
-    "url": "https://uploadsoul.com",
-    "description": "AI数字情感陪伴平台 - 数字永生、虚拟恋爱、AI伴侣、情感陪伴",
-    "inLanguage": ["zh-CN", "en", "ja", "ko"],
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://uploadsoul.com/search?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "UploadSoul",
-    "applicationCategory": "LifestyleApplication",
-    "operatingSystem": "Web, iOS, Android",
-    "description": "AI数字情感陪伴应用 - 虚拟恋人、数字宠物、情感聊天、心灵慰藉",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.8",
-      "ratingCount": "1000"
-    }
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://uploadsoul.com/#organization",
+        "name": "UploadSoul 传灵",
+        "alternateName": ["UploadSoul", "传灵", "Upload Soul"],
+        "url": "https://uploadsoul.com",
+        "logo": "https://uploadsoul.com/logo.png",
+        "description": "全球领先的AI数字情感陪伴平台，提供数字永生、虚拟恋爱、AI伴侣、情感陪伴等创新服务。",
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "email": "contact@uploadsoul.com",
+          "contactType": "customer service",
+          "availableLanguage": ["Chinese", "English", "Japanese", "Korean"]
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://uploadsoul.com/#website",
+        "url": "https://uploadsoul.com",
+        "name": "UploadSoul 传灵",
+        "description": "AI数字情感陪伴平台 - 数字永生、虚拟恋爱、AI伴侣、情感陪伴",
+        "publisher": {"@id": "https://uploadsoul.com/#organization"},
+        "inLanguage": ["zh-CN", "en", "ja", "ko"]
+      },
+      {
+        "@type": "Service",
+        "serviceType": "AI Digital Companion",
+        "provider": {"@id": "https://uploadsoul.com/#organization"},
+        "description": "Digital Immortality and AI Emotional Companionship services including Virtual Pet, AI Partner, and Family Tree digitization."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Digital Immortality?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Digital Immortality is the preservation of consciousness, memories, and personality through advanced AI models, allowing for eternal connection with loved ones."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the AI Companion work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Our AI companions use cutting-edge LLMs and digital human technology to provide empathetic, context-aware emotional support and interaction."
+            }
+          }
+        ]
+      }
+    ]
   }
   </script>
 

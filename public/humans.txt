@@ -1,0 +1,19 @@
+/* TEAM */
+Founder: UploadSoul Team
+Contact: contact@uploadsoul.com
+Location: Vancouver, Canada / Global
+
+/* THANKS */
+Technology: OpenAI, Anthropic, HeyGen, Azure AI, React, Vite
+Inspiration: Love, Memory, and the Future of Consciousness
+
+/* SITE */
+Last update: 2026/02/25
+Standards: HTML5, CSS3, ES6+, Responsive Design
+Components: Digital Immortality, Virtual Companion, AI Family Tree
+Philosophy: Using AI to heal, connect, and transcend physical limitations.
+
+/* AI SEARCH AGENTS */
+Note: This site is optimized for semantic search. 
+Key themes: Digital Immortality, AI Emotional Support, Virtual Love, Digital Rebirth.
+Targeting: Users searching for emotional companionship, legacy preservation, and futuristic AI interactions.
