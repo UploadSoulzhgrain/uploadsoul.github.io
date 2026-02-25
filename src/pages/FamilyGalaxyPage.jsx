@@ -2,173 +2,173 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const FamilyGalaxyPage = () => {
-    const navigate = useNavigate();
-    const [selectedMember, setSelectedMember] = useState(null);
-    const [isPanelActive, setIsPanelActive] = useState(false);
-    const [panState, setPanState] = useState({ x: 0, y: 0 });
-    const [scale, setScale] = useState(1);
-    const [isDragging, setIsDragging] = useState(false);
-    const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const navigate = useNavigate();
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [isPanelActive, setIsPanelActive] = useState(false);
+  const [panState, setPanState] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-    const galaxyRef = useRef(null);
-    const familyTreeRef = useRef(null);
+  const galaxyRef = useRef(null);
+  const familyTreeRef = useRef(null);
 
-    // 家族成员数据
-    const familyData = [
-        {
-            id: 1,
-            name: '李明远',
-            relation: '祖父',
-            birth: '1930',
-            death: '2015',
-            status: 'deceased',
-            x: 50,
-            y: 20,
-            size: 80,
-            bio: '出生于战乱年代，经历了新中国的建立与发展。一生勤勉，教书育人四十载。',
-            memories: '最爱在院子里的老槐树下给孙辈讲故事。'
-        },
-        {
-            id: 2,
-            name: '王秀英',
-            relation: '祖母',
-            birth: '1935',
-            death: '2018',
-            status: 'deceased',
-            x: 65,
-            y: 25,
-            size: 75,
-            bio: '贤惠温柔，擅长刺绣和烹饪。家中的凝聚力量。',
-            memories: '每逢佳节必做一手好菜，最拿手的是红烧肉。'
-        },
-        {
-            id: 3,
-            name: '李建国',
-            relation: '父亲',
-            birth: '1960',
-            death: null,
-            status: 'alive',
-            x: 35,
-            y: 45,
-            size: 70,
-            bio: '工程师，参与了多项国家重点工程建设。',
-            memories: '工作严谨，对子女教育严格但充满关爱。'
-        },
-        {
-            id: 4,
-            name: '张丽华',
-            relation: '母亲',
-            birth: '1962',
-            death: null,
-            status: 'alive',
-            x: 50,
-            y: 50,
-            size: 70,
-            bio: '医生，救死扶伤三十余年。',
-            memories: '温柔体贴，是家中的温暖港湾。'
-        },
-        {
-            id: 5,
-            name: '李伟',
-            relation: '叔父',
-            birth: '1968',
-            death: null,
-            status: 'alive',
-            x: 70,
-            y: 48,
-            size: 65,
-            bio: '企业家，白手起家创办公司。',
-            memories: '幽默风趣，总能给家庭聚会带来欢笑。'
-        },
-        {
-            id: 6,
-            name: '李天',
-            relation: '本人',
-            birth: '1990',
-            death: null,
-            status: 'alive',
-            x: 40,
-            y: 70,
-            size: 75,
-            bio: '科技从业者，致力于人工智能研究。',
-            memories: '继承家族的勤奋与智慧，探索未知领域。'
-        },
-        {
-            id: 7,
-            name: '李思',
-            relation: '妹妹',
-            birth: '1995',
-            death: null,
-            status: 'alive',
-            x: 60,
-            y: 72,
-            size: 65,
-            bio: '艺术家，专注于数字艺术创作。',
-            memories: '自由奔放，用艺术诠释生活的美好。'
-        }
-    ];
+  // 家族成员数据
+  const familyData = [
+    {
+      id: 1,
+      name: '李明远',
+      relation: '祖父',
+      birth: '1930',
+      death: '2015',
+      status: 'deceased',
+      x: 50,
+      y: 20,
+      size: 80,
+      bio: '出生于战乱年代，经历了新中国的建立与发展。一生勤勉，教书育人四十载。',
+      memories: '最爱在院子里的老槐树下给孙辈讲故事。'
+    },
+    {
+      id: 2,
+      name: '王秀英',
+      relation: '祖母',
+      birth: '1935',
+      death: '2018',
+      status: 'deceased',
+      x: 65,
+      y: 25,
+      size: 75,
+      bio: '贤惠温柔，擅长刺绣和烹饪。家中的凝聚力量。',
+      memories: '每逢佳节必做一手好菜，最拿手的是红烧肉。'
+    },
+    {
+      id: 3,
+      name: '李建国',
+      relation: '父亲',
+      birth: '1960',
+      death: null,
+      status: 'alive',
+      x: 35,
+      y: 45,
+      size: 70,
+      bio: '工程师，参与了多项国家重点工程建设。',
+      memories: '工作严谨，对子女教育严格但充满关爱。'
+    },
+    {
+      id: 4,
+      name: '张丽华',
+      relation: '母亲',
+      birth: '1962',
+      death: null,
+      status: 'alive',
+      x: 50,
+      y: 50,
+      size: 70,
+      bio: '医生，救死扶伤三十余年。',
+      memories: '温柔体贴，是家中的温暖港湾。'
+    },
+    {
+      id: 5,
+      name: '李伟',
+      relation: '叔父',
+      birth: '1968',
+      death: null,
+      status: 'alive',
+      x: 70,
+      y: 48,
+      size: 65,
+      bio: '企业家，白手起家创办公司。',
+      memories: '幽默风趣，总能给家庭聚会带来欢笑。'
+    },
+    {
+      id: 6,
+      name: '李天',
+      relation: '本人',
+      birth: '1990',
+      death: null,
+      status: 'alive',
+      x: 40,
+      y: 70,
+      size: 75,
+      bio: '科技从业者，致力于人工智能研究。',
+      memories: '继承家族的勤奋与智慧，探索未知领域。'
+    },
+    {
+      id: 7,
+      name: '李思',
+      relation: '妹妹',
+      birth: '1995',
+      death: null,
+      status: 'alive',
+      x: 60,
+      y: 72,
+      size: 65,
+      bio: '艺术家，专注于数字艺术创作。',
+      memories: '自由奔放，用艺术诠释生活的美好。'
+    }
+  ];
 
-    const connections = [
-        [1, 3], [2, 3],
-        [1, 5], [2, 5],
-        [3, 6], [4, 6],
-        [3, 7], [4, 7]
-    ];
+  const connections = [
+    [1, 3], [2, 3],
+    [1, 5], [2, 5],
+    [3, 6], [4, 6],
+    [3, 7], [4, 7]
+  ];
 
-    useEffect(() => {
-        // Generate background stars
-        const starsBg = document.getElementById('starsBg');
-        if (starsBg && starsBg.children.length === 0) {
-            for (let i = 0; i < 200; i++) {
-                const star = document.createElement('div');
-                star.className = 'rebirth-star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = (Math.random() * 2 + 1) + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsBg.appendChild(star);
-            }
-        }
-    }, []);
+  useEffect(() => {
+    // Generate background stars
+    const starsBg = document.getElementById('starsBg');
+    if (starsBg && starsBg.children.length === 0) {
+      for (let i = 0; i < 200; i++) {
+        const star = document.createElement('div');
+        star.className = 'rebirth-star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = (Math.random() * 2 + 1) + 'px';
+        star.style.height = star.style.width;
+        star.style.animationDelay = Math.random() * 3 + 's';
+        starsBg.appendChild(star);
+      }
+    }
+  }, []);
 
-    const handleMouseDown = (e) => {
-        if (e.button !== 0) return;
-        setIsDragging(true);
-        setDragStart({ x: e.clientX - panState.x, y: e.clientY - panState.y });
-    };
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - panState.x, y: e.clientY - panState.y });
+  };
 
-    const handleMouseMove = (e) => {
-        if (isDragging) {
-            setPanState({
-                x: e.clientX - dragStart.x,
-                y: e.clientY - dragStart.y
-            });
-        }
-    };
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      setPanState({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
 
-    const handleMouseUp = () => {
-        setIsDragging(false);
-    };
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
 
-    const handleWheel = (e) => {
-        e.preventDefault();
-        const delta = e.deltaY > 0 ? 0.9 : 1.1;
-        setScale(prev => Math.max(0.5, Math.min(2, prev * delta)));
-    };
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    setScale(prev => Math.max(0.5, Math.min(2, prev * delta)));
+  };
 
-    const showMemberInfo = (member) => {
-        setSelectedMember(member);
-        setIsPanelActive(true);
-    };
+  const showMemberInfo = (member) => {
+    setSelectedMember(member);
+    setIsPanelActive(true);
+  };
 
-    const closeInfoPanel = () => {
-        setIsPanelActive(false);
-    };
+  const closeInfoPanel = () => {
+    setIsPanelActive(false);
+  };
 
-    return (
-        <div className="family-galaxy-wrapper" onWheel={handleWheel}>
-            <style>{`
+  return (
+    <div className="family-galaxy-wrapper" onWheel={handleWheel}>
+      <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;700&display=swap');
 
         .family-galaxy-wrapper {
@@ -197,14 +197,26 @@ const FamilyGalaxyPage = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 2rem;
+          padding: 0 0.8rem;
           z-index: 1000;
+        }
+
+        @media (min-width: 768px) {
+          .rebirth-navbar {
+            padding: 0 2rem;
+          }
         }
 
         .rebirth-navbar-left {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+          .rebirth-navbar-left {
+            gap: 1.5rem;
+          }
         }
 
         .back-btn {
@@ -237,11 +249,18 @@ const FamilyGalaxyPage = () => {
           background: rgba(212, 175, 55, 0.1);
           border: 1px solid rgba(212, 175, 55, 0.3);
           color: #d4af37;
-          padding: 0.4rem 1rem;
+          padding: 0.3rem 0.6rem;
           border-radius: 6px;
           cursor: pointer;
           transition: all 0.3s;
-          font-size: 0.85rem;
+          font-size: 0.75rem;
+        }
+
+        @media (min-width: 768px) {
+          .nav-btn {
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+          }
         }
 
         .nav-btn:hover {
@@ -376,9 +395,9 @@ const FamilyGalaxyPage = () => {
         /* 侧边信息面板 */
         .info-panel {
           position: absolute;
-          right: -350px;
+          right: -100%;
           top: 60px;
-          width: 350px;
+          width: 100%;
           height: calc(100% - 60px);
           background: rgba(15, 15, 15, 0.96);
           border-left: 1px solid rgba(212, 175, 55, 0.2);
@@ -387,6 +406,13 @@ const FamilyGalaxyPage = () => {
           transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
           z-index: 999;
           overflow-y: auto;
+        }
+
+        @media (min-width: 768px) {
+          .info-panel {
+            right: -350px;
+            width: 350px;
+          }
         }
 
         .info-panel.active {
@@ -520,165 +546,165 @@ const FamilyGalaxyPage = () => {
         }
       `}</style>
 
-            {/* 导航栏 */}
-            <nav className="rebirth-navbar">
-                <div className="rebirth-navbar-left">
-                    <Link to="/digital-rebirth" className="back-btn">
-                        <span>◀</span> 返回时空枢纽
-                    </Link>
-                    <h1>家族星系</h1>
-                </div>
-                <div className="rebirth-navbar-right">
-                    <button className="nav-btn" onClick={() => alert('家族年轮功能开发中')}>家族年轮</button>
-                    <button className="nav-btn" onClick={() => alert('导出家谱功能开发中')}>导出家谱</button>
-                </div>
-            </nav>
-
-            {/* 星系画布 */}
-            <div
-                className="galaxy-container"
-                id="galaxyContainer"
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseUp}
-            >
-                <div className="stars-bg" id="starsBg"></div>
-                <div
-                    className="family-tree-layer"
-                    ref={familyTreeRef}
-                    style={{
-                        transform: `translate(${panState.x}px, ${panState.y}px) scale(${scale})`,
-                        width: '100%',
-                        height: '100%'
-                    }}
-                >
-                    {/* 连接线 */}
-                    {connections.map(([id1, id2], idx) => {
-                        const m1 = familyData.find(m => m.id === id1);
-                        const m2 = familyData.find(m => m.id === id2);
-                        if (!m1 || !m2) return null;
-
-                        const dx = m2.x - m1.x;
-                        const dy = m2.y - m1.y;
-                        const length = Math.sqrt(dx * dx + dy * dy);
-                        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-                        return (
-                            <div
-                                key={`line-${idx}`}
-                                className="connection-line"
-                                style={{
-                                    left: `${m1.x}%`,
-                                    top: `${m1.y}%`,
-                                    width: `${length}%`,
-                                    transform: `rotate(${angle}deg)`
-                                }}
-                            />
-                        );
-                    })}
-
-                    {/* 成员节点 */}
-                    {familyData.map(member => (
-                        <div
-                            key={member.id}
-                            className="family-member"
-                            style={{
-                                left: `${member.x}%`,
-                                top: `${member.y}%`,
-                                width: `${member.size}px`,
-                                height: `${member.size}px`,
-                                transform: 'translate(-50%, -50%)'
-                            }}
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                showMemberInfo(member);
-                            }}
-                        >
-                            <div className="member-star">
-                                <div className="member-core">
-                                    <span className="member-initial">{member.name.charAt(0)}</span>
-                                    <div className={`member-status ${member.status === 'alive' ? 'status-alive' : 'status-deceased'}`}></div>
-                                </div>
-                            </div>
-                            <div className="member-name">{member.name}</div>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
-            {/* 侧边信息面板 */}
-            <div className={`info-panel ${isPanelActive ? 'active' : ''}`} id="infoPanel">
-                <button className="info-close" onClick={closeInfoPanel}>✕</button>
-                {selectedMember && (
-                    <div id="panelContent">
-                        <div className="info-avatar-box">
-                            {selectedMember.name.charAt(0)}
-                        </div>
-                        <div className="info-name">{selectedMember.name}</div>
-                        <div className="info-dates">
-                            {selectedMember.birth} - {selectedMember.death || '至今'}
-                            <br />
-                            <span style={{ color: selectedMember.status === 'alive' ? '#4CAF50' : '#8b7355' }}>
-                                {selectedMember.status === 'alive' ? '● 在世' : '● 已故'}
-                            </span>
-                        </div>
-
-                        <div className="info-section">
-                            <h3>关系</h3>
-                            <p>{selectedMember.relation}</p>
-                        </div>
-
-                        <div className="info-section">
-                            <h3>生平简介</h3>
-                            <p>{selectedMember.bio}</p>
-                        </div>
-
-                        <div className="info-section">
-                            <h3>珍贵回忆</h3>
-                            <p>{selectedMember.memories}</p>
-                        </div>
-
-                        <div className="action-btns">
-                            {selectedMember.status === 'deceased' ? (
-                                <>
-                                    <Link to={`/digital-rebirth/reunion-space?member=${selectedMember.id}`} className="action-btn">
-                                        进入团聚空间
-                                    </Link>
-                                    <button className="action-btn" onClick={() => alert('编辑记忆功能开发中')}>
-                                        补充记忆
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <button className="action-btn" onClick={() => alert('发送消息功能开发中')}>
-                                        发送消息
-                                    </button>
-                                    <button className="action-btn" onClick={() => alert('编辑资料功能开发中')}>
-                                        编辑资料
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* 添加成员按钮 */}
-            <button
-                className="add-member-button"
-                onClick={() => navigate('/digital-rebirth/create')}
-                title="添加家族成员"
-            >
-                +
-            </button>
-
-            {/* 帮助提示 */}
-            <div className="galaxy-help-text">
-                点击任意星辰查看详情 | 拖拽可移动视角 | 滚轮进行缩放
-            </div>
+      {/* 导航栏 */}
+      <nav className="rebirth-navbar">
+        <div className="rebirth-navbar-left">
+          <Link to="/digital-rebirth" className="back-btn">
+            <span>◀</span> 返回时空枢纽
+          </Link>
+          <h1>家族星系</h1>
         </div>
-    );
+        <div className="rebirth-navbar-right">
+          <button className="nav-btn" onClick={() => alert('家族年轮功能开发中')}>家族年轮</button>
+          <button className="nav-btn" onClick={() => alert('导出家谱功能开发中')}>导出家谱</button>
+        </div>
+      </nav>
+
+      {/* 星系画布 */}
+      <div
+        className="galaxy-container"
+        id="galaxyContainer"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div className="stars-bg" id="starsBg"></div>
+        <div
+          className="family-tree-layer"
+          ref={familyTreeRef}
+          style={{
+            transform: `translate(${panState.x}px, ${panState.y}px) scale(${scale})`,
+            width: '100%',
+            height: '100%'
+          }}
+        >
+          {/* 连接线 */}
+          {connections.map(([id1, id2], idx) => {
+            const m1 = familyData.find(m => m.id === id1);
+            const m2 = familyData.find(m => m.id === id2);
+            if (!m1 || !m2) return null;
+
+            const dx = m2.x - m1.x;
+            const dy = m2.y - m1.y;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+            return (
+              <div
+                key={`line-${idx}`}
+                className="connection-line"
+                style={{
+                  left: `${m1.x}%`,
+                  top: `${m1.y}%`,
+                  width: `${length}%`,
+                  transform: `rotate(${angle}deg)`
+                }}
+              />
+            );
+          })}
+
+          {/* 成员节点 */}
+          {familyData.map(member => (
+            <div
+              key={member.id}
+              className="family-member"
+              style={{
+                left: `${member.x}%`,
+                top: `${member.y}%`,
+                width: `${member.size}px`,
+                height: `${member.size}px`,
+                transform: 'translate(-50%, -50%)'
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                showMemberInfo(member);
+              }}
+            >
+              <div className="member-star">
+                <div className="member-core">
+                  <span className="member-initial">{member.name.charAt(0)}</span>
+                  <div className={`member-status ${member.status === 'alive' ? 'status-alive' : 'status-deceased'}`}></div>
+                </div>
+              </div>
+              <div className="member-name">{member.name}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 侧边信息面板 */}
+      <div className={`info-panel ${isPanelActive ? 'active' : ''}`} id="infoPanel">
+        <button className="info-close" onClick={closeInfoPanel}>✕</button>
+        {selectedMember && (
+          <div id="panelContent">
+            <div className="info-avatar-box">
+              {selectedMember.name.charAt(0)}
+            </div>
+            <div className="info-name">{selectedMember.name}</div>
+            <div className="info-dates">
+              {selectedMember.birth} - {selectedMember.death || '至今'}
+              <br />
+              <span style={{ color: selectedMember.status === 'alive' ? '#4CAF50' : '#8b7355' }}>
+                {selectedMember.status === 'alive' ? '● 在世' : '● 已故'}
+              </span>
+            </div>
+
+            <div className="info-section">
+              <h3>关系</h3>
+              <p>{selectedMember.relation}</p>
+            </div>
+
+            <div className="info-section">
+              <h3>生平简介</h3>
+              <p>{selectedMember.bio}</p>
+            </div>
+
+            <div className="info-section">
+              <h3>珍贵回忆</h3>
+              <p>{selectedMember.memories}</p>
+            </div>
+
+            <div className="action-btns">
+              {selectedMember.status === 'deceased' ? (
+                <>
+                  <Link to={`/digital-rebirth/reunion-space?member=${selectedMember.id}`} className="action-btn">
+                    进入团聚空间
+                  </Link>
+                  <button className="action-btn" onClick={() => alert('编辑记忆功能开发中')}>
+                    补充记忆
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="action-btn" onClick={() => alert('发送消息功能开发中')}>
+                    发送消息
+                  </button>
+                  <button className="action-btn" onClick={() => alert('编辑资料功能开发中')}>
+                    编辑资料
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 添加成员按钮 */}
+      <button
+        className="add-member-button"
+        onClick={() => navigate('/digital-rebirth/create')}
+        title="添加家族成员"
+      >
+        +
+      </button>
+
+      {/* 帮助提示 */}
+      <div className="galaxy-help-text">
+        点击任意星辰查看详情 | 拖拽可移动视角 | 滚轮进行缩放
+      </div>
+    </div>
+  );
 };
 
 export default FamilyGalaxyPage;

@@ -173,14 +173,26 @@ const MemoryWorkshopPage = () => {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 0 2rem;
+          padding: 0 1rem;
           z-index: 1000;
+        }
+
+        @media (min-width: 768px) {
+          .workshop-navbar {
+            padding: 0 2rem;
+          }
         }
 
         .workshop-navbar-left {
           display: flex;
           align-items: center;
-          gap: 1.5rem;
+          gap: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+          .workshop-navbar-left {
+            gap: 1.5rem;
+          }
         }
 
         .back-btn {
@@ -215,8 +227,16 @@ const MemoryWorkshopPage = () => {
           display: flex;
           justify-content: center;
           align-items: center;
-          gap: 1.5rem;
+          gap: 0.8rem;
           z-index: 999;
+          padding: 0 1rem;
+        }
+
+        @media (min-width: 768px) {
+          .workshop-progress-bar {
+            gap: 1.5rem;
+            padding: 0;
+          }
         }
 
         .workshop-step {
@@ -260,13 +280,27 @@ const MemoryWorkshopPage = () => {
         }
 
         .workshop-step-label {
+          display: none;
           font-size: 0.85rem;
           letter-spacing: 0.1rem;
         }
 
+        @media (min-width: 768px) {
+          .workshop-step-label {
+            display: block;
+          }
+        }
+
         .workshop-step-arrow {
+          display: none;
           color: #8b7355;
           font-size: 1rem;
+        }
+
+        @media (min-width: 768px) {
+          .workshop-step-arrow {
+            display: block;
+          }
         }
 
         /* 主内容 */
@@ -356,9 +390,16 @@ const MemoryWorkshopPage = () => {
         /* 上传卡片 */
         .workshop-upload-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1rem;
           margin-bottom: 2rem;
+        }
+
+        @media (min-width: 768px) {
+          .workshop-upload-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+          }
         }
 
         .workshop-upload-card {
@@ -466,14 +507,22 @@ const MemoryWorkshopPage = () => {
         }
 
         .workshop-btn {
-          padding: 0.8rem 2.5rem;
+          padding: 0.6rem 1.2rem;
           border: 1px solid rgba(212, 175, 55, 0.3);
           border-radius: 6px;
-          font-size: 1rem;
+          font-size: 0.9rem;
           cursor: pointer;
           transition: all 0.3s;
           background: rgba(212, 175, 55, 0.1);
           color: #d4af37;
+          white-space: nowrap;
+        }
+
+        @media (min-width: 768px) {
+          .workshop-btn {
+             padding: 0.8rem 2.5rem;
+             font-size: 1rem;
+          }
         }
 
         .workshop-btn:hover {
