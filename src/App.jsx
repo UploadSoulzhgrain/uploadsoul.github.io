@@ -11,6 +11,7 @@ import CompanionPage from './pages/CompanionPage'
 import DailyCompanionPage from './pages/DailyCompanionPage'
 import SeniorCarePage from './pages/SeniorCarePage'
 import MentalWellnessPage from './pages/MentalWellnessPage'
+import AIChatPage from './pages/AIChatPage'
 import PetPage from './pages/PetPage'
 import DigitalHumanPage from './pages/DigitalHumanPage'
 import ShopPage from './pages/ShopPage'
@@ -118,6 +119,7 @@ const BusinessRoutes = () => (
     <Route path="companion/daily" element={<DailyCompanionPage />} />
     <Route path="companion/senior" element={<SeniorCarePage />} />
     <Route path="companion/mental" element={<MentalWellnessPage />} />
+    <Route path="companion/chat" element={<AIChatPage />} />
     <Route path="virtual-pet" element={<PetPage />} />
     <Route path="pet" element={<ProtectedRoute><PetDashboardPage /></ProtectedRoute>} />
     <Route path="pet/p/:slug" element={<PetDetailPage />} />

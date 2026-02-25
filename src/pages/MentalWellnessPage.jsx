@@ -12,7 +12,8 @@ const MentalWellnessPage = () => {
             tags: '擅长：焦虑缓解、职场压力调解、正念引导。',
             services: '12.5k+',
             online: true,
-            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnqAlbZNaYi5CyPcDWzVLwy-H2uts46t8m66PZUl1XHFeeTgvelKk1ywNJV7DYVGG8NndAdiJ7kt2oXJjPUHjkop-QAz2yCYxT6mqWOe8NAGsKDceppqt_6g0tcV7aDF0UIiwPA22kpqscduUHJKBfMfrECRfutA6xd91Cxtaz3quRbjDonztAbB7N8aMddN4T9lWB2Faqn5uODfL0t_MW-Qkh198OpsaI1tN0u85kckp6DJkdMAbIITl3OuEq6HRHWr5EGhZ-hV0'
+            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBnqAlbZNaYi5CyPcDWzVLwy-H2uts46t8m66PZUl1XHFeeTgvelKk1ywNJV7DYVGG8NndAdiJ7kt2oXJjPUHjkop-QAz2yCYxT6mqWOe8NAGsKDceppqt_6g0tcV7aDF0UIiwPA22kpqscduUHJKBfMfrECRfutA6xd91Cxtaz3quRbjDonztAbB7N8aMddN4T9lWB2Faqn5uODfL0t_MW-Qkh198OpsaI1tN0u85kckp6DJkdMAbIITl3OuEq6HRHWr5EGhZ-hV0',
+            gender: 'female'
         },
         {
             id: 2,
@@ -21,7 +22,8 @@ const MentalWellnessPage = () => {
             tags: '擅长：认知行为疗法 (CBT)、人际关系疏导。',
             services: '8.2k+',
             online: true,
-            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdTnW4WswlHbNBQYOhu-ts5bWxE3QHNHqbJ3AiemEicX9x-MCpwMnDHXIb2eq3ducrkK0DTxNoJwC1lG7OCUROeaCgrPL76DnkpXJu1UnsIQ1DkdFQpGCWZ5zaN-7B-OsPn8bHaNs-G96vOA6QnbjhDg2XN1Dj61gsZk7NIYuSBo0ARU8frehxvYFUlYhS1Xg1QtPjahR87Pe2XEpil2PcLJc5SanoXE-e4AODXipZsBcjJinP_fix3hKrxWwQW25EU2sTkkrXTtg'
+            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAdTnW4WswlHbNBQYOhu-ts5bWxE3QHNHqbJ3AiemEicX9x-MCpwMnDHXIb2eq3ducrkK0DTxNoJwC1lG7OCUROeaCgrPL76DnkpXJu1UnsIQ1DkdFQpGCWZ5zaN-7B-OsPn8bHaNs-G96vOA6QnbjhDg2XN1Dj61gsZk7NIYuSBo0ARU8frehxvYFUlYhS1Xg1QtPjahR87Pe2XEpil2PcLJc5SanoXE-e4AODXipZsBcjJinP_fix3hKrxWwQW25EU2sTkkrXTtg',
+            gender: 'male'
         },
         {
             id: 3,
@@ -30,7 +32,8 @@ const MentalWellnessPage = () => {
             tags: '擅长：亲子教育、青少年成长期困惑咨询。',
             services: '5.6k+',
             online: false,
-            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCTCh6ONIXTCEJtjFEMnk6jZceNlkYO36-AsMONW0N3o9qFGl70kyxOjUCpzNdS8wqImUNYRmm2AI03Zc_KYZ13MAirqhD6zuQeiHZnBLPtLIVqHRsNkPw18-dENWWr12EqaOFBs71PJYzuiXi2DAZbG1iyV3dSt3yUuAZtCCzApLT-D_Q-rPQlSYQUw40Kg3UEbicXT2PgNFaw-AcbTSabGVNMPldy4N0ogLewBe51OOKU2TZHa0FpajXRwXc_RV94zUbAifoh3ko'
+            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCTCh6ONIXTCEJtjFEMnk6jZceNlkYO36-AsMONW0N3o9qFGl70kyxOjUCpzNdS8wqImUNYRmm2AI03Zc_KYZ13MAirqhD6zuQeiHZnBLPtLIVqHRsNkPw18-dENWWr12EqaOFBs71PJYzuiXi2DAZbG1iyV3dSt3yUuAZtCCzApLT-D_Q-rPQlSYQUw40Kg3UEbicXT2PgNFaw-AcbTSabGVNMPldy4N0ogLewBe51OOKU2TZHa0FpajXRwXc_RV94zUbAifoh3ko',
+            gender: 'female'
         },
         {
             id: 4,
@@ -39,7 +42,8 @@ const MentalWellnessPage = () => {
             tags: '擅长：高压行业心理支持、高管职业倦怠管理。',
             services: '9.1k+',
             online: true,
-            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDW62d7u5r0BvhovNucBQLcnozrhVP8o3NzztmLheZOs0ue1DiwEeVvl6ef4w0qOX4Lonr39nhi9kPWPLP8KzSFxK1rkCJlBQmNzwe52uTKB9Hjq-1WHieGDr_Bd5umBDvvgeg1iAL7Kp9pCYsLVdti7JQLPqZb7VtEMTZCrYjBA3IiR4f9AoBYVpex-_cA9pOrlI63N0KkJzlTedVupO6BX89uUIFONbjn6Bl286w78QjUavxF3VanPr14WowLYaa5WZDTWyrA3dQ'
+            avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDW62d7u5r0BvhovNucBQLcnozrhVP8o3NzztmLheZOs0ue1DiwEeVvl6ef4w0qOX4Lonr39nhi9kPWPLP8KzSFxK1rkCJlBQmNzwe52uTKB9Hjq-1WHieGDr_Bd5umBDvvgeg1iAL7Kp9pCYsLVdti7JQLPqZb7VtEMTZCrYjBA3IiR4f9AoBYVpex-_cA9pOrlI63N0KkJzlTedVupO6BX89uUIFONbjn6Bl286w78QjUavxF3VanPr14WowLYaa5WZDTWyrA3dQ',
+            gender: 'male'
         }
     ];
 
@@ -182,7 +186,7 @@ const MentalWellnessPage = () => {
                                         <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">{expert.tags}</p>
                                         <div className="mt-4 pt-4 border-t border-slate-50 dark:border-white/5 flex justify-between items-center">
                                             <span className="text-xs text-slate-400">服务次数: {expert.services}</span>
-                                            <button className="bg-[#ee7c2b]/10 text-[#ee7c2b] px-3 py-1 rounded-lg text-xs font-bold hover:bg-[#ee7c2b] hover:text-white transition-colors">预约</button>
+                                            <button onClick={() => navigate(l(`/companion/chat?name=${encodeURIComponent(expert.name)}&gender=${expert.gender}`))} className="bg-[#ee7c2b]/10 text-[#ee7c2b] px-3 py-1 rounded-lg text-xs font-bold hover:bg-[#ee7c2b] hover:text-white transition-colors">预约</button>
                                         </div>
                                     </div>
                                 </div>
