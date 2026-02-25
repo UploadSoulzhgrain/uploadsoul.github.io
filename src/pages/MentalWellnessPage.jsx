@@ -58,7 +58,7 @@ const MentalWellnessPage = () => {
                             </div>
                             <h2 className="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight">心灵避风港</h2>
                         </button>
-                        <nav className="hidden xl:flex items-center gap-6">
+                        <nav className="hidden lg:flex items-center gap-6">
                             <button onClick={() => navigate(l('/'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">首页</button>
                             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
                             <button onClick={() => navigate(l('/companion/daily'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">日常陪伴</button>
@@ -69,6 +69,7 @@ const MentalWellnessPage = () => {
                             <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">专业咨询</button>
                             <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">情绪追踪</button>
                             <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">冥想工具</button>
+                            <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">机构合作</button>
                         </nav>
                     </div>
                     <div className="flex items-center gap-6">
@@ -253,8 +254,8 @@ const MentalWellnessPage = () => {
                         <div>
                             <h4 className="font-bold mb-6 text-sm uppercase tracking-widest text-slate-400">联系我们</h4>
                             <ul className="space-y-3 text-sm text-slate-600 dark:text-slate-400 font-medium">
-                                <li className="flex items-center gap-2 font-display uppercase tracking-tight"><span className="material-symbols-outlined text-xs">mail</span> support@sanctuary.com</li>
-                                <li className="flex items-center gap-2"><span class="material-symbols-outlined text-xs">location_on</span> 上海市徐汇区城市核心区</li>
+                                <li className="flex items-center gap-2 font-display uppercase tracking-tight"><span className="material-symbols-outlined text-xs">mail</span> contact@uploadsoul.com</li>
+                                <li className="flex items-center gap-2"><span className="material-symbols-outlined text-xs">location_on</span> Vancouver, Canada</li>
                             </ul>
                         </div>
                     </div>
