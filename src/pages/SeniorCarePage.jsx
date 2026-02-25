@@ -18,11 +18,18 @@ const SeniorCarePage = () => {
                                 <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>settings_accessibility</span>
                                 <h2 className="text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">银发伙伴 (Silver Companion)</h2>
                             </button>
-                            <nav className="hidden lg:flex items-center gap-10">
-                                <button onClick={() => navigate(l('/'))} className="text-lg font-bold hover:text-[#ee7c2b] transition-colors">首页</button>
-                                <button onClick={() => navigate(l('/companion/daily'))} className="text-lg font-bold hover:text-[#ee7c2b] transition-colors">日常陪伴</button>
-                                <button onClick={() => navigate(l('/companion/senior'))} className="text-lg font-bold hover:text-[#ee7c2b] transition-colors border-b-4 border-[#ee7c2b] pb-1">长者关怀</button>
-                                <button onClick={() => navigate(l('/companion/mental'))} className="text-lg font-bold hover:text-[#ee7c2b] transition-colors">心理健康</button>
+                            <nav className="hidden xl:flex items-center gap-6">
+                                <button onClick={() => navigate(l('/'))} className="text-lg font-bold text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors">首页</button>
+                                <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+                                <button onClick={() => navigate(l('/companion/daily'))} className="text-lg font-bold text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors">日常陪伴</button>
+                                <button onClick={() => navigate(l('/companion/senior'))} className="text-lg font-bold text-[#ee7c2b] border-b-4 border-[#ee7c2b] pb-1">长者关怀</button>
+                                <button onClick={() => navigate(l('/companion/mental'))} className="text-lg font-bold text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors">心理健康</button>
+                                <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-2"></div>
+                                {/* 规划中子页功能按钮 */}
+                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">健康监测</button>
+                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">医疗咨询</button>
+                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">营养膳食</button>
+                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">社区活动</button>
                             </nav>
                         </div>
                         <div className="flex items-center gap-6">
