@@ -15,7 +15,7 @@ const FamilyTreePage = () => {
   const [showReunionModal, setShowReunionModal] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const [activeTab, setActiveTab] = useState('tree'); // 'tree', 'memories', 'events'
-  
+
   // Mock digital humans
   const digitalHumans = [
     {
@@ -114,9 +114,9 @@ const FamilyTreePage = () => {
           bio: '李阿姨曾是一名医生，现已退休。她热爱园艺和阅读。'
         },
         children: [
-          { 
+          {
             id: 'grandchild1',
-            name: '张小明', 
+            name: '张小明',
             avatar: '/assets/digital-humans/cousin1.jpg',
             birthDate: '1985-07-12',
             bio: '张小明在IT行业工作，是一名软件工程师。他喜欢打篮球和旅游。'
@@ -137,13 +137,13 @@ const FamilyTreePage = () => {
           bio: '李父是一名机械工程师，喜欢修理各种家用电器。他的动手能力很强，总能解决家里的各种问题。'
         },
         children: [
-          { 
+          {
             id: 'self',
-            name: '我', 
-            avatar: '/assets/digital-humans/me.jpg', 
+            name: '我',
+            avatar: '/assets/digital-humans/me.jpg',
             birthDate: '1985-06-23',
             bio: '我喜欢科技和历史，目前在一家科技公司工作。空闲时间喜欢研究家族历史和数字技术。',
-            current: true 
+            current: true
           }
         ]
       }
@@ -199,8 +199,8 @@ const FamilyTreePage = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-red-600 text-xl mb-4">{error}</div>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
           >
             {t('common.retry')}
@@ -218,9 +218,9 @@ const FamilyTreePage = () => {
       <div className={`mb-6 ${level > 0 ? 'ml-8 border-l-2 border-gray-200 pl-6' : ''}`} key={node.id || node.name}>
         <div className="flex items-start">
           <div className="w-16 h-16 rounded-full overflow-hidden mr-4 border-4 border-white shadow-lg">
-            <img 
-              src={node.avatar} 
-              alt={node.name} 
+            <img
+              src={node.avatar}
+              alt={node.name}
               className="w-full h-full object-cover"
               onError={(e) => {
                 e.target.src = 'https://via.placeholder.com/80?text=Avatar';
@@ -253,9 +253,9 @@ const FamilyTreePage = () => {
           <div className="ml-8 mt-4 border-l-2 border-pink-200 pl-6">
             <div className="flex items-start">
               <div className="w-14 h-14 rounded-full overflow-hidden mr-4 border-2 border-pink-200">
-                <img 
-                  src={node.spouse.avatar} 
-                  alt={node.spouse.name} 
+                <img
+                  src={node.spouse.avatar}
+                  alt={node.spouse.name}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.src = 'https://via.placeholder.com/80?text=Avatar';
@@ -295,148 +295,134 @@ const FamilyTreePage = () => {
   // Render the family tree
   const renderFamilyTree = () => {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex justify-center mb-8">
-          <div className="relative w-full max-w-4xl">
-            {/* 这里应该是一个实际的家族树可视化组件 */}
-            {/* 为了演示，我们使用一个简化的版本 */}
+      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6 overflow-hidden">
+        <div className="flex justify-start md:justify-center mb-8 overflow-x-auto pb-4 custom-scrollbar">
+          <div className="relative min-w-[600px] md:w-full max-w-4xl">
             <div className="grid grid-cols-5 gap-4">
-              {/* 第一代 */}
-              <div className="col-span-5 flex justify-center">
+              <div className="col-span-5 flex justify-center gap-4">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className={`bg-purple-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
-                    selectedMember?.id === '1' ? 'ring-2 ring-purple-500' : ''
-                  }`}
+                  className={`bg-purple-100 rounded-lg p-3 md:p-4 w-32 md:w-40 text-center cursor-pointer transition-all ${selectedMember?.id === '1' ? 'ring-2 ring-purple-500 shadow-md' : 'shadow-sm'
+                    }`}
                   onClick={() => setSelectedMember(digitalHumans[0])}
                 >
-                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
-                    <img 
-                      src={digitalHumans[0].avatar} 
-                      alt={digitalHumans[0].name} 
+                  <div className="size-16 md:size-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200 border-2 border-white">
+                    <img
+                      src={digitalHumans[0].avatar}
+                      alt={digitalHumans[0].name}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
-                      }}
                     />
                   </div>
-                  <h3 className="font-semibold">{digitalHumans[0].name}</h3>
-                  <p className="text-sm text-gray-600">{digitalHumans[0].relationship}</p>
+                  <h3 className="font-semibold text-sm md:text-base">{digitalHumans[0].name}</h3>
+                  <p className="text-[10px] md:text-sm text-gray-600">{digitalHumans[0].relationship}</p>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className={`bg-purple-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
-                    selectedMember?.id === '2' ? 'ring-2 ring-purple-500' : ''
-                  }`}
+                  className={`bg-purple-100 rounded-lg p-3 md:p-4 w-32 md:w-40 text-center cursor-pointer transition-all ${selectedMember?.id === '2' ? 'ring-2 ring-purple-500 shadow-md' : 'shadow-sm'
+                    }`}
                   onClick={() => setSelectedMember(digitalHumans[1])}
                 >
-                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
-                    <img 
-                      src={digitalHumans[1].avatar} 
-                      alt={digitalHumans[1].name} 
+                  <div className="size-16 md:size-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200 border-2 border-white">
+                    <img
+                      src={digitalHumans[1].avatar}
+                      alt={digitalHumans[1].name}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
-                      }}
                     />
                   </div>
-                  <h3 className="font-semibold">{digitalHumans[1].name}</h3>
-                  <p className="text-sm text-gray-600">{digitalHumans[1].relationship}</p>
+                  <h3 className="font-semibold text-sm md:text-base">{digitalHumans[1].name}</h3>
+                  <p className="text-[10px] md:text-sm text-gray-600">{digitalHumans[1].relationship}</p>
                 </motion.div>
               </div>
-              
-              {/* 第二代 */}
-              <div className="col-span-5 flex justify-center gap-8">
+
+              <div className="col-span-5 flex justify-center gap-4 md:gap-8 mt-4">
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className={`bg-indigo-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
-                    selectedMember?.id === '3' ? 'ring-2 ring-purple-500' : ''
-                  }`}
+                  className={`bg-indigo-100 rounded-lg p-3 md:p-4 w-32 md:w-40 text-center cursor-pointer transition-all ${selectedMember?.id === '3' ? 'ring-2 ring-purple-500 shadow-md' : 'shadow-sm'
+                    }`}
                   onClick={() => setSelectedMember(mockFamilyData.children[0])}
                 >
-                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
-                    <img 
-                      src={mockFamilyData.children[0].avatar} 
-                      alt={mockFamilyData.children[0].name} 
+                  <div className="size-16 md:size-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200 border-2 border-white">
+                    <img
+                      src={mockFamilyData.children[0].avatar}
+                      alt={mockFamilyData.children[0].name}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
-                      }}
                     />
                   </div>
-                  <h3 className="font-semibold">{mockFamilyData.children[0].name}</h3>
-                  <p className="text-sm text-gray-600">{mockFamilyData.children[0].relationship}</p>
+                  <h3 className="font-semibold text-sm md:text-base">{mockFamilyData.children[0].name}</h3>
+                  <p className="text-[10px] md:text-sm text-gray-600">{mockFamilyData.children[0].relationship}</p>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
-                  className={`bg-indigo-100 rounded-lg p-4 w-40 text-center cursor-pointer ${
-                    selectedMember?.id === '4' ? 'ring-2 ring-purple-500' : ''
-                  }`}
+                  className={`bg-indigo-100 rounded-lg p-3 md:p-4 w-32 md:w-40 text-center cursor-pointer transition-all ${selectedMember?.id === '4' ? 'ring-2 ring-purple-500 shadow-md' : 'shadow-sm'
+                    }`}
                   onClick={() => setSelectedMember(mockFamilyData.children[1])}
                 >
-                  <div className="w-20 h-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200">
-                    <img 
-                      src={mockFamilyData.children[1].avatar} 
-                      alt={mockFamilyData.children[1].name} 
+                  <div className="size-16 md:size-20 mx-auto rounded-full overflow-hidden mb-2 bg-gray-200 border-2 border-white">
+                    <img
+                      src={mockFamilyData.children[1].avatar}
+                      alt={mockFamilyData.children[1].name}
                       className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/80?text=Avatar';
-                      }}
                     />
                   </div>
-                  <h3 className="font-semibold">{mockFamilyData.children[1].name}</h3>
-                  <p className="text-sm text-gray-600">{mockFamilyData.children[1].relationship}</p>
+                  <h3 className="font-semibold text-sm md:text-base">{mockFamilyData.children[1].name}</h3>
+                  <p className="text-[10px] md:text-sm text-gray-600">{mockFamilyData.children[1].relationship}</p>
                 </motion.div>
               </div>
             </div>
           </div>
         </div>
-        
+
         {selectedMember && (
-          <div className="mt-8 bg-gray-50 rounded-lg p-6">
-            <div className="flex items-center mb-4">
-              <div className="w-20 h-20 rounded-full overflow-hidden mr-4 bg-gray-200">
-                <img 
-                  src={selectedMember.avatar} 
-                  alt={selectedMember.name} 
+          <div className="mt-8 bg-gray-50 rounded-2xl p-4 md:p-6 border border-gray-100">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left mb-6">
+              <div className="size-24 rounded-full overflow-hidden mb-4 sm:mb-0 sm:mr-6 bg-gray-200 border-4 border-white shadow-md">
+                <img
+                  src={selectedMember.avatar}
+                  alt={selectedMember.name}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/80?text=Avatar';
-                  }}
                 />
               </div>
-              <div>
-                <h3 className="text-xl font-semibold">{selectedMember.name}</h3>
-                <p className="text-gray-600">{selectedMember.relationship}</p>
-                <p className="text-sm text-gray-500">
-                  {t('familyTree.birthDate')}: {selectedMember.birthDate} | {t('familyTree.deathDate')}: {selectedMember.deathDate}
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-gray-900">{selectedMember.name}</h3>
+                <p className="text-purple-600 font-medium mb-2">{selectedMember.relationship}</p>
+                <p className="text-xs md:text-sm text-gray-500 bg-white inline-block px-3 py-1 rounded-full border border-gray-100">
+                  {t('familyTree.birthDate')}: {selectedMember.birthDate} {selectedMember.deathDate && `| ${t('familyTree.deathDate')}: ${selectedMember.deathDate}`}
                 </p>
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h4 className="font-semibold text-purple-700">{t('familyTree.digitalAvatar')}</h4>
-                <p className="text-gray-700">
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h4 className="font-bold text-purple-700 mb-2 flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-purple-500"></span>
+                  {t('familyTree.digitalAvatar')}
+                </h4>
+                <p className="text-gray-600 text-sm mb-4">
                   {selectedMember.current ? t('familyTree.hasAvatar') : t('familyTree.noAvatar')}
                 </p>
                 {!selectedMember.current && (
-                  <button className="mt-2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700 transition-colors">
+                  <button className="w-full bg-purple-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-purple-700 transition-all active:scale-95 shadow-lg shadow-purple-600/20">
                     {t('familyTree.createAvatar')}
                   </button>
                 )}
               </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h4 className="font-semibold text-indigo-700">{t('familyTree.memories')}</h4>
-                <p className="text-gray-700">{selectedMember.memories || 0} {t('familyTree.memoryCount')}</p>
-                <button className="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition-colors">
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h4 className="font-bold text-indigo-700 mb-2 flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-indigo-500"></span>
+                  {t('familyTree.memories')}
+                </h4>
+                <p className="text-gray-600 text-sm mb-4">{selectedMember.memories || 0} {t('familyTree.memoryCount')}</p>
+                <button className="w-full bg-indigo-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-600/20">
                   {t('familyTree.viewMemories')}
                 </button>
               </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm">
-                <h4 className="font-semibold text-blue-700">{t('familyTree.events')}</h4>
-                <p className="text-gray-700">{selectedMember.events || 0} {t('familyTree.eventCount')}</p>
-                <button className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                <h4 className="font-bold text-blue-700 mb-2 flex items-center gap-2">
+                  <span className="size-2 rounded-full bg-blue-500"></span>
+                  {t('familyTree.events')}
+                </h4>
+                <p className="text-gray-600 text-sm mb-4">{selectedMember.events || 0} {t('familyTree.eventCount')}</p>
+                <button className="w-full bg-blue-600 text-white py-2.5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-600/20">
                   {t('familyTree.viewEvents')}
                 </button>
               </div>
@@ -447,32 +433,33 @@ const FamilyTreePage = () => {
     );
   };
 
-  // Render the memories section
   const renderMemories = () => {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">{t('familyTree.memorySharing')}</h2>
-          <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <h2 className="text-2xl font-bold text-gray-900">{t('familyTree.memorySharing')}</h2>
+          <button className="w-full sm:w-auto bg-purple-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-purple-700 transition-all active:scale-95 shadow-lg shadow-purple-600/20">
             {t('familyTree.addMemory')}
           </button>
         </div>
-        
+
         <div className="space-y-6">
           {memoriesData.map((memory) => (
-            <div key={memory.id} className="bg-gray-50 rounded-lg p-6">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-semibold text-gray-900">{memory.title}</h3>
-                <span className="text-sm text-gray-500">{memory.date}</span>
+            <div key={memory.id} className="bg-gray-50 rounded-2xl p-5 md:p-6 border border-gray-100 hover:border-purple-200 transition-colors">
+              <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-2">
+                <h3 className="text-xl font-bold text-gray-900">{memory.title}</h3>
+                <span className="text-sm font-medium text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100">{memory.date}</span>
               </div>
-              <p className="text-gray-600 mb-4">{memory.description}</p>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-500">{t('familyTree.contributor')}: {selectedHuman.name}</span>
-                <div className="flex space-x-2">
-                  <button className="text-purple-600 hover:text-purple-800">
+              <p className="text-gray-600 leading-relaxed mb-6">{memory.description}</p>
+              <div className="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-gray-100 gap-4">
+                <span className="text-sm text-gray-400">
+                  {t('familyTree.contributor')}: <span className="text-gray-700 font-medium">{selectedHuman.name}</span>
+                </span>
+                <div className="flex space-x-4">
+                  <button className="text-sm font-bold text-purple-600 hover:text-purple-800 transition-colors">
                     {t('familyTree.edit')}
                   </button>
-                  <button className="text-red-600 hover:text-red-800">
+                  <button className="text-sm font-bold text-red-600 hover:text-red-800 transition-colors">
                     {t('familyTree.delete')}
                   </button>
                 </div>
@@ -484,43 +471,42 @@ const FamilyTreePage = () => {
     );
   };
 
-  // Render the events section
   const renderEvents = () => {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold text-gray-900">{t('familyTree.familyEvents')}</h2>
-          <Link 
-            to="/digital-rebirth/reunion-space" 
-            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+      <div className="bg-white rounded-xl shadow-lg p-4 md:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <h2 className="text-2xl font-bold text-gray-900">{t('familyTree.familyEvents')}</h2>
+          <Link
+            to="/digital-rebirth/reunion-space"
+            className="w-full sm:w-auto text-center bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-600/20"
           >
             {t('familyTree.planEvent')}
           </Link>
         </div>
-        
+
         <div className="space-y-6">
           {eventsData.map((event) => (
-            <div key={event.id} className="bg-gray-50 rounded-lg p-6">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
-                <span className="text-sm text-gray-500">{event.date}</span>
+            <div key={event.id} className="bg-gray-50 rounded-2xl p-5 md:p-6 border border-gray-100">
+              <div className="flex flex-col sm:flex-row justify-between items-start mb-6 gap-2">
+                <h3 className="text-xl font-bold text-gray-900">{event.title}</h3>
+                <span className="text-sm font-medium text-gray-400 bg-white px-3 py-1 rounded-full border border-gray-100">{event.date}</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <div>
-                  <p className="text-sm text-gray-500">{t('familyTree.participants')}</p>
-                  <p className="font-medium">{event.participants} {t('familyTree.people')}</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                <div className="bg-white p-4 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">{t('familyTree.participants')}</p>
+                  <p className="font-bold text-gray-800">{event.participants} {t('familyTree.people')}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">{t('familyTree.environment')}</p>
-                  <p className="font-medium">{event.environment}</p>
+                <div className="bg-white p-4 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">{t('familyTree.environment')}</p>
+                  <p className="font-bold text-gray-800">{event.environment}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">{t('familyTree.activity')}</p>
-                  <p className="font-medium">{event.activity}</p>
+                <div className="bg-white p-4 rounded-xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1">{t('familyTree.activity')}</p>
+                  <p className="font-bold text-gray-800">{event.activity}</p>
                 </div>
               </div>
               <div className="flex justify-end">
-                <button className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors">
+                <button className="w-full sm:w-auto bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-600/20">
                   {t('familyTree.viewDetails')}
                 </button>
               </div>
@@ -532,7 +518,7 @@ const FamilyTreePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-16">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12 md:py-20">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -540,45 +526,43 @@ const FamilyTreePage = () => {
           transition={{ duration: 0.5 }}
           className="max-w-6xl mx-auto"
         >
-          <h1 className="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 mb-4">
-            {t('familyTree.title')}
-          </h1>
-          <p className="text-xl text-gray-600 text-center mb-8">{t('familyTree.description')}</p>
-          
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 mb-4 tracking-tight">
+              {t('familyTree.title')}
+            </h1>
+            <p className="text-base md:text-xl text-gray-500 max-w-2xl mx-auto">{t('familyTree.description')}</p>
+          </div>
+
           <div className="text-center mb-12">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-2xl font-medium text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text"
+              className="text-lg md:text-2xl font-bold text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-transparent bg-clip-text italic"
             >
               {t('familyTree.slogan')}
             </motion.div>
           </div>
 
-          {/* 标签页 */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-white rounded-lg shadow-md p-1 inline-flex">
+          <div className="flex justify-center mb-10">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl shadow-xl p-1.5 flex gap-1 border border-white">
               <button
-                className={`px-6 py-2 rounded-md transition-colors ${
-                  activeTab === 'tree' ? 'bg-purple-100 text-purple-800' : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`px-4 md:px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'tree' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'text-gray-500 hover:bg-gray-100'
+                  }`}
                 onClick={() => setActiveTab('tree')}
               >
                 {t('familyTree.treeTab')}
               </button>
               <button
-                className={`px-6 py-2 rounded-md transition-colors ${
-                  activeTab === 'memories' ? 'bg-purple-100 text-purple-800' : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`px-4 md:px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'memories' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'text-gray-500 hover:bg-gray-100'
+                  }`}
                 onClick={() => setActiveTab('memories')}
               >
                 {t('familyTree.memoriesTab')}
               </button>
               <button
-                className={`px-6 py-2 rounded-md transition-colors ${
-                  activeTab === 'events' ? 'bg-purple-100 text-purple-800' : 'text-gray-600 hover:bg-gray-100'
-                }`}
+                className={`px-4 md:px-8 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'events' ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/20' : 'text-gray-500 hover:bg-gray-100'
+                  }`}
                 onClick={() => setActiveTab('events')}
               >
                 {t('familyTree.eventsTab')}
@@ -586,44 +570,47 @@ const FamilyTreePage = () => {
             </div>
           </div>
 
-          {/* 内容区域 */}
-          {activeTab === 'tree' && renderFamilyTree()}
-          {activeTab === 'memories' && renderMemories()}
-          {activeTab === 'events' && renderEvents()}
+          <div className="mb-16">
+            {activeTab === 'tree' && renderFamilyTree()}
+            {activeTab === 'memories' && renderMemories()}
+            {activeTab === 'events' && renderEvents()}
+          </div>
 
-          {/* 特殊日期提醒 */}
-          <div className="mt-12 bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">{t('familyTree.upcomingDates')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-purple-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-purple-800 mb-2">{t('familyTree.grandfatherBirthday')}</h3>
-                <p className="text-gray-700 mb-2">2023-05-15</p>
-                <p className="text-gray-600 text-sm mb-4">{t('familyTree.grandfatherBirthdayDesc')}</p>
-                <Link 
-                  to="/digital-rebirth/reunion-space" 
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors inline-block"
+          <div className="mt-16 bg-white/50 backdrop-blur-sm rounded-3xl p-6 md:p-10 border border-white">
+            <h2 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
+              <span className="size-3 rounded-full bg-purple-500 animate-pulse"></span>
+              {t('familyTree.upcomingDates')}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+              <div className="bg-white rounded-2xl p-6 shadow-xl shadow-purple-900/5 border border-purple-50 hover:-translate-y-1 transition-all">
+                <h3 className="text-lg font-bold text-purple-900 mb-2">{t('familyTree.grandfatherBirthday')}</h3>
+                <p className="text-purple-600 font-black text-xl mb-3 tracking-tight">2023-05-15</p>
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t('familyTree.grandfatherBirthdayDesc')}</p>
+                <Link
+                  to="/digital-rebirth/reunion-space"
+                  className="w-full text-center bg-purple-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-purple-700 transition-all active:scale-95 shadow-lg shadow-purple-600/20 inline-block"
                 >
                   {t('familyTree.planEvent')}
                 </Link>
               </div>
-              <div className="bg-indigo-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-indigo-800 mb-2">{t('familyTree.grandmotherAnniversary')}</h3>
-                <p className="text-gray-700 mb-2">2023-11-10</p>
-                <p className="text-gray-600 text-sm mb-4">{t('familyTree.grandmotherAnniversaryDesc')}</p>
-                <Link 
-                  to="/digital-rebirth/reunion-space" 
-                  className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors inline-block"
+              <div className="bg-white rounded-2xl p-6 shadow-xl shadow-indigo-900/5 border border-indigo-50 hover:-translate-y-1 transition-all">
+                <h3 className="text-lg font-bold text-indigo-900 mb-2">{t('familyTree.grandmotherAnniversary')}</h3>
+                <p className="text-indigo-600 font-black text-xl mb-3 tracking-tight">2023-11-10</p>
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t('familyTree.grandmotherAnniversaryDesc')}</p>
+                <Link
+                  to="/digital-rebirth/reunion-space"
+                  className="w-full text-center bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-indigo-700 transition-all active:scale-95 shadow-lg shadow-indigo-600/20 inline-block"
                 >
                   {t('familyTree.planEvent')}
                 </Link>
               </div>
-              <div className="bg-blue-50 rounded-lg p-4">
-                <h3 className="text-lg font-semibold text-blue-800 mb-2">{t('familyTree.familyReunion')}</h3>
-                <p className="text-gray-700 mb-2">2023-12-25</p>
-                <p className="text-gray-600 text-sm mb-4">{t('familyTree.familyReunionDesc')}</p>
-                <Link 
-                  to="/digital-rebirth/reunion-space" 
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors inline-block"
+              <div className="bg-white rounded-2xl p-6 shadow-xl shadow-blue-900/5 border border-blue-50 hover:-translate-y-1 transition-all">
+                <h3 className="text-lg font-bold text-blue-900 mb-2">{t('familyTree.familyReunion')}</h3>
+                <p className="text-blue-600 font-black text-xl mb-3 tracking-tight">2023-12-25</p>
+                <p className="text-gray-500 text-sm mb-6 leading-relaxed">{t('familyTree.familyReunionDesc')}</p>
+                <Link
+                  to="/digital-rebirth/reunion-space"
+                  className="w-full text-center bg-blue-600 text-white px-4 py-2.5 rounded-xl font-bold hover:bg-blue-700 transition-all active:scale-95 shadow-lg shadow-blue-600/20 inline-block"
                 >
                   {t('familyTree.planEvent')}
                 </Link>

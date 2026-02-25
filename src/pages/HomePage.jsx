@@ -107,10 +107,10 @@ const HomePage = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 0.5 }}
-            className="mb-14 relative inline-block"
+            className="mb-10 md:mb-14 relative inline-block"
           >
             <span className="absolute -top-6 -left-8 text-7xl text-white/5 font-serif select-none">“</span>
-            <p className="text-xl md:text-2xl text-white/90 font-serif italic leading-relaxed tracking-wider px-4">
+            <p className="text-lg md:text-2xl text-white/90 font-serif italic leading-relaxed tracking-wider px-4">
               {t('home.hero.founderQuote')}
             </p>
             <div className="mt-4 flex items-center justify-center gap-3">
@@ -152,7 +152,7 @@ const HomePage = () => {
             </div>
           </div>
 
-          <div className="mt-16 flex flex-wrap justify-center gap-12 items-center">
+          <div className="mt-12 md:mt-16 flex flex-wrap justify-center gap-6 md:gap-12 items-center">
             {/* 温情故事 - 斑驳古卷轴样式 */}
             <motion.div
               whileHover={{ scale: 1.05 }}

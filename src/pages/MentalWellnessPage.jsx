@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
 
 const MentalWellnessPage = () => {
     const { navigate, l } = useLocalizedNavigate();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const experts = [
         {
@@ -51,16 +52,16 @@ const MentalWellnessPage = () => {
         <div className="bg-[#f8f7f6] dark:bg-[#1b130d] text-slate-900 dark:text-slate-100 transition-colors duration-300 min-h-screen font-display">
             <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
                 {/* Navigation */}
-                <header className="flex items-center justify-between border-b border-[#ee7c2b]/10 px-6 py-4 lg:px-20 bg-white/80 dark:bg-[#1b130d]/80 backdrop-blur-md sticky top-0 z-50">
+                <header className="flex items-center justify-between border-b border-[#ee7c2b]/10 px-6 md:px-10 lg:px-20 bg-white/80 dark:bg-[#1b130d]/80 backdrop-blur-md sticky top-0 z-50">
                     <div className="flex items-center gap-8">
                         <button
                             onClick={() => navigate(l('/companion'))}
-                            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                            className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity"
                         >
                             <div className="bg-[#ee7c2b] p-1.5 rounded-lg text-white">
                                 <span className="material-symbols-outlined block">psychology</span>
                             </div>
-                            <h2 className="text-slate-900 dark:text-slate-100 text-xl font-bold tracking-tight">心灵避风港</h2>
+                            <h2 className="text-slate-900 dark:text-slate-100 text-lg md:text-xl font-bold tracking-tight">心灵避风港</h2>
                         </button>
                         <nav className="hidden lg:flex items-center gap-6">
                             <button onClick={() => navigate(l('/'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">首页</button>
@@ -69,25 +70,37 @@ const MentalWellnessPage = () => {
                             <button onClick={() => navigate(l('/companion/senior'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">长者关怀</button>
                             <button onClick={() => navigate(l('/companion/mental'))} className="text-[#ee7c2b] font-semibold text-sm border-b-2 border-[#ee7c2b] pb-0.5">心理健康</button>
                             <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                            {/* 规划中子页功能按钮 */}
-                            <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">专业咨询</button>
-                            <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">情绪追踪</button>
                             <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">冥想工具</button>
-                            <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">机构合作</button>
                         </nav>
                     </div>
-                    <div className="flex items-center gap-6">
-                        <div className="hidden md:flex items-center bg-[#ee7c2b]/5 dark:bg-white/5 rounded-full px-4 py-2 border border-[#ee7c2b]/10">
+                    <div className="flex items-center gap-3 md:gap-6">
+                        <div className="hidden xl:flex items-center bg-[#ee7c2b]/5 dark:bg-white/5 rounded-full px-4 py-2 border border-[#ee7c2b]/10">
                             <span className="material-symbols-outlined text-[#ee7c2b] text-xl">search</span>
-                            <input className="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-400" placeholder="搜索资源或顾问" type="text" />
+                            <input className="bg-transparent border-none focus:ring-0 text-sm w-32 xl:w-48 placeholder:text-slate-400" placeholder="搜索资源..." type="text" />
                         </div>
-                        <button onClick={() => navigate(l('/login'))} className="bg-[#ee7c2b] hover:bg-[#ee7c2b]/90 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg shadow-[#ee7c2b]/20 transition-all">
+                        <button onClick={() => navigate(l('/login'))} className="hidden sm:block bg-[#ee7c2b] hover:bg-[#ee7c2b]/90 text-white px-5 md:px-6 py-2 rounded-full text-sm font-bold shadow-lg shadow-[#ee7c2b]/20 transition-all">
                             个人中心
                         </button>
-                        <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-[#ee7c2b]/20">
+                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-200 overflow-hidden border-2 border-[#ee7c2b]/20">
                             <img alt="Profile" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVSoYtX2H912CeZKBUNGp16mKp2fS2qkSTqzuacCqjLsDndqUCWR-x1Wv7fQg9ZHbh-pjbyoZ3HWNHGxyVovkgcKPtjLB7i3MKd3--BIKMNtxSg5H9wnXjLoqQHdyiSMpXFVSfv0YHiqXkLrI5yMQBHqsCZQtQGJnwtKdkPLAahnRuAmQwTJi8eDHpqHT2GZkUEsup_A3dwesBN7Q1Bh816I_rsHVIIULdgd2zDWX4IUztWCy4lrOkwr-At0JBRQA2yNkoysKBDNk" />
                         </div>
+
+                        {/* Mobile Menu Toggle */}
+                        <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden flex items-center justify-center p-2 text-slate-600 dark:text-slate-400">
+                            <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
+                        </button>
                     </div>
+
+                    {/* Mobile Dropdown Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="absolute top-full left-0 right-0 bg-white dark:bg-[#1b130d] border-b border-[#ee7c2b]/10 shadow-lg lg:hidden flex flex-col p-6 gap-6 z-50 animate-fadeIn text-left">
+                            <button onClick={() => { navigate(l('/')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-white/5 font-bold text-slate-600 dark:text-slate-300">首页</button>
+                            <button onClick={() => { navigate(l('/companion/daily')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-white/5 font-bold text-slate-600 dark:text-slate-300">日常陪伴</button>
+                            <button onClick={() => { navigate(l('/companion/senior')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-white/5 font-bold text-slate-600 dark:text-slate-300">长者关怀</button>
+                            <button onClick={() => { navigate(l('/companion/mental')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-white/5 font-bold text-[#ee7c2b]">心理健康</button>
+                            <button onClick={() => { navigate(l('/login')); setIsMobileMenuOpen(false); }} className="w-full py-4 bg-[#ee7c2b] text-white text-center rounded-full font-bold">个人中心</button>
+                        </div>
+                    )}
                 </header>
 
                 <main className="flex-1 px-6 lg:px-20 py-10">
@@ -98,10 +111,10 @@ const MentalWellnessPage = () => {
                                 <span className="material-symbols-outlined text-sm">verified_user</span>
                                 企业级安全隐私保护
                             </div>
-                            <h1 className="text-5xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 leading-[1.1]">
+                            <h1 className="text-3xl sm:text-4xl lg:text-6xl font-black text-slate-900 dark:text-slate-100 leading-[1.2]">
                                 您的私人<br /><span className="text-[#ee7c2b]">心理健康</span>顾问
                             </h1>
-                            <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
+                            <p className="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-xl">
                                 在安全、私密的空间里，开启您的心灵愈合之旅。我们的AI专家Dr. Serenity随时为您提供24/7的专业支持。
                             </p>
                             <div className="flex flex-wrap gap-4">
@@ -118,10 +131,10 @@ const MentalWellnessPage = () => {
                             <div className="absolute -top-4 -left-4 w-24 h-24 bg-[#ee7c2b]/10 rounded-full blur-2xl"></div>
                             <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-[#ee7c2b]/20 rounded-full blur-3xl"></div>
                             <div className="rounded-3xl overflow-hidden shadow-2xl border-4 border-white dark:border-slate-800 relative z-10">
-                                <img alt="Counselor" className="w-full h-[500px] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZCDd6-fCRthVhRrS57fl8aFXJ-81NzMON33gmyiv6SzMj3TqzeryVr7ZtGwEhv_ms15BGwS4fAX7I4lIe5TX2ZjweVq8u-NqmXIxuxjqscwIvRwhfVE-Hl-Mg9Asm9DwapyHthdEmivp1CSzIvQYk8ve9zZhAm8DMQaIt1nLWKtgkV-SpSMIQbIlNq3aNpx8QrYllcfvdPAxbe1TemryPUHL-GjjiYn7Vmex_obajRfnPyRSUFCF6EuS3kr7gHXe-2EGtsIJZUeY" />
-                                <div className="absolute bottom-6 left-6 right-6 p-6 bg-white/90 dark:bg-[#1b130d]/90 backdrop-blur rounded-2xl border border-white/20 text-left">
+                                <img alt="Counselor" className="w-full h-[300px] md:h-[500px] object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZCDd6-fCRthVhRrS57fl8aFXJ-81NzMON33gmyiv6SzMj3TqzeryVr7ZtGwEhv_ms15BGwS4fAX7I4lIe5TX2ZjweVq8u-NqmXIxuxjqscwIvRwhfVE-Hl-Mg9Asm9DwapyHthdEmivp1CSzIvQYk8ve9zZhAm8DMQaIt1nLWKtgkV-SpSMIQbIlNq3aNpx8QrYllcfvdPAxbe1TemryPUHL-GjjiYn7Vmex_obajRfnPyRSUFCF6EuS3kr7gHXe-2EGtsIJZUeY" />
+                                <div className="absolute bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 p-4 md:p-6 bg-white/90 dark:bg-[#1b130d]/90 backdrop-blur rounded-2xl border border-white/20 text-left">
                                     <p className="text-[#ee7c2b] font-bold">Dr. Serenity</p>
-                                    <p className="text-slate-600 dark:text-slate-400 text-sm">资深AI心理学专家 · 已支持1.2万名用户</p>
+                                    <p className="text-slate-600 dark:text-slate-400 text-xs md:text-sm">资深AI心理学专家 · 已支持1.2万名用户</p>
                                 </div>
                             </div>
                         </div>
@@ -195,11 +208,11 @@ const MentalWellnessPage = () => {
                     </div>
 
                     {/* B2B Section */}
-                    <div className="bg-[#ee7c2b]/5 dark:bg-white/5 rounded-3xl p-10 lg:p-16 border border-[#ee7c2b]/10 flex flex-col lg:flex-row items-center gap-12">
-                        <div className="flex-1 space-y-6 text-left">
-                            <h2 className="text-3xl font-bold">面向机构与企业的服务</h2>
-                            <p className="text-slate-600 dark:text-slate-400 text-lg">为您的团队提供系统化的心理健康支持，提升员工幸福感与创造力。</p>
-                            <ul className="space-y-4">
+                    <div className="bg-[#ee7c2b]/5 dark:bg-white/5 rounded-3xl p-6 md:p-10 lg:p-16 border border-[#ee7c2b]/10 flex flex-col lg:flex-row items-center gap-8 md:gap-12">
+                        <div className="flex-1 space-y-4 md:space-y-6 text-left">
+                            <h2 className="text-2xl md:text-3xl font-bold">面向机构与企业的服务</h2>
+                            <p className="text-slate-600 dark:text-slate-400 text-base md:text-lg">为您的团队提供系统化的心理健康支持，提升员工幸福感与创造力。</p>
+                            <ul className="space-y-3 md:space-y-4 text-sm md:text-base">
                                 <li className="flex items-center gap-3">
                                     <span className="material-symbols-outlined text-[#ee7c2b]">check_circle</span>
                                     <span>企业级后台数据驾驶舱</span>
@@ -213,10 +226,10 @@ const MentalWellnessPage = () => {
                                     <span>EAP员工心理援助计划集成</span>
                                 </li>
                             </ul>
-                            <button className="bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">申请演示</button>
+                            <button className="w-full sm:w-auto bg-slate-900 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">申请演示</button>
                         </div>
                         <div className="w-full lg:w-1/2">
-                            <div className="bg-white dark:bg-[#1b130d] p-4 rounded-2xl shadow-xl border border-[#ee7c2b]/5">
+                            <div className="bg-white dark:bg-[#1b130d] p-3 md:p-4 rounded-2xl shadow-xl border border-[#ee7c2b]/5">
                                 <img alt="Dashboard" className="rounded-xl w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuwqarTqSlmac4RU79okbBlH3rzPRJ9ASbghZ2XZQkQ12fby7nUj05SSIs3DMCXVFxSY48m9IE68EIjrSlOIT2o4pFoa52vonLwa78r5VX_8I5xyWh7UgOzhDMAQDKyqD0zfkOwsvExeHaLITlviuS27KpohDTwM1p3q3MidnERqjPLHHMB6Pfmt7RZxb3j7ZAjqJDpcMNtwWd8KIucAuIi9YSeQa2Os1oC4PKXX8aXOiXfNREhiUm6IPD0gMbU5jiwDiRqwe8E1k" />
                             </div>
                         </div>

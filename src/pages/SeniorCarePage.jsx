@@ -1,22 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
 
 const SeniorCarePage = () => {
     const { navigate, l } = useLocalizedNavigate();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
         <div className="bg-[#f8f7f6] dark:bg-[#221810] text-slate-900 dark:text-slate-100 font-display min-h-screen">
             <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
                 <div className="layout-container flex h-full grow flex-col">
                     {/* Navigation Bar */}
-                    <header className="flex items-center justify-between border-b border-[#ee7c2b]/20 px-10 py-5 bg-white dark:bg-slate-900 sticky top-0 z-50">
+                    <header className="flex items-center justify-between border-b border-[#ee7c2b]/20 px-6 md:px-10 py-5 bg-white dark:bg-slate-900 sticky top-0 z-50">
                         <div className="flex items-center gap-10">
                             <button
                                 onClick={() => navigate(l('/companion'))}
-                                className="flex items-center gap-4 text-[#ee7c2b] hover:opacity-80 transition-opacity"
+                                className="flex items-center gap-2 md:gap-4 text-[#ee7c2b] hover:opacity-80 transition-opacity"
                             >
-                                <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>settings_accessibility</span>
-                                <h2 className="text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">银发伙伴 (Silver Companion)</h2>
+                                <span className="material-symbols-outlined text-3xl md:text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>settings_accessibility</span>
+                                <h2 className="text-xl md:text-2xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">银发伙伴</h2>
                             </button>
                             <nav className="hidden lg:flex items-center gap-6">
                                 <button onClick={() => navigate(l('/'))} className="text-lg font-bold text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors">首页</button>
@@ -25,32 +26,44 @@ const SeniorCarePage = () => {
                                 <button onClick={() => navigate(l('/companion/senior'))} className="text-lg font-bold text-[#ee7c2b] border-b-4 border-[#ee7c2b] pb-1">长者关怀</button>
                                 <button onClick={() => navigate(l('/companion/mental'))} className="text-lg font-bold text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors">心理健康</button>
                                 <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                                {/* 规划中子页功能按钮 */}
                                 <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">健康监测</button>
-                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">医疗咨询</button>
-                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">营养膳食</button>
-                                <button className="text-lg font-bold text-slate-400 hover:text-[#ee7c2b] transition-colors">社区活动</button>
                             </nav>
                         </div>
-                        <div className="flex items-center gap-6">
-                            <label className="relative hidden md:flex items-center">
+                        <div className="flex items-center gap-3 md:gap-6">
+                            <label className="relative hidden xl:flex items-center">
                                 <span className="material-symbols-outlined absolute left-3 text-slate-500">search</span>
-                                <input className="w-64 pl-12 pr-4 py-3 rounded-xl border-2 border-[#ee7c2b]/20 bg-slate-50 dark:bg-slate-800 focus:border-[#ee7c2b] focus:ring-0 text-lg" placeholder="搜索功能或资讯..." />
+                                <input className="w-48 xl:w-64 pl-12 pr-4 py-3 rounded-xl border-2 border-[#ee7c2b]/20 bg-slate-50 dark:bg-slate-800 focus:border-[#ee7c2b] focus:ring-0 text-lg" placeholder="搜索..." />
                             </label>
-                            <button className="bg-[#ee7c2b] hover:bg-[#ee7c2b]/90 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg shadow-[#ee7c2b]/20 transition-all">
-                                机构管理后台
+                            <button className="hidden sm:block bg-[#ee7c2b] hover:bg-[#ee7c2b]/90 text-white px-6 md:px-8 py-3 rounded-xl font-bold text-base md:text-lg shadow-lg shadow-[#ee7c2b]/20 transition-all">
+                                管理后台
                             </button>
-                            <div className="size-14 rounded-full border-2 border-[#ee7c2b] p-1 overflow-hidden">
+                            <div className="size-10 md:size-14 rounded-full border-2 border-[#ee7c2b] p-0.5 md:p-1 overflow-hidden">
                                 <img className="w-full h-full object-cover rounded-full" alt="Senior care administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhYF4zJnycspVu9kBSc7IN_DI0BCenQ74FjAsowMviGjd4q_x7DKWcVNoYxVvJmk9ij13nSwS_zuXBCgLwJOfqecBNunFMp3qKfHMdZBoUN8s1m5XvCXUsF721GcmtOgcuC08h3ow71kdGaik0Dan1xTR7z6_bd7Enl1twp18PLafPitQDRjwYYg7RuvgLAgs8QYjaEAV48dQ6MzlTItrtbY3UHBpAyEIXUf1btAwGbqbwokuvugOl0x5_3FqV9WA12HUf4xPD3Dk" />
                             </div>
+
+                            {/* Mobile Menu Toggle */}
+                            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="lg:hidden flex items-center justify-center p-2 text-slate-600 dark:text-slate-400">
+                                <span className="material-symbols-outlined">{isMobileMenuOpen ? 'close' : 'menu'}</span>
+                            </button>
                         </div>
+
+                        {/* Mobile Dropdown Menu */}
+                        {isMobileMenuOpen && (
+                            <div className="absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-[#ee7c2b]/20 shadow-lg lg:hidden flex flex-col p-6 gap-6 z-50 animate-fadeIn">
+                                <button onClick={() => { navigate(l('/')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-slate-800 font-bold text-slate-600 dark:text-slate-300">首页</button>
+                                <button onClick={() => { navigate(l('/companion/daily')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-slate-800 font-bold text-slate-600 dark:text-slate-300">日常陪伴</button>
+                                <button onClick={() => { navigate(l('/companion/senior')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-slate-800 font-bold text-[#ee7c2b]">长者关怀</button>
+                                <button onClick={() => { navigate(l('/companion/mental')); setIsMobileMenuOpen(false); }} className="text-left py-2 border-b border-slate-100 dark:border-slate-800 font-bold text-slate-600 dark:text-slate-300">心理健康</button>
+                                <button className="w-full py-4 bg-[#ee7c2b] text-white text-center rounded-xl font-bold">管理后台</button>
+                            </div>
+                        )}
                     </header>
 
-                    <main className="max-w-[1400px] mx-auto w-full px-10 py-10 space-y-12">
+                    <main className="max-w-[1400px] mx-auto w-full px-6 md:px-10 py-10 space-y-12">
                         {/* Hero Section */}
-                        <section className="flex flex-col gap-4 mb-10 text-left">
-                            <h1 className="text-5xl font-black text-slate-900 dark:text-white leading-tight">长者关怀管理中心</h1>
-                            <p className="text-2xl text-slate-600 dark:text-slate-400 font-display">智能 AI 辅助：全天候守护健康，丰富老年社交生活</p>
+                        <section className="flex flex-col gap-3 md:gap-4 mb-10 text-center md:text-left">
+                            <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white leading-tight">长者关怀管理中心</h1>
+                            <p className="text-lg md:text-2xl text-slate-600 dark:text-slate-400 font-display">智能 AI 辅助：全天候守护健康，丰富老年社交生活</p>
                         </section>
 
                         <div className="grid grid-cols-12 gap-8">
@@ -189,34 +202,33 @@ const SeniorCarePage = () => {
                         </div>
 
                         {/* Global Health Reminders Banner */}
-                        <div className="bg-[#ee7c2b] text-white p-10 rounded-[2rem] flex flex-col md:flex-row items-center justify-between shadow-xl shadow-[#ee7c2b]/30 gap-8">
-                            <div className="flex items-center gap-8 text-left">
-                                <div className="bg-white/20 p-6 rounded-2xl backdrop-blur-sm">
-                                    <span className="material-symbols-outlined text-6xl">notification_important</span>
+                        <div className="bg-[#ee7c2b] text-white p-6 md:p-10 rounded-3xl md:rounded-[2rem] flex flex-col md:flex-row items-center justify-between shadow-xl shadow-[#ee7c2b]/30 gap-8">
+                            <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 text-center md:text-left">
+                                <div className="bg-white/20 p-4 md:p-6 rounded-2xl backdrop-blur-sm shrink-0">
+                                    <span className="material-symbols-outlined text-4xl md:text-6xl">notification_important</span>
                                 </div>
-                                <div>
-                                    <h2 className="text-4xl font-black mb-2">重要健康提醒</h2>
-                                    <p className="text-xl opacity-90">张大爷，下午 4:00 记得服用降压药，随后有半小时的午间散步计划。</p>
+                                <div className="space-y-1 md:space-y-2">
+                                    <h2 className="text-2xl md:text-4xl font-black">重要健康提醒</h2>
+                                    <p className="text-lg md:text-xl opacity-90">张大爷，下午 4:00 记得服用降压药，随后有半小时的午间散步计划。</p>
                                 </div>
                             </div>
-                            <button className="bg-white text-[#ee7c2b] px-12 py-5 rounded-2xl text-2xl font-black hover:bg-slate-50 transition-colors whitespace-nowrap">
+                            <button className="w-full md:w-auto bg-white text-[#ee7c2b] px-8 md:px-12 py-4 md:py-5 rounded-2xl text-xl md:text-2xl font-black hover:bg-slate-50 transition-colors whitespace-nowrap">
                                 我已确认
                             </button>
                         </div>
                     </main>
 
                     {/* Footer */}
-                    <footer className="mt-20 border-t border-[#ee7c2b]/10 py-12 px-10 bg-slate-50 dark:bg-slate-900/50">
+                    <footer className="mt-20 border-t border-[#ee7c2b]/10 py-12 px-6 md:px-10 bg-slate-50 dark:bg-slate-900/50">
                         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-                            <div className="flex items-center gap-4 text-[#ee7c2b] opacity-60">
+                            <div className="flex items-center gap-3 md:gap-4 text-[#ee7c2b] opacity-60">
                                 <span className="material-symbols-outlined text-3xl">settings_accessibility</span>
-                                <span className="text-xl font-bold">银发伙伴 - 专业长者关怀平台</span>
+                                <span className="text-lg md:text-xl font-bold">银发伙伴</span>
                             </div>
-                            <div className="flex flex-wrap justify-center gap-12 text-slate-400 font-bold">
+                            <div className="flex flex-wrap justify-center md:justify-end gap-6 md:gap-12 text-slate-400 font-bold text-sm md:text-base">
                                 <a className="hover:text-[#ee7c2b] transition-colors" href="#privacy">隐私政策</a>
-                                <a className="hover:text-[#ee7c2b] transition-colors" href="#emergency">紧急呼叫设置</a>
-                                <a className="hover:text-[#ee7c2b] transition-colors" href="mailto:contact@uploadsoul.com">联系我们: contact@uploadsoul.com</a>
-                                <span className="text-slate-400">Vancouver, Canada</span>
+                                <a className="hover:text-[#ee7c2b] transition-colors" href="#emergency">紧急呼叫</a>
+                                <a className="hover:text-[#ee7c2b] transition-colors" href="mailto:contact@uploadsoul.com">联系我们</a>
                             </div>
                         </div>
                     </footer>

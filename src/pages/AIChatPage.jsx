@@ -34,33 +34,33 @@ const AIChatPage = () => {
     return (
         <div className="relative flex flex-col h-screen w-full bg-slate-900 font-display text-white antialiased overflow-hidden">
             {/* Header */}
-            <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-6 py-4 bg-gradient-to-b from-black/40 to-transparent">
-                <div className="flex items-center gap-3">
-                    <div className="size-10 flex items-center justify-center bg-[#ee7c2b] rounded-lg shadow-lg shadow-[#ee7c2b]/20">
-                        <span className="material-symbols-outlined text-white text-2xl">psychology</span>
+            <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 md:px-6 py-4 bg-gradient-to-b from-black/60 to-transparent">
+                <div className="flex items-center gap-2 md:gap-3">
+                    <div className="size-8 md:size-10 flex items-center justify-center bg-[#ee7c2b] rounded-lg shadow-lg shadow-[#ee7c2b]/20">
+                        <span className="material-symbols-outlined text-white text-xl md:text-2xl">psychology</span>
                     </div>
                     <div>
-                        <h1 className="text-white text-xl font-bold leading-tight tracking-tight">UploadSoul</h1>
-                        <div className="flex items-center gap-2">
-                            <span className="flex size-2 rounded-full bg-green-500 animate-pulse"></span>
-                            <p className="text-white/80 text-xs font-medium">{companionName} - 在线</p>
+                        <h1 className="text-white text-sm md:text-xl font-bold leading-tight tracking-tight">UploadSoul</h1>
+                        <div className="flex items-center gap-1.5 md:gap-2">
+                            <span className="flex size-1.5 md:size-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <p className="text-white/80 text-[10px] md:text-xs font-medium">{companionName} - 在线</p>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <div className="hidden md:flex items-center gap-4 px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
-                        <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 md:gap-4">
+                    <div className="flex items-center gap-2 md:gap-4 px-3 md:px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
+                        <div className="hidden sm:flex items-center gap-1 md:gap-2">
                             <span className="material-symbols-outlined text-green-400 text-sm">signal_cellular_alt</span>
-                            <span className="text-white text-xs font-medium">连接状态: 稳定</span>
+                            <span className="text-white text-[10px] md:text-xs font-medium">稳定</span>
                         </div>
-                        <div className="w-px h-3 bg-white/20"></div>
-                        <div className="flex items-center gap-2 text-white text-xs font-medium">
+                        <div className="hidden sm:block w-px h-3 bg-white/20"></div>
+                        <div className="flex items-center gap-1.5 md:gap-2 text-white text-[10px] md:text-xs font-medium">
                             <span className="material-symbols-outlined text-sm">schedule</span>
                             <span>{callTime}</span>
                         </div>
                     </div>
                     <button className="p-2 bg-white/10 backdrop-blur-md hover:bg-white/20 rounded-full text-white transition-all">
-                        <span className="material-symbols-outlined">settings</span>
+                        <span className="material-symbols-outlined text-sm md:text-base">settings</span>
                     </button>
                 </div>
             </header>
@@ -76,36 +76,36 @@ const AIChatPage = () => {
                 </div>
 
                 {/* Subtitle Area */}
-                <div className="absolute bottom-32 left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 text-center z-10">
-                    <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl">
-                        <p className="text-white text-lg md:text-xl font-medium leading-relaxed tracking-wide">
+                <div className="absolute top-[25%] left-1/2 -translate-x-1/2 w-full max-w-2xl px-6 text-center z-10">
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-4 md:p-6 rounded-2xl shadow-2xl">
+                        <p className="text-white text-base md:text-xl font-medium leading-relaxed tracking-wide">
                             " 今天能在这里见到你真好，你想聊聊什么呢？ "
                         </p>
                     </div>
                 </div>
 
                 {/* Control Bar */}
-                <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
-                    <div className="flex items-center gap-4 p-2 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full shadow-2xl">
+                <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-20">
+                    <div className="flex items-center gap-3 md:gap-4 p-2 bg-black/60 backdrop-blur-2xl border border-white/20 rounded-full shadow-2xl">
                         <button
                             onClick={() => setMuted(!muted)}
-                            className={`flex size-12 items-center justify-center rounded-full transition-colors ${muted ? 'bg-red-500/30 text-red-300' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+                            className={`flex size-10 md:size-12 items-center justify-center rounded-full transition-colors ${muted ? 'bg-red-500/30 text-red-300' : 'bg-white/10 hover:bg-white/20 text-white'}`}
                         >
-                            <span className="material-symbols-outlined">{muted ? 'mic_off' : 'mic'}</span>
+                            <span className="material-symbols-outlined text-xl md:text-2xl">{muted ? 'mic_off' : 'mic'}</span>
                         </button>
                         <button
                             onClick={() => setCameraOn(!cameraOn)}
-                            className={`flex size-12 items-center justify-center rounded-full transition-colors ${!cameraOn ? 'bg-red-500/30 text-red-300' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+                            className={`flex size-10 md:size-12 items-center justify-center rounded-full transition-colors ${!cameraOn ? 'bg-red-500/30 text-red-300' : 'bg-white/10 hover:bg-white/20 text-white'}`}
                         >
-                            <span className="material-symbols-outlined">{cameraOn ? 'videocam' : 'videocam_off'}</span>
+                            <span className="material-symbols-outlined text-xl md:text-2xl">{cameraOn ? 'videocam' : 'videocam_off'}</span>
                         </button>
                         <button
                             onClick={() => navigate(-1)}
-                            className="flex size-14 items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 transition-all hover:scale-105 active:scale-95"
+                            className="flex size-12 md:size-14 items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/30 transition-all hover:scale-105 active:scale-95"
                         >
-                            <span className="material-symbols-outlined text-3xl">call_end</span>
+                            <span className="material-symbols-outlined text-2xl md:text-3xl">call_end</span>
                         </button>
-                        <button className="flex size-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
+                        <button className="hidden sm:flex size-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors">
                             <span className="material-symbols-outlined">chat_bubble</span>
                         </button>
                         <button
@@ -116,28 +116,28 @@ const AIChatPage = () => {
                                     document.documentElement.requestFullscreen();
                                 }
                             }}
-                            className="flex size-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                            className="flex size-10 md:size-12 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
                         >
-                            <span className="material-symbols-outlined">fullscreen</span>
+                            <span className="material-symbols-outlined text-xl md:text-2xl">fullscreen</span>
                         </button>
                     </div>
                 </div>
 
                 {/* Picture-in-Picture (User Camera) */}
                 {cameraOn && (
-                    <div className="absolute bottom-8 right-8 z-20 group">
-                        <div className="relative w-48 h-64 md:w-60 md:h-80 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-slate-800">
+                    <div className="absolute top-20 md:top-auto md:bottom-8 right-4 md:right-8 z-20 group">
+                        <div className="relative w-32 h-44 md:w-60 md:h-80 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl bg-slate-800">
                             <div
                                 className="w-full h-full bg-cover bg-center"
                                 style={{ backgroundImage: `url('${USER_CAMERA_IMG}')` }}
                             ></div>
                             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                            <div className="absolute top-3 left-3 px-2 py-0.5 bg-black/40 backdrop-blur-md rounded-md">
-                                <p className="text-[10px] text-white font-bold uppercase tracking-wider">You</p>
+                            <div className="absolute top-2 md:top-3 left-2 md:left-3 px-2 py-0.5 bg-black/40 backdrop-blur-md rounded-md">
+                                <p className="text-[8px] md:text-[10px] text-white font-bold uppercase tracking-wider">You</p>
                             </div>
-                            <div className="absolute bottom-3 right-3">
-                                <button className="p-2 bg-[#ee7c2b] hover:bg-[#ee7c2b]/90 rounded-full text-white shadow-lg transition-transform hover:rotate-12">
-                                    <span className="material-symbols-outlined text-sm">flip_camera_ios</span>
+                            <div className="absolute bottom-2 md:bottom-3 right-2 md:right-3">
+                                <button className="p-1.5 md:p-2 bg-[#ee7c2b] hover:bg-[#ee7c2b]/90 rounded-full text-white shadow-lg transition-transform hover:rotate-12">
+                                    <span className="material-symbols-outlined text-xs md:text-sm">flip_camera_ios</span>
                                 </button>
                             </div>
                         </div>
