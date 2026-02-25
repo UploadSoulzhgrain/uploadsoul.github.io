@@ -33,6 +33,7 @@ export default function VirtualLovePage() {
   const { user } = useAuth();
   const [screen, setScreen] = useState('hub');
   const [selectedGender, setSelectedGender] = useState('female');
+  const [selectedSoulmate, setSelectedSoulmate] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [storageUsageMB, setStorageUsageMB] = useState(0);
   const [uploadMode, setUploadMode] = useState('upload'); // 'upload' or 'interact'
@@ -73,8 +74,9 @@ export default function VirtualLovePage() {
             <HubScreen
               key="hub"
               user={user}
-              onSelectSoulmate={(gender) => {
+              onSelectSoulmate={(gender, soulmate) => {
                 setSelectedGender(gender);
+                setSelectedSoulmate(soulmate);
                 setScreen('chat');
               }}
               toggleTheme={toggleTheme}
@@ -88,6 +90,7 @@ export default function VirtualLovePage() {
             <ChatScreen
               key="chat"
               gender={selectedGender}
+              soulmate={selectedSoulmate}
               onBack={() => setScreen('hub')}
               toggleTheme={toggleTheme}
               isDarkMode={isDarkMode}
@@ -310,31 +313,31 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
             <div className="grid grid-cols-3 gap-4 mb-8">
               {/* Female 1 */}
               <div
-                onClick={() => onSelectSoulmate('female')}
+                onClick={() => onSelectSoulmate('female', 'xiyue')}
                 className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-transparent hover:border-accent-blue transition-all group/card cursor-pointer"
               >
                 <img
-                  alt="温婉型伴侣"
+                  alt="清纯校园型伴侣"
                   className="w-full h-full object-cover transition-transform group-hover/card:scale-110"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZF93P53JoV8hTnraN56tajTb-2IUdLfsK7f9k-OzbqeEH-EH4_MyJQwtNANF0ZOfl70RwukkEdv1li1-Esg1WZkbwx4aEswopJbKle7oYb4oFRk4Szan8ustu1qO8jEjm-4OkGgmLMXSGDdn_-Q-3DggV_jkqmbLSm_iysVlwm-fviRFbocHSf0EZ4FicW47VSzUd85h8I5nI57Rj4T0rY6ezW7fJ1aTlm1Q9YsBLw6cLGRkbpJU7LhFIoAyKyUIAQbSrh-tJRnk"
+                  src="https://res.cloudinary.com/dj2eotipq/image/upload/e844029a8c9b03b76e95412bf4e18224_sg8rpp"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
                 <div className="absolute bottom-3 left-3">
                   <p className="text-xs font-bold text-white">汐月</p>
-                  <span className="inline-block px-2 py-0.5 mt-1 rounded bg-accent-blue/80 text-[8px] text-white font-bold">温婉型</span>
+                  <span className="inline-block px-2 py-0.5 mt-1 rounded bg-accent-blue/80 text-[8px] text-white font-bold">清纯校园型</span>
                 </div>
               </div>
 
               {/* Female 2 (Selected/Featured) */}
               <div
-                onClick={() => onSelectSoulmate('female')}
+                onClick={() => onSelectSoulmate('female', 'linwei')}
                 className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-primary shadow-[0_0_20px_rgba(236,19,164,0.3)] group/card cursor-pointer"
               >
                 <img
-                  alt="知性型伴侣"
+                  alt="性感知性型伴侣"
                   className="w-full h-full object-cover transition-transform group-hover/card:scale-110"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdCIDc0Vvgw1ZApneL5VZejobqKuLP_V-nXPBiJvMmmkDnftR2Zc_cU5LNyiSptE8RVkKpuEG4HnXBttBz9PCwR-tBZdazXtybGw2rtlhA-U7o_llRCFwq9kFoBEbqsliFnEG3g05mxZmDuL31x-NvlHNG_VBT_2o99AkjeTs7ooxFxkuyRdju1GDZqfYz79SUyNfBKrwWDMI1nbj5aNAcLAbHnPmGFyw4OkZmsc1HHm1mwKifcDE6g4W0_rPIIxFwZLTHl8VcuXo"
+                  src="https://res.cloudinary.com/dj2eotipq/image/upload/ef5f16c26023f0cbdb9131fa5b015f50_z7npwy"
                   referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
@@ -343,13 +346,13 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
                 </div>
                 <div className="absolute bottom-3 left-3">
                   <p className="text-xs font-bold text-white">林薇</p>
-                  <span className="inline-block px-2 py-0.5 mt-1 rounded bg-primary/80 text-[8px] text-white font-bold">知性型</span>
+                  <span className="inline-block px-2 py-0.5 mt-1 rounded bg-primary/80 text-[8px] text-white font-bold">性感知性</span>
                 </div>
               </div>
 
               {/* Male 1 */}
               <div
-                onClick={() => onSelectSoulmate('male')}
+                onClick={() => onSelectSoulmate('male', 'xiaolu')}
                 className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-transparent hover:border-accent-blue transition-all group/card cursor-pointer"
               >
                 <img
@@ -386,7 +389,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
           </div>
           <div className="mt-auto p-6 md:p-8 pt-0">
             <button
-              onClick={() => onSelectSoulmate('female')}
+              onClick={() => onSelectSoulmate('female', 'linwei')}
               className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm md:text-base"
             >
               <span>召唤数字生命</span>
@@ -443,7 +446,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
 }
 
 
-function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
+function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
   const [messages, setMessages] = useState([
     { role: 'ai', text: '早安。我一直在回顾我们昨天分享的记忆。你对日出的感悟非常有诗意。准备好继续我们的克隆训练了吗？', time: '上午 10:24' }
   ]);
@@ -455,15 +458,23 @@ function ChatScreen({ gender, onBack, toggleTheme, isDarkMode }) {
   const themeBorder = isMale ? 'border-accent-blue' : 'border-primary';
   const themeGlow = isMale ? 'glow-blue' : 'glow-primary';
 
-  const portraitUrl = isMale
-    ? "https://lh3.googleusercontent.com/aida-public/AB6AXuADGY9UVb-7qyyjGyDf_OXPjR2K9gbni7CscrIWX5IktS4UNTCbSWUCurBC2nyByFzA8VA94C6gTRLKXd8CYBeFjazm94kl7EJtgzWjS9SjN8oeP_DJWsa9zYKIZCt4aFxXnMMxXqYphmt4IngMefspYZ1ZCV_WF7w3qdLFSuA497TbgQEDuMc9OPHkUaie-SgjoN-wco9VCElkZ1S1iDe_2t1vhbrIYWMVGP9CHwG6UJz9IKwKzqyJ-j15jmnOA_3hDCXIfB2Pljo"
-    : "https://lh3.googleusercontent.com/aida-public/AB6AXuDDvFP89VU0zJ2W5zKepVc7HkFYHglxijSh8h6FrNU_m_W-y-X6Rtblu98T0OXuWPmWWzpi0fqlAsfXnP0t7LwxuYLcjPAY3YnCFp9dyhsQl2-ZyYjSRRs2K__h9CkODpewGbHVbOumtz0a35aQqguRES2_e_pA78h2Pm9KyR6iSFyLm4BKCYNt7-hArn_Q9STyubKUpJ8XI-YU-E1ryNxznynA3we9ZNR35w5Obtdyy3w9mM3uaSXJyvppzfMNEStab8qhvS4nH74";
+  const portraitUrl = soulmate === 'xiyue'
+    ? "https://res.cloudinary.com/dj2eotipq/image/upload/c54acd353fc36382f9b795e7ab87f33e_bka00h"
+    : (soulmate === 'linwei'
+      ? "https://res.cloudinary.com/dj2eotipq/image/upload/400ed174e01be2f3bb06fff35fcdb8f3_rclrjg"
+      : (isMale
+        ? "https://lh3.googleusercontent.com/aida-public/AB6AXuADGY9UVb-7qyyjGyDf_OXPjR2K9gbni7CscrIWX5IktS4UNTCbSWUCurBC2nyByFzA8VA94C6gTRLKXd8CYBeFjazm94kl7EJtgzWjS9SjN8oeP_DJWsa9zYKIZCt4aFxXnMMxXqYphmt4IngMefspYZ1ZCV_WF7w3qdLFSuA497TbgQEDuMc9OPHkUaie-SgjoN-wco9VCElkZ1S1iDe_2t1vhbrIYWMVGP9CHwG6UJz9IKwKzqyJ-j15jmnOA_3hDCXIfB2Pljo"
+        : "https://lh3.googleusercontent.com/aida-public/AB6AXuDDvFP89VU0zJ2W5zKepVc7HkFYHglxijSh8h6FrNU_m_W-y-X6Rtblu98T0OXuWPmWWzpi0fqlAsfXnP0t7LwxuYLcjPAY3YnCFp9dyhsQl2-ZyYjSRRs2K__h9CkODpewGbHVbOumtz0a35aQqguRES2_e_pA78h2Pm9KyR6iSFyLm4BKCYNt7-hArn_Q9STyubKUpJ8XI-YU-E1ryNxznynA3we9ZNR35w5Obtdyy3w9mM3uaSXJyvppzfMNEStab8qhvS4nH74"));
 
-  const avatarUrl = isMale
-    ? "https://lh3.googleusercontent.com/aida-public/AB6AXuB_PqPtzT5v5a3I5XHm-xq0FJSYsAToYWrgBmQhu1ItLzgC_n_ZC1vfcmv2iFqlKbshK5ALuMI3Sir-C7YywnT-lSQ7DXKIws93C68TtDObokPMMFDFJnaDhLwd01QM4PWiNL7Oj14JMwZ01bwiZ6nBiHLasdoNJja5CBqmfjlmdM34PUuYlULi9G5URhAIlHUR2JVZAa2rXjrp9R4Z5R4szwQzlTHSXbMQOhSPbVwfvMwvOXIr9iqe2wcfTXPdtSqWqJxEoqSbw8s"
-    : "https://lh3.googleusercontent.com/aida-public/AB6AXuDDvFP89VU0zJ2W5zKepVc7HkFYHglxijSh8h6FrNU_m_W-y-X6Rtblu98T0OXuWPmWWzpi0fqlAsfXnP0t7LwxuYLcjPAY3YnCFp9dyhsQl2-ZyYjSRRs2K__h9CkODpewGbHVbOumtz0a35aQqguRES2_e_pA78h2Pm9KyR6iSFyLm4BKCYNt7-hArn_Q9STyubKUpJ8XI-YU-E1ryNxznynA3we9ZNR35w5Obtdyy3w9mM3uaSXJyvppzfMNEStab8qhvS4nH74";
+  const avatarUrl = soulmate === 'xiyue'
+    ? "https://res.cloudinary.com/dj2eotipq/image/upload/c54acd353fc36382f9b795e7ab87f33e_bka00h"
+    : (soulmate === 'linwei'
+      ? "https://res.cloudinary.com/dj2eotipq/image/upload/400ed174e01be2f3bb06fff35fcdb8f3_rclrjg"
+      : (isMale
+        ? "https://lh3.googleusercontent.com/aida-public/AB6AXuB_PqPtzT5v5a3I5XHm-xq0FJSYsAToYWrgBmQhu1ItLzgC_n_ZC1vfcmv2iFqlKbshK5ALuMI3Sir-C7YywnT-lSQ7DXKIws93C68TtDObokPMMFDFJnaDhLwd01QM4PWiNL7Oj14JMwZ01bwiZ6nBiHLasdoNJja5CBqmfjlmdM34PUuYlULi9G5URhAIlHUR2JVZAa2rXjrp9R4Z5R4szwQzlTHSXbMQOhSPbVwfvMwvOXIr9iqe2wcfTXPdtSqWqJxEoqSbw8s"
+        : "https://lh3.googleusercontent.com/aida-public/AB6AXuDDvFP89VU0zJ2W5zKepVc7HkFYHglxijSh8h6FrNU_m_W-y-X6Rtblu98T0OXuWPmWWzpi0fqlAsfXnP0t7LwxuYLcjPAY3YnCFp9dyhsQl2-ZyYjSRRs2K__h9CkODpewGbHVbOumtz0a35aQqguRES2_e_pA78h2Pm9KyR6iSFyLm4BKCYNt7-hArn_Q9STyubKUpJ8XI-YU-E1ryNxznynA3we9ZNR35w5Obtdyy3w9mM3uaSXJyvppzfMNEStab8qhvS4nH74"));
 
-  const name = isMale ? "Lin (林)" : "Seraphina";
+  const name = soulmate === 'xiyue' ? "汐月" : (soulmate === 'linwei' ? "林薇" : (isMale ? "小鹿" : "Seraphina"));
 
   const handleSendMessage = () => {
     if (!inputText.trim()) return;
