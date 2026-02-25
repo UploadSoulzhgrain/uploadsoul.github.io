@@ -5,17 +5,14 @@
     <meta charset="utf-8">
     <title>UploadSoul - Redirecting...</title>
     <script type="text/javascript">
-        // Simple SPA redirector for GitHub Pages
-        // This script will take the current path and redirect back to index.html
-        // conveying the path via sessionStorage or similar if needed.
-        // However, for most modern SPA routers (like react-router-dom), 
-        // simply serving the index.html content on 404 is enough.
-        // On GitHub Pages, we can't easily change the server config to serve index.html on 404,
-        // so we use this 404.html as a client-side redirector or a duplicate of index.html.
-
-        // Option: Redirect to the home page with the path as a parameter
-        // This is a common pattern for GH Pages (using things like spa-github-pages)
-        window.location.replace("/");
+        var l = window.location;
+        l.replace(
+            l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+            l.pathname.split('/').slice(0, 1).join('/') + '/?p=' +
+            l.pathname.slice(1).replace(/&/g, '~and~') +
+            (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+            l.hash
+        );
     </script>
 </head>
 
