@@ -12,6 +12,7 @@ const DailyCompanionPage = () => {
             avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAjxAV95ITqD2oLiErbbLq3ezfEDN891Hrc7RbPilGZyaRvIR-9CocAWpAmv0sokIfCeoGIWI38wbdHXhJ3IarD02Aa9Hqpywzw9c-R7JAEUvWYP3oaawr6zOAMUWJQs0ymoXdBYhilyXwLGusYHwDQT7Smb61ZjW1F1ap0HYjWQF1WXTEnvr_UMeghLshW2BA2eFzEgq68SgMn4CgGhZxD069QgsbXnxo_TVxOa2retApke6lN3cOYN5TxaZfFgZqvp3Ze-oh8obU',
             status: 'online',
             personality: '热情、爱笑、乐于助人。她总能带给你满满的正能量，是你心情低落时的最佳倾听者。',
+            gender: 'female',
             favorited: true
         },
         {
@@ -21,6 +22,7 @@ const DailyCompanionPage = () => {
             avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCU1MBa3KPjN0jMovoP8My79SxlmCcBWf4_RKp9cqHLNJShBovwLS2AIrc2ipJbOiWVbDASwLuZpaGaxPc_SE-bfcmEJePxLtNqoxaheX4AvOAwbNDf8FVQph9PnxojpfYZaVRgy2k19J1TjdC5ihr9rCPKdAbSSS09UW8d50KnNRDsPFyHS6ovQe3m_NMUCgPL5JL5u8MqVs8GA2AjvHSlrsHSeN4hb4l2lNQWB1wUJsM6VTU5r4TRg_iqAVOab0Pbc3RD2ttXVhc',
             status: 'offline',
             personality: '温柔、细腻、博学多才。如果你喜欢深入探讨文学与哲学，露娜会是你最完美的精神伙伴。',
+            gender: 'female',
             favorited: false
         },
         {
@@ -30,6 +32,7 @@ const DailyCompanionPage = () => {
             avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBBy7Q36TDAVh_7cOVBHfMCba8EYbTwVXmkdH9ImOdSZI3ZEPaLsb1nQmslha_GDA1J1paEWcLrKxBcqyX5SBT5ip3aal8XUMLiCnHyuWfhdSXT7Eb26DdabCEIuAu4FNhgebb4F08exILu3CobqojPx97oT990kKhG3Fek4x4rd9pYCk0y7elKiI-5d_nBKl86GryehI0OEp69vUokGEjEgYc7vObQsAa1RK6jJTaARoaHp9ip-XIbn0Mi8rpbs22lwcpCNFIV37Q',
             status: 'online',
             personality: '幽默、自律、充满活力。喜欢运动和旅行？阿朗不仅是你的伙伴，更是你生活中最棒的战友。',
+            gender: 'male',
             favorited: false
         },
         {
@@ -39,6 +42,7 @@ const DailyCompanionPage = () => {
             avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBbgfp6U8EcsCgCPH6smvmR4I8cm8VoyvdGxoLptC5s3zz2YMMQyIdSSNghLAZ_AkdeAiFtWMUkDY8ON7WehZg6Hr8tml6KeJ8z4ctYrQv0hU4OPpk-7mMbdWRG0CYBcanCarRubcxk6Vh8zUp_Gre0RqD_033SK3k-dTscVyg1G7wTJONVN5VeToBSJ9EKBkImz2yNLpHMZCwllTsYx-8DZEKA1oPoaaManS-0sIQTs7k3Z-pWs6shYsjsYpyVr1qVfo4GDkc85WI',
             status: 'online',
             personality: '安静、感性、富有创意。喜欢绘画和音乐的你，一定会和她在艺术的海洋里找到共鸣。',
+            gender: 'female',
             favorited: true
         }
     ];
@@ -159,7 +163,7 @@ const DailyCompanionPage = () => {
                                             性格：{profile.personality}
                                         </p>
                                         <div className="mt-auto">
-                                            <button className="w-full py-3 bg-[#ee7c2b] text-white rounded-xl font-bold hover:bg-[#ee7c2b]/90 transition-colors flex items-center justify-center gap-2">
+                                            <button onClick={() => navigate(l(`/companion/chat?name=${encodeURIComponent(profile.name)}&gender=${profile.gender}`))} className="w-full py-3 bg-[#ee7c2b] text-white rounded-xl font-bold hover:bg-[#ee7c2b]/90 transition-colors flex items-center justify-center gap-2">
                                                 <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
                                                 开始聊天
                                             </button>
