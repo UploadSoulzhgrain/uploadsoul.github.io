@@ -59,11 +59,17 @@ const DailyCompanionPage = () => {
                                 </div>
                                 <h2 className="text-slate-900 dark:text-slate-100 text-xl font-bold leading-tight tracking-tight">AI Companion</h2>
                             </button>
-                            <nav className="hidden md:flex items-center gap-8">
+                            <nav className="hidden md:flex items-center gap-6">
                                 <button onClick={() => navigate(l('/'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">首页</button>
-                                <button onClick={() => navigate(l('/companion/daily'))} className="text-[#ee7c2b] text-sm font-semibold leading-normal border-b-2 border-[#ee7c2b] pb-1">日常陪伴</button>
+                                <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                                <button onClick={() => navigate(l('/companion/daily'))} className="text-[#ee7c2b] text-sm font-semibold border-b-2 border-[#ee7c2b] pb-1">日常陪伴</button>
                                 <button onClick={() => navigate(l('/companion/senior'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">长者关怀</button>
                                 <button onClick={() => navigate(l('/companion/mental'))} className="text-slate-600 dark:text-slate-400 hover:text-[#ee7c2b] transition-colors text-sm font-medium leading-normal">心理健康</button>
+                                <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
+                                {/* 规划中功能按钮 */}
+                                <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">探索</button>
+                                <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">我的伙伴</button>
+                                <button className="text-slate-400 dark:text-slate-500 hover:text-[#ee7c2b] transition-colors text-sm font-medium">社区</button>
                             </nav>
                         </div>
                         <div className="flex flex-1 justify-end gap-6 items-center">
