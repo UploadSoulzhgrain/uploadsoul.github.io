@@ -27,6 +27,7 @@ import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../contexts/AuthContext';
 import { MediaService } from '../services/mediaService';
 import toast, { Toaster } from 'react-hot-toast';
+import audioService from '../services/audioService';
 import './VirtualLovePage.css';
 
 export default function VirtualLovePage() {
@@ -451,6 +452,8 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
     { role: 'ai', text: '早安。我一直在回顾我们昨天分享的记忆。你对日出的感悟非常有诗意。准备好继续我们的克隆训练了吗？', time: '上午 10:24' }
   ]);
   const [inputText, setInputText] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const isMale = gender === 'male';
   const themeColor = isMale ? 'text-accent-blue' : 'text-primary';
@@ -476,20 +479,99 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
 
   const name = soulmate === 'xiyue' ? "汐月" : (soulmate === 'linwei' ? "林薇" : (isMale ? "小鹿" : "Seraphina"));
 
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
-    const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-    setMessages(prev => [...prev, { role: 'user', text: inputText, time }]);
-    setInputText('');
+  const handleSendMessage = async (textOverride) => {
+    const text = textOverride || inputText;
+    if (!text.trim()) return;
 
-    // Auto reply simulation
-    setTimeout(() => {
+    const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+    setMessages(prev => [...prev, { role: 'user', text, time }]);
+    if (!textOverride) setInputText('');
+    setIsProcessing(true);
+
+    try {
+      const response = await fetch('/api/virtual-lover/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          characterId: name,
+          userId: 'test-user' // Replace with actual user ID if available
+        })
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
       setMessages(prev => [...prev, {
         role: 'ai',
-        text: '我感应到了你的想法。正在深度处理中...',
+        text: data.aiText,
         time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
       }]);
-    }, 1000);
+
+      if (data.audioUrl) {
+        audioService.playAudio(data.audioUrl).catch(err => console.error('Audio play error:', err));
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+      toast.error('对话方案同步失败，请重试');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const startVoiceChat = async (e) => {
+    if (e) e.preventDefault();
+    console.log('Starting voice chat...');
+    try {
+      await audioService.startRecording();
+      setIsRecording(true);
+      toast.success('正在听取您的心声...');
+    } catch (error) {
+      console.error('Mic start error:', error);
+      toast.error('麦克风启动失败');
+    }
+  };
+
+  const stopVoiceChat = async (e) => {
+    if (e) e.preventDefault();
+    console.log('Stopping voice chat...');
+    setIsRecording(false);
+    setIsProcessing(true);
+    try {
+      const audioBlob = await audioService.stopRecording();
+      console.log('Audio recorded, size:', audioBlob.size);
+
+      const formData = new FormData();
+      formData.append('audio', audioBlob);
+      formData.append('characterId', name);
+      formData.append('userId', 'test-user');
+
+      const response = await fetch('/api/virtual-lover/chat', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      console.log('API Response:', data);
+
+      if (data.error) throw new Error(data.error);
+
+      const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', text: data.userText || '[语音已接收]', time },
+        { role: 'ai', text: data.aiText, time }
+      ]);
+
+      if (data.audioUrl) {
+        audioService.playAudio(data.audioUrl).catch(err => console.error('Audio play error:', err));
+      }
+    } catch (error) {
+      console.error('Voice chat process error:', error);
+      toast.error('语音识别同步失败');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -596,8 +678,10 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
 
             <div className="absolute bottom-12 left-12 right-12">
               <div className="flex items-center gap-2 mb-3">
-                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-xs font-bold text-green-500 uppercase tracking-widest">活跃并已同步</span>
+                <span className={`h-2 w-2 rounded-full ${isProcessing ? 'bg-primary animate-ping' : 'bg-green-500 animate-pulse'}`}></span>
+                <span className={`text-xs font-bold ${isProcessing ? 'text-primary' : 'text-green-500'} uppercase tracking-widest`}>
+                  {isProcessing ? '正在共鸣中...' : '活跃并已同步'}
+                </span>
               </div>
               <h1 className="text-5xl font-bold text-white tracking-tight">
                 {name} <span className={`${themeColor} font-light ml-2`}>v4.2</span>
@@ -720,7 +804,15 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
           </div>
           <div className="flex items-center justify-between mt-4">
             <div className="flex gap-1">
-              <button onClick={() => toast.success('语音通话录音已开启')} className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
+              <button
+                onMouseDown={(e) => startVoiceChat(e)}
+                onMouseUp={(e) => stopVoiceChat(e)}
+                onMouseLeave={(e) => isRecording && stopVoiceChat(e)}
+                onTouchStart={(e) => startVoiceChat(e)}
+                onTouchEnd={(e) => stopVoiceChat(e)}
+                className={`p-2.5 rounded-xl transition-all ${isRecording ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/30' : 'hover:bg-white/10 text-slate-500 hover:text-slate-300'}`}
+                title="按住说话 (Hold to talk)"
+              >
                 <Mic size={20} />
               </button>
               <button onClick={() => toast.success('请选择上传附件')} className="p-2.5 rounded-xl hover:bg-white/10 text-slate-500 hover:text-slate-300 transition-colors">
