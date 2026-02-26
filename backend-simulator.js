@@ -2,6 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { AzureOpenAI } from "openai";
 import axios from 'axios';
+import formidable from 'formidable';
+import fs from 'fs';
 
 dotenv.config();
 
@@ -9,6 +11,11 @@ const app = express();
 app.use(express.json());
 
 const PORT = 3000;
+
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+});
 
 // HeyGen Token API
 app.get('/api/heygen-token', async (req, res) => {
@@ -133,6 +140,88 @@ app.post('/api/chat', async (req, res) => {
             error: `API 响应异常 (${status}): ${message}`,
             detail: body
         });
+    }
+});
+
+// Virtual Lover API
+app.post('/api/virtual-lover/chat', async (req, res) => {
+    console.log('>>> Incoming Virtual Lover Chat Request');
+    console.log('Content-Type:', req.headers['content-type']);
+    try {
+        const { siliconFlowService } = await import('./api/lib/siliconflow.js');
+        const { supabaseService } = await import('./api/lib/supabase-server.js');
+
+        let fields = {};
+        let files = {};
+        const contentType = req.headers['content-type'] || '';
+
+        if (contentType.includes('multipart/form-data')) {
+            const form = formidable({ multiples: false });
+            [fields, files] = await new Promise((resolve, reject) => {
+                form.parse(req, (err, fields, files) => {
+                    if (err) reject(err);
+                    resolve([fields, files]);
+                });
+            });
+        } else {
+            fields = req.body;
+        }
+
+        const audioFile = files.audio?.[0] || files.audio;
+        const message = Array.isArray(fields.message) ? fields.message[0] : (fields.message || '');
+        const userId = Array.isArray(fields.userId) ? fields.userId[0] : (fields.userId || 'test-user');
+        const characterId = Array.isArray(fields.characterId) ? fields.characterId[0] : (fields.characterId || '汐月');
+
+        let userText = message;
+
+        if (audioFile) {
+            console.log('Step 1: ASR processing...', audioFile.filepath);
+            const audioBuffer = fs.readFileSync(audioFile.filepath);
+            userText = await siliconFlowService.transcribe(audioBuffer);
+            console.log('ASR Result:', userText);
+        }
+
+        if (!userText && !audioFile) {
+            return res.status(400).json({ error: 'Message or audio is required' });
+        }
+
+        if (!userText && audioFile) {
+            return res.json({ userText: '', aiText: '我没听清，请再说一次？', audioUrl: null });
+        }
+
+        // 2. LLM
+        console.log('Step 2: LLM processing...');
+        const chatMessages = [
+            { role: 'system', content: `你是一个名为${characterId}的虚拟恋人。请温柔回复。` },
+            { role: 'user', content: userText }
+        ];
+        const aiText = await siliconFlowService.chat(chatMessages);
+        console.log('AI Response:', aiText);
+
+        // 3. TTS
+        console.log('Step 3: TTS processing...');
+        const aiAudioBuffer = await siliconFlowService.synthesize(aiText);
+        console.log('TTS Done.');
+
+        // 4. Supabase
+        console.log('Step 4: Supabase upload...');
+        const fileName = `${userId}_${Date.now()}.mp3`;
+        const audioUrl = await supabaseService.uploadAudio(aiAudioBuffer, fileName);
+        console.log('Audio URL:', audioUrl);
+
+        await supabaseService.saveChatRecord({
+            userId,
+            characterId,
+            userText,
+            aiText,
+            audioUrl
+        });
+
+        res.json({ userText, aiText, audioUrl });
+
+    } catch (error) {
+        console.error('Virtual Lover Route Error:', error);
+        res.status(500).json({ error: error.message });
     }
 });
 
