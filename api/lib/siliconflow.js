@@ -83,6 +83,30 @@ export const siliconFlowService = {
     },
 
     /**
+     * LLM Stream: Streaming chat completion
+     */
+    async chatStream(messages) {
+        try {
+            const response = await fetch(`${BASE_URL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${SILICON_FLOW_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'Qwen/Qwen2-7B-Instruct',
+                    messages: messages,
+                    stream: true
+                })
+            });
+            return response.body; // Return standard ReadableStream
+        } catch (error) {
+            console.error('LLM Stream Error:', error.message);
+            throw new Error('LLM interaction failed');
+        }
+    },
+
+    /**
      * TTS: Generate audio from text
      * @param {string} text 
      * @param {string} voiceModel 

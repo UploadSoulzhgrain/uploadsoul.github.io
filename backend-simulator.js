@@ -143,7 +143,13 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// Virtual Lover API
+// Virtual Lover Pre-warm API
+app.get('/api/virtual-lover/prewarm', (req, res) => {
+    console.log('Pre-warming Virtual Lover services...');
+    res.json({ status: 'ok', message: 'Ready' });
+});
+
+// Virtual Lover API (Enhanced Streaming)
 app.post('/api/virtual-lover/chat', async (req, res) => {
     console.log('>>> Incoming Virtual Lover Chat Request');
     console.log('Content-Type:', req.headers['content-type']);
@@ -169,7 +175,7 @@ app.post('/api/virtual-lover/chat', async (req, res) => {
 
         const audioFile = files.audio?.[0] || files.audio;
         const message = Array.isArray(fields.message) ? fields.message[0] : (fields.message || '');
-        const userId = Array.isArray(fields.userId) ? fields.userId[0] : (fields.userId || 'test-user');
+        const userId = Array.isArray(fields.userId) ? fields.userId[0] : (fields.userId || '00000000-0000-4000-8000-000000000000');
         const characterId = Array.isArray(fields.characterId) ? fields.characterId[0] : (fields.characterId || '汐月');
         const requestedVoice = Array.isArray(fields.voice) ? fields.voice[0] : (fields.voice || 'FunAudioLLM/CosyVoice2-0.5B:anna');
 
@@ -202,12 +208,109 @@ app.post('/api/virtual-lover/chat', async (req, res) => {
             return res.json({ userText: '', aiText: '我没听清，请再说一次？', audioUrl: null });
         }
 
-        // 2. LLM
+        // 2. LLM with colloquial prompt
         console.log('Step 2: LLM processing...');
+        const systemPrompt = `你是一个名为${characterId}的虚拟恋人。请用极度口语化、生活化的方式交流。
+禁止使用“首先/其次/再次/总之”等任何结构化词汇。
+禁止写成列表或分点。
+就像在微信上跟亲密伴侣聊天一样，语气要自然、亲昵、偶尔带点小情绪或语气助词（如：哈、呢、哦、嘛）。
+多用感叹号和问号来增加情绪感，不要总是陈述句。
+保持简短，一句话左右最好。`;
+
         const chatMessages = [
-            { role: 'system', content: `你是一个名为${characterId}的虚拟恋人。请温柔回复。` },
+            { role: 'system', content: systemPrompt },
             { role: 'user', content: userText }
         ];
+
+        // Check for streaming request
+        const isStream = req.query.stream === 'true' || req.headers['accept'] === 'text/event-stream';
+        console.log('IsStream Debug:', { isStream, query: req.query, accept: req.headers['accept'] });
+
+        if (isStream) {
+            console.log('Starting Streaming Response...');
+            res.setHeader('Content-Type', 'text/event-stream');
+            res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('Connection', 'keep-alive');
+
+            const stream = await siliconFlowService.chatStream(chatMessages);
+            let fullAiText = '';
+            let sentenceBuffer = '';
+            const sentenceEndings = /[。！？!？]/;
+
+            // Helper to process and send a sentence
+            const processSentence = async (text) => {
+                if (!text.trim()) return;
+                console.log('Synthesizing sentence:', text);
+                try {
+                    const audioBuffer = await siliconFlowService.synthesize(text, requestedVoice);
+                    const fileName = `${userId}_stream_${Date.now()}.mp3`;
+                    const audioUrl = await supabaseService.uploadAudio(audioBuffer, fileName);
+
+                    res.write(`data: ${JSON.stringify({
+                        type: 'sentence',
+                        text: text,
+                        audioUrl: audioUrl
+                    })}\n\n`);
+                } catch (err) {
+                    console.error('Sentence synthesis error:', err);
+                    res.write(`data: ${JSON.stringify({ type: 'error', message: 'Synthesis failed' })}\n\n`);
+                }
+            };
+
+            const reader = stream.getReader();
+            const decoder = new TextDecoder();
+            let chunkBuffer = '';
+
+            try {
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    chunkBuffer += decoder.decode(value, { stream: true });
+                    const lines = chunkBuffer.split('\n');
+                    chunkBuffer = lines.pop();
+
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (data === '[DONE]') continue;
+                            try {
+                                const parsed = JSON.parse(data);
+                                const delta = parsed.choices[0].delta?.content || '';
+                                if (delta) {
+                                    fullAiText += delta;
+                                    sentenceBuffer += delta;
+                                    if (sentenceEndings.test(delta)) {
+                                        const parts = sentenceBuffer.split(sentenceEndings);
+                                        const ending = sentenceBuffer.match(sentenceEndings)[0];
+                                        const sentence = parts[0] + ending;
+                                        sentenceBuffer = parts.slice(1).join(ending);
+                                        await processSentence(sentence);
+                                    }
+                                }
+                            } catch (e) { }
+                        }
+                    }
+                }
+                if (sentenceBuffer.trim()) {
+                    await processSentence(sentenceBuffer);
+                }
+
+                // Save record at the end
+                await supabaseService.saveChatRecord({
+                    userId, characterId, userText, aiText: fullAiText, audioUrl: null // No single audioUrl for stream
+                });
+
+                res.write(`data: ${JSON.stringify({ type: 'done', fullText: fullAiText })}\n\n`);
+                res.end();
+            } catch (err) {
+                console.error('Stream processing error:', err);
+                res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
+                res.end();
+            }
+            return;
+        }
+
         const aiText = await siliconFlowService.chat(chatMessages);
         console.log('AI Response:', aiText);
 
