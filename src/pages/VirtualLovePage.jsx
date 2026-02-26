@@ -455,6 +455,55 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
   const [inputText, setInputText] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [abortController, setAbortController] = useState(null);
+
+  const handleInterrupt = () => {
+    if (audioService.stopAllAudio) {
+      audioService.stopAllAudio();
+    }
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+    }
+  };
+
+  const consumeStream = async (reader, aiMessageId) => {
+    const decoder = new TextDecoder();
+    let accumulatedAiText = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // Keep partial line in buffer
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+
+        try {
+          const content = trimmed.slice(6);
+          if (content === '[DONE]') continue;
+
+          const data = JSON.parse(content);
+          if (data.type === 'sentence') {
+            accumulatedAiText += data.text;
+            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: accumulatedAiText } : m));
+            if (data.audioUrl) audioService.enqueueAudio(data.audioUrl);
+          } else if (data.type === 'done') {
+            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: data.fullText } : m));
+          } else if (data.type === 'error') {
+            toast.error(data.message || '生成中断');
+          }
+        } catch (e) {
+          console.warn('SSE Parse Error:', e, trimmed);
+        }
+      }
+    }
+  };
 
   const config = getAvatarConfig(gender);
   const isMale = config.gender === 'male';
@@ -486,40 +535,53 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
     const text = textOverride || inputText;
     if (!text.trim()) return;
 
+    handleInterrupt(); // Stop current playback/request
+
     const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
     setMessages(prev => [...prev, { role: 'user', text, time }]);
     if (!textOverride) setInputText('');
     setIsProcessing(true);
 
+    const controller = new AbortController();
+    setAbortController(controller);
+
     try {
-      const response = await fetch('/api/virtual-lover/chat', {
+      const response = await fetch('/api/virtual-lover/chat?stream=true', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
         body: JSON.stringify({
           message: text,
           characterId: name,
-          userId: 'test-user',
+          userId: '00000000-0000-4000-8000-000000000000',
           voice: voiceId
         })
       });
 
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
+      if (!response.ok) throw new Error('API Error');
 
+      const aiMessageId = Date.now();
+
+      // Inject AI loading bubble
       setMessages(prev => [...prev, {
         role: 'ai',
-        text: data.aiText,
-        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+        text: '',
+        time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+        id: aiMessageId
       }]);
 
-      if (data.audioUrl) {
-        audioService.playAudio(data.audioUrl).catch(err => console.error('Audio play error:', err));
-      }
+      await consumeStream(response.body.getReader(), aiMessageId);
+
     } catch (error) {
-      console.error('Chat error:', error);
-      toast.error('对话方案同步失败，请重试');
+      if (error.name === 'AbortError') {
+        console.log('Chat session aborted');
+      } else {
+        console.error('Chat error:', error);
+        toast.error('对话方案同步失败，请重试');
+      }
     } finally {
       setIsProcessing(false);
+      setAbortController(null);
     }
   };
 
@@ -548,37 +610,48 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'recording.webm');
         formData.append('characterId', name);
-        formData.append('userId', 'test-user');
+        formData.append('userId', '00000000-0000-4000-8000-000000000000');
         formData.append('voice', voiceId);
 
-        const response = await fetch('/api/virtual-lover/chat', {
+        const controller = new AbortController();
+        setAbortController(controller);
+
+        const response = await fetch('/api/virtual-lover/chat?stream=true', {
           method: 'POST',
+          signal: controller.signal,
           body: formData
         });
 
-        const data = await response.json();
-        console.log('API Response:', data);
+        if (!response.ok) throw new Error('API Error');
 
-        if (data.error) throw new Error(data.error);
+        const aiMessageId = Date.now();
 
-        const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
         setMessages(prev => [
           ...prev,
-          { role: 'user', text: data.userText || '[语音已接收]', time },
-          { role: 'ai', text: data.aiText, time }
+          { role: 'user', text: '[语音已接收]', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) },
+          { role: 'ai', text: '', time: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }), id: aiMessageId }
         ]);
 
-        if (data.audioUrl) {
-          audioService.playAudio(data.audioUrl).catch(err => console.error('Audio play error:', err));
-        }
+        await consumeStream(response.body.getReader(), aiMessageId);
+
       } catch (error) {
-        console.error('Voice chat process error:', error);
-        toast.error(error.message || '语音识别同步失败');
+        if (error.name === 'AbortError') {
+          console.log('Voice session aborted');
+        } else {
+          console.error('Voice chat process error:', error);
+          toast.error(error.message || '语音识别同步失败');
+        }
       } finally {
         setIsProcessing(false);
+        setAbortController(null);
       }
     } else {
       console.log('Toggle: Starting voice chat...');
+      handleInterrupt(); // Stop current playback
+
+      // Pre-warm signal to reduce cold start
+      fetch('/api/virtual-lover/prewarm').catch(() => { });
+
       try {
         await audioService.startRecording();
         setIsRecording(true);
@@ -816,6 +889,7 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
               rows={2}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
+              onFocus={handleInterrupt}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
