@@ -171,13 +171,26 @@ app.post('/api/virtual-lover/chat', async (req, res) => {
         const message = Array.isArray(fields.message) ? fields.message[0] : (fields.message || '');
         const userId = Array.isArray(fields.userId) ? fields.userId[0] : (fields.userId || 'test-user');
         const characterId = Array.isArray(fields.characterId) ? fields.characterId[0] : (fields.characterId || '汐月');
+        const requestedVoice = Array.isArray(fields.voice) ? fields.voice[0] : (fields.voice || 'FunAudioLLM/CosyVoice2-0.5B:anna');
 
         let userText = message;
 
         if (audioFile) {
             console.log('Step 1: ASR processing...', audioFile.filepath);
             const audioBuffer = fs.readFileSync(audioFile.filepath);
-            userText = await siliconFlowService.transcribe(audioBuffer);
+            try {
+                userText = await siliconFlowService.transcribe(audioBuffer);
+            } catch (err) {
+                if (err.message === 'ASR_EMPTY_RESULT') {
+                    console.warn('ASR returned empty text.');
+                    return res.status(400).json({
+                        error: '没听清，请再说一次？',
+                        userText: '',
+                        details: 'ASR_EMPTY_RESULT'
+                    });
+                }
+                throw err;
+            }
             console.log('ASR Result:', userText);
         }
 
@@ -200,7 +213,7 @@ app.post('/api/virtual-lover/chat', async (req, res) => {
 
         // 3. TTS
         console.log('Step 3: TTS processing...');
-        const aiAudioBuffer = await siliconFlowService.synthesize(aiText);
+        const aiAudioBuffer = await siliconFlowService.synthesize(aiText, requestedVoice);
         console.log('TTS Done.');
 
         // 4. Supabase
