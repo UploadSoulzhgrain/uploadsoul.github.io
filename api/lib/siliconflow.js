@@ -10,28 +10,51 @@ if (!SILICON_FLOW_API_KEY) {
 }
 
 export const siliconFlowService = {
+    apiKey: SILICON_FLOW_API_KEY,
+    baseUrl: BASE_URL,
     /**
      * ASR: Transcribe audio using Whisper or SenseVoice
      * @param {Blob|Buffer} audioData 
      * @returns {Promise<string>}
      */
-    async transcribe(audioData) {
+    async transcribe(audioBuffer) {
+        console.log('SiliconFlow ASR: Transcribing audio buffer, size:', audioBuffer.length);
+
+        // In Node.js environment, we use Buffer directly for FormData
         const formData = new FormData();
-        // SiliconFlow ASR expects 'file' parameter
-        formData.append('file', audioData, 'input.wav');
-        formData.append('model', 'openai/whisper-large-v3'); // Defaulting to whisper
+
+        // Note: For newer Node.js global FormData, we can use File or Blob
+        // For axios to properly recognize it as a file, we provide a filename
+        const file = new File([audioBuffer], 'recording.webm', { type: 'audio/webm' });
+
+        formData.append('model', 'FunAudioLLM/SenseVoiceSmall');
+        formData.append('file', file);
 
         try {
-            const response = await axios.post(`${BASE_URL}/audio/transcriptions`, formData, {
+            const response = await axios.post(`${this.baseUrl}/audio/transcriptions`, formData, {
                 headers: {
-                    'Authorization': `Bearer ${SILICON_FLOW_API_KEY}`,
-                    'Content-Type': 'multipart/form-data'
-                }
+                    'Authorization': `Bearer ${this.apiKey}`,
+                },
+                timeout: 15000 // 15 seconds timeout
             });
-            return response.data.text;
+
+            console.log('SiliconFlow ASR Raw Response SUCCESS');
+            const text = response.data.text || '';
+
+            if (!text.trim()) {
+                console.warn('SiliconFlow ASR: Received empty transcription text.');
+                throw new Error('ASR_EMPTY_RESULT');
+            }
+
+            return text;
         } catch (error) {
-            console.error('ASR Error:', error.response?.data || error.message);
-            throw new Error('Transcription failed');
+            if (error.response) {
+                console.error('SiliconFlow ASR Error Response:', JSON.stringify(error.response.data, null, 2));
+            } else {
+                console.error('SiliconFlow ASR Error:', error.message);
+            }
+            if (error.message === 'ASR_EMPTY_RESULT') throw error;
+            throw new Error('Failed to transcribe audio: ' + (error.response?.data?.message || error.message));
         }
     },
 
@@ -65,12 +88,19 @@ export const siliconFlowService = {
      * @param {string} voiceModel 
      * @returns {Promise<Buffer>}
      */
-    async synthesize(text, voiceModel = 'FunAudioLLM/CosyVoice2-0.5B') {
+    async synthesize(text, requestedVoice = 'FunAudioLLM/CosyVoice2-0.5B:alex') {
+        // requestedVoice format: "modelId:voiceName"
+        const [modelId, voiceName] = requestedVoice.includes(':')
+            ? requestedVoice.split(':')
+            : ['FunAudioLLM/CosyVoice2-0.5B', 'alex'];
+
+        console.log('SiliconFlow TTS: Synthesizing with model:', modelId, 'voice:', voiceName);
+
         try {
             const response = await axios.post(`${BASE_URL}/audio/speech`, {
-                model: voiceModel,
+                model: modelId,
                 input: text,
-                voice: 'FunAudioLLM/CosyVoice2-0.5B:alex',
+                voice: requestedVoice,
                 response_format: 'mp3',
                 sample_rate: 32000,
                 stream: false

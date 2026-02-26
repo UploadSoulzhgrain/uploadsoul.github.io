@@ -28,6 +28,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { MediaService } from '../services/mediaService';
 import toast, { Toaster } from 'react-hot-toast';
 import audioService from '../services/audioService';
+import { getAvatarConfig } from '../config/avatarConfig';
 import './VirtualLovePage.css';
 
 export default function VirtualLovePage() {
@@ -455,11 +456,13 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const isMale = gender === 'male';
-  const themeColor = isMale ? 'text-accent-blue' : 'text-primary';
-  const themeBg = isMale ? 'bg-accent-blue' : 'bg-primary';
-  const themeBorder = isMale ? 'border-accent-blue' : 'border-primary';
-  const themeGlow = isMale ? 'glow-blue' : 'glow-primary';
+  const config = getAvatarConfig(gender);
+  const isMale = config.gender === 'male';
+  const themeColor = config.themeColor;
+  const themeBg = config.themeBg;
+  const themeBorder = config.themeBorder;
+  const themeGlow = config.themeGlow;
+  const voiceId = config.voiceId;
 
   const portraitUrl = soulmate === 'xiyue'
     ? "https://res.cloudinary.com/dj2eotipq/image/upload/c54acd353fc36382f9b795e7ab87f33e_bka00h"
@@ -495,7 +498,8 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
         body: JSON.stringify({
           message: text,
           characterId: name,
-          userId: 'test-user' // Replace with actual user ID if available
+          userId: 'test-user',
+          voice: voiceId
         })
       });
 
@@ -519,59 +523,83 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
     }
   };
 
-  const startVoiceChat = async (e) => {
+  const toggleVoiceChat = async (e) => {
     if (e) e.preventDefault();
-    console.log('Starting voice chat...');
-    try {
-      await audioService.startRecording();
-      setIsRecording(true);
-      toast.success('正在听取您的心声...');
-    } catch (error) {
-      console.error('Mic start error:', error);
-      toast.error('麦克风启动失败');
+
+    if (isRecording) {
+      console.log('Toggle: Stopping voice chat...');
+      setIsRecording(false);
+      setIsProcessing(true);
+      try {
+        const audioBlob = await audioService.stopRecording();
+        console.log('Audio recorded:', {
+          size: audioBlob.size,
+          type: audioBlob.type,
+          sizeInKB: (audioBlob.size / 1024).toFixed(2) + ' KB'
+        });
+
+        if (audioBlob.size < 100) {
+          console.warn('Audio blob too small, likely no sound captured.');
+          toast.error('录音时间太短或无声音');
+          setIsProcessing(false);
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'recording.webm');
+        formData.append('characterId', name);
+        formData.append('userId', 'test-user');
+        formData.append('voice', voiceId);
+
+        const response = await fetch('/api/virtual-lover/chat', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await response.json();
+        console.log('API Response:', data);
+
+        if (data.error) throw new Error(data.error);
+
+        const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        setMessages(prev => [
+          ...prev,
+          { role: 'user', text: data.userText || '[语音已接收]', time },
+          { role: 'ai', text: data.aiText, time }
+        ]);
+
+        if (data.audioUrl) {
+          audioService.playAudio(data.audioUrl).catch(err => console.error('Audio play error:', err));
+        }
+      } catch (error) {
+        console.error('Voice chat process error:', error);
+        toast.error(error.message || '语音识别同步失败');
+      } finally {
+        setIsProcessing(false);
+      }
+    } else {
+      console.log('Toggle: Starting voice chat...');
+      try {
+        await audioService.startRecording();
+        setIsRecording(true);
+        toast.success('正在听取您的心声 (点击停止)...');
+      } catch (error) {
+        console.error('Mic start error:', error);
+        toast.error('麦克风启动失败');
+      }
     }
   };
 
-  const stopVoiceChat = async (e) => {
+  const startVoiceChat = async (e) => {
+    // Keep for potential internal use or legacy support
     if (e) e.preventDefault();
-    console.log('Stopping voice chat...');
-    setIsRecording(false);
-    setIsProcessing(true);
-    try {
-      const audioBlob = await audioService.stopRecording();
-      console.log('Audio recorded, size:', audioBlob.size);
+    toggleVoiceChat(e);
+  };
 
-      const formData = new FormData();
-      formData.append('audio', audioBlob);
-      formData.append('characterId', name);
-      formData.append('userId', 'test-user');
-
-      const response = await fetch('/api/virtual-lover/chat', {
-        method: 'POST',
-        body: formData
-      });
-
-      const data = await response.json();
-      console.log('API Response:', data);
-
-      if (data.error) throw new Error(data.error);
-
-      const time = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
-      setMessages(prev => [
-        ...prev,
-        { role: 'user', text: data.userText || '[语音已接收]', time },
-        { role: 'ai', text: data.aiText, time }
-      ]);
-
-      if (data.audioUrl) {
-        audioService.playAudio(data.audioUrl).catch(err => console.error('Audio play error:', err));
-      }
-    } catch (error) {
-      console.error('Voice chat process error:', error);
-      toast.error('语音识别同步失败');
-    } finally {
-      setIsProcessing(false);
-    }
+  const stopVoiceChat = async (e) => {
+    // Keep for potential internal use or legacy support
+    if (e) e.preventDefault();
+    if (isRecording) toggleVoiceChat(e);
   };
 
   return (
@@ -805,13 +833,9 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
           <div className="flex items-center justify-between mt-4">
             <div className="flex gap-1">
               <button
-                onMouseDown={(e) => startVoiceChat(e)}
-                onMouseUp={(e) => stopVoiceChat(e)}
-                onMouseLeave={(e) => isRecording && stopVoiceChat(e)}
-                onTouchStart={(e) => startVoiceChat(e)}
-                onTouchEnd={(e) => stopVoiceChat(e)}
-                className={`p-2.5 rounded-xl transition-all ${isRecording ? 'bg-primary text-white scale-110 shadow-lg shadow-primary/30' : 'hover:bg-white/10 text-slate-500 hover:text-slate-300'}`}
-                title="按住说话 (Hold to talk)"
+                onClick={(e) => toggleVoiceChat(e)}
+                className={`p-2.5 rounded-xl transition-all ${isRecording ? 'bg-primary text-white animate-pulse scale-110 shadow-lg shadow-primary/30' : 'hover:bg-white/10 text-slate-500 hover:text-slate-300'}`}
+                title={isRecording ? "点击停止 (Click to stop)" : "点击说话 (Click to talk)"}
               >
                 <Mic size={20} />
               </button>
