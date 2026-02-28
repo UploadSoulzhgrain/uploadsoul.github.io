@@ -1,416 +1,484 @@
-// pages/ShopPage.jsx
-import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useState } from 'react';
+import {
+  ShoppingBag,
+  Globe,
+  User,
+  Users,
+  Shirt,
+  Box,
+  Zap,
+  Sun,
+  ArrowLeft,
+  Share2,
+  Heart,
+  ShoppingCart
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const ShopPage = () => {
-  const { t } = useTranslation();
-  const [products, setProducts] = useState([]);
-  const [cart, setCart] = useState([]);
-  const [showCart, setShowCart] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
-  
-  // Mock product data
-  useEffect(() => {
-    setProducts([
-      {
-        id: '1',
-        name: '高级会员月卡',
-        price: 30,
-        image: '/assets/shop/membership.jpg',
-        category: 'membership',
-        description: '30天高级会员权限，解锁所有角色和无限对话次数',
-        popular: true
-      },
-      {
-        id: '2',
-        name: '高级会员年卡',
-        price: 298,
-        image: '/assets/shop/membership-year.jpg',
-        category: 'membership',
-        description: '365天高级会员权限，比月卡更划算，享受全年无限服务',
-        popular: true,
-        discount: true,
-        originalPrice: 360
-      },
-      {
-        id: '3',
-        name: '时尚风衣',
-        price: 15,
-        image: '/assets/shop/coat.jpg',
-        category: 'character',
-        description: '给你的AI角色穿上这件时尚风衣，展现不同风格',
-        forType: 'character'
-      },
-      {
-        id: '4',
-        name: '复古眼镜',
-        price: 8,
-        image: '/assets/shop/glasses.jpg',
-        category: 'character',
-        description: '复古风格眼镜，为AI角色增添知性魅力',
-        forType: 'character'
-      },
-      {
-        id: '5',
-        name: '豪华猫窝',
-        price: 12,
-        image: '/assets/shop/pet-bed.jpg',
-        category: 'pet',
-        description: '舒适的豪华猫窝，提升宠物幸福感和休息质量',
-        forType: 'pet'
-      },
-      {
-        id: '6',
-        name: '宠物玩具套装',
-        price: 20,
-        image: '/assets/shop/pet-toys.jpg',
-        category: 'pet',
-        description: '多种互动玩具组合，让您的虚拟宠物玩得更开心',
-        forType: 'pet',
-        discount: true,
-        originalPrice: 25
-      },
-      {
-        id: '7',
-        name: '海滩别墅场景',
-        price: 25,
-        image: '/assets/shop/beach-scene.jpg',
-        category: 'scene',
-        description: '浪漫的海滩别墅场景，适合放松心情和特别的约会',
-        forType: 'scene'
-      },
-      {
-        id: '8',
-        name: '雪山木屋场景',
-        price: 25,
-        image: '/assets/shop/snow-scene.jpg',
-        category: 'scene',
-        description: '温馨的雪山木屋场景，壁炉、热巧克力和皑皑白雪',
-        forType: 'scene'
-      },
-      {
-        id: '9',
-        name: '声音模型训练',
-        price: 50,
-        image: '/assets/shop/voice-training.jpg',
-        category: 'digital-human',
-        description: '为您的数字人创建定制声音模型，让交流更加真实',
-        forType: 'digital-human'
-      },
-      {
-        id: '10',
-        name: '高清3D模型定制',
-        price: 99,
-        image: '/assets/shop/3d-model.jpg',
-        category: 'digital-human',
-        description: '根据照片创建高清3D人物模型，支持VR互动',
-        forType: 'digital-human'
-      }
-    ]);
-  }, []);
-  
-  // Add product to cart
-  const addToCart = (product) => {
-    const existingItem = cart.find(item => item.id === product.id);
-    
-    if (existingItem) {
-      setCart(cart.map(item => 
-        item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-      ));
-    } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
-    }
-  };
-  
-  // Remove product from cart
-  const removeFromCart = (productId) => {
-    setCart(cart.filter(item => item.id !== productId));
-  };
-  
-  // Update product quantity in cart
-  const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity < 1) return;
-    
-    setCart(cart.map(item => 
-      item.id === productId ? { ...item, quantity: newQuantity } : item
-    ));
-  };
-  
-  // Calculate total price
-  const totalPrice = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
-  
-  // Get filtered products based on category
-  const filteredProducts = activeCategory === 'all' 
-    ? products 
-    : products.filter(product => product.category === activeCategory);
-  
-  // Product Card Component
-  const ProductCard = ({ product }) => (
-    <div className="bg-white rounded-lg shadow overflow-hidden transition hover:shadow-md">
-      <div className="relative">
-        <img 
-          src={product.image} 
-          alt={product.name} 
-          className="w-full h-48 object-cover" 
-        />
-        {product.popular && (
-          <span className="absolute top-2 left-2 bg-yellow-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            热门
-          </span>
-        )}
-        {product.discount && (
-          <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-            优惠
-          </span>
-        )}
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
-        <div className="flex items-center mt-1">
-          <span className="text-purple-600 font-bold">¥{product.price}</span>
-          {product.originalPrice && (
-            <span className="text-gray-400 text-sm line-through ml-2">¥{product.originalPrice}</span>
-          )}
-        </div>
-        <p className="text-gray-500 text-sm mt-1">{product.description}</p>
-        <button
-          onClick={() => addToCart(product)}
-          className="mt-3 w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 transition"
-        >
-          添加到购物车
-        </button>
-      </div>
-    </div>
-  );
+// --- Mock Data ---
+const PRODUCTS = [
+  // Environments
+  {
+    id: '1',
+    name: '云端雪域庄园',
+    category: 'Environments',
+    price: 3500,
+    image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA35P0KHdk4kG0tyfVzN7anExBoeuozFcE1SrSWsSiQTZOAqvutPa0Qr-S5BrJGCbL-vLlhnWYUrq8Ud3GtrAoToTzFNUzlls9EEFwz9yI4Su4tddVx9gnqa65yww3no6ayisbBYOuWaSCTY1y3bpCRtIIkNLD83fSEOQtKZH7HMG-kEa73oc28CLYlSeVIwqS99cGlptri9HgaXu0M6AALlrvV0g1J2wVGGXP_2_SdmkhR-9JfGGHE6KLqTl47Iq8ncKTjaFjD3xq1',
+    tag: '至臻写实',
+    features: ['全景视野', '恒温系统', '私人管家'],
+    specs: {
+      '纹理质量': '8K 超清',
+      '交互点': '18个',
+      '空间面积': '1200㎡',
+      '文件格式': 'USDZ, GLB'
+    },
+    description: '坐落于阿尔卑斯山脉之巅的私人庄园。在这里，您可以与爱人共赏窗外的皑皑白雪，享受顶级的恒温生活空间与管家式服务。'
+  },
+  {
+    id: '2',
+    name: '山水禅意别院',
+    category: 'Environments',
+    price: 4800,
+    image: 'https://images.unsplash.com/photo-1542224566-6e85f2e6772f?auto=format&fit=crop&q=80&w=1000',
+    tag: '中式古典',
+    features: ['瀑布流水', '室外篝火', '躺椅闲谈'],
+    specs: {
+      '纹理质量': '8K PBR',
+      '交互点': '15个',
+      '风格': '山水禅意',
+      '文件格式': 'USDZ, FBX'
+    },
+    description: '隐于名山大川之间的禅意别院。拥有壮丽的瀑布景观与繁茂绿植，室外设有篝火与舒适躺椅，是好友围炉夜话、感悟自然的绝佳居所。'
+  },
+  {
+    id: '5',
+    name: '翡翠湾沙滩椰林',
+    category: 'Environments',
+    price: 3800,
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=1000',
+    tag: '度假天堂',
+    features: ['海浪音效', '动态椰林', '日光浴场'],
+    specs: {
+      '纹理质量': '4K 实时',
+      '交互点': '12个',
+      '植被密度': '高',
+      '文件格式': 'USDZ, GLB'
+    },
+    description: '阳光、沙滩、椰林。翡翠湾为您还原最真实的马尔代夫度假体验。在这里，您可以尽情享受日光浴，聆听海浪拍打沙滩的声音。'
+  },
+  // Real Estate
+  {
+    id: '3',
+    name: '寰宇天际大平层',
+    category: 'Real Estate',
+    price: 9500,
+    image: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&q=80&w=1000',
+    tag: '无敌视野',
+    features: ['270°全景', '无边泳池', '智能家居'],
+    specs: {
+      '纹理质量': '16K 贴图',
+      '交互点': '32个',
+      '视野范围': '全无遮挡',
+      '文件格式': 'GLB, FBX'
+    },
+    description: '位于城市最顶端的寰宇天际公寓。270度无死角全景落地窗，将整座城市的繁华与远方的地平线尽收眼底，尽显王者气概。'
+  },
+  {
+    id: '6',
+    name: '深海亚特兰蒂斯',
+    category: 'Real Estate',
+    price: 12000,
+    image: 'https://images.unsplash.com/photo-1582967788606-a171c1080cb0?auto=format&fit=crop&q=80&w=1000',
+    tag: '深海奇观',
+    features: ['水下全景', '海洋生物交互', '压力平衡系统'],
+    specs: {
+      '深度': '水下200米',
+      '视野': '360°海底',
+      '交互点': '45个',
+      '文件格式': 'GLB'
+    },
+    description: '深藏于大洋底部的未来主义居所。透过超强度透明穹顶，您可以近距离观察深海生物，体验前所未有的水下生活。'
+  },
+  // Apparel
+  {
+    id: '7',
+    name: '星云流光礼服',
+    category: 'Apparel',
+    price: 1500,
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&q=80&w=1000',
+    tag: '数字高定',
+    features: ['自发光材质', '粒子特效', '动态剪裁'],
+    specs: {
+      '材质': '液态光子',
+      '动态级别': 'Level 5',
+      '适用场合': '虚拟晚宴',
+      '文件格式': 'GLB, VRM'
+    },
+    description: '采用液态光子技术打造的数字礼服。裙摆间流淌着星云般的色彩，随数字人的动作产生绚丽的粒子拖尾。'
+  },
+  {
+    id: '8',
+    name: '赛博机能战甲',
+    category: 'Apparel',
+    price: 2200,
+    image: 'https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&q=80&w=1000',
+    tag: '硬核装备',
+    features: ['外骨骼增强', '多功能UI', '环境自适应'],
+    specs: {
+      '材质': '碳纤维复合',
+      '防御等级': '虚拟防护 A级',
+      '交互点': '12个',
+      '文件格式': 'GLB'
+    },
+    description: '专为虚拟探险设计的机能战甲。不仅拥有极具冲击力的视觉外观，还集成了多种虚拟探测功能。'
+  },
+  // Props
+  {
+    id: '4',
+    name: '皇家典藏壁炉书阁',
+    category: 'Props',
+    price: 5200,
+    image: 'https://images.unsplash.com/photo-1507842217343-583bb7270b66?auto=format&fit=crop&q=80&w=1000',
+    tag: '奢华至极',
+    features: ['万卷藏书', '真火壁炉', '古典交响'],
+    specs: {
+      '纹理质量': '8K PBR',
+      '交互点': '20个',
+      '层高': '8米挑高',
+      '文件格式': 'USDZ, GLB'
+    },
+    description: '一座宏伟奢华的皇家级私人图书馆。八米挑高的空间，整面墙的珍贵藏书，伴随着壁炉中跳动的火焰，为您提供最尊贵的阅读体验。'
+  },
+  {
+    id: '9',
+    name: '智能机械宠物犬',
+    category: 'Props',
+    price: 1800,
+    image: 'https://images.unsplash.com/photo-1589127017022-45ca48d329eb?auto=format&fit=crop&q=80&w=1000',
+    tag: '智能伴侣',
+    features: ['AI情感交互', '自动跟随', '多种皮肤'],
+    specs: {
+      'AI等级': 'Level 4',
+      '动作库': '200+动作',
+      '交互模式': '语音/手势',
+      '文件格式': 'GLB'
+    },
+    description: '您的数字空间完美伴侣。采用先进的AI情感引擎，能够识别您的情绪并作出相应的互动反馈。'
+  },
+  {
+    id: '10',
+    name: '云端奢华宠物屋',
+    category: 'Props',
+    price: 1200,
+    image: 'https://images.unsplash.com/photo-1518717758536-85ae29035b6d?auto=format&fit=crop&q=80&w=1000',
+    tag: '宠物奢享',
+    features: ['恒温控制', '自动清洁', '舒缓音乐'],
+    specs: {
+      '材质': '航空级复合材料',
+      '功能': '全自动环境调节',
+      '适用': '中小型犬/猫',
+      '文件格式': 'GLB, USDZ'
+    },
+    description: '为您的数字宠物打造的顶级居所。集成恒温控制系统与自动清洁功能，让您的宠物在虚拟世界也能享受五星级待遇。'
+  },
+  {
+    id: '11',
+    name: '多维空间猫爬架',
+    category: 'Props',
+    price: 950,
+    image: 'https://images.unsplash.com/photo-1545249390-6bdfa286032f?auto=format&fit=crop&q=80&w=1000',
+    tag: '猫咪乐园',
+    features: ['多层交互', '磨爪材质', '悬浮球玩具'],
+    specs: {
+      '结构': '模块化设计',
+      '交互点': '8个',
+      '高度': '2.5米',
+      '文件格式': 'GLB'
+    },
+    description: '专为数字猫咪设计的立体游乐场。多层错落的空间结构，配合丰富的交互玩具，极大丰富了虚拟宠物的日常活动。'
+  }
+];
+
+const CategoryTabs = ({ activeCategory, onCategoryChange }) => {
+  const categories = [
+    { id: 'Environments', name: '场景', icon: Sun },
+    { id: 'Real Estate', name: '房产', icon: Globe },
+    { id: 'Apparel', name: '服饰', icon: Shirt },
+    { id: 'Props', name: '道具', icon: Box },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="container mx-auto">
-        {/* Page Header */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{t('header.shop')}</h1>
-            <p className="text-gray-600 mt-1">选购虚拟物品，升级您的AI伙伴体验</p>
+    <div className="flex gap-4 p-4 overflow-x-auto no-scrollbar">
+      {categories.map((cat) => (
+        <button
+          key={cat.id}
+          onClick={() => onCategoryChange(cat.id)}
+          className={`flex flex-col items-center gap-2 min-w-[72px] transition-all ${activeCategory === cat.id ? 'opacity-100' : 'opacity-40 grayscale'
+            }`}
+        >
+          <div className={`size-14 rounded-2xl flex items-center justify-center border ${activeCategory === cat.id ? 'bg-[#ec5b13]/10 border-[#ec5b13]/50 text-[#ec5b13]' : 'glass-card border-white/10 text-slate-300'
+            }`}>
+            <cat.icon className="size-6" />
           </div>
-          <div className="mt-4 md:mt-0 flex items-center">
-            <button 
-              onClick={() => setShowCart(!showCart)}
-              className="flex items-center bg-white text-gray-800 px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" />
-              </svg>
-              购物车 ({cart.reduce((total, item) => total + item.quantity, 0)})
-            </button>
-          </div>
-        </div>
-        
-        {/* Category Filter */}
-        <div className="mb-6 bg-white rounded-lg shadow p-4 overflow-x-auto">
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setActiveCategory('all')}
-              className={`px-4 py-2 rounded-lg ${activeCategory === 'all' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              全部
-            </button>
-            <button
-              onClick={() => setActiveCategory('membership')}
-              className={`px-4 py-2 rounded-lg ${activeCategory === 'membership' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              会员服务
-            </button>
-            <button
-              onClick={() => setActiveCategory('character')}
-              className={`px-4 py-2 rounded-lg ${activeCategory === 'character' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              角色装扮
-            </button>
-            <button
-              onClick={() => setActiveCategory('pet')}
-              className={`px-4 py-2 rounded-lg ${activeCategory === 'pet' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              宠物用品
-            </button>
-            <button
-              onClick={() => setActiveCategory('scene')}
-              className={`px-4 py-2 rounded-lg ${activeCategory === 'scene' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              场景背景
-            </button>
-            <button
-              onClick={() => setActiveCategory('digital-human')}
-              className={`px-4 py-2 rounded-lg ${activeCategory === 'digital-human' ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`}
-            >
-              数字人服务
-            </button>
-          </div>
-        </div>
-        
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map(product => (
-            <ProductCard key={product.id} product={product} />
+          <span className={`text-[10px] font-bold uppercase tracking-widest ${activeCategory === cat.id ? 'text-[#ec5b13]' : 'text-slate-400'}`}>
+            {cat.name}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+};
+
+function ProductCard({ product, onClick }) {
+  return (
+    <motion.div
+      layoutId={`card-${product.id}`}
+      onClick={onClick}
+      className="glass-card rounded-2xl overflow-hidden mb-6 cursor-pointer group hover:border-[#ec5b13]/30 transition-colors"
+    >
+      <div className="relative h-64 w-full overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0705]/90 via-transparent to-transparent" />
+
+        <div className="absolute top-3 left-3 flex gap-2">
+          {product.features.slice(0, 2).map((feat, idx) => (
+            <span key={idx} className="text-[9px] font-bold px-2 py-1 bg-black/60 backdrop-blur-md rounded border border-white/10 flex items-center gap-1 uppercase tracking-tighter text-white">
+              {feat}
+            </span>
           ))}
         </div>
-        
-        {/* Shopping Cart Slide-in */}
-        {showCart && (
-          <div className="fixed inset-0 z-50 overflow-hidden" onClick={() => setShowCart(false)}>
-            <div className="absolute inset-0 bg-black bg-opacity-50 transition-opacity"></div>
-            <div className="absolute inset-y-0 right-0 max-w-full flex">
-              <div 
-                className="w-screen max-w-md"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="h-full flex flex-col bg-white shadow-xl">
-                  <div className="flex-1 overflow-y-auto p-6">
-                    <div className="flex items-start justify-between">
-                      <h2 className="text-lg font-medium text-gray-900">购物车</h2>
-                      <button 
-                        onClick={() => setShowCart(false)}
-                        className="ml-3 h-7 w-7 bg-white rounded-full flex items-center justify-center text-gray-400 hover:text-gray-500"
-                      >
-                        <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </div>
-                    
-                    <div className="mt-8">
-                      {cart.length === 0 ? (
-                        <div className="text-center py-10">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          <p className="mt-4 text-gray-500">您的购物车是空的</p>
-                          <button 
-                            onClick={() => setShowCart(false)}
-                            className="mt-4 text-purple-600 hover:text-purple-800"
-                          >
-                            继续购物
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flow-root">
-                          <ul className="-my-6 divide-y divide-gray-200">
-                            {cart.map(item => (
-                              <li key={item.id} className="py-6 flex">
-                                <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
-                                  <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-                                </div>
-                                <div className="ml-4 flex-1 flex flex-col">
-                                  <div>
-                                    <div className="flex justify-between text-base font-medium text-gray-900">
-                                      <h3>{item.name}</h3>
-                                      <p className="ml-4">¥{item.price * item.quantity}</p>
-                                    </div>
-                                    <p className="mt-1 text-sm text-gray-500">{item.description.substring(0, 40)}...</p>
-                                  </div>
-                                  <div className="flex-1 flex items-end justify-between text-sm">
-                                    <div className="flex items-center border rounded">
-                                      <button 
-                                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                        className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                                      >
-                                        -
-                                      </button>
-                                      <span className="px-4 py-1 border-x">{item.quantity}</span>
-                                      <button 
-                                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                        className="px-2 py-1 text-gray-600 hover:bg-gray-100"
-                                      >
-                                        +
-                                      </button>
-                                    </div>
-                                    <div className="flex">
-                                      <button 
-                                        onClick={() => removeFromCart(item.id)}
-                                        className="font-medium text-red-600 hover:text-red-800"
-                                      >
-                                        删除
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {cart.length > 0 && (
-                    <div className="border-t border-gray-200 p-6 space-y-4">
-                      <div className="flex justify-between text-base font-medium text-gray-900">
-                        <p>合计</p>
-                        <p>¥{totalPrice}</p>
-                      </div>
-                      <p className="text-sm text-gray-500">运费与税费将在结账时计算</p>
-                      <div>
-                        <button 
-                          onClick={() => {
-                            alert('此功能仅作演示，不会实际处理支付');
-                          }}
-                          className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition font-medium"
-                        >
-                          支付
-                        </button>
-                      </div>
-                      <div className="flex justify-center">
-                        <button 
-                          onClick={() => setShowCart(false)}
-                          className="text-sm font-medium text-purple-600 hover:text-purple-800"
-                        >
-                          继续购物 →
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+
+        <div className="absolute bottom-4 left-4 right-4 text-white">
+          <p className="text-[10px] text-[#ec5b13] font-black uppercase tracking-[0.2em] mb-1">{product.tag}</p>
+          <h3 className="text-xl font-bold leading-tight">{product.name}</h3>
+        </div>
+      </div>
+
+      <div className="p-4 flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="text-[9px] text-slate-500 uppercase font-black tracking-widest">所有权费用</span>
+          <span className="text-lg font-black tracking-tight text-white">{product.price.toLocaleString()} SOUL</span>
+        </div>
+        <div className="flex gap-2">
+          <button className="px-4 py-2 rounded-xl glass-card text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-colors text-white">
+            预览
+          </button>
+          <button className="px-4 py-2 rounded-xl bg-[#ec5b13] text-white text-[10px] font-bold uppercase tracking-widest neon-glow hover:brightness-110 transition-all">
+            购买
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function ProductDetail({ product, onClose }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] bg-[#0a0705] overflow-y-auto no-scrollbar"
+    >
+      <div className="sticky top-0 z-50 flex items-center justify-between p-6 bg-[#0a0705]/80 backdrop-blur-md">
+        <button onClick={onClose} className="flex items-center justify-center size-10 rounded-full glass-card border-white/10 text-white">
+          <ArrowLeft className="size-5" />
+        </button>
+        <h2 className="text-base font-bold text-white">资产详情</h2>
+        <button className="flex items-center justify-center size-10 rounded-full glass-card border-white/10 text-white">
+          <Share2 className="size-5" />
+        </button>
+      </div>
+
+      <div className="px-6 pb-32 max-w-2xl mx-auto">
+        <motion.div
+          layoutId={`card-${product.id}`}
+          className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/5"
+        >
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0705] via-transparent to-transparent" />
+          <div className="absolute bottom-6 left-6">
+            <span className="px-3 py-1 bg-[#ec5b13] text-white text-[10px] font-black rounded-full tracking-widest uppercase">
+              {product.tag}
+            </span>
+          </div>
+        </motion.div>
+
+        <div className="mt-8">
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-black tracking-tighter mb-1 text-white">{product.name}</h1>
+              <p className="text-[#ec5b13] font-bold text-xs tracking-[0.2em] uppercase opacity-80">{product.category}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-[#ec5b13] text-2xl font-black">{product.price.toLocaleString()}</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tighter">Soul Credits</p>
             </div>
           </div>
-        )}
-        
-        {/* Featured Products */}
-        <div className="mt-10 bg-white rounded-xl shadow-md p-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">会员特权</h2>
-          <div className="bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg overflow-hidden">
-            <div className="md:flex items-center">
-              <div className="md:w-2/3 p-6 md:p-8">
-                <div className="inline-block bg-white bg-opacity-20 px-3 py-1 rounded-full text-white text-sm font-medium mb-3">
-                  限时优惠
-                </div>
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">高级会员年卡</h3>
-                <p className="text-white text-opacity-90 mb-4 max-w-md">
-                  解锁所有高级功能，包括无限对话、优先客服、专属角色定制、VR高级场景等特权。
-                </p>
-                <div className="mb-4">
-                  <span className="text-3xl font-bold text-white">¥298</span>
-                  <span className="text-xl line-through text-white text-opacity-70 ml-2">¥360</span>
-                  <span className="ml-2 bg-yellow-400 text-yellow-800 text-xs font-bold px-2 py-1 rounded">
-                    省¥62
-                  </span>
-                </div>
-                <button 
-                  onClick={() => addToCart(products.find(p => p.id === '2'))}
-                  className="bg-white text-purple-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition"
-                >
-                  立即订购
-                </button>
+
+          <div className="flex gap-2 mt-6 overflow-x-auto pb-2 no-scrollbar">
+            {product.features.map((feat, i) => (
+              <div key={i} className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card border-white/5 shrink-0 text-white">
+                <Zap className="size-3 text-[#ec5b13] fill-[#ec5b13]" />
+                <span className="text-[10px] font-bold uppercase tracking-widest">{feat}</span>
               </div>
-              <div className="md:w-1/3 p-6">
-                <img 
-                  src="/assets/shop/vip-card.png" 
-                  alt="VIP Card" 
-                  className="w-full max-w-xs mx-auto"
-                />
+            ))}
+          </div>
+
+          <div className="mt-8 p-6 rounded-2xl glass-card border-white/5 space-y-4">
+            <h3 className="text-[10px] font-black text-[#ec5b13] tracking-[0.3em] uppercase">设计理念</h3>
+            <p className="text-slate-300 text-sm leading-relaxed font-medium">
+              {product.description}
+            </p>
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            {Object.entries(product.specs).map(([key, val]) => (
+              <div key={key} className="p-4 rounded-2xl glass-card border-white/5 text-white">
+                <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest mb-1">{key}</p>
+                <p className="text-sm font-bold">{val}</p>
               </div>
-            </div>
+            ))}
           </div>
         </div>
+      </div>
+
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-[#0a0705]/95 backdrop-blur-2xl border-t border-white/5 flex items-center gap-4 z-[110]">
+        <button className="flex items-center justify-center size-14 rounded-2xl glass-card border-white/10 text-slate-300 hover:text-primary transition-colors">
+          <Heart className="size-6" />
+        </button>
+        <button className="flex-1 h-14 bg-[#ec5b13] rounded-2xl flex items-center justify-center gap-3 text-white font-black text-sm tracking-widest uppercase shadow-[0_8px_30px_rgba(236,91,19,0.4)] hover:scale-[1.02] transition-transform active:scale-95">
+          <ShoppingCart className="size-5" />
+          <span>购买并部署</span>
+        </button>
+      </div>
+    </motion.div>
+  );
+}
+
+const BottomNav = () => (
+  <nav className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-white/10 px-8 pt-4 pb-8 flex justify-between items-center bg-[#0a0705]/80">
+    <button className="flex flex-col items-center gap-1.5 text-[#ec5b13]">
+      <ShoppingBag className="size-6 fill-[#ec5b13]/20" />
+      <span className="text-[9px] font-black uppercase tracking-widest">商城</span>
+    </button>
+    <button className="flex flex-col items-center gap-1.5 text-slate-500">
+      <Globe className="size-6" />
+      <span className="text-[9px] font-black uppercase tracking-widest">世界</span>
+    </button>
+    <button className="flex flex-col items-center gap-1.5 text-slate-500">
+      <Shirt className="size-6" />
+      <span className="text-[9px] font-black uppercase tracking-widest">衣橱</span>
+    </button>
+    <button className="flex flex-col items-center gap-1.5 text-slate-500">
+      <Users className="size-6" />
+      <span className="text-[9px] font-black uppercase tracking-widest">社交</span>
+    </button>
+    <button className="flex flex-col items-center gap-1.5 text-slate-500">
+      <User className="size-6" />
+      <span className="text-[9px] font-black uppercase tracking-widest">我的</span>
+    </button>
+  </nav>
+);
+
+const ShopPage = () => {
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [activeCategory, setActiveCategory] = useState('Environments');
+
+  const filteredProducts = PRODUCTS.filter(p => p.category === activeCategory);
+
+  const categoryTitles = {
+    'Environments': { title: '精选生活空间', subtitle: '数字人沉浸式体验' },
+    'Real Estate': { title: '顶级数字房产', subtitle: '独一无二的虚拟居所' },
+    'Apparel': { title: '数字高定服饰', subtitle: '展现您的虚拟个性' },
+    'Props': { title: '交互式数字道具', subtitle: '丰富您的虚拟生活' },
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col w-full max-w-7xl mx-auto relative shadow-[0_0_100px_rgba(0,0,0,0.5)] bg-[#0a0705]">
+      <style>{`
+        .glass-card {
+          background: rgba(255, 255, 255, 0.05);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .neon-glow {
+          box-shadow: 0 0 20px rgba(236, 91, 19, 0.3);
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+      `}</style>
+
+      <div className="pt-24 flex-1 flex flex-col">
+        <main className="flex-1 overflow-y-auto no-scrollbar pb-32">
+          <div className="max-w-4xl mx-auto">
+            <CategoryTabs activeCategory={activeCategory} onCategoryChange={setActiveCategory} />
+          </div>
+
+          <section className="px-4 py-4 md:px-8 lg:px-12">
+            <div className="flex items-end justify-between mb-8 max-w-4xl mx-auto lg:max-w-none text-white">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-black tracking-tighter">
+                  {categoryTitles[activeCategory].title}
+                </h2>
+                <p className="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">
+                  {categoryTitles[activeCategory].subtitle}
+                </p>
+              </div>
+              <button className="text-[10px] md:text-xs text-[#ec5b13] font-black uppercase tracking-widest">查看全部</button>
+            </div>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeCategory}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={() => setSelectedProduct(product)}
+                  />
+                ))}
+              </motion.div>
+            </AnimatePresence>
+          </section>
+        </main>
+
+        <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-center pointer-events-none">
+          <div className="w-full max-w-md pointer-events-auto">
+            <BottomNav />
+          </div>
+        </div>
+
+        <AnimatePresence>
+          {selectedProduct && (
+            <ProductDetail
+              product={selectedProduct}
+              onClose={() => setSelectedProduct(null)}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

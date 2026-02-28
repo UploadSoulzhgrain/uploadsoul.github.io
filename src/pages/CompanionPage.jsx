@@ -22,7 +22,10 @@ const CompanionPage = () => {
         <div className="layout-container flex h-full grow flex-col">
           {/* Top Navigation Bar */}
           <header className="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#f3ece7] px-6 md:px-10 py-4 bg-[#f8f7f6]/80 backdrop-blur-md sticky top-0 z-50">
-            <div className="flex items-center gap-3 md:gap-4 text-[#1b130d]">
+            <div
+              className="flex items-center gap-3 md:gap-4 text-[#1b130d] cursor-pointer"
+              onClick={() => navigate(l('/'))}
+            >
               <div className="text-[#ee7c2b]">
                 <span className="material-symbols-outlined text-3xl md:text-4xl">cloud_upload</span>
               </div>
