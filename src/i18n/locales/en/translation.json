@@ -275,6 +275,10 @@
         "title": "Virtual Pet",
         "description": "Create and interact with digital pets that provide comfort and companionship."
       },
+      "shop": {
+        "title": "Virtual Shop",
+        "description": "Premium virtual assets to build your immersive digital living space"
+      },
       "vrExperience": {
         "title": "VR Experience",
         "description": "Immerse yourself in virtual reality interactions with your digital companions."

@@ -33,7 +33,8 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       ),
-      link: '/companion'
+      link: '/companion',
+      image: 'https://images.unsplash.com/photo-1516110833967-0b5716ca1387?auto=format&fit=crop&q=80&w=1000'
     },
     {
       id: 'love',
@@ -41,10 +42,11 @@ const HomePage = () => {
       desc: t('virtualLove.description'),
       icon: (
         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z" />
         </svg>
       ),
-      link: '/virtual-love'
+      link: '/virtual-love',
+      image: 'https://images.unsplash.com/photo-1518196775741-201ef597dead?auto=format&fit=crop&q=80&w=1000'
     },
     {
       id: 'pet',
@@ -55,7 +57,8 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
         </svg>
       ),
-      link: '/pet'
+      link: '/pet',
+      image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=1000'
     },
     {
       id: 'rebirth',
@@ -66,7 +69,8 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
       ),
-      link: '/digital-rebirth'
+      link: '/digital-rebirth',
+      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1000'
     },
     {
       id: 'immortality',
@@ -77,7 +81,20 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
         </svg>
       ),
-      link: '/digital-immortality'
+      link: '/digital-immortality',
+      image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&q=80&w=1000'
+    },
+    {
+      id: 'shop',
+      title: t('home.features.shop.title'),
+      desc: t('home.features.shop.description'),
+      icon: (
+        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      ),
+      link: '/shop',
+      image: '/assets/cloud_snowy_estate.png'
     }
   ];
 
@@ -302,34 +319,46 @@ const HomePage = () => {
           </div>
 
           {/* 功能网格 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
             {features.map((feature, index) => (
               <div
                 key={feature.id}
                 onClick={() => handleAction(feature.link)}
-                className={`card-premium p-8 group cursor-pointer ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                className={`card-premium relative overflow-hidden group cursor-pointer flex flex-col p-8 transition-all hover:bg-white/5 ${index === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
               >
-                {/* 图标 */}
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6 text-amber-500 group-hover:text-amber-400 transition-colors">
-                  {feature.icon}
+                {/* Image Background Layer */}
+                <div className="absolute inset-0 z-0">
+                  <img
+                    src={feature.image}
+                    alt=""
+                    className="w-full h-full object-cover opacity-[0.08] blur-[1px] transition-all duration-700 group-hover:scale-110 group-hover:opacity-[0.15]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-transparent to-transparent opacity-40" />
                 </div>
 
-                {/* 标题 */}
-                <h3 className="text-xl font-semibold mb-3 group-hover:text-amber-500 transition-all">
-                  {feature.title}
-                </h3>
+                <div className="relative z-10 flex-1 flex flex-col">
+                  {/* 图标 */}
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center mb-6 text-amber-500 group-hover:text-amber-400 transition-colors">
+                    {feature.icon}
+                  </div>
 
-                {/* 描述 */}
-                <p className="text-white/50 text-sm leading-relaxed line-clamp-2">
-                  {feature.desc}
-                </p>
+                  {/* 标题 */}
+                  <h3 className="text-xl font-semibold mb-3 group-hover:text-amber-500 transition-all">
+                    {feature.title}
+                  </h3>
 
-                {/* 箭头 */}
-                <div className="mt-6 flex items-center text-white/30 group-hover:text-amber-500 transition-colors">
-                  <span className="text-sm">{t('common.startExperience')}</span>
-                  <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  {/* 描述 */}
+                  <p className="text-white/50 text-sm leading-relaxed line-clamp-2">
+                    {feature.desc}
+                  </p>
+
+                  {/* 箭头 - Pushed to bottom */}
+                  <div className="mt-auto pt-8 flex items-center text-white/30 group-hover:text-amber-500 transition-colors">
+                    <span className="text-sm">{t('common.startExperience')}</span>
+                    <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             ))}
