@@ -155,10 +155,10 @@ app.post('/api/chat', async (req, res) => {
  */
 async function handleVolcengineChat(req, res, avatarType) {
     try {
-        const { volcengineLLMStream } = await import('./api/lib/volcengine-llm.js');
-        const { streamTTS } = await import('./api/lib/volcengine-tts.js');
-        const { transcribeBuffer } = await import('./api/lib/volcengine-asr.js');
-        const { supabaseService } = await import('./api/lib/supabase-server.js');
+        const { volcengineLLMStream } = await import('./api/_lib/volcengine-llm.js');
+        const { streamTTS } = await import('./api/_lib/volcengine-tts.js');
+        const { transcribeBuffer } = await import('./api/_lib/volcengine-asr.js');
+        const { supabaseService } = await import('./api/_lib/supabase-server.js');
 
         let fields = {};
         let files = {};
@@ -359,8 +359,8 @@ app.post('/api/virtual-lover/chat', async (req, res) => {
     console.log('>>> Incoming Virtual Lover Chat Request');
     console.log('Content-Type:', req.headers['content-type']);
     try {
-        const { siliconFlowService } = await import('./api/lib/siliconflow.js');
-        const { supabaseService } = await import('./api/lib/supabase-server.js');
+        const { siliconFlowService } = await import('./api/_lib/siliconflow.js');
+        const { supabaseService } = await import('./api/_lib/supabase-server.js');
 
         let fields = {};
         let files = {};
@@ -550,7 +550,7 @@ app.post('/api/virtual-lover/chat', async (req, res) => {
 app.post('/api/pet/reconstruct', async (req, res) => {
     console.log('>>> Incoming Pet Reconstruction Request');
     try {
-        const { supabaseService } = await import('./api/lib/supabase-server.js');
+        const { supabaseService } = await import('./api/_lib/supabase-server.js');
         const form = formidable({ multiples: false });
 
         const [fields, files] = await new Promise((resolve, reject) => {
