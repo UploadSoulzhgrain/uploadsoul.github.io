@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BrowserRouter as Router, Routes, Route, useLocation, useParams, Outlet } from 'react-router-dom'
+import { Toaster } from 'react-hot-toast'
 import { I18nextProvider, useTranslation } from 'react-i18next'
 import i18n from './i18n/i18n'
 import Header from './components/layout/Header'
@@ -157,6 +158,7 @@ const BusinessRoutes = () => (
   </>
 );
 
+
 function App() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
@@ -179,6 +181,7 @@ function App() {
 
   return (
     <I18nextProvider i18n={i18n}>
+      <Toaster position="top-center" reverseOrder={false} />
       <Router>
         <ScrollToTop />
         <Routes>
