@@ -46,15 +46,15 @@
   ],
   "functions": {
     "api/chat.js": {
-      "maxDuration": 60,
+      "maxDuration": 10,
       "runtime": "nodejs20.x"
     },
     "api/volcengine-chat.js": {
-      "maxDuration": 200,
+      "maxDuration": 10,
       "runtime": "nodejs20.x"
     },
     "api/heygen-token.js": {
-      "maxDuration": 30
+      "maxDuration": 10
     }
   }
 }
