@@ -4,6 +4,18 @@
   "cleanUrls": true,
   "rewrites": [
     {
+      "source": "/api/chat",
+      "destination": "/api/chat.js"
+    },
+    {
+      "source": "/api/heygen-token",
+      "destination": "/api/heygen-token.js"
+    },
+    {
+      "source": "/api/(virtual-lover|companion|senior-care|mental|immortality|rebirth)/chat",
+      "destination": "/api/volcengine-chat.js"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
@@ -34,7 +46,12 @@
   ],
   "functions": {
     "api/chat.js": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "runtime": "nodejs20.x"
+    },
+    "api/volcengine-chat.js": {
+      "maxDuration": 200,
+      "runtime": "nodejs20.x"
     },
     "api/heygen-token.js": {
       "maxDuration": 30

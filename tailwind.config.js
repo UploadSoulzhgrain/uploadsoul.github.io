@@ -54,6 +54,14 @@ export default {
         "border-sepia": "#D7C4A5",
         "soft-sepia": "#F2E8D5",
         "ink-brown": "#2D241E",
+        // Soul Pet Hub Palette
+        "soulpet": {
+          "primary": "#C2936C",
+          "bg-light": "#f4f0eb",
+          "bg-dark": "#221F1D",
+          "surface": "#2D2B2A",
+          "cream": "#E0DEDC",
+        },
       },
       fontFamily: {
         'serif': ['Playfair Display', 'serif'],

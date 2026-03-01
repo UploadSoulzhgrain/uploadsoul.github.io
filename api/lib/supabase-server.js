@@ -16,37 +16,42 @@ export const supabaseService = {
      * Upload buffer to Supabase Storage
      * @param {Buffer} buffer 
      * @param {string} path 
+     * @param {string} bucket
+     * @param {string} contentType
      * @returns {Promise<string>} Public URL
      */
-    async uploadAudio(buffer, path) {
+    async uploadMedia(buffer, path, bucket = 'audio_responses', contentType = 'audio/mpeg') {
         try {
-            console.log(`Uploading to Supabase bucket: audio_responses, path: ${path}`);
+            console.log(`Uploading to Supabase bucket: ${bucket}, path: ${path}`);
             const { data, error } = await supabase.storage
-                .from('audio_responses')
+                .from(bucket)
                 .upload(path, buffer, {
-                    contentType: 'audio/mpeg',
+                    contentType: contentType,
                     upsert: true
                 });
 
             if (error) {
                 console.warn('Supabase Storage Error (Initial):', error.message);
-                // If it's a 404/400 (bucket not found), we log it specifically
                 if (error.statusCode === '404' || error.status === 400) {
-                    throw new Error('Supabase bucket "audio_responses" not found. Please create it in your Supabase dashboard.');
+                    throw new Error(`Supabase bucket "${bucket}" not found. Please create it in your Supabase dashboard.`);
                 }
                 throw error;
             }
 
             const { data: { publicUrl } } = supabase.storage
-                .from('audio_responses')
+                .from(bucket)
                 .getPublicUrl(path);
 
             return publicUrl;
         } catch (error) {
             console.error('Supabase Service Exception:', error.message);
-            // Fallback for demo/dev purposes if bucket is missing
             return `https://placeholder-url.com/${path}?error=${encodeURIComponent(error.message)}`;
         }
+    },
+
+    // Legacy method for backward compatibility
+    async uploadAudio(buffer, path) {
+        return this.uploadMedia(buffer, path, 'audio_responses', 'audio/mpeg');
     },
 
     /**
@@ -68,6 +73,32 @@ export const supabaseService = {
         if (error) {
             console.error('Supabase Database Error:', error);
             // We don't throw here to avoid failing the whole request if DB save fails
+        }
+    },
+
+    /**
+     * Store pet reconstruction request
+     * @param {Object} data 
+     */
+    async savePetReconstruction(data) {
+        const { error } = await supabase
+            .from('pet_reconstructions')
+            .insert({
+                user_id: data.userId,
+                pet_name: data.petName,
+                photo_url: data.photoUrl,
+                audio_url: data.audioUrl,
+                video_url: data.videoUrl,
+                mode: data.mode,
+                memories: data.memories,
+                anniversary_reminder: data.anniversaryReminder,
+                status: 'pending',
+                created_at: new Date().toISOString()
+            });
+
+        if (error) {
+            console.error('Supabase savePetReconstruction Error:', error);
+            throw error;
         }
     }
 };
