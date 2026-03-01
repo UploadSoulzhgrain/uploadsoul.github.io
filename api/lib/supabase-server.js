@@ -12,17 +12,10 @@ if (!supabaseUrl || !supabaseKey) {
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
 export const supabaseService = {
-    /**
-     * Upload buffer to Supabase Storage
-     * @param {Buffer} buffer 
-     * @param {string} path 
-     * @param {string} bucket
-     * @param {string} contentType
-     * @returns {Promise<string>} Public URL
-     */
     async uploadMedia(buffer, path, bucket = 'audio_responses', contentType = 'audio/mpeg') {
         try {
             console.log(`Uploading to Supabase bucket: ${bucket}, path: ${path}`);
+
             const { data, error } = await supabase.storage
                 .from(bucket)
                 .upload(path, buffer, {
