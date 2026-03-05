@@ -1328,7 +1328,8 @@
       "placeholder": "输入消息...",
       "waitConnect": "请先开启连接...",
       "title": "海外交互日志",
-      "ready": "等待会话开始..."
+      "ready": "等待会话开始...",
+      "startVoiceChat": "点击开始说话"
     },
     "controls": {
       "start": "启动数字人助手",

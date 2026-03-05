@@ -1,0 +1,29 @@
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:3000...
+* Established connection to localhost (::1 port 3000) from ::1 port 49205 
+* using HTTP/1.x
+> GET /api/speech-token HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.16.0
+> Accept: */*
+> 
+* Request completely sent off
+  0     0    0     0    0     0      0      0 --:--:--  0:00:01 --:--:--     0< HTTP/1.1 200 OK
+< cache-control: public, max-age=0, must-revalidate
+< server: Vercel
+< x-vercel-id: dev1::dev1::agrrf-1772604819948-47c4521dacd4
+< x-vercel-cache: MISS
+< connection: close
+< content-length: 800
+< content-type: application/json; charset=utf-8
+< date: Wed, 04 Mar 2026 06:13:40 GMT
+< etag: W/"320-iMJJU4NG3WT5qj1lu4gixS0Chf8"
+< 
+{ [800 bytes data]
+100   800  100   800    0     0    632      0  0:00:01  0:00:01 --:--:--   632
+* shutting down connection #0
+{"token":"eyJhbGciOiJFUzI1NiIsImtpZCI6ImtleTEiLCJ0eXAiOiJKV1QifQ.eyJyZWdpb24iOiJlYXN0dXMyIiwic3Vic2NyaXB0aW9uLWlkIjoiY2UxNjllZGNhMGE3NDNjODg3ZDY3Yzc0N2JjZTExMGIiLCJwcm9kdWN0LWlkIjoiU3BlZWNoU2VydmljZXMuUzAiLCJjb2duaXRpdmUtc2VydmljZXMtZW5kcG9pbnQiOiJodHRwczovL2FwaS5jb2duaXRpdmUubWljcm9zb2Z0LmNvbS9pbnRlcm5hbC92MS4wLyIsImF6dXJlLXJlc291cmNlLWlkIjoiL3N1YnNjcmlwdGlvbnMvMzYwYjBiZTgtMzZiYi00NWIzLTllMGItMjNmZjAxNjI2ZGFmL3Jlc291cmNlR3JvdXBzL1VwbG9hZFNvdWxNVlBVUy9wcm92aWRlcnMvTWljcm9zb2Z0LkNvZ25pdGl2ZVNlcnZpY2VzL2FjY291bnRzL1VwbG9hZFNvdWxNVlBVUyIsInNjb3BlIjoic3BlZWNoc2VydmljZXMiLCJhdWQiOiJ1cm46bXMuc3BlZWNoc2VydmljZXMuZWFzdHVzMiIsImV4cCI6MTc3MjYwNTQyMCwiaXNzIjoidXJuOm1zLmNvZ25pdGl2ZXNlcnZpY2VzIn0.ZiHk17KurLRY47EhICBGNnGmBrUwQdq7l_HbZ1QTLtTI32F62Aj3P7UyfhQpfSLuxBbsI-s5Ff3W6xz07WIF5A","region":"eastus2"}
