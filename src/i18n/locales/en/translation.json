@@ -1281,7 +1281,8 @@
       "placeholder": "Type a message...",
       "waitConnect": "Please connect first...",
       "title": "Overseas Interaction Log",
-      "ready": "Waiting for session to start..."
+      "ready": "Waiting for session to start...",
+      "startVoiceChat": "Click to Start Talking"
     },
     "controls": {
       "start": "Launch Digital Human",

@@ -1,42 +1,52 @@
 /**
- * api/index.js — Unified API Router
+ * api/index.js — Unified API Router for Vercel
  * 
- * All API endpoints consolidated into a single Vercel Serverless Function.
- * Dispatches requests based on URL path.
- * 
- * This keeps the project under Vercel Hobby plan's 12-function limit
- * and future-proofs against new API additions.
+ * Consolidates all API endpoints into a single Serverless Function.
+ * Dispatches requests based on the URL path.
  */
 
 import { AzureOpenAI } from "openai";
-import axios from 'axios';
 import formidable from 'formidable';
 import fs from 'fs';
 
 // ──────────────────────────────────────────────
-// Route: /api/chat (POST) — Azure OpenAI Chat
+// Helpers
 // ──────────────────────────────────────────────
+const sseHeaders = {
+    'Content-Type': 'text/event-stream; charset=utf-8',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'X-Accel-Buffering': 'no'
+};
+
+// ──────────────────────────────────────────────
+// Routes
+// ──────────────────────────────────────────────
+
+/**
+ * Azure OpenAI Chat
+ */
 async function handleChat(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
-    const { message, preferred_language } = req.body;
-    if (!message) {
-        return res.status(400).json({ error: 'Message is required' });
-    }
-
-    const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
-    const azureApiKey = process.env.AZURE_OPENAI_KEY;
-    const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4';
-    const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-12-01-preview';
-
-    if (!endpoint || !azureApiKey) {
-        console.error('Azure OpenAI credentials missing');
-        return res.status(500).json({ error: 'Azure OpenAI credentials are not configured' });
-    }
-
     try {
+        const body = await new Promise((resolve, reject) => {
+            let data = '';
+            req.on('data', chunk => { data += chunk; });
+            req.on('end', () => {
+                try { resolve(data ? JSON.parse(data) : {}); }
+                catch (e) { reject(e); }
+            });
+        });
+
+        const { message, preferred_language } = body || {};
+        const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+        const azureApiKey = process.env.AZURE_OPENAI_KEY;
+        const deploymentName = process.env.AZURE_OPENAI_DEPLOYMENT_NAME || 'gpt-4';
+        const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-12-01-preview';
+
+        if (!endpoint || !azureApiKey) {
+            return res.status(500).json({ error: 'Azure OpenAI credentials missing' });
+        }
+
         const client = new AzureOpenAI({
             endpoint,
             apiKey: azureApiKey,
@@ -44,11 +54,7 @@ async function handleChat(req, res) {
             deployment: deploymentName,
         });
 
-        const langHint = preferred_language === 'cantonese'
-            ? '请用粤语回复。'
-            : preferred_language === 'english'
-                ? 'Please reply in English.'
-                : '请用普通话回复。';
+        const langHint = preferred_language === 'cantonese' ? '请用粤语回复。' : preferred_language === 'english' ? 'Please reply in English.' : '请用普通话回复。';
 
         const result = await client.chat.completions.create({
             messages: [
@@ -58,366 +64,222 @@ async function handleChat(req, res) {
             model: deploymentName,
         });
 
-        const reply = result.choices[0].message.content;
-        res.status(200).json({ reply });
+        res.status(200).json({ reply: result.choices[0].message.content });
     } catch (error) {
-        console.error('Error with Azure OpenAI:', error);
-        res.status(500).json({ error: `Failed to get chat completion: ${error.message}` });
+        res.status(500).json({ error: error.message });
     }
 }
 
-// ──────────────────────────────────────────────
-// Route: /api/diagnose (GET) — Environment Check
-// ──────────────────────────────────────────────
-function handleDiagnose(req, res) {
-    const envCheck = {
-        speechKey: !!process.env.AZURE_SPEECH_KEY,
-        speechRegion: !!process.env.AZURE_SPEECH_REGION,
-        openaiKey: !!process.env.AZURE_OPENAI_KEY,
-        env: process.env.NODE_ENV
-    };
-    res.status(200).json({ status: 'ok', checks: envCheck });
-}
-
-// ──────────────────────────────────────────────
-// Route: /api/heygen-token (GET) — HeyGen Token
-// ──────────────────────────────────────────────
-async function handleHeygenToken(req, res) {
-    if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
-    const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY || 'sk_V2_hgu_kUJuwlf4dLH_ljzwKlF1jsoS7UPRqkPLPmSj3fX2wG34';
-
-    try {
-        const response = await axios.post('https://api.heygen.com/v1/streaming.create_token', null, {
-            headers: {
-                'x-api-key': HEYGEN_API_KEY
-            }
-        });
-        res.status(200).json({ token: response.data.data.token });
-    } catch (err) {
-        console.error('HeyGen Token Error:', err.response?.data || err.message);
-        res.status(500).json({ error: 'Failed to fetch HeyGen token' });
-    }
-}
-
-// ──────────────────────────────────────────────
-// Route: /api/ice-servers (GET) — Azure ICE Relay
-// ──────────────────────────────────────────────
-async function handleIceServers(req, res) {
-    const speechKey = process.env.AZURE_SPEECH_KEY;
-    const speechRegion = process.env.AZURE_SPEECH_REGION;
-
-    if (!speechKey || !speechRegion) {
-        console.error('Azure Speech credentials missing in environment');
-        return res.status(500).json({ error: 'Azure Speech credentials are not configured' });
-    }
-
-    try {
-        const relayEndpoint = `https://${speechRegion}.tts.speech.microsoft.com/cognitiveservices/avatar/relay/token/v1`;
-        const response = await axios.get(relayEndpoint, {
-            headers: {
-                'Ocp-Apim-Subscription-Key': speechKey
-            }
-        });
-
-        const data = response.data;
-        res.status(200).json({
-            urls: data.Urls || data.urls,
-            username: data.Username || data.username,
-            credential: data.Password || data.password || data.credential
-        });
-    } catch (error) {
-        console.error('ICE Servers Error:', error.response?.data || error.message);
-        res.status(500).json({ error: 'Failed to fetch ICE servers' });
-    }
-}
-
-// ──────────────────────────────────────────────
-// Route: /api/speech-token (GET/POST) — Azure Speech Token
-// ──────────────────────────────────────────────
+/**
+ * Azure Speech Token
+ */
 async function handleSpeechToken(req, res) {
     const speechKey = process.env.AZURE_SPEECH_KEY;
     const speechRegion = process.env.AZURE_SPEECH_REGION;
 
     if (!speechKey || !speechRegion) {
-        return res.status(500).json({ error: 'Azure Speech credentials are not configured' });
+        return res.status(500).json({ error: 'Azure Speech credentials missing' });
     }
-
-    const fetchOptions = {
-        method: 'POST',
-        headers: {
-            'Ocp-Apim-Subscription-Key': speechKey,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        }
-    };
 
     try {
-        const response = await fetch(`https://${speechRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, fetchOptions);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch token: ${response.statusText}`);
-        }
+        const fetchTokenEndpoint = `https://${speechRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`;
+        const response = await fetch(fetchTokenEndpoint, {
+            method: 'POST',
+            headers: { 'Ocp-Apim-Subscription-Key': speechKey, 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
         const token = await response.text();
         res.status(200).json({ token, region: speechRegion });
-    } catch (error) {
-        console.error('Error fetching speech token:', error);
-        res.status(500).json({ error: 'Failed to fetch speech token' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 }
 
-// ──────────────────────────────────────────────
-// Route: /api/virtual-lover/prewarm (GET)
-// ──────────────────────────────────────────────
-function handlePrewarm(req, res) {
-    res.status(200).json({ status: 'ok', message: 'Volcengine chain ready' });
-}
+/**
+ * Azure ICE Relay Servers
+ */
+async function handleIceServers(req, res) {
+    const speechKey = process.env.AZURE_SPEECH_KEY;
+    const speechRegion = process.env.AZURE_SPEECH_REGION;
 
-// ──────────────────────────────────────────────
-// Route: /api/virtual-lover/chat (POST) — SiliconFlow Pipeline
-// ──────────────────────────────────────────────
-async function handleVirtualLoverChat(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+    if (!speechKey || !speechRegion) {
+        return res.status(500).json({ error: 'Azure Speech credentials missing' });
     }
 
-    const { siliconFlowService } = await import('./_lib/siliconflow.js');
+    try {
+        const relayEndpoint = `https://${speechRegion}.tts.speech.microsoft.com/cognitiveservices/avatar/relay/token/v1`;
+        const response = await fetch(relayEndpoint, {
+            headers: { 'Ocp-Apim-Subscription-Key': speechKey }
+        });
+        const data = await response.json();
+        res.status(200).json({
+            urls: data.Urls || data.urls,
+            username: data.Username || data.username,
+            credential: data.Password || data.password || data.credential
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+/**
+ * HeyGen Token
+ */
+async function handleHeygenToken(req, res) {
+    const key = process.env.HEYGEN_API_KEY;
+    if (!key) return res.status(500).json({ error: 'HeyGen API key missing' });
+
+    try {
+        const response = await fetch('https://api.heygen.com/v1/streaming.create_token', {
+            method: 'POST',
+            headers: { 'x-api-key': key, 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        res.status(200).json({ token: data.data.token });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
+
+/**
+ * Volcengine SSE Chain (ASR -> LLM -> TTS)
+ */
+async function handleVolcengineChat(req, res, avatarTypeOverride = null) {
+    const { volcengineLLMStream } = await import('./_lib/volcengine-llm.js');
+    const { streamTTS } = await import('./_lib/volcengine-tts.js');
+    const { transcribeBuffer } = await import('./_lib/volcengine-asr.js');
     const { supabaseService } = await import('./_lib/supabase-server.js');
 
     const form = formidable({ multiples: false });
-
     try {
         const [fields, files] = await new Promise((resolve, reject) => {
-            form.parse(req, (err, fields, files) => {
-                if (err) reject(err);
-                resolve([fields, files]);
-            });
+            form.parse(req, (err, f, fi) => err ? reject(err) : resolve([f, fi]));
         });
 
+        const get = (key, def = '') => Array.isArray(fields[key]) ? fields[key][0] : (fields[key] ?? def);
+
+        const avatarType = avatarTypeOverride || get('avatarType', 'general');
+        const message = get('message');
+        const userId = get('userId', '00000000-0000-4000-8000-000000000000');
+        const characterId = get('characterId', '汐月');
+        const characterName = get('characterName', characterId);
+        const gender = get('gender', 'female');
+        const endpointId = get('endpointId', '');
+        const voiceId = get('voiceId', '');
         const audioFile = files.audio?.[0] || files.audio;
-        const userId = fields.userId?.[0] || fields.userId;
-        const characterId = fields.characterId?.[0] || fields.characterId;
 
-        if (!audioFile) {
-            return res.status(400).json({ error: 'Audio file is required' });
+        // 1. ASR
+        let userText = message;
+        if (audioFile) {
+            const buffer = fs.readFileSync(audioFile.filepath);
+            userText = await transcribeBuffer(buffer, audioFile.mimetype || 'audio/webm');
         }
-
-        // 1. ASR: Transcribe
-        const audioBuffer = fs.readFileSync(audioFile.filepath);
-        const userText = await siliconFlowService.transcribe(audioBuffer);
 
         if (!userText) {
-            return res.status(200).json({ reply: '我没听清，请再说一次？', audioUrl: null });
+            return res.status(400).json({ error: 'Input empty' });
         }
 
-        // 2. LLM: Get Reply
-        const messages = [
-            { role: 'system', content: `你是一个名为${characterId || '数字人'}的虚拟恋人。你温柔、体贴，旨在为用户提供情感陪伴。请保持回答简短且充满感情。` },
-            { role: 'user', content: userText }
-        ];
-        const aiText = await siliconFlowService.chat(messages);
+        // 2. SSE Setup
+        res.writeHead(200, sseHeaders);
+        const sse = (obj) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+        sse({ type: 'userText', text: userText });
 
-        // 3. TTS: Synthesize
-        const aiAudioBuffer = await siliconFlowService.synthesize(aiText);
+        // 3. Chain
+        let fullAiText = '';
+        let sentenceBuffer = '';
+        const endings = /[。！？!？\n]/;
 
-        // 4. Persistence: Upload & Save
-        const fileName = `${userId || 'anon'}_${Date.now()}.mp3`;
-        const audioUrl = await supabaseService.uploadAudio(aiAudioBuffer, fileName);
-
-        await supabaseService.saveChatRecord({
-            userId,
-            characterId,
-            userText,
-            aiText,
-            audioUrl
-        });
-
-        // 5. Response
-        res.status(200).json({
-            userText,
-            aiText,
-            audioUrl
-        });
-
-    } catch (error) {
-        console.error('Orchestration Error:', error);
-        res.status(500).json({ error: error.message || 'Internal Server Error' });
-    }
-}
-
-// ──────────────────────────────────────────────
-// Route: /api/(volcengine-pattern)/chat (POST) — Volcengine SSE Pipeline
-// ──────────────────────────────────────────────
-async function handleVolcengineChat(req, res) {
-    if (req.method !== 'POST') {
-        res.setHeader('Allow', 'POST');
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
-    const { volcengineLLMStream } = await import('./_lib/volcengine-llm.js');
-    const { streamTTS } = await import('./_lib/volcengine-tts.js');
-    const { createRealtimeASR } = await import('./_lib/volcengine-asr.js');
-
-    // Determine avatar type from path
-    const url = new URL(req.url, 'http://localhost');
-    let avatarType = 'general';
-    if (url.pathname.includes('senior-care')) avatarType = 'senior';
-    else if (url.pathname.includes('virtual-lover')) avatarType = 'lover';
-    else if (url.pathname.includes('companion')) avatarType = 'companion';
-    else if (url.pathname.includes('mental')) avatarType = 'mental';
-    else if (url.pathname.includes('immortality')) avatarType = 'immortality';
-    else if (url.pathname.includes('rebirth')) avatarType = 'rebirth';
-
-    const form = formidable({ multiples: false });
-
-    try {
-        const [fields, files] = await new Promise((resolve, reject) => {
-            form.parse(req, (err, fields, files) => {
-                if (err) reject(err);
-                resolve([fields, files]);
-            });
-        });
-
-        const userText = fields.message?.[0] || fields.message;
-        const charName = fields.characterName?.[0] || fields.characterName || 'AI助手';
-        const audioFile = files.audio?.[0] || files.audio;
-
-        // 1. Set up SSE
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-
-        const sendEvt = (type, data) => {
-            res.write(`data: ${JSON.stringify({ type, ...data })}\n\n`);
+        const processTTS = async (sentence) => {
+            if (!sentence.trim()) return;
+            sse({ type: 'sentence_start', text: sentence });
+            try {
+                await streamTTS(sentence, avatarType, voiceId || undefined, (chunk) => {
+                    sse({ type: 'audio_chunk', data: chunk.toString('base64') });
+                }, () => sse({ type: 'sentence_done', text: sentence }), null, null);
+            } catch (e) { console.error('TTS error', e); }
         };
 
-        const signal = req.signal;
-
-        // 2. ASR (if audio provided)
-        let processedText = userText;
-        if (audioFile) {
-            sendEvt('status', { message: '正在识别语音...' });
-            const audioBuffer = fs.readFileSync(audioFile.filepath);
-            const asr = createRealtimeASR();
-            processedText = await asr.transcribeBuffer(audioBuffer);
-            sendEvt('userText', { text: processedText });
-        }
-
-        if (!processedText) {
-            sendEvt('error', { message: '未检测到输入内容' });
-            return res.end();
-        }
-
-        // 3. LLM + TTS Pipeline
-        let fullAiText = '';
-        let ttsActive = false;
-
+        let firstDone = false;
         await volcengineLLMStream({
-            messages: [{ role: 'user', content: processedText }],
-            avatarType,
-            characterName: charName,
-            signal,
+            messages: [{ role: 'user', content: userText }],
+            avatarType, characterName, gender, endpointId: endpointId || undefined,
             onToken: (token) => {
                 fullAiText += token;
-                sendEvt('token', { token });
+                sentenceBuffer += token;
+                sse({ type: 'token', text: token });
+                if (endings.test(sentenceBuffer)) {
+                    const match = sentenceBuffer.match(endings);
+                    const idx = sentenceBuffer.indexOf(match[0]);
+                    const sentence = sentenceBuffer.slice(0, idx + 1);
+                    sentenceBuffer = sentenceBuffer.slice(idx + 1);
+                    processTTS(sentence);
+                    firstDone = true;
+                }
             },
-            onFirstSentence: (sentence) => {
-                if (signal?.aborted) return;
-                ttsActive = true;
-                streamTTS(sentence, avatarType, (chunk) => {
-                    if (signal?.aborted) return;
-                    sendEvt('audio', { audio: chunk.toString('base64') });
-                }).catch(err => console.error('[TTS Error]', err));
-            },
-            onDone: (full) => {
-                sendEvt('done', { fullText: full });
-                setTimeout(() => { if (!res.writableEnded) res.end(); }, 3000);
+            onFirstSentence: (s) => { if (!firstDone) processTTS(s); },
+            onDone: async (full) => {
+                if (sentenceBuffer.trim()) await processTTS(sentenceBuffer.trim());
+                try {
+                    await supabaseService.saveChatRecord({ userId, characterId, userText, aiText: full, audioUrl: null });
+                } catch (e) { }
+                sse({ type: 'done', fullText: full });
+                res.end();
             }
         });
 
     } catch (err) {
-        console.error('[Volcengine SSE Error]', err);
-        if (!res.writableEnded) {
-            res.write(`data: ${JSON.stringify({ type: 'error', message: err.message })}\n\n`);
-            res.end();
-        }
+        console.error('SSE pipeline error:', err);
+        if (!res.headersSent) res.status(500).json({ error: err.message });
+        else res.end();
     }
 }
 
-// ══════════════════════════════════════════════
-//  UNIVERSAL ROUTER
-// ══════════════════════════════════════════════
+// ──────────────────────────────────────────────
+// Universal Router
+// ──────────────────────────────────────────────
 
-// Disable default body parser for multipart routes
 export const config = {
-    api: {
-        bodyParser: false,
-    },
+    api: { bodyParser: false }
 };
 
 export default async function handler(req, res) {
-    // Parse the route from the URL
-    const url = new URL(req.url, 'http://localhost');
-    const pathname = url.pathname;
+    const pathname = (req.url || '').replace(/^\/api/, '').replace(/\/$/, '').split('?')[0];
 
-    console.log(`[API Router] ${req.method} ${pathname}`);
-
-    // ── Exact path matches ──
-    if (pathname === '/api/chat') {
-        // Body parser needed for this route — parse manually
-        if (!req.body && req.method === 'POST') {
-            req.body = await parseJsonBody(req);
+    try {
+        if (pathname === '/chat') return await handleChat(req, res);
+        if (pathname === '/speech-token') return await handleSpeechToken(req, res);
+        if (pathname === '/ice-servers') return await handleIceServers(req, res);
+        if (pathname === '/heygen-token') return await handleHeygenToken(req, res);
+        if (pathname === '/diagnose') {
+            return res.status(200).json({
+                status: 'ok',
+                env: {
+                    hasSpeechKey: !!process.env.AZURE_SPEECH_KEY,
+                    hasOpenAIKey: !!process.env.AZURE_OPENAI_KEY,
+                    hasHeygenKey: !!process.env.HEYGEN_API_KEY,
+                    hasVolcAK: !!process.env.VOLC_AK
+                }
+            });
         }
-        return handleChat(req, res);
-    }
+        if (pathname === '/virtual-lover/prewarm') return res.status(200).json({ status: 'ok' });
 
-    if (pathname === '/api/diagnose') {
-        return handleDiagnose(req, res);
-    }
-
-    if (pathname === '/api/heygen-token') {
-        return handleHeygenToken(req, res);
-    }
-
-    if (pathname === '/api/ice-servers') {
-        return handleIceServers(req, res);
-    }
-
-    if (pathname === '/api/speech-token') {
-        return handleSpeechToken(req, res);
-    }
-
-    if (pathname === '/api/virtual-lover/prewarm') {
-        return handlePrewarm(req, res);
-    }
-
-    // ── Virtual Lover chat (SiliconFlow) ──
-    if (pathname === '/api/virtual-lover/chat') {
-        return handleVirtualLoverChat(req, res);
-    }
-
-    // ── Volcengine chat routes ──
-    const volcenginePattern = /^\/api\/(companion|senior-care|mental|immortality|rebirth)\/chat$/;
-    if (volcenginePattern.test(pathname)) {
-        return handleVolcengineChat(req, res);
-    }
-
-    // ── Fallback: 404 ──
-    res.status(404).json({ error: `API route not found: ${pathname}` });
-}
-
-// ── Helper: Parse JSON body manually ──
-function parseJsonBody(req) {
-    return new Promise((resolve, reject) => {
-        let data = '';
-        req.on('data', chunk => { data += chunk; });
-        req.on('end', () => {
-            try {
-                resolve(data ? JSON.parse(data) : {});
-            } catch (e) {
-                resolve({});
+        // Dynamic Chat Routes
+        if (pathname.endsWith('/chat')) {
+            const types = {
+                '/virtual-lover': 'lover',
+                '/companion': 'companion',
+                '/senior-care': 'senior',
+                '/mental': 'mental',
+                '/immortality': 'immortality',
+                '/rebirth': 'rebirth',
+                '/pet': 'pet'
+            };
+            for (const [prefix, type] of Object.entries(types)) {
+                if (pathname.startsWith(prefix)) return await handleVolcengineChat(req, res, type);
             }
-        });
-        req.on('error', reject);
-    });
+        }
+
+        return res.status(404).json({ error: `Not found: ${pathname}` });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 }

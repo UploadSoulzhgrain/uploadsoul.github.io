@@ -1,0 +1,29 @@
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:3000...
+* Established connection to localhost (::1 port 3000) from ::1 port 49200 
+* using HTTP/1.x
+> GET /api/diagnose HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.16.0
+> Accept: */*
+> 
+* Request completely sent off
+< HTTP/1.1 200 OK
+< cache-control: public, max-age=0, must-revalidate
+< server: Vercel
+< x-vercel-id: dev1::dev1::agrrf-1772604819105-0180141153e3
+< x-vercel-cache: MISS
+< connection: close
+< content-length: 80
+< content-type: application/json; charset=utf-8
+< date: Wed, 04 Mar 2026 06:13:39 GMT
+< etag: W/"50-O/aIbIgiriPSnu5iJatzkNXI0Xc"
+< 
+{ [80 bytes data]
+100    80  100    80    0     0    113      0 --:--:-- --:--:-- --:--:--   113100    80  100    80    0     0    113      0 --:--:-- --:--:-- --:--:--   113
+* shutting down connection #0
+{"status":"ok","checks":{"speechKey":true,"speechRegion":true,"openaiKey":true}}

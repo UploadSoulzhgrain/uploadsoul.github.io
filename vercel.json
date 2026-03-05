@@ -4,8 +4,8 @@
   "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api/:path*",
+      "destination": "/api/index"
     },
     {
       "source": "/(.*)",
@@ -34,7 +34,7 @@
   ],
   "functions": {
     "api/index.js": {
-      "maxDuration": 10
+      "maxDuration": 60
     }
   }
 }
