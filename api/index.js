@@ -242,7 +242,9 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-    const pathname = (req.url || '').replace(/^\/api/, '').replace(/\/$/, '').split('?')[0];
+    const rawPath = new URL(req.url, 'http://localhost').pathname;
+    const pathname = rawPath.replace(/^\/api/, '').replace(/\/$/, '');
+    console.log('[Router] pathname resolved:', pathname);
 
     try {
         if (pathname === '/chat') return await handleChat(req, res);
