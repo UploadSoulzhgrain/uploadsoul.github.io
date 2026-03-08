@@ -171,7 +171,11 @@ async function handleVolcengineChat(req, res, avatarTypeOverride = null) {
         let userText = message;
         if (audioFile) {
             const buffer = fs.readFileSync(audioFile.filepath);
-            userText = await transcribeBuffer(buffer, audioFile.mimetype || 'audio/webm');
+            // Safely extract base mime type, stripping codec suffix (e.g. 'audio/webm;codecs=opus' → 'audio/webm')
+            const rawMime = audioFile.mimetype || audioFile.type || 'audio/webm';
+            const baseMime = rawMime.split(';')[0].trim();
+            console.log(`[ASR] audioFile size: ${buffer.length}, rawMime: ${rawMime}, baseMime: ${baseMime}`);
+            userText = await transcribeBuffer(buffer, baseMime);
         }
 
         if (!userText) {
