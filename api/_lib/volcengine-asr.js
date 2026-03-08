@@ -43,11 +43,16 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
 
         ws.on('open', () => {
             // Send config packet first
+            const audioFormat = mimeType.includes('wav') ? 'wav' : mimeType.includes('mp4') ? 'mp4' : 'webm';
+            // Chrome records WebM/Opus at 48kHz regardless of getUserMedia sampleRate hints.
+            // Only raw wav/pcm recordings can be 16kHz.
+            const sampleRate = audioFormat === 'wav' ? 16000 : 48000;
+
             const config = {
                 user: { uid: 'uploadsoul-user' },
                 audio: {
-                    format: mimeType.includes('wav') ? 'wav' : 'webm',
-                    sample_rate: 16000,
+                    format: audioFormat,
+                    sample_rate: sampleRate,
                     channel: 1,
                     bits: 16,
                 },
