@@ -451,6 +451,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
 
 
 function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
+  const { user } = useAuth();
   const [messages, setMessages] = useState([
     { role: 'ai', text: '早安。我一直在回顾我们昨天分享的记忆。你对日出的感悟非常有诗意。准备好继续我们的克隆训练了吗？', time: '上午 10:24' }
   ]);
