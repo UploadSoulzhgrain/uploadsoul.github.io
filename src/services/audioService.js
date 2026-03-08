@@ -48,24 +48,38 @@ const audioService = {
    */
   startRecording: async () => {
     try {
-      // Request microphone permissions
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      // Request 16kHz mono to match Volcengine ASR requirements
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          sampleRate: 16000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+        }
+      });
       audioService.stream = stream;
 
-      // Create new MediaRecorder
-      const mediaRecorder = new MediaRecorder(stream);
+      // Pick the best supported mimeType
+      const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : 'audio/mp4';
+      audioService._mimeType = mimeType;
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       audioService.mediaRecorder = mediaRecorder;
       audioService.audioChunks = [];
 
-      // Set up event handlers
+      // Collect chunks every 250ms so data accumulates even for short recordings
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioService.audioChunks.push(event.data);
+          console.log('[Audio] chunk received, size:', event.data.size);
         }
       };
 
-      // Start recording
-      mediaRecorder.start();
+      mediaRecorder.start(250);
 
       return Promise.resolve();
     } catch (error) {
@@ -86,8 +100,8 @@ const audioService = {
       }
 
       audioService.mediaRecorder.onstop = () => {
-        // Create audio blob from chunks
-        const audioBlob = new Blob(audioService.audioChunks, { type: 'audio/webm' });
+        // Create audio blob from chunks using the actual recorded mimeType
+        const audioBlob = new Blob(audioService.audioChunks, { type: audioService._mimeType || 'audio/webm' });
 
         // Clean up
         if (audioService.stream) {
