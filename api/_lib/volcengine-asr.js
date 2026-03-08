@@ -65,6 +65,7 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
                     workflow: 'audio_in,resample,partition,vad,fe,decode,itn,nlu_punctuation',
                 },
             };
+            console.log(`[VolcASR] Using format: ${audioFormat}, sampleRate: ${sampleRate}`);
             ws.send(JSON.stringify(config));
 
             // Stream the audio in chunks
