@@ -492,7 +492,7 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
   };
 
   const handleSendMessage = async (textOverride) => {
-    const text = textOverride || inputText;
+    const text = (typeof textOverride === 'string' ? textOverride : null) || inputText;
     if (!text.trim()) return;
 
     handleInterrupt();
