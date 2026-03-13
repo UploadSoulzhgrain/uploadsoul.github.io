@@ -90,16 +90,25 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
                 const msg = typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString());
 
                 if (msg.error_code && msg.error_code !== 0) {
-                    reject(new Error(`ASR error ${msg.error_code}: ${msg.error_msg || 'unknown'}`));
+                    const errMsg = `ASR server error ${msg.error_code}: ${msg.error_msg || 'unknown'}`;
+                    console.error(`[VolcASR] Request ${requestId} failed:`, errMsg);
+                    reject(new Error(errMsg));
                     ws.close();
                     return;
+                }
+
+                if (msg.results?.[0]?.text) {
+                    console.log(`[VolcASR] Partial/Final result: "${msg.results[0].text}"`);
                 }
 
                 // Partial or final result
                 const result = msg.result || msg.asr_result || msg.results?.[0];
                 if (result) {
                     const text = result.text || result.utterances?.[0]?.text || '';
-                    if (text) finalText = text; // Keep latest (final replaces partial)
+                    if (text) {
+                        finalText = text;
+                        if (msg.is_last_package) console.log(`[VolcASR] Final text reached: "${finalText}"`);
+                    }
                 }
 
                 // End of stream
@@ -108,9 +117,10 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
                         resolved = true;
                         ws.close();
                         if (!finalText.trim()) {
+                            console.warn(`[VolcASR] Completed with empty result for request ${requestId}`);
                             reject(new Error('ASR_EMPTY_RESULT'));
                         } else {
-                            console.log(`[VolcASR] Final text: "${finalText}"`);
+                            console.log(`[VolcASR] Resolved result: "${finalText.trim()}"`);
                             resolve(finalText.trim());
                         }
                     }
