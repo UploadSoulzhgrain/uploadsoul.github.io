@@ -11,8 +11,8 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const APPID = process.env.VOLC_SPEECH_APPID || '1750280251';
-const API_KEY = process.env.VOLC_SPEECH_APIKEY || 'e507562e-9d2b-4d70-be67-f312793b4fad';
+const APPID = process.env.VOLC_SPEECH_APPID;
+const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN;
 const ASR_WSS = 'wss://openspeech.bytedance.com/api/v3/sauc/bigmodel';
 
 /**
@@ -32,7 +32,7 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
 
         const ws = new WebSocket(ASR_WSS, {
             headers: {
-                'Authorization': `Bearer;${API_KEY}`,
+                'Authorization': `Bearer; ${ACCESS_TOKEN}`,
                 'X-Api-App-Key': APPID,
                 'X-Api-Resource-Id': 'volc.bigasr.sauc.duration',
                 'X-Api-Request-Id': requestId,
@@ -180,7 +180,7 @@ export function createRealtimeASR({ onPartial, onFinal, onVAD, onSilence, onErro
 
     const ws = new WebSocket(ASR_WSS, {
         headers: {
-            'Authorization': `Bearer;${API_KEY}`,
+            'Authorization': `Bearer; ${ACCESS_TOKEN}`,
             'X-Api-App-Key': APPID,
             'X-Api-Resource-Id': 'volc.bigasr.sauc.duration',
             'X-Api-Request-Id': requestId,

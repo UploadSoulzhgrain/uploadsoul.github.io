@@ -12,8 +12,8 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const APPID = process.env.VOLC_SPEECH_APPID || '1750280251';
-const API_KEY = process.env.VOLC_SPEECH_APIKEY || 'e507562e-9d2b-4d70-be67-f312793b4fad';
+const APPID = process.env.VOLC_SPEECH_APPID;
+const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN;
 const TTS_WSS = 'wss://openspeech.bytedance.com/api/v3/tts/ws';
 
 // ─────────────────────────────────────────────
@@ -54,8 +54,7 @@ function resolveVoiceConfig(avatarType, overrideVoiceId) {
  */
 function buildAuthHeader() {
     const timestamp = Math.floor(Date.now() / 1000).toString();
-    const token = `HMAC-SHA256 ${API_KEY}:${timestamp}`;
-    return token;
+    return `HMAC-SHA256 ${ACCESS_TOKEN}:${timestamp}`;
 }
 
 /**
@@ -97,7 +96,7 @@ export function streamTTS(text, avatarType = 'companion', voiceId, onChunk, onDo
 
         ws.on('open', () => {
             const payload = {
-                app: { appid: APPID, token: API_KEY, cluster: 'volcano_tts' },
+                app: { appid: APPID, token: ACCESS_TOKEN, cluster: 'volcano_tts' },
                 user: { uid: 'uploadsoul-user' },
                 audio: {
                     voice_type: internalVoice,
