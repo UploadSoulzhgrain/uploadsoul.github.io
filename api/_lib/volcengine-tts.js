@@ -9,8 +9,7 @@
 
 import WebSocket from 'ws';
 import crypto from 'crypto';
-import dotenv from 'dotenv';
-dotenv.config();
+
 
 const APPID = process.env.VOLC_SPEECH_APPID;
 const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN;
