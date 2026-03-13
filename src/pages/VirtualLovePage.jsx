@@ -527,11 +527,13 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
       },
       onDone: (full) => {
         setIsProcessing(false);
-        setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: full } : m));
+        setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: full || accumulatedText } : m));
       },
       onError: (err) => {
         setIsProcessing(false);
         toast.error('对话方案同步失败，请重试');
+        // Clean up empty bubble on error
+        setMessages(prev => prev.filter(m => m.id !== aiMessageId));
       }
     });
   };
@@ -584,11 +586,13 @@ function ChatScreen({ gender, soulmate, onBack, toggleTheme, isDarkMode }) {
           },
           onDone: (full) => {
             setIsProcessing(false);
-            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: full } : m));
+            setMessages(prev => prev.map(m => m.id === aiMessageId ? { ...m, text: full || (accumulatedText ? accumulatedText : '...') } : m));
           },
           onError: (err) => {
             setIsProcessing(false);
             toast.error('语音对话失败，请重试');
+            // Clean up empty bubbles on error
+            setMessages(prev => prev.filter(m => m.id !== aiMessageId && m.text !== '[语音解析中...]'));
           }
         }, true);
 
