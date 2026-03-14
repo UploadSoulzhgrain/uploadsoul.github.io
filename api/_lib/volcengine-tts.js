@@ -48,13 +48,6 @@ function resolveVoiceConfig(avatarType, overrideVoiceId) {
     };
 }
 
-/**
- * 生成连接鉴权 token
- */
-function buildAuthHeader() {
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    return `HMAC-SHA256 ${ACCESS_TOKEN}:${timestamp}`;
-}
 
 /**
  * 流式 TTS — 主入口
@@ -79,8 +72,8 @@ export function streamTTS(text, avatarType = 'companion', voiceId, onChunk, onDo
 
         const ws = new WebSocket(TTS_WSS, {
             headers: {
-                'Authorization': buildAuthHeader(),
                 'X-Api-App-Key': APPID,
+                'X-Api-Access-Key': ACCESS_TOKEN,
                 'X-Api-Resource-Id': 'volcano.tts.bigmodel',
                 'X-Api-Request-Id': requestId,
             }

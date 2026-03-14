@@ -12,7 +12,7 @@ import crypto from 'crypto';
 
 const APPID = process.env.VOLC_SPEECH_APPID;
 const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN;
-const ASR_WSS = 'wss://openspeech.bytedance.com/api/v3/asr/bigmodel';
+const ASR_WSS = 'wss://openspeech.bytedance.com/api/v3/sauc/bigmodel';
 
 /**
  * 一次性批量转写（接收完整音频 Buffer，适合"录制完再识别"场景）
@@ -31,8 +31,8 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
 
         const ws = new WebSocket(ASR_WSS, {
             headers: {
-                'Authorization': `Bearer;${ACCESS_TOKEN}`,
                 'X-Api-App-Key': APPID,
+                'X-Api-Access-Key': ACCESS_TOKEN,
                 'X-Api-Resource-Id': 'volc.bigasr.sauc.duration',
                 'X-Api-Request-Id': requestId,
             }
@@ -181,8 +181,8 @@ export function createRealtimeASR({ onPartial, onFinal, onVAD, onSilence, onErro
 
     const ws = new WebSocket(ASR_WSS, {
         headers: {
-            'Authorization': `Bearer;${ACCESS_TOKEN}`,
             'X-Api-App-Key': APPID,
+            'X-Api-Access-Key': ACCESS_TOKEN,
             'X-Api-Resource-Id': 'volc.bigasr.sauc.duration',
             'X-Api-Request-Id': requestId,
         }
