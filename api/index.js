@@ -246,6 +246,12 @@ export const config = {
 };
 
 export default async function handler(req, res) {
+    console.log('[ENV DEBUG]', JSON.stringify({
+        VOLC_SPEECH_APPID: process.env.VOLC_SPEECH_APPID,
+        VOLC_SPEECH_ACCESS_TOKEN: process.env.VOLC_SPEECH_ACCESS_TOKEN ? 'SET' : 'UNDEFINED',
+        VOLC_AK: process.env.VOLC_AK ? 'SET' : 'UNDEFINED',
+        AZURE_SPEECH_KEY: process.env.AZURE_SPEECH_KEY ? 'SET' : 'UNDEFINED',
+    }));
     const rawPath = new URL(req.url, 'http://localhost').pathname;
     const pathname = rawPath.replace(/^\/api/, '').replace(/\/$/, '');
     console.log('[Router] pathname resolved:', pathname);
