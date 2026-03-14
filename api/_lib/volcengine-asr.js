@@ -12,7 +12,7 @@ import crypto from 'crypto';
 
 const APPID = process.env.VOLC_SPEECH_APPID;
 const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN;
-const ASR_WSS = 'wss://openspeech.bytedance.com/api/v3/sauc/bigmodel';
+const ASR_WSS = 'wss://openspeech.bytedance.com/api/v3/asr/bigmodel';
 
 /**
  * 一次性批量转写（接收完整音频 Buffer，适合"录制完再识别"场景）
@@ -41,6 +41,7 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
         const CHUNK_SIZE = 8192; // 8KB per send
 
         console.log('[VolcASR] Connecting with APPID:', APPID, 'TOKEN_PREFIX:', ACCESS_TOKEN?.slice(0, 10));
+        console.log('[VolcASR] WSS:', ASR_WSS, 'Resource:', 'volc.bigasr.sauc.duration');
         ws.on('open', () => {
             // Send config packet first
             const audioFormat = mimeType.includes('wav') ? 'wav' : mimeType.includes('mp4') ? 'mp4' : 'webm';
@@ -188,6 +189,7 @@ export function createRealtimeASR({ onPartial, onFinal, onVAD, onSilence, onErro
     });
 
     console.log('[VolcASR] Connecting with APPID:', APPID, 'TOKEN_PREFIX:', ACCESS_TOKEN?.slice(0, 10));
+    console.log('[VolcASR] WSS:', ASR_WSS, 'Resource:', 'volc.bigasr.sauc.duration');
     ws.on('open', () => {
         const config = {
             user: { uid: 'uploadsoul-user' },
