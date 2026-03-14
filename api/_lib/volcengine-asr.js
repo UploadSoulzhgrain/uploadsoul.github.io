@@ -31,7 +31,7 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
 
         const ws = new WebSocket(ASR_WSS, {
             headers: {
-                'Authorization': `Bearer; ${ACCESS_TOKEN}`,
+                'Authorization': `Bearer;${ACCESS_TOKEN}`,
                 'X-Api-App-Key': APPID,
                 'X-Api-Resource-Id': 'volc.bigasr.sauc.duration',
                 'X-Api-Request-Id': requestId,
@@ -40,6 +40,7 @@ export async function transcribeBuffer(audioBuffer, mimeType = 'audio/webm') {
 
         const CHUNK_SIZE = 8192; // 8KB per send
 
+        console.log('[VolcASR] Connecting with APPID:', APPID, 'TOKEN_PREFIX:', ACCESS_TOKEN?.slice(0, 10));
         ws.on('open', () => {
             // Send config packet first
             const audioFormat = mimeType.includes('wav') ? 'wav' : mimeType.includes('mp4') ? 'mp4' : 'webm';
@@ -179,13 +180,14 @@ export function createRealtimeASR({ onPartial, onFinal, onVAD, onSilence, onErro
 
     const ws = new WebSocket(ASR_WSS, {
         headers: {
-            'Authorization': `Bearer; ${ACCESS_TOKEN}`,
+            'Authorization': `Bearer;${ACCESS_TOKEN}`,
             'X-Api-App-Key': APPID,
             'X-Api-Resource-Id': 'volc.bigasr.sauc.duration',
             'X-Api-Request-Id': requestId,
         }
     });
 
+    console.log('[VolcASR] Connecting with APPID:', APPID, 'TOKEN_PREFIX:', ACCESS_TOKEN?.slice(0, 10));
     ws.on('open', () => {
         const config = {
             user: { uid: 'uploadsoul-user' },
