@@ -1,17 +1,59 @@
 # https://www.robotstxt.org/robotstxt.html
+
+# Generic Crawler Rules
 User-agent: *
 Allow: /
-
-Sitemap: https://uploadsoul.com/sitemap.xml
-
-# Disallow admin and api routes
 Disallow: /admin/
 Disallow: /api/
+Disallow: /dashboard/
 
-# Allow all other pages
+# AI bot optimization
+# OpenAI GPTBot
+User-agent: GPTBot
+Allow: /
+
+# OpenAI Search Bot
+User-agent: OAI-SearchBot
+Allow: /
+
+# Anthropic Claude Bot
+User-agent: Claude-Weblib
+Allow: /
+User-agent: ClaudeBot
+Allow: /
+
+# Google AI Extended
+User-agent: Google-Extended
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+
+# Common Search Engine Crawlers
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Baiduspider
+User-agent: YandexBot
+User-agent: slurp
+User-agent: duckduckbot
+Allow: /
+
+# Asset Permissions
 Allow: /*.html$
 Allow: /*.js$
 Allow: /*.css$
 Allow: /*.png$
 Allow: /*.jpg$
-Allow: /*.gif$ 
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.ico$
+Allow: /*.json$
+
+Sitemap: https://uploadsoul.com/sitemap.xml
+ 
