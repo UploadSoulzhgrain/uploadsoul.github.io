@@ -180,6 +180,9 @@ async function handleVolcengineChat(req, res, avatarTypeOverride = null) {
 
         const get = (key, def = '') => Array.isArray(fields[key]) ? fields[key][0] : (fields[key] ?? def);
 
+        // 加这行日志
+        console.log('[Chat] fields:', JSON.stringify(fields).slice(0, 200), 'message:', get('message'));
+
         const avatarType = avatarTypeOverride || get('avatarType', 'general');
         const message = get('message');
         const userId = get('userId', '00000000-0000-4000-8000-000000000000');
