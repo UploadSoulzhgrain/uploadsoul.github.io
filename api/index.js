@@ -277,6 +277,7 @@ export default async function handler(req, res) {
         VOLC_SPEECH_ACCESS_TOKEN: process.env.VOLC_SPEECH_ACCESS_TOKEN ? 'SET' : 'UNDEFINED',
         VOLC_AK: process.env.VOLC_AK ? 'SET' : 'UNDEFINED',
         AZURE_SPEECH_KEY: process.env.AZURE_SPEECH_KEY ? 'SET' : 'UNDEFINED',
+        VOLC_SPEECH_APIKEY: process.env.VOLC_SPEECH_APIKEY ? process.env.VOLC_SPEECH_APIKEY.slice(0, 8) + '...' : 'UNDEFINED',
     }));
     const rawPath = new URL(req.url, 'http://localhost').pathname;
     const pathname = rawPath.replace(/^\/api/, '').replace(/\/$/, '');

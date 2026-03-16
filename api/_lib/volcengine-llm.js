@@ -6,8 +6,7 @@
  * ⚠️  仅供非 MVP 板块使用，MVP 路由保持 AzureOpenAI 不变
  */
 
-import dotenv from 'dotenv';
-dotenv.config();
+
 
 const VOLC_AK = process.env.VOLC_AK;
 const VOLC_SK = process.env.VOLC_SK;
