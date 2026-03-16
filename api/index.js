@@ -149,11 +149,34 @@ async function handleVolcengineChat(req, res, avatarTypeOverride = null) {
     const { transcribeBuffer } = await import('./_lib/volcengine-asr.js');
     const { supabaseService } = await import('./_lib/supabase-server.js');
 
-    const form = formidable({ multiples: false });
     try {
-        const [fields, files] = await new Promise((resolve, reject) => {
-            form.parse(req, (err, f, fi) => err ? reject(err) : resolve([f, fi]));
-        });
+        // 兼容 JSON 和 FormData 两种请求格式
+        let fields = {};
+        let files = {};
+
+        const contentType = req.headers['content-type'] || '';
+
+        if (contentType.includes('multipart/form-data')) {
+            // 语音请求：FormData
+            const form = formidable({ multiples: false });
+            [fields, files] = await new Promise((resolve, reject) => {
+                form.parse(req, (err, f, fi) => err ? reject(err) : resolve([f, fi]));
+            });
+        } else {
+            // 文字请求：JSON
+            const body = await new Promise((resolve, reject) => {
+                let data = '';
+                req.on('data', chunk => { data += chunk; });
+                req.on('end', () => {
+                    try { resolve(data ? JSON.parse(data) : {}); }
+                    catch (e) { reject(e); }
+                });
+            });
+            // 把 JSON body 转换为 fields 格式，和 formidable 的结构保持一致
+            Object.keys(body).forEach(key => {
+                fields[key] = [body[key]];
+            });
+        }
 
         const get = (key, def = '') => Array.isArray(fields[key]) ? fields[key][0] : (fields[key] ?? def);
 
