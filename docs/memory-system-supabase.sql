@@ -12,6 +12,8 @@ create table if not exists profiles (
   created_at timestamptz default now()
 );
 
+alter table profiles enable row level security;
+
 create table if not exists memory_fragments (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
@@ -31,6 +33,8 @@ create table if not exists memory_fragments (
   embedding vector(1024),
   created_at timestamptz default now()
 );
+
+alter table memory_fragments enable row level security;
 
 alter table memory_fragments add column if not exists source_kind text default 'manual'
   check (source_kind in ('manual','voice','image','video','chat','interview','import'));
@@ -72,8 +76,21 @@ create table if not exists profile_assets (
   created_at timestamptz default now()
 );
 
+alter table profile_assets enable row level security;
+
 create index if not exists profile_assets_profile_type_idx
 on profile_assets (profile_id, asset_type, created_at desc);
+
+create table if not exists conversations (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  profile_id uuid references profiles(id) on delete cascade,
+  messages jsonb default '[]',
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+alter table conversations enable row level security;
 
 create table if not exists memory_feedback (
   id uuid primary key default gen_random_uuid(),
@@ -89,23 +106,10 @@ create table if not exists memory_feedback (
   created_at timestamptz default now()
 );
 
+alter table memory_feedback enable row level security;
+
 create index if not exists memory_feedback_profile_created_idx
 on memory_feedback (profile_id, created_at desc);
-
-create table if not exists conversations (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid references auth.users(id) on delete cascade,
-  profile_id uuid references profiles(id) on delete cascade,
-  messages jsonb default '[]',
-  created_at timestamptz default now(),
-  updated_at timestamptz default now()
-);
-
-alter table profiles enable row level security;
-alter table memory_fragments enable row level security;
-alter table conversations enable row level security;
-alter table profile_assets enable row level security;
-alter table memory_feedback enable row level security;
 
 drop policy if exists "profiles owner access" on profiles;
 create policy "profiles owner access" on profiles

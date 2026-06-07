@@ -114,7 +114,36 @@ const LoginPage = () => {
       navigate(state?.from?.pathname || '/dashboard');
     } catch (error) {
       console.error('Login error:', error);
-      setError(error.message || '登录失败，请检查邮箱和密码');
+      const isInvalidCredentials = /invalid login credentials/i.test(error.message || '');
+      setError(isInvalidCredentials
+        ? '邮箱或密码不正确。你也可以使用下方“发送邮箱登录链接”免密码进入。'
+        : (error.message || '登录失败，请检查邮箱和密码'));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEmailMagicLink = async () => {
+    if (!email) {
+      setError('请先输入邮箱地址');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const { error } = await signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: `${window.location.origin}${state?.from?.pathname || '/dashboard'}`
+        }
+      });
+      if (error) throw error;
+      setMessage('登录链接已发送到邮箱，请打开邮件继续。');
+    } catch (error) {
+      console.error('Email link error:', error);
+      setError(error.message || '发送邮箱登录链接失败');
     } finally {
       setLoading(false);
     }
@@ -248,6 +277,14 @@ const LoginPage = () => {
                     />
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={handleEmailMagicLink}
+                  disabled={loading || !email}
+                  className="w-full py-3 border border-gray-700 rounded-xl text-sm font-medium text-amber-500 hover:bg-gray-800 disabled:opacity-50 transition-colors"
+                >
+                  发送邮箱登录链接
+                </button>
               </>
             ) : (
               <>

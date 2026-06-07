@@ -92,6 +92,11 @@ const mvpCopy = {
     feedbackNotLike: '不像',
     feedbackMissing: '缺少记忆',
     feedbackThanks: '已记录反馈',
+    sourcePanelTitle: '记忆依据',
+    sourcePanelHint: '最近一次回答参考的记忆会显示在这里。',
+    sourceEmpty: '还没有可展示的记忆依据',
+    sourceSimilarity: '相关度',
+    sourceConfirmed: '已确认',
     portraitMode: '照片模式',
     loopVideoMode: '循环视频模式',
     emotionAwareness: '情绪感知',
@@ -218,6 +223,11 @@ const mvpCopy = {
     feedbackNotLike: 'Not quite',
     feedbackMissing: 'Missing memory',
     feedbackThanks: 'Feedback saved',
+    sourcePanelTitle: 'Memory Sources',
+    sourcePanelHint: 'Memories used by the latest reply appear here.',
+    sourceEmpty: 'No memory sources yet',
+    sourceSimilarity: 'Relevance',
+    sourceConfirmed: 'Confirmed',
     portraitMode: 'Photo mode',
     loopVideoMode: 'Loop video mode',
     emotionAwareness: 'Emotion awareness',
@@ -391,6 +401,7 @@ const MVPChinaPage = () => {
   const [memoryText, setMemoryText] = useState('');
   const [memoryState, setMemoryState] = useState('idle');
   const [messages, setMessages] = useState([]);
+  const [selectedSourceMessageId, setSelectedSourceMessageId] = useState('');
   const [feedbackByMessage, setFeedbackByMessage] = useState({});
   const [input, setInput] = useState(copy.defaultInput);
   const [chatState, setChatState] = useState('idle');
@@ -436,6 +447,12 @@ const MVPChinaPage = () => {
   const activeEmotionLabel = copy.emotions[emotionState.visual_mood] || copy.emotions[emotionState.emotion_label] || copy.emotions.neutral;
   const captureMode = localizedCaptureModes.find(mode => mode.id === captureModeId) || localizedCaptureModes[0];
   const selectedVoiceSample = voiceSamples.find(sample => sample.id === selectedVoiceSampleId);
+  const latestAssistantWithSources = useMemo(
+    () => [...messages].reverse().find(message => message.role === 'assistant' && message.sources?.length),
+    [messages]
+  );
+  const selectedSourceMessage = messages.find(message => message.id === selectedSourceMessageId && message.sources?.length) || latestAssistantWithSources;
+  const latestSources = selectedSourceMessage?.sources || [];
   const flowProgress = useMemo(() => {
     let count = 1;
     if (profile) count += 1;
@@ -444,6 +461,47 @@ const MVPChinaPage = () => {
     if (messages.length) count += 1;
     return Math.min(5, count);
   }, [hasVoice, messages.length, profile, voiceFile]);
+
+  const renderSourcePanel = (compact = false) => (
+    <aside className={`test-panel p-4 ${compact ? 'max-h-72' : 'min-h-0'} overflow-hidden flex flex-col`}>
+      <div className="flex items-center justify-between gap-3 mb-3">
+        <div className="flex items-center gap-2">
+          <ShieldCheck size={16} className="text-emerald-300" />
+          <h3 className="text-sm font-semibold">{copy.sourcePanelTitle}</h3>
+        </div>
+        <span className="text-[11px] text-white/35">{latestSources.length}</span>
+      </div>
+      <div className="text-xs text-white/42 leading-relaxed mb-3">{copy.sourcePanelHint}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto space-y-2 pr-1">
+        {latestSources.length === 0 ? (
+          <div className="text-xs text-white/38">{copy.sourceEmpty}</div>
+        ) : latestSources.map((source, index) => {
+          const topics = Array.isArray(source.topics) ? source.topics.slice(0, 3) : [];
+          const score = Number(source.similarity || 0);
+          return (
+            <div key={source.id || index} className="rounded-lg border border-white/10 bg-white/[0.04] p-3">
+              <div className="flex items-center justify-between gap-2 text-[11px] text-white/45 mb-2">
+                <span>{source.emotion_label || 'memory'}</span>
+                <span>{copy.sourceSimilarity} {score ? score.toFixed(2) : '-'}</span>
+              </div>
+              <div className="text-xs text-white/78 leading-relaxed line-clamp-4">
+                {source.summary || source.content_text}
+              </div>
+              {source.summary && source.content_text && (
+                <div className="mt-2 text-[11px] text-white/42 leading-relaxed line-clamp-3">{source.content_text}</div>
+              )}
+              <div className="mt-3 flex flex-wrap gap-1">
+                {source.user_confirmed && <span className="px-2 py-1 rounded-md bg-emerald-300/10 text-emerald-200/75 text-[10px]">{copy.sourceConfirmed}</span>}
+                {topics.map(topic => (
+                  <span key={topic} className="px-2 py-1 rounded-md bg-white/5 text-white/45 text-[10px]">{topic}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </aside>
+  );
 
   useEffect(() => {
     setInput(prev => (
@@ -951,6 +1009,7 @@ const MVPChinaPage = () => {
             setMessages(prev => prev.map(item => (
               item.id === assistantId ? { ...item, sources: payload.memories || [] } : item
             )));
+            if (payload.memories?.length) setSelectedSourceMessageId(assistantId);
           }
           if (payload.type === 'done') {
             setMessages(prev => prev.map(item => (
@@ -958,6 +1017,7 @@ const MVPChinaPage = () => {
                 ? { ...item, text: payload.fullText || item.text, sources: payload.sources || item.sources || [], emotion: payload.emotion || nextEmotion }
                 : item
             )));
+            if (payload.sources?.length) setSelectedSourceMessageId(assistantId);
             flushSentenceBuffer(nextEmotion, activeProfile, true);
           }
           if (payload.type === 'error') throw new Error(payload.error);
@@ -1285,7 +1345,7 @@ const MVPChinaPage = () => {
                     </button>
                   </div>
                 </div>
-                <div className={callFullscreen ? 'flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_minmax(340px,420px)] gap-4' : 'contents'}>
+                <div className={callFullscreen ? 'flex-1 min-h-0 grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(320px,400px)_minmax(280px,340px)] gap-4 overflow-y-auto xl:overflow-hidden' : 'contents'}>
                 <div className={`test-panel overflow-hidden ${callFullscreen ? 'min-h-0 h-full flex flex-col mb-0' : 'mb-4'}`}>
                   <div className={`relative bg-black flex items-center justify-center overflow-hidden ${callFullscreen ? 'flex-1 min-h-[54vh]' : 'aspect-[16/10]'}`}>
                     <div
@@ -1373,7 +1433,12 @@ const MVPChinaPage = () => {
                   {messages.map((message, index) => (
                     <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[82%] ${message.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-2`}>
-                        <div className={`w-full px-4 py-3 rounded-lg text-sm ${message.role === 'user' ? 'bg-amber-300 text-black' : 'bg-white/8 border border-white/10 text-white/82'}`}>{message.text}</div>
+                        <div
+                          onClick={() => message.role === 'assistant' && message.sources?.length && setSelectedSourceMessageId(message.id)}
+                          className={`w-full px-4 py-3 rounded-lg text-sm ${message.role === 'user' ? 'bg-amber-300 text-black' : `bg-white/8 border text-white/82 ${message.sources?.length ? 'cursor-pointer hover:border-emerald-300/35' : ''} ${selectedSourceMessageId === message.id ? 'border-emerald-300/45' : 'border-white/10'}`}`}
+                        >
+                          {message.text}
+                        </div>
                         {message.role === 'assistant' && message.id && message.text && (
                           <div className="flex flex-wrap gap-1 text-[11px]">
                             {feedbackByMessage[message.id] ? (
@@ -1428,8 +1493,10 @@ const MVPChinaPage = () => {
                   </div>
                   {streamingReply && <div className="text-xs text-emerald-200/70">{copy.generating}</div>}
                   {phoneMode && !streamingReply && <div className="text-xs text-emerald-200/70">{listening ? copy.phoneListening : copy.phoneWaiting}</div>}
+                  {!callFullscreen && renderSourcePanel(true)}
                 </div>
                 </div>
+                {callFullscreen && renderSourcePanel(false)}
                 </div>
               </section>
 
