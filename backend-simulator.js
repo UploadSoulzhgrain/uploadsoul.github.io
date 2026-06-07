@@ -19,6 +19,7 @@ const delegatedMvpApiPrefixes = [
     '/api/cloudinary/signature',
     '/api/voice/clone',
     '/api/voice/speech',
+    '/api/test-chat-stream',
     '/api/test-chat'
 ];
 

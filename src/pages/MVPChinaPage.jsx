@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, MessageSquare, Mic, Play, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
+import { Box, Camera, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, Maximize2, MessageSquare, Mic, MicOff, Minimize2, Play, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -127,6 +127,19 @@ async function recordedBlobToWavFile(blob) {
   }
 }
 
+function takeSpeakableSentence(buffer, force = false) {
+  const text = buffer.trimStart();
+  if (!text) return null;
+  const match = text.match(/^(.{8,}?[。！？!?；;]|.{16,}?[，,、])/);
+  if (match) {
+    const sentence = match[0].trim();
+    return { sentence, rest: text.slice(match[0].length) };
+  }
+  if (force && text.trim()) return { sentence: text.trim(), rest: '' };
+  if (text.length >= 28) return { sentence: text.slice(0, 28).trim(), rest: text.slice(28) };
+  return null;
+}
+
 const MVPChinaPage = () => {
   const { user, session } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -150,6 +163,10 @@ const MVPChinaPage = () => {
   const [visualState, setVisualState] = useState('idle');
   const [audioLevel, setAudioLevel] = useState(0);
   const [emotionState, setEmotionState] = useState(defaultEmotionState);
+  const [callFullscreen, setCallFullscreen] = useState(false);
+  const [cameraOn, setCameraOn] = useState(false);
+  const [listening, setListening] = useState(false);
+  const [streamingReply, setStreamingReply] = useState(false);
   const audioRef = useRef(null);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -160,6 +177,15 @@ const MVPChinaPage = () => {
   const timerRef = useRef(null);
   const fileRef = useRef(null);
   const visualFileRef = useRef(null);
+  const voiceFileRef = useRef(null);
+  const callShellRef = useRef(null);
+  const userVideoRef = useRef(null);
+  const cameraStreamRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const streamAbortRef = useRef(null);
+  const ttsQueueRef = useRef([]);
+  const ttsPlayingRef = useRef(false);
+  const sentenceBufferRef = useRef('');
 
   const hasVoice = Boolean(profile?.elevenlabs_voice_id);
   const activeEmotionVisual = emotionVisuals[emotionState.visual_mood] || emotionVisuals[emotionState.emotion_label] || emotionVisuals.neutral;
@@ -214,8 +240,11 @@ const MVPChinaPage = () => {
   useEffect(() => () => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    streamAbortRef.current?.abort();
     audioContextRef.current?.close?.();
     recorderRef.current?.stream?.getTracks?.().forEach(track => track.stop());
+    cameraStreamRef.current?.getTracks?.().forEach(track => track.stop());
+    recognitionRef.current?.stop?.();
   }, []);
 
   const startRecording = async () => {
@@ -239,7 +268,11 @@ const MVPChinaPage = () => {
         try {
           const file = await recordedBlobToWavFile(blob);
           setVoiceFile(file);
-          toast.success('录音已转换为 wav，可用于克隆');
+          voiceFileRef.current = file;
+          toast.success('录音已转换为 wav，正在生成克隆声音');
+          if (profile?.id) {
+            cloneVoice(file).catch(() => {});
+          }
         } catch (error) {
           console.error('Recorded audio conversion failed:', error);
           toast.error('录音转 wav 失败，请改用 mp3/wav 文件上传');
@@ -272,8 +305,13 @@ const MVPChinaPage = () => {
     setRecording(false);
   };
 
-  const cloneVoice = async () => {
-    if (!profile?.id || !voiceFile) {
+  useEffect(() => {
+    voiceFileRef.current = voiceFile;
+  }, [voiceFile]);
+
+  const cloneVoice = async (fileOverride = null) => {
+    const fileToClone = fileOverride || voiceFileRef.current;
+    if (!profile?.id || !fileToClone) {
       toast.error('请先选择或录制一段声音样本');
       return;
     }
@@ -281,17 +319,23 @@ const MVPChinaPage = () => {
     try {
       const form = new FormData();
       form.append('profile_id', profile.id);
-      form.append('file', voiceFile);
+      form.append('file', fileToClone);
       const response = await authedFetch(session, '/api/voice/clone', { method: 'POST', body: form });
       const data = await response.json();
-      setProfile(data.profile);
+      const nextProfile = {
+        ...(data.profile || profile),
+        elevenlabs_voice_id: data.voice_uri || data.profile?.elevenlabs_voice_id || profile?.elevenlabs_voice_id
+      };
+      setProfile(nextProfile);
       setTranscript(data.transcript || '');
       setMemoryText(data.transcript || '');
       toast.success('声音克隆完成，后续对话将使用该声线');
       setCloneState('done');
+      return nextProfile;
     } catch (error) {
       toast.error(error.message);
       setCloneState('error');
+      throw error;
     }
   };
 
@@ -416,14 +460,15 @@ const MVPChinaPage = () => {
     }
   };
 
-  const speakText = async (text, emotion = emotionState) => {
+  const speakText = async (text, emotion = emotionState, profileOverride = null) => {
     setVisualState('thinking');
     try {
-      const voiceUri = profile?.elevenlabs_voice_id;
+      const activeProfile = profileOverride || profile;
+      const voiceUri = activeProfile?.elevenlabs_voice_id;
       if (!voiceUri) throw new Error('当前档案还没有克隆 voice uri，请先重新生成克隆声音');
       const response = await authedFetch(session, '/api/voice/speech', {
         method: 'POST',
-        body: JSON.stringify({ profile_id: profile.id, text, emotion, voice_uri: voiceUri })
+        body: JSON.stringify({ profile_id: activeProfile.id, text, emotion, voice_uri: voiceUri })
       });
       const data = await response.json();
       if (!data.audio) throw new Error('语音接口没有返回音频');
@@ -459,6 +504,11 @@ const MVPChinaPage = () => {
   };
 
   const stopSpeaking = () => {
+    streamAbortRef.current?.abort();
+    streamAbortRef.current = null;
+    ttsQueueRef.current = [];
+    ttsPlayingRef.current = false;
+    sentenceBufferRef.current = '';
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -466,6 +516,36 @@ const MVPChinaPage = () => {
     if (animationRef.current) cancelAnimationFrame(animationRef.current);
     setAudioLevel(0);
     setVisualState('idle');
+    setStreamingReply(false);
+  };
+
+  const playTtsQueue = async (activeProfile) => {
+    if (ttsPlayingRef.current) return;
+    ttsPlayingRef.current = true;
+    try {
+      while (ttsQueueRef.current.length) {
+        const next = ttsQueueRef.current.shift();
+        if (next?.text) await speakText(next.text, next.emotion || emotionState, activeProfile);
+      }
+    } finally {
+      ttsPlayingRef.current = false;
+    }
+  };
+
+  const enqueueSentenceForSpeech = (text, emotion, activeProfile) => {
+    const cleaned = text.trim();
+    if (!cleaned) return;
+    ttsQueueRef.current.push({ text: cleaned, emotion });
+    playTtsQueue(activeProfile).catch(error => console.warn('TTS queue failed:', error.message));
+  };
+
+  const flushSentenceBuffer = (emotion, activeProfile, force = false) => {
+    let picked = takeSpeakableSentence(sentenceBufferRef.current, force);
+    while (picked) {
+      enqueueSentenceForSpeech(picked.sentence, emotion, activeProfile);
+      sentenceBufferRef.current = picked.rest;
+      picked = takeSpeakableSentence(sentenceBufferRef.current, force);
+    }
   };
 
   const sendMessage = async () => {
@@ -473,32 +553,150 @@ const MVPChinaPage = () => {
     const text = input.trim();
     stopSpeaking();
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', text }]);
+    const assistantId = `assistant-${Date.now()}`;
+    setMessages(prev => [...prev, { role: 'user', text }, { id: assistantId, role: 'assistant', text: '' }]);
     setChatState('working');
+    setStreamingReply(true);
     setVisualState('thinking');
     try {
-      const response = await authedFetch(session, '/api/test-chat', {
+      let activeProfile = profile;
+      if (!activeProfile?.elevenlabs_voice_id && voiceFileRef.current) {
+        toast('正在先生成克隆声音...');
+        activeProfile = await cloneVoice(voiceFileRef.current);
+      }
+      if (!activeProfile?.elevenlabs_voice_id) {
+        throw new Error('当前档案还没有克隆 voice uri，请先录音并等待克隆完成');
+      }
+      const controller = new AbortController();
+      streamAbortRef.current = controller;
+      const response = await authedFetch(session, '/api/test-chat-stream', {
         method: 'POST',
-        body: JSON.stringify({ profile_id: profile.id, message: text })
+        body: JSON.stringify({ profile_id: activeProfile.id, message: text }),
+        signal: controller.signal
       });
-      const data = await response.json();
-      const nextEmotion = data.emotion || defaultEmotionState;
-      setEmotionState(nextEmotion);
-      setMessages(prev => [...prev, { role: 'assistant', text: data.reply, emotion: nextEmotion }]);
-      await speakText(data.reply, nextEmotion);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let nextEmotion = emotionState;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const events = buffer.split('\n\n');
+        buffer = events.pop() || '';
+        events.forEach(event => {
+          const line = event.split('\n').find(row => row.startsWith('data: '));
+          if (!line) return;
+          const payload = JSON.parse(line.slice(6));
+          if (payload.type === 'emotion') {
+            nextEmotion = payload.emotion || defaultEmotionState;
+            setEmotionState(nextEmotion);
+          }
+          if (payload.type === 'token') {
+            sentenceBufferRef.current += payload.text;
+            setMessages(prev => prev.map(item => (
+              item.id === assistantId ? { ...item, text: `${item.text || ''}${payload.text}`, emotion: nextEmotion } : item
+            )));
+            flushSentenceBuffer(nextEmotion, activeProfile, false);
+          }
+          if (payload.type === 'done') {
+            flushSentenceBuffer(nextEmotion, activeProfile, true);
+          }
+          if (payload.type === 'error') throw new Error(payload.error);
+        });
+      }
+      flushSentenceBuffer(nextEmotion, activeProfile, true);
       setChatState('done');
     } catch (error) {
-      toast.error(error.message);
-      setMessages(prev => [...prev, { role: 'assistant', text: `测试失败：${error.message}` }]);
+      if (error.name !== 'AbortError') toast.error(error.message);
+      setMessages(prev => prev.map(item => (
+        item.id === assistantId && !item.text ? { ...item, text: `测试失败：${error.message}` } : item
+      )));
       setChatState('error');
       setVisualState('idle');
       setAudioLevel(0);
+    } finally {
+      streamAbortRef.current = null;
+      setStreamingReply(false);
     }
   };
 
   const playLastReply = async () => {
     const last = [...messages].reverse().find(item => item.role === 'assistant');
     if (last?.text) await speakText(last.text);
+  };
+
+  const toggleFullscreen = async () => {
+    try {
+      if (!document.fullscreenElement && callShellRef.current) {
+        await callShellRef.current.requestFullscreen();
+        setCallFullscreen(true);
+      } else if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        setCallFullscreen(false);
+      }
+    } catch (error) {
+      toast.error(`全屏失败：${error.message}`);
+    }
+  };
+
+  useEffect(() => {
+    const onFullscreen = () => setCallFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener('fullscreenchange', onFullscreen);
+    return () => document.removeEventListener('fullscreenchange', onFullscreen);
+  }, []);
+
+  const toggleCamera = async () => {
+    if (cameraOn) {
+      cameraStreamRef.current?.getTracks?.().forEach(track => track.stop());
+      cameraStreamRef.current = null;
+      if (userVideoRef.current) userVideoRef.current.srcObject = null;
+      setCameraOn(false);
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 480, height: 360, facingMode: 'user' }, audio: false });
+      cameraStreamRef.current = stream;
+      setCameraOn(true);
+      setTimeout(() => {
+        if (userVideoRef.current) {
+          userVideoRef.current.srcObject = stream;
+          userVideoRef.current.play().catch(() => {});
+        }
+      }, 0);
+    } catch (error) {
+      toast.error(`无法打开摄像头：${error.message}`);
+    }
+  };
+
+  const toggleListening = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error('当前浏览器不支持语音输入');
+      return;
+    }
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'zh-CN';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onstart = () => setListening(true);
+    recognition.onend = () => setListening(false);
+    recognition.onerror = event => {
+      setListening(false);
+      toast.error(`语音识别失败：${event.error}`);
+    };
+    recognition.onresult = event => {
+      const text = event.results?.[0]?.[0]?.transcript || '';
+      if (text.trim()) setInput(text.trim());
+    };
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   return (
@@ -583,8 +781,21 @@ const MVPChinaPage = () => {
             </aside>
 
             <main className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-6">
-              <section className="test-panel p-5 min-h-[640px] flex flex-col">
-                <div className="flex items-center gap-2 mb-4"><MessageSquare size={18} className="text-emerald-300" /><h2 className="font-semibold">对话与声音输出测试</h2></div>
+              <section ref={callShellRef} className={`test-panel p-5 min-h-[640px] flex flex-col ${callFullscreen ? 'bg-[#080b10] w-screen h-screen max-w-none p-6' : ''}`}>
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <MessageSquare size={18} className="text-emerald-300" />
+                    <h2 className="font-semibold">对话与声音输出测试</h2>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={toggleCamera} className={`w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center ${cameraOn ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title="摄像头">
+                      <Camera size={16} />
+                    </button>
+                    <button onClick={toggleFullscreen} className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center" title="全屏">
+                      {callFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                    </button>
+                  </div>
+                </div>
                 <div className="test-panel overflow-hidden mb-4">
                   <div className="relative aspect-[16/10] bg-black flex items-center justify-center">
                     <div
@@ -628,6 +839,12 @@ const MVPChinaPage = () => {
                         {visualState === 'speaking' ? '正在用克隆声线说话' : visualState === 'thinking' ? '正在组织记忆与回答' : '待机中'}
                       </div>
                     </div>
+                    {cameraOn && (
+                      <div className="absolute right-4 top-4 z-30 w-32 md:w-44 aspect-[4/3] rounded-lg overflow-hidden border border-white/20 bg-black shadow-xl">
+                        <video ref={userVideoRef} className="w-full h-full object-cover scale-x-[-1]" muted playsInline autoPlay />
+                        <div className="absolute left-2 bottom-1 text-[10px] text-white/70">你</div>
+                      </div>
+                    )}
                   </div>
                   <div className="p-3 grid grid-cols-2 gap-2">
                     <input
@@ -668,6 +885,9 @@ const MVPChinaPage = () => {
                 </div>
                 <div className="pt-4 border-t border-white/10 space-y-3">
                   <div className="flex gap-2">
+                    <button onClick={toggleListening} className={`w-11 h-11 rounded-lg border border-white/10 flex items-center justify-center ${listening ? 'bg-red-500 text-white' : 'text-white/70 hover:text-white'}`} title="语音输入">
+                      {listening ? <MicOff size={17} /> : <Mic size={17} />}
+                    </button>
                     <input
                       className="test-input flex-1 px-3 text-sm"
                       value={input}
@@ -677,16 +897,25 @@ const MVPChinaPage = () => {
                       }}
                       placeholder="输入测试问题..."
                     />
-                    <button onClick={sendMessage} disabled={!input.trim() || chatState === 'working'} className="w-11 h-11 rounded-lg bg-emerald-300 text-black flex items-center justify-center disabled:opacity-55">
-                      <Send size={17} />
+                    <button onClick={streamingReply ? stopSpeaking : sendMessage} disabled={!streamingReply && !input.trim()} className={`w-11 h-11 rounded-lg flex items-center justify-center disabled:opacity-55 ${streamingReply ? 'border border-white/10 text-white/80' : 'bg-emerald-300 text-black'}`}>
+                      {streamingReply ? <Square size={15} /> : <Send size={17} />}
                     </button>
                   </div>
-                  <button onClick={playLastReply} disabled={!messages.some(item => item.role === 'assistant')} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
-                    <Volume2 size={16} /> 重播上一条克隆语音
-                  </button>
-                  <button onClick={stopSpeaking} disabled={visualState !== 'speaking' && visualState !== 'thinking'} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
-                    <Square size={15} /> 打断当前说话
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button onClick={playLastReply} disabled={!messages.some(item => item.role === 'assistant')} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
+                      <Volume2 size={16} /> 重播上一条
+                    </button>
+                    <button onClick={stopSpeaking} disabled={visualState !== 'speaking' && visualState !== 'thinking' && !streamingReply} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
+                      <Square size={15} /> 打断
+                    </button>
+                    <button onClick={toggleCamera} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
+                      <Camera size={15} /> {cameraOn ? '关闭摄像头' : '打开摄像头'}
+                    </button>
+                    <button onClick={toggleFullscreen} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
+                      {callFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />} {callFullscreen ? '退出全屏' : '全屏通话'}
+                    </button>
+                  </div>
+                  {streamingReply && <div className="text-xs text-emerald-200/70">正在流式生成，数字人会按句子分段开口。</div>}
                 </div>
               </section>
 

@@ -433,6 +433,49 @@ ${memoryBlock || '暂无'}`);
     }
 }
 
+function estimateEmotionState({ message = '', memories = [] }) {
+    const text = String(message).toLowerCase();
+    const memory = memories.find(item => item.emotion_label && item.emotion_label !== 'neutral') || memories[0];
+    let emotionLabel = memory?.emotion_label || 'neutral';
+    let intensity = Number(memory?.emotion_score ?? 2);
+
+    if (/开心|高兴|想笑|幸福|喜欢|真好|太好了|快乐|哈哈/.test(message)) {
+        emotionLabel = 'joy';
+        intensity = Math.max(intensity, 3.2);
+    } else if (/难过|想哭|遗憾|后悔|舍不得|去世|离开|孤单|想念|怀念/.test(message)) {
+        emotionLabel = 'sadness';
+        intensity = Math.max(intensity, 3.4);
+    } else if (/生气|愤怒|讨厌|委屈|不公平|气死/.test(message)) {
+        emotionLabel = 'anger';
+        intensity = Math.max(intensity, 3.3);
+    } else if (/害怕|担心|焦虑|紧张|不安/.test(message)) {
+        emotionLabel = 'fear';
+        intensity = Math.max(intensity, 3);
+    } else if (/没想到|竟然|突然|惊讶/.test(message) || text.includes('wow')) {
+        emotionLabel = 'surprise';
+        intensity = Math.max(intensity, 2.8);
+    }
+
+    const toneMap = {
+        joy: ['gentle_happy', '轻快、亲近、带一点笑意', 'Warm, lightly happy', 'warm'],
+        sadness: ['nostalgic', '慢一点、柔和、带一点怀念', 'Soft, slow and nostalgic', 'blue'],
+        anger: ['serious', '克制、认真、不过度激烈', 'Serious and restrained', 'red'],
+        fear: ['comforting', '安抚、稳定、给人安全感', 'Comforting and steady', 'blue'],
+        surprise: ['warm', '轻快、好奇、自然回应', 'Curious and warm', 'green'],
+        neutral: ['calm', '平静、温柔、自然', 'Calm and warm', 'neutral']
+    };
+    const [tone, speakingStyle, ttsPrompt, visualMood] = toneMap[emotionLabel] || toneMap.neutral;
+    return {
+        emotion_label: emotionLabel,
+        intensity: Math.max(0, Math.min(5, Number.isFinite(intensity) ? intensity : 2)),
+        tone,
+        speaking_style: speakingStyle,
+        tts_prompt: ttsPrompt,
+        visual_mood: visualMood,
+        reason: memories.length ? '基于相关记忆' : '基于当前语气'
+    };
+}
+
 // ──────────────────────────────────────────────
 // Routes
 // ──────────────────────────────────────────────
@@ -1311,22 +1354,25 @@ async function handleVoiceSpeech(req, res) {
     const { user, supabaseAdmin } = auth;
 
     try {
+        const startedAt = Date.now();
         const { profile_id, text, voice_uri, emotion } = await readJsonBody(req);
         if (!profile_id || !text) return res.status(400).json({ error: 'profile_id and text are required' });
 
-        const { data: profile, error: profileError } = await supabaseAdmin
-            .from('profiles')
-            .select('id,user_id,elevenlabs_voice_id')
-            .eq('id', profile_id)
-            .eq('user_id', user.id)
-            .single();
-        if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
-
-        const voice = voice_uri || profile.elevenlabs_voice_id;
+        let voice = voice_uri;
+        let voiceSource = voice_uri ? 'request' : 'profile';
+        if (!voice) {
+            const { data: profile, error: profileError } = await supabaseAdmin
+                .from('profiles')
+                .select('id,user_id,elevenlabs_voice_id')
+                .eq('id', profile_id)
+                .eq('user_id', user.id)
+                .single();
+            if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
+            voice = profile.elevenlabs_voice_id;
+        }
         if (!voice) {
             return res.status(400).json({ error: 'No cloned voice uri found for this profile. Please clone a voice sample first.' });
         }
-        const voiceSource = voice_uri ? 'request' : 'profile';
         if (!SILICONFLOW_API_KEY) throw new Error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY missing');
         const speechText = cleanTextForSpeech(text);
         if (!speechText) return res.status(400).json({ error: 'speech text is empty after cleanup' });
@@ -1359,7 +1405,7 @@ async function handleVoiceSpeech(req, res) {
             console.warn('[VoiceSpeech] unexpected response:', { contentType, bytes: arrayBuffer.byteLength, responseText: responseText.slice(0, 300) });
             throw new Error(responseText || `Speech synthesis returned non-audio response (${contentType || 'unknown'})`);
         }
-        console.log('[VoiceSpeech] audio generated:', { contentType, bytes: arrayBuffer.byteLength, voiceSource, voice: String(voice).slice(0, 96) });
+        console.log('[VoiceSpeech] audio generated:', { ms: Date.now() - startedAt, contentType, bytes: arrayBuffer.byteLength, voiceSource, voice: String(voice).slice(0, 96) });
         const mimeType = contentType.includes('audio') ? contentType : 'audio/wav';
         return res.status(200).json({
             success: true,
@@ -1384,17 +1430,21 @@ async function handleTestChat(req, res) {
     try {
         const { profile_id, message } = await readJsonBody(req);
         if (!profile_id || !message) return res.status(400).json({ error: 'profile_id and message are required' });
-        const { data: profile, error: profileError } = await supabaseAdmin
+        const startedAt = Date.now();
+        const profilePromise = supabaseAdmin
             .from('profiles')
             .select('*')
             .eq('id', profile_id)
             .eq('user_id', user.id)
             .single();
+        const embeddingPromise = embedText(message);
+
+        const { data: profile, error: profileError } = await profilePromise;
         if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
 
         let memories = [];
         try {
-            const queryEmbedding = await embedText(message);
+            const queryEmbedding = await embeddingPromise;
             const { data: matched = [] } = await supabaseAdmin.rpc('match_memory_fragments', {
                 query_embedding: queryEmbedding,
                 match_profile_id: profile_id,
@@ -1405,7 +1455,7 @@ async function handleTestChat(req, res) {
         } catch (error) {
             console.warn('[TestChat] memory retrieval skipped:', error.message);
         }
-        const emotionState = await analyzeEmotionalState({ message, memories, profile });
+        const emotionState = estimateEmotionState({ message, memories });
         const memoryBlock = memories
             .map(item => `[${item.emotion_label || 'neutral'}] ${item.content_text || item.summary || ''}`)
             .join('\n');
@@ -1413,7 +1463,7 @@ async function handleTestChat(req, res) {
         const data = await callSiliconFlowChat({
             model: MEMORY_LLM_MODEL,
             temperature: 0.78,
-            maxTokens: 220,
+            maxTokens: 160,
             messages: [
                 {
                     role: 'system',
@@ -1444,6 +1494,7 @@ Adjust your language rhythm, warmth, and word choice to match this emotion. If n
             ]
         });
         const reply = data.choices?.[0]?.message?.content?.trim() || '我听到了，我们继续聊。';
+        console.log('[TestChat] completed:', { ms: Date.now() - startedAt, memories: memories.length, model: MEMORY_LLM_MODEL });
         return res.status(200).json({ reply, profile, emotion: emotionState, sources: memories });
     } catch (error) {
         console.error('[TestChat] Fatal:', error);
@@ -1454,6 +1505,89 @@ Adjust your language rhythm, warmth, and word choice to match this emotion. If n
 // ──────────────────────────────────────────────
 // Universal Router
 // ──────────────────────────────────────────────
+
+async function handleTestChatStream(req, res) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const auth = await getAuthedSupabase(req);
+    if (auth.error) return res.status(401).json({ error: auth.error });
+    const { user, supabaseAdmin } = auth;
+
+    try {
+        const { profile_id, message } = await readJsonBody(req);
+        if (!profile_id || !message) return res.status(400).json({ error: 'profile_id and message are required' });
+        const startedAt = Date.now();
+        const profilePromise = supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('id', profile_id)
+            .eq('user_id', user.id)
+            .single();
+        const embeddingPromise = embedText(message);
+
+        const { data: profile, error: profileError } = await profilePromise;
+        if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
+
+        let memories = [];
+        try {
+            const queryEmbedding = await embeddingPromise;
+            const { data: matched = [] } = await supabaseAdmin.rpc('match_memory_fragments', {
+                query_embedding: queryEmbedding,
+                match_profile_id: profile_id,
+                match_user_id: user.id,
+                match_count: 5
+            });
+            memories = matched;
+        } catch (error) {
+            console.warn('[TestChatStream] memory retrieval skipped:', error.message);
+        }
+
+        const emotionState = estimateEmotionState({ message, memories });
+        const memoryBlock = memories
+            .map(item => `[${item.emotion_label || 'neutral'}] ${item.content_text || item.summary || ''}`)
+            .join('\n');
+        const systemPrompt = `Retrieved memories:
+${memoryBlock || 'None'}
+
+Emotion state:
+- emotion_label: ${emotionState.emotion_label}
+- intensity: ${emotionState.intensity}/5
+- tone: ${emotionState.tone}
+- speaking_style: ${emotionState.speaking_style}
+
+Adjust your language rhythm, warmth, and word choice to match this emotion. If no relevant memory exists, admit uncertainty instead of inventing details.
+
+${NATURAL_CHAT_STYLE_PROMPT}
+
+${DIGITAL_VOICE_ROLE_PROMPT}
+
+You are ${profile.display_name || 'UploadSoul digital person'}. Use first person, natural spoken Chinese, under 80 Chinese characters.`;
+
+        res.writeHead(200, sseHeaders);
+        const sse = (obj) => res.write(`data: ${JSON.stringify(obj)}\n\n`);
+        sse({ type: 'emotion', emotion: emotionState });
+        sse({ type: 'sources', memories });
+
+        let answer = '';
+        try {
+            answer = await streamSiliconFlowAnswer({
+                systemPrompt,
+                message,
+                onToken: (text) => sse({ type: 'token', text })
+            });
+            console.log('[TestChatStream] completed:', { ms: Date.now() - startedAt, memories: memories.length, model: MEMORY_LLM_MODEL });
+            sse({ type: 'done', fullText: answer, profile, emotion: emotionState, sources: memories });
+            res.end();
+        } catch (error) {
+            console.error('[TestChatStream] stream failed:', error);
+            sse({ type: 'error', error: error.message });
+            res.end();
+        }
+    } catch (error) {
+        console.error('[TestChatStream] Fatal:', error);
+        if (!res.headersSent) return res.status(500).json({ error: error.message });
+        res.end();
+    }
+}
 
 export const config = {
     api: { bodyParser: false }
@@ -1482,6 +1616,7 @@ export default async function handler(req, res) {
         if (pathname === '/cloudinary/signature') return await handleCloudinarySignature(req, res);
         if (pathname === '/voice/clone') return await handleVoiceClone(req, res);
         if (pathname === '/voice/speech') return await handleVoiceSpeech(req, res);
+        if (pathname === '/test-chat-stream') return await handleTestChatStream(req, res);
         if (pathname === '/test-chat') return await handleTestChat(req, res);
         if (pathname === '/chat') return await handleChat(req, res);
         if (pathname === '/speech-token') return await handleSpeechToken(req, res);
