@@ -64,7 +64,28 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "postcss": "^8.4.45",
+    "react-snap": "^1.23.0",
     "tailwindcss": "^3.4.10",
     "vite": "^5.4.1"
+  },
+  "reactSnap": {
+    "source": "dist",
+    "destination": "dist",
+    "include": [
+      "/",
+      "/digital-immortality",
+      "/digital-rebirth",
+      "/speak-bar",
+      "/virtual-love",
+      "/about",
+      "/our-stories",
+      "/privacy",
+      "/terms"
+    ],
+    "puppeteerArgs": [
+      "--no-sandbox",
+      "--disable-setuid-sandbox"
+    ],
+    "delay": 10000
   }
 }

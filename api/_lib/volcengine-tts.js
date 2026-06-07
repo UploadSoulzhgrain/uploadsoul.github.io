@@ -11,8 +11,6 @@ import WebSocket from 'ws';
 import crypto from 'crypto';
 
 
-const APPID = process.env.VOLC_SPEECH_APPID;
-const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN;
 const TTS_WSS = 'wss://openspeech.bytedance.com/api/v3/tts/ws';
 
 // ─────────────────────────────────────────────
@@ -64,6 +62,10 @@ function resolveVoiceConfig(avatarType, overrideVoiceId) {
  */
 export function streamTTS(text, avatarType = 'companion', voiceId, onChunk, onDone, onError, signal) {
     return new Promise((resolve, reject) => {
+        const APPID = process.env.VOLC_SPEECH_APPID;
+        // Fallback to APIKEY if ACCESS_TOKEN is not set
+        const ACCESS_TOKEN = process.env.VOLC_SPEECH_ACCESS_TOKEN || process.env.VOLC_SPEECH_APIKEY;
+
         const { internalVoice, speedRatio } = resolveVoiceConfig(avatarType, voiceId);
         const requestId = crypto.randomUUID();
         const audioChunks = [];

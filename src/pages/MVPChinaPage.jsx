@@ -1,688 +1,752 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import StreamingAvatar from "@heygen/streaming-avatar";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Box, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, MessageSquare, Mic, Play, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
+import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
+
+async function authedFetch(session, url, options = {}) {
+  const headers = {
+    ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
+    ...(options.headers || {}),
+    Authorization: `Bearer ${session?.access_token}`
+  };
+  const response = await fetch(url, { ...options, headers });
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error || `请求失败: ${response.status}`);
+  }
+  return response;
+}
+
+const stepCopy = [
+  ['账号', '登录后创建或读取默认 profile'],
+  ['声音', '上传 3-5 秒微信语音或现场录音'],
+  ['克隆', '转写参考文本并生成 CosyVoice2 音色 URI'],
+  ['记忆', '把文本/语音/照片整理成 memory_fragment'],
+  ['对话', 'LLM 生成回复，再用克隆声音输出']
+];
+
+const captureModes = [
+  {
+    id: 'relationship',
+    title: '关系图谱采集',
+    icon: GitBranch,
+    prompt: '请写下一个对你很重要的人：你们是什么关系？你们之间最常被想起的一件小事是什么？',
+    note: '人物、关系、亲疏、称呼、情感强度'
+  },
+  {
+    id: 'life_stage',
+    title: '人生阶段采集',
+    icon: Landmark,
+    prompt: '请选择一个人生阶段，比如童年、求学、工作、婚恋、迁徙。那段时间最能代表你的一个场景是什么？',
+    note: '童年、求学、工作、婚恋、迁徙、告别'
+  },
+  {
+    id: 'object_photo',
+    title: '物件/照片触发',
+    icon: Box,
+    prompt: '想起一张照片或一个旧物件。它现在在哪里？它让你想起谁、哪一天、什么声音或气味？',
+    note: '照片、旧物、声音、气味、地点线索'
+  }
+];
+
+const defaultEmotionState = {
+  emotion_label: 'neutral',
+  intensity: 2,
+  tone: 'calm',
+  speaking_style: '平静、温柔、自然',
+  tts_prompt: 'Calm and warm',
+  visual_mood: 'neutral',
+  reason: '等待对话'
+};
+
+const emotionVisuals = {
+  joy: { rgb: '245,197,66', label: '喜悦' },
+  sadness: { rgb: '79,140,255', label: '怀念/低落' },
+  anger: { rgb: '239,68,68', label: '严肃' },
+  fear: { rgb: '139,92,246', label: '不安' },
+  surprise: { rgb: '34,197,94', label: '惊喜' },
+  neutral: { rgb: '16,185,129', label: '平静' },
+  warm: { rgb: '245,197,66', label: '温暖' },
+  blue: { rgb: '79,140,255', label: '安静' },
+  red: { rgb: '239,68,68', label: '强烈' },
+  green: { rgb: '34,197,94', label: '轻快' }
+};
+
+function audioBufferToWav(audioBuffer) {
+  const channels = Math.min(2, audioBuffer.numberOfChannels);
+  const sampleRate = audioBuffer.sampleRate;
+  const samples = audioBuffer.length;
+  const blockAlign = channels * 2;
+  const buffer = new ArrayBuffer(44 + samples * blockAlign);
+  const view = new DataView(buffer);
+  let offset = 0;
+
+  const writeString = (value) => {
+    for (let i = 0; i < value.length; i += 1) {
+      view.setUint8(offset + i, value.charCodeAt(i));
+    }
+    offset += value.length;
+  };
+
+  writeString('RIFF');
+  view.setUint32(offset, 36 + samples * blockAlign, true); offset += 4;
+  writeString('WAVE');
+  writeString('fmt ');
+  view.setUint32(offset, 16, true); offset += 4;
+  view.setUint16(offset, 1, true); offset += 2;
+  view.setUint16(offset, channels, true); offset += 2;
+  view.setUint32(offset, sampleRate, true); offset += 4;
+  view.setUint32(offset, sampleRate * blockAlign, true); offset += 4;
+  view.setUint16(offset, blockAlign, true); offset += 2;
+  view.setUint16(offset, 16, true); offset += 2;
+  writeString('data');
+  view.setUint32(offset, samples * blockAlign, true); offset += 4;
+
+  for (let i = 0; i < samples; i += 1) {
+    for (let channel = 0; channel < channels; channel += 1) {
+      const sample = Math.max(-1, Math.min(1, audioBuffer.getChannelData(channel)[i]));
+      view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7fff, true);
+      offset += 2;
+    }
+  }
+
+  return new Blob([buffer], { type: 'audio/wav' });
+}
+
+async function recordedBlobToWavFile(blob) {
+  const arrayBuffer = await blob.arrayBuffer();
+  const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextCtor) throw new Error('AudioContext unsupported');
+  const context = new AudioContextCtor();
+  try {
+    const audioBuffer = await context.decodeAudioData(arrayBuffer.slice(0));
+    const wavBlob = audioBufferToWav(audioBuffer);
+    return new File([wavBlob], `voice-sample-${Date.now()}.wav`, { type: 'audio/wav' });
+  } finally {
+    await context.close().catch(() => {});
+  }
+}
 
 const MVPChinaPage = () => {
-  const { t, i18n } = useTranslation();
-  const [status, setStatus] = useState('idle'); // idle, connecting, ready, error
+  const { user, session } = useAuth();
+  const [profile, setProfile] = useState(null);
+  const [booting, setBooting] = useState(true);
+  const [setupError, setSetupError] = useState('');
+  const [voiceFile, setVoiceFile] = useState(null);
+  const [cloneState, setCloneState] = useState('idle');
+  const [transcript, setTranscript] = useState('');
+  const [memoryText, setMemoryText] = useState('');
+  const [memoryState, setMemoryState] = useState('idle');
   const [messages, setMessages] = useState([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isTalking, setIsTalking] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [recognition, setRecognition] = useState(null);
-  const [continuousMode, setContinuousMode] = useState(true); // 连续对话模式
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isCameraOn, setIsCameraOn] = useState(false);
-  const [cameraStream, setCameraStream] = useState(null);
+  const [input, setInput] = useState('你能用刚才上传的声音跟我打个招呼吗？');
+  const [chatState, setChatState] = useState('idle');
+  const [recording, setRecording] = useState(false);
+  const [recordSeconds, setRecordSeconds] = useState(0);
+  const [captureMode, setCaptureMode] = useState(captureModes[0]);
+  const [interviewQuestion, setInterviewQuestion] = useState('');
+  const [interviewLoading, setInterviewLoading] = useState(false);
+  const [visualUrl, setVisualUrl] = useState('');
+  const [visualType, setVisualType] = useState('avatar');
+  const [visualState, setVisualState] = useState('idle');
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [emotionState, setEmotionState] = useState(defaultEmotionState);
+  const audioRef = useRef(null);
+  const audioContextRef = useRef(null);
+  const analyserRef = useRef(null);
+  const sourceRef = useRef(null);
+  const animationRef = useRef(null);
+  const recorderRef = useRef(null);
+  const chunksRef = useRef([]);
+  const timerRef = useRef(null);
+  const fileRef = useRef(null);
+  const visualFileRef = useRef(null);
 
-  const videoRef = useRef(null);
-  const avatarRef = useRef(null);
-  const chatEndRef = useRef(null);
-  const recognitionRef = useRef(null);
-  const sendMessageRef = useRef(null);
-  const isTalkingRef = useRef(false); // 存储最新的 isTalking 状态
-  const videoContainerRef = useRef(null);
-  const userVideoRef = useRef(null);
-  const chatContainerRef = useRef(null);
-  const [debugLog, setDebugLog] = useState([]);
-  const [hasVideoTrack, setHasVideoTrack] = useState(false);
-  // 数字人当前说话语言：普通话（默认）、英文、粤语，用户可随时切换
-  const [avatarLang, setAvatarLang] = useState('mandarin');
+  const hasVoice = Boolean(profile?.elevenlabs_voice_id);
+  const activeEmotionVisual = emotionVisuals[emotionState.visual_mood] || emotionVisuals[emotionState.emotion_label] || emotionVisuals.neutral;
+  const flowProgress = useMemo(() => {
+    let count = 1;
+    if (profile) count += 1;
+    if (voiceFile || profile?.voice_sample_url) count += 1;
+    if (hasVoice) count += 1;
+    if (messages.length) count += 1;
+    return Math.min(5, count);
+  }, [hasVoice, messages.length, profile, voiceFile]);
 
-  const addDebug = (msg) => {
-    console.log(`[AVATAR_DEBUG] ${msg}`);
-    setDebugLog(prev => [...prev.slice(-4), msg]);
-  };
-
-  // HeyGen 三种语音 ID（普通话 / 英文 / 粤语）。普通话/粤语可从 HeyGen 后台或 GET /v2/voices 按 zh-CN/zh-HK 获取
-  const HEYGEN_VOICE_IDS = {
-    mandarin: '6b4b654c8f2a4f3e9c8d7e6f5a4b3c2d', // 普通话 zh-CN，若无效请从 HeyGen 控制台替换
-    english: '1bd001e7e50f421d891986aad5158bc8',
-    cantonese: '867e42cd03df44929a6744e8fa663884'  // 粤语
-  };
-
-  // 像真人：你要求什么语言就什么语言，或你说什么语言就同样用什么语言（无按钮，全由内容决定）
-  const resolveAvatarLang = (text) => {
-    const t = (text || '').trim();
-    // 1) 显式要求：用粤语/说英文/用普通话 等
-    if (/\b(用|说|讲|切换?成?)\s*(粤语|廣東話|广东话|Cantonese)\b/i.test(t)) {
-      setAvatarLang('cantonese');
-      return 'cantonese';
-    }
-    if (/\b(用|说|讲|切换?成?)\s*(英文|英语|English)\b/i.test(t) || /\b(switch to|in) english\b/i.test(t)) {
-      setAvatarLang('english');
-      return 'english';
-    }
-    if (/\b(用|说|讲|切换?成?)\s*(普通话|国语|Mandarin)\b/i.test(t)) {
-      setAvatarLang('mandarin');
-      return 'mandarin';
-    }
-    // 2) 无显式要求：根据用户输入语言推断（你说英文就回英文，说中文就回普通话）
-    const enCount = (t.match(/[a-zA-Z]/g) || []).length;
-    const cjkCount = (t.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) || []).length;
-    const isMostlyEnglish = enCount >= cjkCount && (enCount + cjkCount) > 0;
-    const lang = isMostlyEnglish ? 'english' : 'mandarin';
-    setAvatarLang(lang);
-    return lang;
-  };
-
-  // 全屏切换功能
-  const toggleFullscreen = useCallback(() => {
-    if (!videoContainerRef.current) return;
-
-    if (!document.fullscreenElement) {
-      videoContainerRef.current.requestFullscreen().then(() => {
-        setIsFullscreen(true);
-      }).catch(err => {
-        console.error('Fullscreen error:', err);
-        addDebug(`全屏失败: ${err.message}`);
-      });
-    } else {
-      document.exitFullscreen().then(() => {
-        setIsFullscreen(false);
-      });
-    }
-  }, []);
-
-  // 监听全屏状态变化
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsFullscreen(!!document.fullscreenElement);
-    };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  // 摄像头开关功能
-  const toggleCamera = useCallback(async () => {
-    if (isCameraOn && cameraStream) {
-      // 关闭摄像头
-      cameraStream.getTracks().forEach(track => track.stop());
-      setCameraStream(null);
-      setIsCameraOn(false);
-      if (userVideoRef.current) {
-        userVideoRef.current.srcObject = null;
-      }
-    } else {
-      // 开启摄像头
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 320, height: 240, facingMode: 'user' },
-          audio: false
-        });
-        setCameraStream(stream);
-        setIsCameraOn(true);
-        // 不在此处给 ref 赋值：此时 <video> 尚未挂载（isCameraOn 刚变为 true），由 useEffect 在挂载后绑定
-      } catch (err) {
-        console.error('Camera error:', err);
-        addDebug(`摄像头失败: ${err.message}`);
-      }
-    }
-  }, [isCameraOn, cameraStream]);
-
-  // 摄像头流就绪后绑定到 video 元素（video 在 isCameraOn 为 true 时才挂载，需在 effect 里赋值）
-  useEffect(() => {
-    if (!isCameraOn || !cameraStream || !userVideoRef.current) return;
-    userVideoRef.current.srcObject = cameraStream;
-    userVideoRef.current.play().catch((e) => console.log('User video autoplay:', e));
-  }, [isCameraOn, cameraStream]);
-
-  // 清理摄像头
-  useEffect(() => {
-    return () => {
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [cameraStream]);
-
-  // 启动语音识别的辅助函数，带错误恢复
-  const startVoiceRecognition = useCallback(() => {
-    if (!recognitionRef.current || isTalkingRef.current) {
-      console.log('[Voice] Cannot start - no recognition or is talking');
-      return;
-    }
-
+  const loadOrCreateProfile = useCallback(async () => {
+    if (!session) return;
+    setBooting(true);
+    setSetupError('');
     try {
-      // 动态同步识别语言
-      const currentLang = i18n.language.startsWith('zh') ? 'zh-CN' : 'en-US';
-      if (recognitionRef.current.lang !== currentLang) {
-        console.log(`[Voice] Updating recognition language to: ${currentLang}`);
-        recognitionRef.current.lang = currentLang;
+      const response = await authedFetch(session, '/api/profiles');
+      const data = await response.json();
+      if (data.profiles?.[0]) {
+        setProfile(data.profiles[0]);
+        return;
       }
-
-      console.log('[Voice] Starting recognition...');
-      recognitionRef.current.start();
-      setIsListening(true);
-      console.log('[Voice] ✅ Recognition started successfully');
-    } catch (error) {
-      console.error('[Voice] ❌ Start recognition error:', error);
-
-      // 如果是"already started"错误，先停止再重启
-      if (error.message && error.message.includes('already started')) {
-        console.log('[Voice] Already started detected, stopping and restarting...');
-        try {
-          recognitionRef.current.stop();
-        } catch (e) {
-          console.error('[Voice] Error stopping:', e);
-        }
-        setTimeout(() => startVoiceRecognition(), 300);
-      } else {
-        console.log(`[Voice] Failed to start: ${error.message || error}`);
-        setIsListening(false);
-      }
-    }
-  }, [i18n.language]);
-
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
-  }, [messages]);
-
-  // 初始化语音识别
-  useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      const recognitionInstance = new SpeechRecognition();
-      recognitionInstance.continuous = false;
-      recognitionInstance.interimResults = false;
-      // 初始语言设置，后续在 startVoiceRecognition 中动态同步
-      recognitionInstance.lang = i18n.language.startsWith('zh') ? 'zh-CN' : 'en-US';
-
-      recognitionInstance.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        console.log('[Voice] Recognized:', transcript);
-
-        // 直接调用 ref 中的发送函数，避免闭包问题
-        if (transcript.trim() && sendMessageRef.current) {
-          sendMessageRef.current(transcript.trim());
-        }
-      };
-
-      recognitionInstance.onerror = (event) => {
-        console.error('Speech recognition error:', event.error);
-        setIsListening(false);
-        addDebug(`${t('mvpChina.chat.error')}: ${event.error}`);
-      };
-
-      recognitionInstance.onend = () => {
-        console.log('[Voice] Recognition ended');
-        setIsListening(false);
-      };
-
-      recognitionInstance.onnomatch = () => {
-        console.log('[Voice] No match - please speak clearly');
-        addDebug('未能识别，请再说一遍');
-      };
-
-      recognitionRef.current = recognitionInstance;
-      setRecognition(recognitionInstance);
-    }
-  }, [t, i18n.language]);
-
-  // 同步 isTalking 状态到 ref
-  useEffect(() => {
-    isTalkingRef.current = isTalking;
-  }, [isTalking]);
-
-  // 清理函数
-  useEffect(() => {
-    return () => {
-      if (avatarRef.current) {
-        avatarRef.current.stopAvatar();
-      }
-      if (recognitionRef.current) { // 修正为正确的 ref 名称
-        recognitionRef.current.stop();
-      }
-    };
-  }, []);
-
-  const initAvatar = async () => {
-    if (avatarRef.current) return;
-
-    setStatus('connecting');
-    try {
-      addDebug(t('mvpChina.logs.getToken'));
-      const response = await fetch('/api/heygen-token');
-
-      if (!response.ok) {
-        const errText = await response.text();
-        console.error('HeyGen Token API Error:', errText);
-        throw new Error(`Token API Failed (${response.status}): ${errText.substring(0, 50)}...`);
-      }
-
-      let data;
-      try {
-        data = await response.json();
-      } catch (e) {
-        const errText = await response.text();
-        console.error('HeyGen Token JSON Error:', e, 'Response:', errText);
-        throw new Error('Token API returned invalid JSON');
-      }
-
-      const { token } = data;
-
-      if (!token) throw new Error(t('mvpChina.logs.error'));
-
-      addDebug(t('mvpChina.logs.initEngine'));
-      avatarRef.current = new StreamingAvatar({ token });
-
-      // 绑定流准备就绪事件
-      avatarRef.current.on('stream_ready', (event) => {
-        addDebug(t('mvpChina.logs.streamReady'));
-        if (videoRef.current) {
-          videoRef.current.srcObject = event.detail;
-          videoRef.current.oncanplay = () => {
-            videoRef.current.play().catch(err => console.error('[Avatar] Play error:', err));
-            setHasVideoTrack(true);
-          };
-        }
-      });
-
-      avatarRef.current.on('stream_disconnected', () => {
-        addDebug(t('mvpChina.logs.streamDisconnected'));
-        setHasVideoTrack(false);
-        setStatus('idle');
-        avatarRef.current = null;
-      });
-
-      // 固定普通话语音，一个数字人不因语言切换重启（HeyGen 无多语言单一声源，普通话优先）
-      const selectedVoiceId = HEYGEN_VOICE_IDS.mandarin;
-      console.log('[Avatar] Starting session with voice_id (Mandarin):', selectedVoiceId);
-
-      await avatarRef.current.createStartAvatar({
-        avatarName: "Anna_public_3_20240108",
-        quality: 'low',
-        voice: { voice_id: selectedVoiceId }
-      });
-
-      addDebug(t('mvpChina.logs.sessionEstablished'));
-      setStatus('ready');
-
-      const welcome = t('mvpChina.chat.welcome');
-      addBotMessage(welcome);
-      if (avatarRef.current) {
-        avatarRef.current.speak({
-          text: welcome,
-          task_type: 'repeat'
-        }).catch(err => console.error('[Avatar] Welcome speech failed:', err));
-      }
-
-    } catch (error) {
-      console.error('[Avatar] Initialization failed:', error);
-      addDebug(`${t('mvpChina.status.error')}: ${error.message}`);
-      setStatus('error');
-      avatarRef.current = null; // 允许用户点击「启动」重试
-    }
-  };
-
-  const addBotMessage = (text) => {
-    setMessages(prev => [...prev, { role: 'bot', text }]);
-  };
-
-  const addUserMessage = (text) => {
-    setMessages(prev => [...prev, { role: 'user', text }]);
-  };
-
-  const handleSendMessage = async (messageText) => {
-    if (!messageText || status !== 'ready' || isTalking) {
-      console.log('[Send] Blocked:', { messageText, status, isTalking });
-      return;
-    }
-
-    const text = messageText;
-    setInputValue('');
-    addUserMessage(text);
-    setIsTalking(true);
-    setIsListening(false); // 确保停止监听
-
-    const effectiveLang = resolveAvatarLang(text);
-    // 国内通道固定普通话语音，不因切换语言重启，避免重连失败；LLM 仍按 preferred_language 回复
-
-    try {
-      addDebug(t('mvpChina.logs.thinking'));
-      // 1. 获取 GPT 回复（按当前选择的语言）
-      const chatRes = await fetch('/api/chat', {
+      const created = await authedFetch(session, '/api/profiles', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, preferred_language: effectiveLang })
+        body: JSON.stringify({
+          display_name: user?.user_metadata?.nickname || user?.email?.split('@')[0] || '我的数字人',
+          description: '用于 UploadSoul 内部测试的默认数字人档案。'
+        })
       });
-
-      let data;
-      const contentType = chatRes.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-        data = await chatRes.json();
-      } else {
-        const text = await chatRes.text();
-        console.error('Chat API Non-JSON Response:', text);
-        throw new Error(`Server Error: ${text.substring(0, 50)}...`);
-      }
-
-      if (!chatRes.ok) {
-        throw new Error(data.error || `Chat API Failed (${chatRes.status})`);
-      }
-
-      const reply = data.reply;
-
-      if (reply) {
-        addBotMessage(reply);
-
-        // 2. 让 HeyGen 数字人说话
-        if (avatarRef.current) {
-          addDebug(`[Avatar] Start speaking: ${reply.substring(0, 20)}...`);
-          await avatarRef.current.speak({
-            text: reply,
-            task_type: 'repeat'
-          });
-          addDebug('[Avatar] Finished speaking');
-        }
-      }
+      const createdData = await created.json();
+      setProfile(createdData.profile);
     } catch (error) {
-      console.error('Chat Error:', error);
-      addBotMessage(`${t('mvpChina.chat.error')} (${error.message})`);
+      setSetupError(error.message);
+      toast.error(error.message);
     } finally {
-      setIsTalking(false);
-
-      // 连续对话模式：数字人回复完毕后自动重新开启麦克风
-      if (continuousMode && recognitionRef.current && status === 'ready') {
-        console.log('[Voice] Scheduling mic restart in continuous mode');
-        setTimeout(() => {
-          // 使用 ref 访问最新状态，避免闭包问题
-          console.log('[Voice] Attempting to restart mic, isTalking:', isTalkingRef.current);
-          if (!isTalkingRef.current) {
-            startVoiceRecognition();
-          } else {
-            console.log('[Voice] Still talking, skipping restart');
-          }
-        }, 2000); // 增加延迟到 2 秒，确保语音播放物理层面结束
-      }
+      setBooting(false);
     }
-  };
+  }, [session, user]);
 
-  // 更新 ref，确保语音识别回调能访问最新的函数
   useEffect(() => {
-    sendMessageRef.current = handleSendMessage;
-  }, [status, isTalking, continuousMode, avatarLang]);
+    loadOrCreateProfile();
+  }, [loadOrCreateProfile]);
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      addDebug(`Audio: ${videoRef.current.muted ? 'Muted' : 'Unmuted'}`);
+  useEffect(() => {
+    if (profile?.avatar_url && !visualUrl) {
+      setVisualUrl(profile.avatar_url);
+      setVisualType(profile.avatar_url.match(/\.(mp4|webm|mov)(\?|$)/i) ? 'video' : 'avatar');
+    }
+  }, [profile, visualUrl]);
+
+  useEffect(() => () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    audioContextRef.current?.close?.();
+    recorderRef.current?.stream?.getTracks?.().forEach(track => track.stop());
+  }, []);
+
+  const startRecording = async () => {
+    if (recording) return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const preferredMimeType = MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+        ? 'audio/ogg;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+          ? 'audio/webm;codecs=opus'
+          : '';
+      const recorder = new MediaRecorder(stream, preferredMimeType ? { mimeType: preferredMimeType } : undefined);
+      recorderRef.current = recorder;
+      chunksRef.current = [];
+      setRecordSeconds(0);
+      recorder.ondataavailable = event => {
+        if (event.data.size) chunksRef.current.push(event.data);
+      };
+      recorder.onstop = async () => {
+        const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+        try {
+          const file = await recordedBlobToWavFile(blob);
+          setVoiceFile(file);
+          toast.success('录音已转换为 wav，可用于克隆');
+        } catch (error) {
+          console.error('Recorded audio conversion failed:', error);
+          toast.error('录音转 wav 失败，请改用 mp3/wav 文件上传');
+        } finally {
+          stream.getTracks().forEach(track => track.stop());
+        }
+      };
+      recorder.start();
+      setRecording(true);
+      timerRef.current = setInterval(() => {
+        setRecordSeconds(prev => {
+          if (prev >= 4) {
+            stopRecording();
+            return 5;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    } catch (error) {
+      toast.error(`无法打开麦克风：${error.message}`);
     }
   };
 
-  const toggleVoiceInput = () => {
-    if (!recognition) {
-      addDebug('您的浏览器不支持语音识别');
+  const stopRecording = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    if (recorderRef.current?.state === 'recording') {
+      recorderRef.current.stop();
+    }
+    setRecording(false);
+  };
+
+  const cloneVoice = async () => {
+    if (!profile?.id || !voiceFile) {
+      toast.error('请先选择或录制一段声音样本');
       return;
     }
-
-    if (isListening) {
-      recognition.stop();
-      setIsListening(false);
-    } else {
-      setInputValue('');
-      try {
-        recognition.start();
-        setIsListening(true);
-        addDebug('正在监听您的语音...');
-      } catch (error) {
-        console.error('Failed to start recognition:', error);
-        setIsListening(false);
-      }
+    setCloneState('working');
+    try {
+      const form = new FormData();
+      form.append('profile_id', profile.id);
+      form.append('file', voiceFile);
+      const response = await authedFetch(session, '/api/voice/clone', { method: 'POST', body: form });
+      const data = await response.json();
+      setProfile(data.profile);
+      setTranscript(data.transcript || '');
+      setMemoryText(data.transcript || '');
+      toast.success('声音克隆完成，后续对话将使用该声线');
+      setCloneState('done');
+    } catch (error) {
+      toast.error(error.message);
+      setCloneState('error');
     }
+  };
+
+  const saveMemory = async () => {
+    if (!profile?.id || !memoryText.trim()) {
+      toast.error('先输入一段要写入记忆系统的内容');
+      return;
+    }
+    setMemoryState('working');
+    try {
+      const form = new FormData();
+      form.append('profile_id', profile.id);
+      form.append('content_type', 'diary');
+      form.append('text', `采集入口：${captureMode.title}\n${memoryText.trim()}`);
+      const response = await authedFetch(session, '/api/memory/upload', { method: 'POST', body: form });
+      await response.json();
+      toast.success('记忆片段已写入采集层');
+      setMemoryState('done');
+    } catch (error) {
+      toast.error(error.message);
+      setMemoryState('error');
+    }
+  };
+
+  const ensureAudioContext = () => {
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextCtor) throw new Error('AudioContext unsupported');
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+      audioContextRef.current = new AudioContextCtor();
+      analyserRef.current = null;
+      sourceRef.current = null;
+    }
+    return audioContextRef.current;
+  };
+
+  const monitorAudio = (audio) => {
+    try {
+      const audioContext = ensureAudioContext();
+      if (!analyserRef.current) {
+        analyserRef.current = audioContext.createAnalyser();
+        analyserRef.current.fftSize = 128;
+      }
+      if (sourceRef.current) {
+        sourceRef.current.disconnect();
+      }
+      sourceRef.current = audioContext.createMediaElementSource(audio);
+      sourceRef.current.connect(analyserRef.current);
+      analyserRef.current.connect(audioContext.destination);
+      const data = new Uint8Array(analyserRef.current.frequencyBinCount);
+      const tick = () => {
+        analyserRef.current.getByteFrequencyData(data);
+        const avg = data.reduce((sum, value) => sum + value, 0) / data.length;
+        setAudioLevel(Math.min(1, avg / 120));
+        animationRef.current = requestAnimationFrame(tick);
+      };
+      tick();
+      return audioContext;
+    } catch (error) {
+      console.warn('Audio visualizer unavailable:', error.message);
+      return null;
+    }
+  };
+
+  const updateVisual = async (file) => {
+    if (!file) return;
+    const localUrl = URL.createObjectURL(file);
+    setVisualUrl(localUrl);
+    setVisualType(file.type.startsWith('video') ? 'video' : 'avatar');
+
+    if (!profile?.id) return;
+    try {
+      const signatureResponse = await authedFetch(session, '/api/cloudinary/signature', {
+        method: 'POST',
+        body: JSON.stringify({ folder: `user_content/${user.id}` })
+      });
+      const signatureData = await signatureResponse.json();
+      const resourceType = file.type.startsWith('video') ? 'video' : 'image';
+      const form = new FormData();
+      form.append('file', file);
+      form.append('api_key', signatureData.apiKey);
+      form.append('timestamp', signatureData.timestamp.toString());
+      form.append('signature', signatureData.signature);
+      form.append('folder', signatureData.folder);
+      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${signatureData.cloudName}/${resourceType}/upload`, {
+        method: 'POST',
+        body: form
+      });
+      const uploadData = await uploadResponse.json();
+      if (!uploadResponse.ok) throw new Error(uploadData.error?.message || '形象上传失败');
+      const patchResponse = await authedFetch(session, '/api/profiles', {
+        method: 'PATCH',
+        body: JSON.stringify({ id: profile.id, avatar_url: uploadData.secure_url })
+      });
+      const patchData = await patchResponse.json();
+      setProfile(patchData.profile);
+      setVisualUrl(uploadData.secure_url);
+      toast.success('数字人形象已保存');
+    } catch (error) {
+      toast.error(`形象仅本地预览：${error.message}`);
+    }
+  };
+
+  const askInterviewQuestion = async () => {
+    if (!profile?.id || interviewLoading) return;
+    setInterviewLoading(true);
+    try {
+      const response = await authedFetch(session, '/api/memory/interview/next', {
+        method: 'POST',
+        body: JSON.stringify({
+          profile_id: profile.id,
+          mode: captureMode.id,
+          history: memoryText ? [{ role: 'user', content: memoryText }] : []
+        })
+      });
+      const data = await response.json();
+      setInterviewQuestion(data.question);
+      setMemoryText(prev => prev ? `${prev}\n\nAI追问：${data.question}\n我的回答：` : `AI追问：${data.question}\n我的回答：`);
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setInterviewLoading(false);
+    }
+  };
+
+  const speakText = async (text, emotion = emotionState) => {
+    setVisualState('thinking');
+    try {
+      const voiceUri = profile?.elevenlabs_voice_id;
+      if (!voiceUri) throw new Error('当前档案还没有克隆 voice uri，请先重新生成克隆声音');
+      const response = await authedFetch(session, '/api/voice/speech', {
+        method: 'POST',
+        body: JSON.stringify({ profile_id: profile.id, text, emotion, voice_uri: voiceUri })
+      });
+      const data = await response.json();
+      if (!data.audio) throw new Error('语音接口没有返回音频');
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      const audio = new Audio(data.audio);
+      audioRef.current = audio;
+      audio.volume = 1;
+      audio.muted = false;
+      audio.onplay = () => setVisualState('speaking');
+      audio.onended = () => {
+        setVisualState('idle');
+        setAudioLevel(0);
+        if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      };
+      audio.onerror = () => {
+        setVisualState('idle');
+        setAudioLevel(0);
+        toast.error('浏览器无法解码这段语音，请查看后端日志');
+      };
+      const audioContext = monitorAudio(audio);
+      if (audioContext?.state === 'suspended') {
+        await audioContext.resume();
+      }
+      await audio.play();
+    } catch (error) {
+      setVisualState('idle');
+      setAudioLevel(0);
+      toast.error(`语音播放失败：${error.message}`);
+      throw error;
+    }
+  };
+
+  const stopSpeaking = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    setAudioLevel(0);
+    setVisualState('idle');
+  };
+
+  const sendMessage = async () => {
+    if (!profile?.id || !input.trim() || chatState === 'working') return;
+    const text = input.trim();
+    stopSpeaking();
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text }]);
+    setChatState('working');
+    setVisualState('thinking');
+    try {
+      const response = await authedFetch(session, '/api/test-chat', {
+        method: 'POST',
+        body: JSON.stringify({ profile_id: profile.id, message: text })
+      });
+      const data = await response.json();
+      const nextEmotion = data.emotion || defaultEmotionState;
+      setEmotionState(nextEmotion);
+      setMessages(prev => [...prev, { role: 'assistant', text: data.reply, emotion: nextEmotion }]);
+      await speakText(data.reply, nextEmotion);
+      setChatState('done');
+    } catch (error) {
+      toast.error(error.message);
+      setMessages(prev => [...prev, { role: 'assistant', text: `测试失败：${error.message}` }]);
+      setChatState('error');
+      setVisualState('idle');
+      setAudioLevel(0);
+    }
+  };
+
+  const playLastReply = async () => {
+    const last = [...messages].reverse().find(item => item.role === 'assistant');
+    if (last?.text) await speakText(last.text);
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] text-white flex flex-col pt-20">
-      <div className="flex-1 container mx-auto px-4 py-8 flex flex-col md:flex-row gap-8 max-w-7xl">
-
-        {/* 左侧：数字人视频区 */}
-        <div
-          ref={videoContainerRef}
-          className="flex-1 bg-[#12121A] rounded-3xl border border-white/5 overflow-hidden relative shadow-2xl flex flex-col"
-        >
-          {/* 顶部状态栏 */}
-          <div className="absolute top-6 left-6 right-6 z-10 flex justify-between items-start">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
-              <span className={`w-2 h-2 rounded-full ${status === 'ready' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
-                {status === 'ready' ? t('mvpChina.status.ready') : t('mvpChina.status.idle')}
-              </span>
+    <div className="min-h-screen bg-[#080b10] text-white pt-20">
+      <style>{`
+        .test-shell { background: radial-gradient(circle at 18% 8%, rgba(16,185,129,.16), transparent 28%), radial-gradient(circle at 82% 0%, rgba(245,197,66,.12), transparent 24%), #080b10; }
+        .test-panel { background: rgba(255,255,255,.045); border: 1px solid rgba(255,255,255,.09); border-radius: 8px; }
+        .test-input { background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.12); border-radius: 8px; color: white; outline: none; }
+        .test-input:focus { border-color: rgba(245,197,66,.65); box-shadow: 0 0 0 3px rgba(245,197,66,.1); }
+      `}</style>
+      <div className="test-shell min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
+            <div>
+              <div className="text-xs uppercase tracking-[0.28em] text-emerald-300/75 mb-3">UploadSoul Test Module</div>
+              <h1 className="text-3xl md:text-4xl font-bold">数字重生 / 数字永生流程测试舱</h1>
+              <p className="text-white/56 mt-3 max-w-3xl">这里验证从注册登录、默认档案、3-5 秒声音样本、CosyVoice2 克隆、记忆采集，到数字人用同一声线回答的完整闭环。</p>
             </div>
+            <button onClick={loadOrCreateProfile} className="px-4 py-2 rounded-lg border border-white/10 text-white/75 hover:text-white flex items-center gap-2">
+              <RefreshCw size={16} /> 刷新档案
+            </button>
+          </div>
 
-            {/* 全屏按钮 */}
-            {status === 'ready' && (
-              <button
-                onClick={toggleFullscreen}
-                className="p-2.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 text-white/70 hover:text-white hover:bg-black/60 transition-all"
-                title={isFullscreen ? '退出全屏' : '全屏显示'}
-              >
-                {isFullscreen ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+          <section className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
+            {stepCopy.map((step, index) => (
+              <div key={step[0]} className={`test-panel p-4 ${index < flowProgress ? 'border-emerald-300/35' : ''}`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold mb-3 ${index < flowProgress ? 'bg-emerald-300 text-black' : 'bg-white/10 text-white/45'}`}>{index + 1}</div>
+                <div className="font-semibold">{step[0]}</div>
+                <div className="text-xs text-white/45 mt-1">{step[1]}</div>
+              </div>
+            ))}
+          </section>
+
+          {setupError && (
+            <section className="test-panel p-4 mb-6 border-red-400/30 bg-red-500/8">
+              <div className="font-semibold text-red-200 mb-1">测试页初始化失败</div>
+              <div className="text-sm text-white/65">{setupError}</div>
+              <div className="text-xs text-white/42 mt-2">通常是 Supabase SQL 尚未完整执行、profiles 表不存在、RLS/Service Role 配置未完成，或本地 Vite 没有连到 Vercel API。</div>
+            </section>
+          )}
+
+          <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
+            <aside className="space-y-6">
+              <section className="test-panel p-5">
+                <div className="flex items-center gap-2 mb-4"><ShieldCheck size={18} className="text-emerald-300" /><h2 className="font-semibold">当前测试档案</h2></div>
+                {booting ? (
+                  <div className="text-sm text-white/45">正在初始化 profile...</div>
                 ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                  </svg>
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between gap-4"><span className="text-white/45">登录账号</span><span className="text-right">{user?.email}</span></div>
+                    <div className="flex justify-between gap-4"><span className="text-white/45">档案名</span><span>{profile?.display_name}</span></div>
+                    <div className="flex justify-between gap-4"><span className="text-white/45">声音状态</span><span className={hasVoice ? 'text-emerald-300' : 'text-amber-300'}>{hasVoice ? '已克隆' : '未初始化'}</span></div>
+                    {hasVoice && <div className="text-xs text-white/40 break-all pt-2 border-t border-white/10">{profile.elevenlabs_voice_id}</div>}
+                  </div>
                 )}
-              </button>
-            )}
-          </div>
+              </section>
 
-          <div className="flex-1 flex items-center justify-center relative bg-black/40">
-            {/* 视频渲染容器 */}
-            <div id="video-container" className="w-full h-full min-h-[400px] flex items-center justify-center">
-              <video
-                ref={videoRef}
-                className="w-full h-full object-contain"
-                playsInline
-                autoPlay
-                muted={false}
-              />
-
-              {(status === 'idle' || status === 'error') && (
-                <div className="flex flex-col items-center gap-3 z-20">
-                  {status === 'error' && debugLog.length > 0 && (
-                    <p className="text-red-400/90 text-sm max-w-md text-center px-4">
-                      {debugLog[debugLog.length - 1]}
-                    </p>
-                  )}
-                  <button
-                    onClick={initAvatar}
-                    className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
-                  >
-                    {status === 'error' ? t('mvpChina.controls.retry') || '重试' : t('mvpChina.controls.start')}
+              <section className="test-panel p-5">
+                <div className="flex items-center gap-2 mb-4"><FileAudio size={18} className="text-amber-200" /><h2 className="font-semibold">声音初始化</h2></div>
+                <div className="space-y-3">
+                  <input
+                    ref={fileRef}
+                    className="hidden"
+                    type="file"
+                    accept="audio/*,.mp3,.wav,.opus,.ogg"
+                    onChange={event => setVoiceFile(event.target.files?.[0] || null)}
+                  />
+                  <button onClick={() => fileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-amber-200/40 flex items-center justify-center gap-2">
+                    <Upload size={17} /> 上传微信语音/短音频
                   </button>
+                  <button onClick={recording ? stopRecording : startRecording} className={`w-full px-4 py-3 rounded-lg flex items-center justify-center gap-2 ${recording ? 'bg-red-500 text-white' : 'bg-white/8 border border-white/10'}`}>
+                    <Mic size={17} /> {recording ? `录音中 ${recordSeconds}s，点击停止` : '现场录 5 秒'}
+                  </button>
+                  {voiceFile && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{voiceFile.name} · {(voiceFile.size / 1024 / 1024).toFixed(2)} MB</div>}
+                  <div className="text-[11px] text-white/38 leading-relaxed">正式验证优先上传 mp3 / wav / opus。浏览器现场录音会尽量使用 ogg-opus，部分浏览器可能退回 webm。</div>
+                  <button onClick={cloneVoice} disabled={!voiceFile || cloneState === 'working'} className="w-full px-4 py-3 rounded-lg bg-amber-300 text-black font-semibold disabled:opacity-55">
+                    {cloneState === 'working' ? '转写并克隆中...' : '生成克隆声音'}
+                  </button>
+                  {transcript && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">转写结果：{transcript}</div>}
                 </div>
-              )}
+              </section>
+            </aside>
 
-              {status === 'connecting' && (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-400 animate-pulse font-light tracking-widest text-sm">{t('mvpChina.controls.connecting')}</p>
-                </div>
-              )}
-
-              {status === 'ready' && (
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end z-20">
-                  <div className="bg-black/60 backdrop-blur-md p-3 rounded-xl border border-white/10 text-[10px] space-y-1 font-mono w-64">
-                    <div className="text-gray-400 flex justify-between">
-                      <span># SYSTEM_LOG</span>
-                      <span className="text-[8px] opacity-50 tracking-tighter">CHINA_v2</span>
-                    </div>
-                    <div className="flex flex-col gap-1 overflow-hidden">
-                      <div className="text-gray-500 text-[9px] truncate">
-                        {debugLog.length > 0 ? `> ${debugLog[debugLog.length - 1]}` : 'Waiting...'}
-                      </div>
-                      <div className="flex gap-2 text-amber-500/60 text-[8px]">
-                        <span>STREAM: {hasVideoTrack ? 'ACTIVE' : 'READY'}</span>
-                        <span>LATENCY: LOW</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={toggleMute}
-                    className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
-                      ? 'bg-gray-700 text-white'
-                      : 'bg-amber-500 text-black animate-pulse shadow-amber-500/20'
-                      }`}
-                  >
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      {videoRef.current?.muted ? (
-                        <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
+            <main className="grid grid-cols-1 xl:grid-cols-[1fr_420px] gap-6">
+              <section className="test-panel p-5 min-h-[640px] flex flex-col">
+                <div className="flex items-center gap-2 mb-4"><MessageSquare size={18} className="text-emerald-300" /><h2 className="font-semibold">对话与声音输出测试</h2></div>
+                <div className="test-panel overflow-hidden mb-4">
+                  <div className="relative aspect-[16/10] bg-black flex items-center justify-center">
+                    <div
+                      className="absolute inset-0 opacity-40"
+                      style={{
+                        background: `radial-gradient(circle at 50% 42%, rgba(${activeEmotionVisual.rgb},${0.12 + audioLevel * 0.38}), transparent 32%), radial-gradient(circle at 50% 100%, rgba(${activeEmotionVisual.rgb},.12), transparent 38%)`
+                      }}
+                    />
+                    {visualUrl ? (
+                      visualType === 'video' ? (
+                        <video src={visualUrl} className="relative z-10 w-full h-full object-cover" autoPlay loop muted playsInline />
                       ) : (
-                        <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
-                      )}
-                    </svg>
-                    <span>{videoRef.current?.muted ? '取消静音' : '静音声音'}</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 右侧：聊天对话区 */}
-        <div className="w-full md:w-[400px] flex flex-col bg-[#12121A] rounded-3xl border border-white/5 shadow-2xl relative">
-          {/* 摄像头和语音控制区 */}
-          <div className="p-4 border-b border-white/5 space-y-4">
-            {/* 摄像头控制 */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={toggleCamera}
-                className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${isCameraOn
-                  ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
-                  : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
-                  }`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
-                {isCameraOn ? '关闭摄像头' : '开启摄像头'}
-              </button>
-            </div>
-
-            {/* 用户摄像头画面 */}
-            {isCameraOn && (
-              <div className="relative rounded-xl overflow-hidden bg-black/40 border border-white/10 aspect-video min-h-[200px]">
-                <video
-                  ref={userVideoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full min-h-[200px] object-contain"
-                />
-                <div className="absolute bottom-2 left-2 px-2 py-1 bg-black/60 rounded text-[10px] text-gray-400">
-                  您的画面
-                </div>
-              </div>
-            )}
-
-            {/* 语音控制按钮 - 从左侧移到这里 */}
-            {status === 'ready' && !isListening && !isTalking && (
-              <button
-                onClick={toggleVoiceInput}
-                className="w-full bg-amber-500 hover:bg-amber-400 text-black py-4 rounded-xl font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-              >
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-                </svg>
-                <span className="text-lg">{t('mvpChina.chat.startVoiceChat')}</span>
-              </button>
-            )}
-
-            {status === 'ready' && isListening && (
-              <div className="w-full bg-red-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 animate-pulse">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-                </svg>
-                <span className="text-lg">正在聆听...</span>
-              </div>
-            )}
-
-            {status === 'ready' && isTalking && (
-              <div className="w-full bg-amber-500/20 text-amber-400 py-4 rounded-xl font-medium flex items-center justify-center gap-3 border border-amber-500/30">
-                <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-                <span>数字人正在回复...</span>
-              </div>
-            )}
-          </div>
-
-          {/* 聊天标题 */}
-          <div className="p-4 border-b border-white/5">
-            <h3 className="font-bold flex items-center gap-2 text-amber-500 uppercase tracking-widest text-sm">
-              <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse"></span>
-              {t('mvpChina.chat.title')}
-            </h3>
-          </div>
-
-          <div
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar"
-          >
-            {messages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-gray-600 text-center px-4">
-                <div className="w-16 h-16 rounded-2xl bg-white/5 flex items-center justify-center mb-4 opacity-20">💬</div>
-                <p className="text-xs tracking-wider">{t('mvpChina.chat.ready')}</p>
-              </div>
-            ) : (
-              messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl p-4 text-sm leading-relaxed ${msg.role === 'user'
-                    ? 'bg-amber-500 text-black font-medium shadow-lg shadow-amber-500/10'
-                    : 'bg-white/5 text-gray-200 border border-white/10 backdrop-blur-sm'
-                    }`}>
-                    {msg.text}
+                        <img
+                          src={visualUrl}
+                          alt="digital avatar"
+                          className="relative z-10 w-44 h-44 rounded-full object-cover border border-white/15 shadow-2xl transition-transform duration-150"
+                          style={{ transform: `scale(${1 + audioLevel * 0.045})` }}
+                        />
+                      )
+                    ) : (
+                      <div
+                        className="relative z-10 w-44 h-44 rounded-full border border-emerald-200/25 bg-gradient-to-br from-emerald-300/20 via-white/8 to-amber-200/12 flex items-center justify-center text-5xl font-serif text-white/70 shadow-2xl transition-transform duration-150"
+                        style={{ transform: `scale(${1 + audioLevel * 0.045})` }}
+                      >
+                        {profile?.display_name?.slice(0, 1) || 'U'}
+                      </div>
+                    )}
+                    <div className="absolute left-4 right-4 bottom-4 z-20">
+                      <div className="flex items-end justify-center gap-1 h-12">
+                        {Array.from({ length: 32 }).map((_, index) => {
+                          const wave = Math.sin(index * 0.65 + audioLevel * 8);
+                          const h = visualState === 'speaking'
+                            ? 12 + Math.abs(wave) * 18 + audioLevel * 42
+                            : visualState === 'thinking'
+                              ? 8 + (index % 4) * 3
+                              : 6;
+                          return <span key={index} className="w-1.5 rounded-full" style={{ height: `${h}px`, opacity: visualState === 'idle' ? 0.28 : 0.85, backgroundColor: `rgba(${activeEmotionVisual.rgb}, .85)` }} />;
+                        })}
+                      </div>
+                      <div className="text-center text-xs text-white/50 mt-2">
+                        {visualState === 'speaking' ? '正在用克隆声线说话' : visualState === 'thinking' ? '正在组织记忆与回答' : '待机中'}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-3 grid grid-cols-2 gap-2">
+                    <input
+                      ref={visualFileRef}
+                      type="file"
+                      accept="image/*,video/mp4,video/webm"
+                      className="hidden"
+                      onChange={event => updateVisual(event.target.files?.[0])}
+                    />
+                    <button onClick={() => visualFileRef.current?.click()} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
+                      <ImageIcon size={15} /> 上传照片/短视频
+                    </button>
+                    <button onClick={() => setVisualType(visualType === 'video' ? 'avatar' : 'video')} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
+                      <Video size={15} /> {visualType === 'video' ? '头像模式' : '循环视频模式'}
+                    </button>
+                  </div>
+                  <div className="mx-3 mb-3 p-3 rounded-lg border border-white/10 bg-white/5">
+                    <div className="flex items-center justify-between gap-3 text-xs">
+                      <span className="text-white/45">情绪感知</span>
+                      <span className="font-semibold" style={{ color: `rgb(${activeEmotionVisual.rgb})` }}>
+                        {activeEmotionVisual.label} · {emotionState.emotion_label} · {emotionState.intensity}/5
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-white/50 leading-relaxed">
+                      {emotionState.speaking_style} · {emotionState.reason}
+                    </div>
                   </div>
                 </div>
-              ))
-            )}
-          </div>
+                <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                  {messages.length === 0 && (
+                    <div className="test-panel p-5 text-sm text-white/52">完成声音初始化后，发送一句话。系统会先生成数字人回复，再用刚才克隆的声线播放。</div>
+                  )}
+                  {messages.map((message, index) => (
+                    <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[82%] px-4 py-3 rounded-lg text-sm ${message.role === 'user' ? 'bg-amber-300 text-black' : 'bg-white/8 border border-white/10 text-white/82'}`}>{message.text}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="pt-4 border-t border-white/10 space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      className="test-input flex-1 px-3 text-sm"
+                      value={input}
+                      onChange={event => setInput(event.target.value)}
+                      onKeyDown={event => {
+                        if (event.key === 'Enter') sendMessage();
+                      }}
+                      placeholder="输入测试问题..."
+                    />
+                    <button onClick={sendMessage} disabled={!input.trim() || chatState === 'working'} className="w-11 h-11 rounded-lg bg-emerald-300 text-black flex items-center justify-center disabled:opacity-55">
+                      <Send size={17} />
+                    </button>
+                  </div>
+                  <button onClick={playLastReply} disabled={!messages.some(item => item.role === 'assistant')} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
+                    <Volume2 size={16} /> 重播上一条克隆语音
+                  </button>
+                  <button onClick={stopSpeaking} disabled={visualState !== 'speaking' && visualState !== 'thinking'} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
+                    <Square size={15} /> 打断当前说话
+                  </button>
+                </div>
+              </section>
 
-          {/* 输入框 */}
-          <div className="p-6 bg-black/20 rounded-b-3xl">
-            <div className="relative">
-              <input
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !isTalking && handleSendMessage(inputValue.trim())}
-                placeholder={status === 'ready' ? (isListening ? '正在监听...' : t('mvpChina.chat.placeholder')) : t('mvpChina.chat.waitConnect')}
-                disabled={status !== 'ready' || isTalking}
-                className="w-full bg-gray-900/50 border border-white/10 rounded-2xl px-5 py-4 pr-24 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
-                <button
-                  onClick={toggleVoiceInput}
-                  disabled={status !== 'ready' || isTalking}
-                  className={`p-2 rounded-full transition-all ${isListening
-                    ? 'bg-red-500 text-white animate-pulse'
-                    : 'text-gray-400 hover:text-amber-400'
-                    } disabled:text-gray-600 disabled:cursor-not-allowed`}
-                  title={isListening ? '停止录音' : '语音输入'}
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
-                  </svg>
+              <section className="test-panel p-5 min-h-[640px] flex flex-col">
+                <div className="flex items-center gap-2 mb-4"><Database size={18} className="text-blue-300" /><h2 className="font-semibold">记忆采集测试</h2></div>
+                <div className="grid grid-cols-1 gap-2 mb-4">
+                  {captureModes.map(mode => {
+                    const Icon = mode.icon;
+                    const active = captureMode.id === mode.id;
+                    return (
+                      <button
+                        key={mode.id}
+                        onClick={() => {
+                          setCaptureMode(mode);
+                          setMemoryText(prev => prev || mode.prompt);
+                        }}
+                        className={`text-left p-3 rounded-lg border transition-all ${active ? 'border-emerald-300/45 bg-emerald-300/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}
+                      >
+                        <div className="flex items-center gap-2 font-semibold text-sm">
+                          <Icon size={16} className={active ? 'text-emerald-300' : 'text-white/45'} />
+                          {mode.title}
+                        </div>
+                        <div className="text-xs text-white/42 mt-1">{mode.note}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="test-panel p-3 mb-3">
+                  <div className="flex items-center gap-2 text-sm font-semibold mb-2"><Sparkles size={16} className="text-emerald-300" />AI 访谈开门问题</div>
+                  <div className="text-xs text-white/50 leading-relaxed">{interviewQuestion || captureMode.prompt}</div>
+                  <button
+                    onClick={askInterviewQuestion}
+                    disabled={!profile?.id || interviewLoading}
+                    className="mt-3 px-3 py-2 rounded-lg bg-emerald-300 text-black text-sm font-semibold disabled:opacity-50"
+                  >
+                    {interviewLoading ? '生成追问中...' : '让 AI 继续追问'}
+                  </button>
+                </div>
+                <textarea
+                  className="test-input w-full min-h-[180px] p-3 text-sm resize-none"
+                  value={memoryText}
+                  onChange={event => setMemoryText(event.target.value)}
+                  placeholder="把刚才语音转写、微信聊天、日记片段粘贴到这里，写入 memory_fragments..."
+                />
+                <button onClick={saveMemory} disabled={memoryState === 'working'} className="mt-3 px-4 py-3 rounded-lg bg-blue-300 text-black font-semibold disabled:opacity-55">
+                  {memoryState === 'working' ? '写入中...' : '写入记忆系统'}
                 </button>
-                <button
-                  onClick={() => handleSendMessage(inputValue.trim())}
-                  disabled={status !== 'ready' || isTalking || !inputValue.trim()}
-                  className="p-2 text-amber-500 hover:text-amber-400 disabled:text-gray-600 transition-colors"
-                >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-                  </svg>
+                <div className="mt-5 space-y-3 text-sm text-white/55">
+                  <div className="test-panel p-3"><span className="text-white/85">设计结论：</span>上传声音是能力解锁，不是浏览前置门槛。</div>
+                  <div className="test-panel p-3"><span className="text-white/85">数字永生：</span>用户本人上传声音与记忆，形成自我数字分身。</div>
+                  <div className="test-panel p-3"><span className="text-white/85">数字重生：</span>家人上传旧语音、照片、访谈与记忆，形成纪念型数字人。</div>
+                  <div className="test-panel p-3"><span className="text-white/85">统一底座：</span>两个板块最终都落到同一套 profile、memory_fragments、voice_uri。</div>
+                </div>
+                <button onClick={() => profile?.elevenlabs_voice_id && navigator.clipboard?.writeText(profile.elevenlabs_voice_id)} className="mt-auto px-4 py-2 rounded-lg border border-white/10 text-white/65 hover:text-white flex items-center justify-center gap-2">
+                  <Play size={15} /> 复制当前 voice URI
                 </button>
-              </div>
-            </div>
+              </section>
+            </main>
           </div>
         </div>
-
       </div>
     </div>
   );

@@ -2,11 +2,11 @@ import axios from 'axios';
 import dotenv from 'dotenv';
 dotenv.config();
 
-const SILICON_FLOW_API_KEY = process.env.SILICON_FLOW_API_KEY;
-const BASE_URL = 'https://api.siliconflow.cn/v1';
+const SILICON_FLOW_API_KEY = process.env.SILICONFLOW_API_KEY || process.env.SILICON_FLOW_API_KEY;
+const BASE_URL = process.env.SILICONFLOW_API_BASE || 'https://api.siliconflow.cn/v1';
 
 if (!SILICON_FLOW_API_KEY) {
-    console.error('SILICON_FLOW_API_KEY is missing');
+    console.error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY is missing');
 }
 
 export const siliconFlowService = {

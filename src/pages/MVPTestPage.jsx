@@ -38,11 +38,13 @@ function textForSpeechOnly(rawText) {
 
 const MVPTestPage = () => {
   const { t, i18n } = useTranslation();
+  const [useAzure, setUseAzure] = useState(false); // Toggle for MVP engine
   const [status, setStatus] = useState('idle'); // idle, connecting, ready, error
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState('');
   const [isTalking, setIsTalking] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [continuousMode, setContinuousMode] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -58,6 +60,7 @@ const MVPTestPage = () => {
   const videoContainerRef = useRef(null);
   const userVideoRef = useRef(null);
   const chatContainerRef = useRef(null);
+  const currentAudioRef = useRef(null);
   const [debugLog, setDebugLog] = useState([]);
   const [webrtcState, setWebrtcState] = useState('new');
   const [iceState, setIceState] = useState('new');
@@ -222,6 +225,18 @@ const MVPTestPage = () => {
   };
 
   const initAvatar = async () => {
+    if (!useAzure) {
+      setStatus('connecting');
+      // Simulate connection time
+      setTimeout(() => {
+        setStatus('ready');
+        const welcome = t('mvpTest.chat.welcome');
+        addBotMessage(welcome);
+        // Play local welcome sound if you want, but text is fine for MVP.
+      }, 500);
+      return;
+    }
+
     if (synthesizerRef.current) return;
 
     setStatus('connecting');
@@ -425,9 +440,28 @@ const MVPTestPage = () => {
   const toggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
       addDebug(`Audio: ${videoRef.current.muted ? 'Muted' : 'Unmuted'}`);
     }
   };
+
+  const interruptChat = useCallback(() => {
+    window.speechSynthesis.cancel();
+    if (synthesizerRef.current) {
+       // Cannot strictly pause an ongoing speakTextAsync gracefully via simplified API, but we can close it or mute it.
+       // The best way to interrupt is to dispose it or trigger AudioContext pause. For now this will stop the next sentences.
+    }
+    if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+    }
+    if (recognitionRef.current && isListening) {
+        try { recognitionRef.current.stop(); } catch(e){}
+    }
+    setIsTalking(false);
+    setIsListening(false);
+    addDebug('对话被打断');
+  }, [isListening]);
 
   const toggleVoiceInput = () => {
     if (!recognition) {
@@ -475,54 +509,168 @@ const MVPTestPage = () => {
     // 海外通道使用多语言语音，不因切换语言重启数字人，避免重连失败
 
     try {
-      const chatRes = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, preferred_language: effectiveLang })
-      });
+      let reply = '';
+      if (!useAzure) {
+        // 使用新版 Gemini / Groq 方案
+        const chatRes = await fetch('/api/gemini-chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        
+        let data;
+        const contentType = chatRes.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          data = await chatRes.json();
+        } else {
+          const raw = await chatRes.text();
+          throw new Error(`Server Error: ${raw.substring(0, 50)}...`);
+        }
 
-      let data;
-      const contentType = chatRes.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") !== -1) {
-        data = await chatRes.json();
+        if (!chatRes.ok) throw new Error(data.error || `API Failed (${chatRes.status})`);
+        
+        reply = data.reply;
+        if (reply) {
+          addBotMessage(reply);
+          // Play Audio
+          if (data.audio) {
+            const audio = new Audio(data.audio);
+            currentAudioRef.current = audio;
+            audio.onended = () => setIsTalking(false);
+            if (synthesizerRef.current) synthesizerRef.current.close(); // just ensure no conflict
+            await audio.play().catch(e => {
+                console.error("Audio play failed:", e);
+                setIsTalking(false);
+            });
+          } else {
+            // High-quality Azure TTS Fallback (Male Voice)
+            const toSpeak = textForSpeechOnly(reply);
+            if (toSpeak) {
+                try {
+                    // Lazy initialize Azure Synthesizer if running without Azure AVATAR backend
+                    if (!synthesizerRef.current && typeof SpeechSDK !== 'undefined') {
+                        console.log("[MVP] Lazy initializing Azure TTS synthesizer for male voice fallback...");
+                        const tokenRes = await fetch('/api/speech-token');
+                        if (tokenRes.ok) {
+                            const tokenData = await tokenRes.json();
+                            const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(tokenData.token, tokenData.region);
+                            speechConfig.speechSynthesisLanguage = 'zh-CN';
+                            speechConfig.speechSynthesisVoiceName = 'zh-CN-YunjianNeural';
+                            const audioConfig = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+                            synthesizerRef.current = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
+                        }
+                    }
+
+                    if (synthesizerRef.current) {
+                        synthesizerRef.current.properties.setProperty(SpeechSDK.PropertyId.SpeechServiceConnection_SynthVoice, "zh-CN-YunjianNeural");
+                        synthesizerRef.current.speakTextAsync(
+                            toSpeak,
+                            (result) => {
+                                setIsTalking(false); // Done speaking
+                            },
+                            (error) => {
+                                console.error('Azure TTS Error:', error);
+                                setIsTalking(false);
+                            }
+                        );
+                    } else {
+                        throw new Error("Azure TTS could not be initialized");
+                    }
+                } catch(err) {
+                    console.warn("Falling back to local browser TTS:", err);
+                    const utterance = new SpeechSynthesisUtterance(toSpeak);
+                    utterance.lang = 'zh-CN';
+                    
+                    const voices = window.speechSynthesis.getVoices();
+                    const isMaleOrOld = (name) => {
+                      const n = name.toLowerCase();
+                      return n.includes('male') || n.includes('男') || n.includes('kang') || 
+                             n.includes('yunxi') || n.includes('yunwu') || n.includes('yunfeng') || 
+                             n.includes('yunhao') || n.includes('yunjian');
+                    };
+                    const maleVoice = voices.find(v => v.lang.includes('zh') && isMaleOrOld(v.name));
+                    if (maleVoice) {
+                        utterance.voice = maleVoice;
+                        utterance.pitch = 0.5; // Lower pitch for an older feel
+                    } else {
+                        const zhVoices = voices.filter(v => v.lang.includes('zh'));
+                        if (zhVoices.length > 0) utterance.voice = zhVoices[0];
+                        utterance.pitch = 0.1; // Extremely low pitch to mask default female voice
+                    }
+                    utterance.rate = 0.8;
+                    utterance.onend = () => setIsTalking(false);
+                    utterance.onerror = () => setIsTalking(false);
+                    window.speechSynthesis.speak(utterance);
+                }
+            } else {
+                setIsTalking(false);
+            }
+          }
+        }
       } else {
-        const text = await chatRes.text();
-        console.error('Chat API Non-JSON Response:', text);
-        throw new Error(`Server Error: ${text.substring(0, 50)}...`);
-      }
+        // 现有的 Azure 方案
+        const chatRes = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text, preferred_language: effectiveLang })
+        });
 
-      const reply = data.reply;
+        let data;
+        const contentType = chatRes.headers.get("content-type");
+        if (contentType && contentType.indexOf("application/json") !== -1) {
+          data = await chatRes.json();
+        } else {
+          const rawText = await chatRes.text();
+          console.error('Chat API Non-JSON Response:', rawText);
+          throw new Error(`Server Error: ${rawText.substring(0, 50)}...`);
+        }
 
-      if (!chatRes.ok) {
-        throw new Error(data.error || `Chat API Failed (${chatRes.status})`);
-      }
+        if (!chatRes.ok) {
+          throw new Error(data.error || `Chat API Failed (${chatRes.status})`);
+        }
 
-      if (reply) {
-        addBotMessage(reply);
-        if (synthesizerRef.current) {
-          const toSpeak = textForSpeechOnly(reply);
-          if (toSpeak) await synthesizerRef.current.speakTextAsync(toSpeak);
+        reply = data.reply;
+
+        if (reply) {
+          addBotMessage(reply);
+          if (synthesizerRef.current) {
+            const toSpeak = textForSpeechOnly(reply);
+            if (toSpeak) {
+                // Not standard to know when Azure TTS finishes using current simple wrapper, 
+                // so we just timeout or rely on Azure callbacks if implemented. For safety:
+                setTimeout(() => setIsTalking(false), reply.length * 200 + 1000);
+                await synthesizerRef.current.speakTextAsync(toSpeak);
+            } else {
+                setIsTalking(false);
+            }
+          } else {
+              setIsTalking(false);
+          }
+        } else {
+            setIsTalking(false);
         }
       }
     } catch (error) {
       console.error('Chat Error:', error);
       addBotMessage(`抱歉，我现在出了一点小状况 (${error.message})`);
-    } finally {
       setIsTalking(false);
+    }
+    // We removed the `finally { setIsTalking(false); }` block 
+    // because audio needs to play out synchronously or trigger onended.
+  };
 
-      if (continuousMode && recognitionRef.current && status === 'ready') {
-        console.log('[Voice] Scheduling mic restart in continuous mode');
-        setTimeout(() => {
-          console.log('[Voice] Attempting to restart mic, isTalking:', isTalkingRef.current);
+  useEffect(() => {
+    // When talking is false, auto-restart mic if continuous mode is on
+    if (!isTalking && continuousMode && recognitionRef.current && status === 'ready' && !isListening) {
+        console.log('[Voice] Scheduling mic restart because talking ended');
+        const timer = setTimeout(() => {
           if (!isTalkingRef.current) {
             startVoiceRecognition();
-          } else {
-            console.log('[Voice] Still talking, skipping restart');
           }
-        }, 1000);
-      }
+        }, 800);
+        return () => clearTimeout(timer);
     }
-  };
+  }, [isTalking, status, continuousMode]);
 
   useEffect(() => {
     sendMessageRef.current = handleSendMessage;
@@ -576,11 +724,13 @@ const MVPTestPage = () => {
         >
           {/* 顶部状态栏 */}
           <div className="absolute top-6 left-6 right-6 z-10 flex justify-between items-start">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
-              <span className={`w-2 h-2 rounded-full ${status === 'ready' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
-              <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
-                {status === 'ready' ? t('mvpTest.status.ready') : t('mvpTest.status.idle')}
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10">
+                <span className={`w-2 h-2 rounded-full ${status === 'ready' ? 'bg-green-500 animate-pulse' : 'bg-amber-500'}`} />
+                <span className="text-xs font-medium uppercase tracking-wider text-gray-300">
+                  {status === 'ready' ? t('mvpTest.status.ready') : t('mvpTest.status.idle')}
+                </span>
+              </div>
             </div>
 
             {/* 全屏按钮 */}
@@ -603,15 +753,29 @@ const MVPTestPage = () => {
             )}
           </div>
 
-          <div className="flex-1 flex items-center justify-center relative">
-            <div id="video-container" className="w-full h-full min-h-[400px] flex items-center justify-center">
-              <video
-                ref={videoRef}
-                className="w-full h-full object-cover"
-                playsInline
-                autoPlay
-                muted={false}
-              />
+          <div className="flex-1 flex items-center justify-center relative p-4 mt-16">
+            <div id="video-container" className={`relative flex items-center justify-center overflow-hidden w-full h-full min-h-[400px] ${!useAzure ? 'rounded-3xl bg-black border border-white/10 shadow-2xl' : ''}`}>
+              {useAzure ? (
+                <video
+                  ref={videoRef}
+                  className="w-full h-full object-cover"
+                  playsInline
+                  autoPlay
+                  muted={false}
+                />
+              ) : (
+                status !== 'idle' && (
+                  <video
+                    ref={videoRef}
+                    src="https://res.cloudinary.com/dj2eotipq/video/upload/v1776547065/Daddy_Chat_oyrvci.mp4"
+                    className="w-full h-full object-cover"
+                    autoPlay
+                    loop
+                    muted={isMuted}
+                    playsInline
+                  />
+                )
+              )}
 
               {(status === 'idle' || status === 'error') && (
                 <div className="flex flex-col items-center gap-3">
@@ -624,7 +788,7 @@ const MVPTestPage = () => {
                     onClick={initAvatar}
                     className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
                   >
-                    {status === 'error' ? (t('mvpTest.controls.retry') || '重试') : t('mvpTest.controls.start')}
+                    {status === 'error' ? (t('mvpTest.controls.retry') || '重试') : '在线召唤'}
                   </button>
                 </div>
               )}
@@ -663,19 +827,19 @@ const MVPTestPage = () => {
 
                   <button
                     onClick={toggleMute}
-                    className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${videoRef.current?.muted
+                    className={`px-4 py-2 rounded-full text-xs font-bold shadow-lg transition-all flex items-center gap-2 ${isMuted
                       ? 'bg-gray-700 text-white'
                       : 'bg-amber-500 text-black shadow-amber-500/20'
                       }`}
                   >
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      {videoRef.current?.muted ? (
+                      {isMuted ? (
                         <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.983 5.983 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.984 3.984 0 00-1.172-2.828 1 1 0 010-1.415z" />
                       ) : (
                         <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
                       )}
                     </svg>
-                    <span>{videoRef.current?.muted ? '取消静音' : '静音声音'}</span>
+                    <span>{isMuted ? '取消静音' : '静音声音'}</span>
                   </button>
                 </div>
               )}
@@ -733,19 +897,25 @@ const MVPTestPage = () => {
             )}
 
             {status === 'ready' && isListening && (
-              <div className="w-full bg-red-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 animate-pulse">
+              <button
+                onClick={interruptChat}
+                className="w-full bg-red-500 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 animate-pulse transition-all hover:bg-red-600 cursor-pointer shadow-lg shadow-red-500/20"
+              >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 002 0V8a1 1 0 00-1-1zm4 0a1 1 0 00-1 1v4a1 1 0 002 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
                 </svg>
-                <span className="text-lg">正在聆听...</span>
-              </div>
+                <span className="text-lg">正在聆听... (点击停止)</span>
+              </button>
             )}
 
             {status === 'ready' && isTalking && (
-              <div className="w-full bg-amber-500/20 text-amber-400 py-4 rounded-xl font-medium flex items-center justify-center gap-3 border border-amber-500/30">
+              <button
+                onClick={interruptChat}
+                className="w-full bg-amber-500/20 text-amber-400 py-4 rounded-xl font-medium flex items-center justify-center gap-3 border border-amber-500/30 transition-all hover:bg-amber-500/30 cursor-pointer"
+              >
                 <div className="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
-                <span>数字人正在回复...</span>
-              </div>
+                <span>数字人正在回复... (点击打断)</span>
+              </button>
             )}
           </div>
 

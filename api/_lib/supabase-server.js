@@ -4,12 +4,14 @@ dotenv.config();
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
     console.error('Supabase credentials missing for backend');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey || supabaseKey);
 
 export const supabaseService = {
     async uploadMedia(buffer, path, bucket = 'audio_responses', contentType = 'audio/mpeg') {

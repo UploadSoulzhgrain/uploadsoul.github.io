@@ -8,6 +8,32 @@ import fs from 'fs';
 dotenv.config();
 
 const app = express();
+
+const delegatedMvpApiPrefixes = [
+    '/api/profiles',
+    '/api/memory/upload',
+    '/api/memory/fragments',
+    '/api/memory/search',
+    '/api/memory/interview/next',
+    '/api/memory-chat',
+    '/api/cloudinary/signature',
+    '/api/voice/clone',
+    '/api/voice/speech',
+    '/api/test-chat'
+];
+
+app.use((req, res, next) => {
+    if (delegatedMvpApiPrefixes.some(prefix => req.path === prefix || req.path.startsWith(`${prefix}/`))) {
+        return import('./api/index.js')
+            .then(({ default: vercelApiHandler }) => vercelApiHandler(req, res))
+            .catch(error => {
+                console.error('[MVP API delegate] failed:', error);
+                if (!res.headersSent) res.status(500).json({ error: error.message });
+            });
+    }
+    return next();
+});
+
 app.use(express.json());
 
 const PORT = 3000;
@@ -139,6 +165,149 @@ app.post('/api/chat', async (req, res) => {
         res.status(status).json({
             error: `API 响应异常 (${status}): ${message}`,
             detail: body
+        });
+    }
+});
+
+// ─── Gemini MVP / Groq Fallback Route (Sync with api/index.js) ───
+app.post('/api/gemini-chat', async (req, res) => {
+    try {
+        const { message } = req.body;
+        const geminiKey = process.env.GEMINI_API_KEY;
+        const groqKey = process.env.GROQ_API_KEY;
+        const sfKey = process.env.SILICONFLOW_API_KEY || process.env.SILICON_FLOW_API_KEY;
+
+        if (!geminiKey || !groqKey) {
+            return res.status(500).json({ error: 'API keys missing' });
+        }
+
+        const targetModel = "gemini-3.1-flash-live-preview";
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${geminiKey}`;
+        const systemPrompt = "You are an affectionate, kind elderly man. Use emotional tags like [laughs] and descriptive prompts like 'Infectious enthusiasm' to express emotion. Respond in Chinese.";
+
+        let geminiResponse, geminiData;
+        try {
+            console.log(`[GeminiChat] Calling Gemini model: ${targetModel}`);
+            geminiResponse = await fetch(geminiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    contents: [{ role: "user", parts: [{ text: message }] }],
+                    generationConfig: {
+                        responseModalities: ["TEXT", "AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: {
+                                    voiceName: "Charon"
+                                }
+                            }
+                        }
+                    }
+                })
+            });
+
+            geminiData = await geminiResponse.json();
+            
+            // Auto fallback for 404
+            if (geminiData.error && geminiData.error.code === 404) {
+                console.log(`[GeminiChat] ${targetModel} not found. Falling back to gemini-2.5-flash`);
+                const fallbackUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiKey}`;
+                geminiResponse = await fetch(fallbackUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        contents: [{ role: "user", parts: [{ text: message }] }]
+                    })
+                });
+                geminiData = await geminiResponse.json();
+            }
+
+            if (geminiResponse.ok && !geminiData.error) {
+                let replyText = '';
+                let audioString = null;
+                if (geminiData.candidates && geminiData.candidates[0].content.parts) {
+                    for (const part of geminiData.candidates[0].content.parts) {
+                        if (part.text) replyText += part.text;
+                        if (part.inlineData) {
+                            audioString = `data:${part.inlineData.mimeType || 'audio/wav'};base64,${part.inlineData.data}`;
+                        }
+                    }
+                }
+                return res.status(200).json({ reply: replyText, audio: audioString, engine: 'gemini' });
+            } else {
+                throw new Error(geminiData.error?.message || "Gemini API Failed");
+            }
+        } catch (e) {
+            console.warn("[GeminiChat] Gemini failed, attempting fallbacks:", e.message);
+            
+            const tryOpenAIFormat = async (url, key, modelParam) => {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: modelParam,
+                        messages: [
+                            { role: "system", content: systemPrompt },
+                            { role: "user", content: message }
+                        ]
+                    })
+                });
+                const data = await response.json();
+                if (data.choices && data.choices.length > 0) return data.choices[0].message.content;
+                throw new Error(data.error?.message || `${modelParam} API Failed`);
+            };
+
+            let reply = '';
+            const generateTTSBase64 = async (text) => {
+                try {
+                    const { synthesize } = await import('./api/_lib/volcengine-tts.js');
+                    // Ensure valid token if user defined it as APIKEY in .env
+                    if (!process.env.VOLC_SPEECH_ACCESS_TOKEN) {
+                        process.env.VOLC_SPEECH_ACCESS_TOKEN = process.env.VOLC_SPEECH_APIKEY;
+                    }
+                    const buf = await synthesize(text, 'senior', 'bv002_streaming');
+                    return "data:audio/mp3;base64," + buf.toString('base64');
+                } catch (ttsErr) {
+                    console.warn("[GeminiChat] Volcengine TTS fallback failed:", ttsErr.message);
+                    return null;
+                }
+            };
+
+            const finalizeFallbackResponse = async (text, engineName) => {
+                let audioBase64 = await generateTTSBase64(console.log("[GeminiChat] Synthesizing TTS...") || text);
+                return res.status(200).json({ reply: text, audio: audioBase64, engine: engineName });
+            };
+
+            try {
+                console.log("[GeminiChat] Trying SiliconFlow: DeepSeek-V3");
+                reply = await tryOpenAIFormat("https://api.siliconflow.cn/v1/chat/completions", sfKey, "deepseek-ai/DeepSeek-V3");
+                return await finalizeFallbackResponse(reply, 'siliconflow-deepseek');
+            } catch (sfErr1) {
+                console.warn("[GeminiChat] DeepSeek-V3 failed:", sfErr1.message);
+                try {
+                    console.log("[GeminiChat] Trying SiliconFlow: Qwen2.5-7B");
+                    reply = await tryOpenAIFormat("https://api.siliconflow.cn/v1/chat/completions", sfKey, "Qwen/Qwen2.5-7B-Instruct");
+                    return await finalizeFallbackResponse(reply, 'siliconflow-qwen');
+                } catch (sfErr2) {
+                    console.warn("[GeminiChat] Qwen2.5-7B failed:", sfErr2.message);
+                    try {
+                        console.log("[GeminiChat] Trying Groq");
+                        reply = await tryOpenAIFormat("https://api.groq.com/openai/v1/chat/completions", groqKey, "llama-3.3-70b-versatile");
+                        return await finalizeFallbackResponse(reply, 'groq');
+                    } catch (groqErr) {
+                        console.warn("[GeminiChat] Groq also failed:", groqErr.message);
+                        throw new Error("网络访问受限，所有的海外节点均连接失败。");
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error("[GeminiChat] Fatal Exception:", error.message);
+        return res.status(200).json({ 
+            reply: `嗯...刚才网线好像被风吹断了一下，我没听太清，我在思考。要不你再说一次？`, 
+            engine: 'fallback' 
         });
     }
 });
@@ -307,7 +476,10 @@ async function handleVolcengineChat(req, res, avatarType) {
     } catch (err) {
         console.error(`[${avatarType}] Route error:`, err.message);
         if (!res.headersSent) res.status(500).json({ error: err.message });
-        else res.end();
+        else {
+            sse({ type: 'error', message: err.message });
+            res.end();
+        }
     }
 }
 

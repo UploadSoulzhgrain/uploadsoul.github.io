@@ -12,6 +12,13 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const hasSupabaseEnv = Boolean(import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY);
+        if (!hasSupabaseEnv) {
+            setUser(null);
+            setSession(null);
+            setLoading(false);
+            return undefined;
+        }
         // 获取当前会话
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);

@@ -313,6 +313,28 @@ const DigitalRebirthPage = () => {
           color: #d4af37;
         }
 
+        .rebirth-mvp-link {
+          position: absolute;
+          top: 2rem;
+          right: 2rem;
+          z-index: 12;
+          border: 1px solid rgba(212, 175, 55, 0.42);
+          color: #f4d03f;
+          background: rgba(10, 10, 10, 0.72);
+          padding: 0.75rem 1rem;
+          border-radius: 8px;
+          text-decoration: none;
+          font-size: 0.85rem;
+          letter-spacing: 0.08rem;
+          transition: all 0.25s ease;
+        }
+
+        .rebirth-mvp-link:hover {
+          border-color: #d4af37;
+          background: rgba(212, 175, 55, 0.12);
+          transform: translateY(-2px);
+        }
+
         @media (max-width: 1024px) {
           .portal {
             width: 280px;
@@ -326,6 +348,8 @@ const DigitalRebirthPage = () => {
 
       {/* 粒子背景 */}
       <div className="rebirth-particles" id="particles" ref={particlesRef}></div>
+
+      <Link to="/memory-system" className="rebirth-mvp-link">进入记忆采集 MVP</Link>
 
       {/* 标题 */}
       <div className="rebirth-title">

@@ -39,6 +39,7 @@ import HistoryHallPage from './pages/HistoryHallPage'
 import HistoryDialoguePage from './pages/HistoryDialoguePage'
 import HistoryCreatorPage from './pages/HistoryCreatorPage'
 import MemoryWorkshopPage from './pages/MemoryWorkshopPage'
+import MemorySystemPage from './pages/MemorySystemPage'
 import DigitalWorldPage from './pages/DigitalWorldPage'
 import NotFoundPage from './pages/NotFoundPage'
 import SitemapPage from './pages/SitemapPage'
@@ -138,6 +139,9 @@ const BusinessRoutes = () => (
     <Route path="digital-rebirth/history-dialogue/:id" element={<HistoryDialoguePage />} />
     <Route path="digital-rebirth/history-creator" element={<HistoryCreatorPage />} />
     <Route path="digital-rebirth/create" element={<MemoryWorkshopPage />} />
+    <Route path="memory-system" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
+    <Route path="memories/:profileId" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
+    <Route path="chat/:profileId" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
     <Route path="start-experience" element={<DigitalHumanPage />} />
     <Route path="about" element={<AboutPage />} />
     <Route path="digital-human-experience" element={<DigitalHumanExperiencePage />} />
@@ -150,7 +154,7 @@ const BusinessRoutes = () => (
     <Route path="terms" element={<TermsPage />} />
     <Route path="sitemap" element={<SitemapPage />} />
     <Route path="mvp-test" element={<MVPTestPage />} />
-    <Route path="mvp-china" element={<MVPChinaPage />} />
+    <Route path="mvp-china" element={<ProtectedRoute><MVPChinaPage /></ProtectedRoute>} />
     <Route path="digital-world" element={<DigitalWorldPage />} />
     <Route path="our-stories" element={<WarmStoriesPage />} />
     <Route path="founder-column" element={<FounderColumnPage />} />

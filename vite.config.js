@@ -4,7 +4,9 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
@@ -17,6 +19,8 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    target: 'es2015',
+    cssTarget: 'chrome61',
     // Add sourcemap for better debugging
     sourcemap: true,
     // Copy public files

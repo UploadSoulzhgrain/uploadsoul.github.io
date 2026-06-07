@@ -2,6 +2,14 @@ import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 dotenv.config();
 
+if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+}
+
 /**
  * Cloudinary Backend Service
  * 
@@ -46,11 +54,31 @@ export const cloudinaryService = {
         }
     },
 
+    async uploadMemoryMedia(fileSource, contentType = 'image') {
+        try {
+            const isVideo = String(contentType).startsWith('video');
+            const isAudio = String(contentType).startsWith('audio');
+            const result = await cloudinary.uploader.upload(fileSource, {
+                folder: 'memory_fragments',
+                resource_type: isVideo ? 'video' : isAudio ? 'video' : 'image',
+                transformation: isAudio || isVideo ? undefined : [
+                    { width: 1200, crop: 'limit' },
+                    { fetch_format: 'auto', quality: 'auto' }
+                ]
+            });
+
+            return result.secure_url;
+        } catch (error) {
+            console.error('Cloudinary Memory Upload Error:', error);
+            throw new Error(`Failed to upload memory media: ${error.message}`);
+        }
+    },
+
     /**
      * For testing purposes, verifies connectivity.
      */
     async checkConfig() {
-        return !!process.env.CLOUDINARY_URL;
+        return !!(process.env.CLOUDINARY_URL || (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET));
     }
 };
 

@@ -211,7 +211,17 @@ const DashboardPage = () => {
                 )}
 
                 {/* 快捷操作卡片 */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                    <Link to="/memory-system" className="card-premium p-6 group hover:border-amber-500/50 transition-colors">
+                        <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7a2 2 0 012-2h3l2 2h7a2 2 0 012 2v8a2 2 0 01-2 2H6a2 2 0 01-2-2V7z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-bold mb-1">记忆采集 MVP</h3>
+                        <p className="text-sm text-gray-500">上传文字、语音、照片，生成可检索的数字记忆层。</p>
+                    </Link>
+
                     <Link to="/digital-immortality/create" className="card-premium p-6 group hover:border-amber-500/50 transition-colors">
                         <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-500 mb-4 group-hover:scale-110 transition-transform">
                             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

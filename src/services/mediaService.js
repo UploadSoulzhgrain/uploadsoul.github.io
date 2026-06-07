@@ -1,10 +1,6 @@
 import imageCompression from 'browser-image-compression';
 import { supabase } from '../lib/supabaseClient';
 
-const CLOUDINARY_CLOUD_NAME = 'dj2eotipq';
-const CLOUDINARY_API_KEY = '694293892971346';
-const CLOUDINARY_API_SECRET = '3XqSVEnPDesH3HJawIkpwwgVZdk';
-
 const STORAGE_LIMIT_MB = 100;
 const SINGLE_FILE_LIMIT_MB = 20;
 
@@ -98,19 +94,32 @@ export const MediaService = {
         }
 
         // 4. Cloudinary Signature and Upload
-        const timestamp = Math.round((new Date()).getTime() / 1000);
-        const params = { timestamp };
-        const signature = await this.generateSignature(params, CLOUDINARY_API_SECRET);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+            throw new Error('User session expired. Please sign in again.');
+        }
+        const signatureResponse = await fetch('/api/cloudinary/signature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({ folder: `user_content/${userId}` })
+        });
+        const signatureData = await signatureResponse.json();
+        if (!signatureResponse.ok) {
+            throw new Error(signatureData.error || 'Failed to prepare secure upload');
+        }
 
         const formData = new FormData();
         formData.append('file', fileToUpload);
-        formData.append('api_key', CLOUDINARY_API_KEY);
-        formData.append('timestamp', timestamp.toString());
-        formData.append('signature', signature);
-        formData.append('folder', `user_content/${userId}`);
+        formData.append('api_key', signatureData.apiKey);
+        formData.append('timestamp', signatureData.timestamp.toString());
+        formData.append('signature', signatureData.signature);
+        formData.append('folder', signatureData.folder);
 
         const resourceType = fileType === 'image' ? 'image' : (fileType === 'video' ? 'video' : 'raw');
-        const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`;
+        const url = `https://api.cloudinary.com/v1_1/${signatureData.cloudName}/${resourceType}/upload`;
 
         if (onProgress) onProgress({ status: 'uploading', message: `Uploading ${fileType}...` });
 
@@ -154,14 +163,5 @@ export const MediaService = {
             xhr.onerror = () => reject(new Error('Network error during upload'));
             xhr.send(formData);
         });
-    },
-
-    async generateSignature(params, apiSecret) {
-        const sortedKeys = Object.keys(params).sort();
-        const signatureString = sortedKeys.map(key => `${key}=${params[key]}`).join('&') + apiSecret;
-        const msgBuffer = new TextEncoder().encode(signatureString);
-        const hashBuffer = await crypto.subtle.digest('SHA-1', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 };
