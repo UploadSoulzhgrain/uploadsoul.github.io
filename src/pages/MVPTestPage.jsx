@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as SpeechSDK from 'microsoft-cognitiveservices-speech-sdk';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * 从 TTS 朗读文本中移除不应读出的内容：括号/星号内的描述、表情动作短语、emoji。
@@ -38,6 +40,8 @@ function textForSpeechOnly(rawText) {
 
 const MVPTestPage = () => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [useAzure, setUseAzure] = useState(false); // Toggle for MVP engine
   const [status, setStatus] = useState('idle'); // idle, connecting, ready, error
   const [messages, setMessages] = useState([]);
@@ -68,6 +72,12 @@ const MVPTestPage = () => {
   const [gathState, setGathState] = useState('new');
   const [hasVideoTrack, setHasVideoTrack] = useState(false);
   const [hasAudioTrack, setHasAudioTrack] = useState(false);
+
+  const requireLogin = () => {
+    if (user) return true;
+    navigate('/login', { state: { from: { pathname: '/mvp-test' } } });
+    return false;
+  };
   const [avatarLang, setAvatarLang] = useState('mandarin'); // 普通话（默认）/ 英文 / 粤语
 
   const addDebug = (msg) => {
@@ -785,7 +795,7 @@ const MVPTestPage = () => {
                     </p>
                   )}
                   <button
-                    onClick={initAvatar}
+                    onClick={() => requireLogin() && initAvatar()}
                     className="px-8 py-4 bg-amber-500 text-black font-bold rounded-2xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/20 active:scale-95"
                   >
                     {status === 'error' ? (t('mvpTest.controls.retry') || '重试') : '在线召唤'}
@@ -854,7 +864,7 @@ const MVPTestPage = () => {
             {/* 摄像头控制 */}
             <div className="flex items-center gap-3">
               <button
-                onClick={toggleCamera}
+                onClick={() => requireLogin() && toggleCamera()}
                 className={`flex-1 py-3 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${isCameraOn
                   ? 'bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30'
                   : 'bg-white/5 text-gray-300 border border-white/10 hover:bg-white/10'
@@ -886,7 +896,7 @@ const MVPTestPage = () => {
             {/* 语音控制按钮 - 从左侧移到这里 */}
             {status === 'ready' && !isListening && !isTalking && (
               <button
-                onClick={toggleVoiceInput}
+                onClick={() => requireLogin() && toggleVoiceInput()}
                 className="w-full bg-amber-500 hover:bg-amber-400 text-black py-4 rounded-xl font-bold shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
               >
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -956,14 +966,14 @@ const MVPTestPage = () => {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !isTalking && handleSendMessage(inputValue.trim())}
+                onKeyPress={(e) => e.key === 'Enter' && !isTalking && requireLogin() && handleSendMessage(inputValue.trim())}
                 placeholder={status === 'ready' ? (isListening ? '正在监听...' : t('mvpTest.chat.placeholder')) : t('mvpTest.chat.waitConnect')}
                 disabled={status !== 'ready' || isTalking}
                 className="w-full bg-gray-900 border border-white/10 rounded-2xl px-5 py-4 pr-24 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500/30 transition-all placeholder:text-gray-600 disabled:opacity-50"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
                 <button
-                  onClick={toggleVoiceInput}
+                  onClick={() => requireLogin() && toggleVoiceInput()}
                   disabled={status !== 'ready' || isTalking}
                   className={`p-2 rounded-full transition-all ${isListening
                     ? 'bg-red-500 text-white animate-pulse'
@@ -976,7 +986,7 @@ const MVPTestPage = () => {
                   </svg>
                 </button>
                 <button
-                  onClick={() => handleSendMessage(inputValue.trim())}
+                  onClick={() => requireLogin() && handleSendMessage(inputValue.trim())}
                   disabled={status !== 'ready' || isTalking || !inputValue.trim()}
                   className="p-2 text-amber-500 hover:text-amber-400 disabled:text-gray-600 transition-colors"
                 >

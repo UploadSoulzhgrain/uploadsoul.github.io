@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
 import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
+import { useAuth } from '../contexts/AuthContext';
 
 const DailyCompanionPage = () => {
     const { navigate, l } = useLocalizedNavigate();
+    const { user } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const requireLogin = (path) => {
+        if (user) {
+            navigate(l(path));
+            return;
+        }
+        navigate(l('/login'), { state: { from: { pathname: l(path) } } });
+    };
 
     const aiProfiles = [
         {
@@ -180,7 +190,7 @@ const DailyCompanionPage = () => {
                                             性格：{profile.personality}
                                         </p>
                                         <div className="mt-auto">
-                                            <button onClick={() => navigate(l(`/companion/chat?name=${encodeURIComponent(profile.name)}&gender=${profile.gender}`))} className="w-full py-3 bg-[#ee7c2b] text-white rounded-xl font-bold hover:bg-[#ee7c2b]/90 transition-colors flex items-center justify-center gap-2">
+                                            <button onClick={() => requireLogin(`/companion/chat?name=${encodeURIComponent(profile.name)}&gender=${profile.gender}`)} className="w-full py-3 bg-[#ee7c2b] text-white rounded-xl font-bold hover:bg-[#ee7c2b]/90 transition-colors flex items-center justify-center gap-2">
                                                 <span className="material-symbols-outlined text-[20px]">chat_bubble</span>
                                                 开始聊天
                                             </button>

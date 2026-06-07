@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
 import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
+import { useAuth } from '../contexts/AuthContext';
 
 const MentalWellnessPage = () => {
     const { navigate, l } = useLocalizedNavigate();
+    const { user } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    const requireLogin = (path) => {
+        if (user) {
+            navigate(l(path));
+            return;
+        }
+        navigate(l('/login'), { state: { from: { pathname: l(path) } } });
+    };
 
     const experts = [
         {
@@ -199,7 +209,7 @@ const MentalWellnessPage = () => {
                                         <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">{expert.tags}</p>
                                         <div className="mt-4 pt-4 border-t border-slate-50 dark:border-white/5 flex justify-between items-center">
                                             <span className="text-xs text-slate-400">服务次数: {expert.services}</span>
-                                            <button onClick={() => navigate(l(`/companion/chat?name=${encodeURIComponent(expert.name)}&gender=${expert.gender}`))} className="bg-[#ee7c2b]/10 text-[#ee7c2b] px-3 py-1 rounded-lg text-xs font-bold hover:bg-[#ee7c2b] hover:text-white transition-colors">预约</button>
+                                            <button onClick={() => requireLogin(`/companion/chat?name=${encodeURIComponent(expert.name)}&gender=${expert.gender}`)} className="bg-[#ee7c2b]/10 text-[#ee7c2b] px-3 py-1 rounded-lg text-xs font-bold hover:bg-[#ee7c2b] hover:text-white transition-colors">预约</button>
                                         </div>
                                     </div>
                                 </div>

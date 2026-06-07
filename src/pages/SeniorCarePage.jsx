@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
 import { voiceManager } from '../lib/VoiceManager';
+import { useAuth } from '../contexts/AuthContext';
 
 // ── Volcengine Chat Widget (senior care) ─────────────────────────────────────
 const SeniorChatWidget = ({ companion, onClose }) => {
@@ -201,8 +202,17 @@ const COMPANIONS = [
 
 const SeniorCarePage = () => {
     const { navigate, l } = useLocalizedNavigate();
+    const { user } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeCompanion, setActiveCompanion] = useState(null);
+
+    const startCompanion = (companion) => {
+        if (user) {
+            setActiveCompanion(companion);
+            return;
+        }
+        navigate(l('/login'), { state: { from: { pathname: l('/companion/senior') } } });
+    };
 
     return (
         <div className="bg-[#f8f7f6] dark:bg-[#221810] text-slate-900 dark:text-slate-100 font-display min-h-screen">
@@ -285,7 +295,7 @@ const SeniorCarePage = () => {
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                                         {COMPANIONS.map((c, idx) => (
                                             <div key={idx}
-                                                onClick={() => setActiveCompanion(c)}
+                                                onClick={() => startCompanion(c)}
                                                 className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl text-center border-2 border-transparent hover:border-[#ee7c2b] hover:shadow-lg hover:shadow-[#ee7c2b]/10 transition-all group cursor-pointer">
                                                 <div className="size-32 mx-auto mb-4 rounded-full overflow-hidden border-4 border-white dark:border-slate-800 shadow-md group-hover:scale-105 transition-transform">
                                                     <img className="w-full h-full object-cover" alt={c.name} src={c.img} />

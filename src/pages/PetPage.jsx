@@ -33,6 +33,7 @@ import {
   Image as LucideImage
 } from 'lucide-react';
 import { useLocalizedNavigate } from '../hooks/useLocalizedNavigate';
+import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
 import axios from 'axios';
 import './PetPage.css';
@@ -673,11 +674,17 @@ const InteractionView = ({ pet, onBack }) => {
 const PetPage = () => {
   const { t } = useTranslation();
   const { navigate, l } = useLocalizedNavigate();
+  const { user } = useAuth();
   const [pets, setPets] = useState([]);
   const [view, setView] = useState('hub'); // 'hub', 'reconstruct', 'connect', 'interaction'
   const [activePet, setActivePet] = useState(null);
 
   const handleNavigate = (newView, data = null) => {
+    if (newView !== 'hub' && !user) {
+      toast.error('请先登录后再使用这个功能');
+      navigate(l('/login'), { state: { from: { pathname: l('/virtual-pet') } } });
+      return;
+    }
     if (newView === 'interaction') {
       setActivePet(data);
     }

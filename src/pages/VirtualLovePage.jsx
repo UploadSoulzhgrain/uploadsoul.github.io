@@ -120,6 +120,25 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
     );
   };
 
+  const requireLogin = (target = '/virtual-love') => {
+    if (user) return true;
+    toast.error('请先登录后再使用这个功能');
+    navigate('/login', { state: { from: { pathname: target } } });
+    return false;
+  };
+
+  const handleUploadZoneClick = (event) => {
+    if (!requireLogin('/virtual-love')) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  };
+
+  const startSoulmate = (gender, soulmate) => {
+    if (!requireLogin('/virtual-love')) return;
+    onSelectSoulmate(gender, soulmate);
+  };
+
   const handleFileUpload = async (event, type) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -214,7 +233,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
 
             <div className="space-y-4 mb-8">
               <div className="grid grid-cols-2 gap-4">
-                <label className="bg-primary/5 border-2 border-dashed border-primary/30 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-primary/60 transition-all relative overflow-hidden">
+                <label onClick={handleUploadZoneClick} className="bg-primary/5 border-2 border-dashed border-primary/30 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-primary/60 transition-all relative overflow-hidden">
                   <input type="file" className="hidden" accept="image/*,video/*" onChange={(e) => handleFileUpload(e, '照片/视频')} />
                   <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center group-hover/zone:scale-110 transition-transform">
                     <Video className="text-primary" size={20} />
@@ -225,7 +244,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
                   </div>
                 </label>
 
-                <label className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all relative overflow-hidden">
+                <label onClick={handleUploadZoneClick} className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex flex-col items-center justify-center gap-3 group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all relative overflow-hidden">
                   <input type="file" className="hidden" accept="audio/*" onChange={(e) => handleFileUpload(e, '录音/音频')} />
                   <div className="size-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center group-hover/zone:scale-110 transition-transform">
                     <Mic className="text-slate-500 dark:text-slate-400" size={20} />
@@ -237,7 +256,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
                 </label>
               </div>
 
-              <label className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex items-center justify-between group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all">
+              <label onClick={handleUploadZoneClick} className="bg-slate-100 dark:bg-slate-900/40 border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-6 flex items-center justify-between group/zone cursor-pointer hover:border-slate-400 dark:hover:border-slate-700 transition-all">
                 <input type="file" className="hidden" accept=".txt,.pdf,.doc,.docx" onChange={(e) => handleFileUpload(e, '记忆/性格描述')} />
                 <div className="flex items-center gap-4">
                   <div className="size-12 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center group-hover/zone:scale-110 transition-transform">
@@ -285,7 +304,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
           </div>
           <div className="mt-auto p-6 md:p-8 pt-0">
             <button
-              onClick={() => navigate('/virtual-love/manage?mode=real_memory_lover')}
+              onClick={() => requireLogin('/virtual-love/manage?mode=real_memory_lover') && navigate('/virtual-love/manage?mode=real_memory_lover')}
               className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm md:text-base"
             >
               <span>创建真实记忆恋人</span>
@@ -316,7 +335,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
             <div className="grid grid-cols-3 gap-4 mb-8">
               {/* Female 1 */}
               <div
-                onClick={() => onSelectSoulmate('female', 'xiyue')}
+                onClick={() => startSoulmate('female', 'xiyue')}
                 className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-transparent hover:border-accent-blue transition-all group/card cursor-pointer"
               >
                 <img
@@ -334,7 +353,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
 
               {/* Female 2 (Selected/Featured) */}
               <div
-                onClick={() => onSelectSoulmate('female', 'linwei')}
+                onClick={() => startSoulmate('female', 'linwei')}
                 className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-primary shadow-[0_0_20px_rgba(236,19,164,0.3)] group/card cursor-pointer"
               >
                 <img
@@ -355,7 +374,7 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
 
               {/* Male 1 */}
               <div
-                onClick={() => onSelectSoulmate('male', 'xiaolu')}
+                onClick={() => startSoulmate('male', 'xiaolu')}
                 className="relative aspect-[3/4] rounded-2xl overflow-hidden border-2 border-transparent hover:border-accent-blue transition-all group/card cursor-pointer"
               >
                 <img
@@ -393,14 +412,14 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
           <div className="mt-auto p-6 md:p-8 pt-0">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
-                onClick={() => onSelectSoulmate('female', 'linwei')}
+                onClick={() => startSoulmate('female', 'linwei')}
                 className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm"
               >
                 <span>立即体验</span>
                 <Activity className="group-hover:scale-125 transition-transform" size={20} />
               </button>
               <button
-                onClick={() => navigate('/virtual-love/manage?mode=ideal_companion')}
+                onClick={() => requireLogin('/virtual-love/manage?mode=ideal_companion') && navigate('/virtual-love/manage?mode=ideal_companion')}
                 className="w-full py-4 bg-white/10 border border-white/10 text-slate-100 font-black uppercase tracking-widest rounded-2xl hover:bg-white/15 transition-all flex items-center justify-center gap-3 group text-sm"
               >
                 <span>创建档案</span>
