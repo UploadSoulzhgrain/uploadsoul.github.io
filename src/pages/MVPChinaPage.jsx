@@ -1068,6 +1068,7 @@ const MVPChinaPage = () => {
   };
 
   const submitFeedback = async (message, feedbackType, rating) => {
+    if (!requireLogin('请先登录，再提交对话反馈')) return;
     if (!profile?.id || !message?.id || feedbackByMessage[message.id]) return;
     try {
       const sourceIds = (message.sources || []).map(source => source?.id || source).filter(Boolean);
@@ -1090,11 +1091,13 @@ const MVPChinaPage = () => {
   };
 
   const playLastReply = async () => {
+    if (!requireLogin('请先登录，再重播数字人语音')) return;
     const last = [...messages].reverse().find(item => item.role === 'assistant');
     if (last?.text) await speakText(last.text);
   };
 
   const toggleFullscreen = async () => {
+    if (!requireLogin('请先登录，再进入全屏通话体验')) return;
     try {
       if (!document.fullscreenElement && callShellRef.current) {
         await callShellRef.current.requestFullscreen();
@@ -1269,7 +1272,7 @@ const MVPChinaPage = () => {
                     accept="audio/*,.mp3,.wav,.opus,.ogg"
                     onChange={event => addVoiceSample(event.target.files?.[0], 'upload')}
                   />
-                  <button onClick={() => fileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-amber-200/40 flex items-center justify-center gap-2">
+                  <button onClick={() => requireLogin('请先登录，再上传声音素材') && fileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-amber-200/40 flex items-center justify-center gap-2">
                     <Upload size={17} /> {copy.addVoiceSample}
                   </button>
                   <button onClick={recording ? stopRecording : startRecording} className={`w-full px-4 py-3 rounded-lg flex items-center justify-center gap-2 ${recording ? 'bg-red-500 text-white' : 'bg-white/8 border border-white/10'}`}>
@@ -1296,6 +1299,7 @@ const MVPChinaPage = () => {
                           <button
                             key={sample.id}
                             onClick={() => {
+                              if (!requireLogin('请先登录，再选择声音素材')) return;
                               setSelectedVoiceSampleId(sample.id);
                               setVoiceFile(sample.file);
                               voiceFileRef.current = sample.file;
@@ -1323,7 +1327,7 @@ const MVPChinaPage = () => {
                     <div key={item} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60">{item}</div>
                   ))}
                 </div>
-                <button onClick={() => visualFileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-blue-200/40 flex items-center justify-center gap-2 text-sm">
+                <button onClick={() => requireLogin('请先登录，再上传形象素材') && visualFileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-blue-200/40 flex items-center justify-center gap-2 text-sm">
                   <Upload size={16} /> {copy.uploadVisual}
                 </button>
                 <div className="mt-4">
@@ -1338,6 +1342,7 @@ const MVPChinaPage = () => {
                       <button
                         key={asset.id}
                         onClick={() => {
+                          if (!requireLogin('请先登录，再选择数字人形象')) return;
                           setVisualUrl(asset.url);
                           setVisualType(asset.type === 'video' ? 'video' : 'avatar');
                         }}
@@ -1437,10 +1442,10 @@ const MVPChinaPage = () => {
                       className="hidden"
                       onChange={event => updateVisual(event.target.files?.[0])}
                     />
-                    <button onClick={() => visualFileRef.current?.click()} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
+                    <button onClick={() => requireLogin('请先登录，再上传形象素材') && visualFileRef.current?.click()} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
                       <ImageIcon size={15} /> {copy.uploadVisual}
                     </button>
-                    <button onClick={() => setVisualType(visualType === 'video' ? 'avatar' : 'video')} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
+                    <button onClick={() => requireLogin('请先登录，再切换数字人形象模式') && setVisualType(visualType === 'video' ? 'avatar' : 'video')} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
                       <Video size={15} /> {visualType === 'video' ? copy.portraitMode : copy.loopVideoMode}
                     </button>
                   </div>
@@ -1495,7 +1500,11 @@ const MVPChinaPage = () => {
                     <input
                       className="test-input flex-1 px-3 text-sm"
                       value={input}
-                      onChange={event => setInput(event.target.value)}
+                      onFocus={() => requireLogin('请先登录，再和数字人对话')}
+                      onChange={event => {
+                        if (!session) return;
+                        setInput(event.target.value);
+                      }}
                       onKeyDown={event => {
                         if (event.key === 'Enter') sendMessage();
                       }}
@@ -1509,7 +1518,7 @@ const MVPChinaPage = () => {
                     <button onClick={playLastReply} disabled={!messages.some(item => item.role === 'assistant')} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
                       <Volume2 size={16} /> {copy.replayLast}
                     </button>
-                    <button onClick={stopSpeaking} disabled={visualState !== 'speaking' && visualState !== 'thinking' && !streamingReply} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
+                    <button onClick={() => requireLogin('请先登录，再打断数字人回复') && stopSpeaking()} disabled={visualState !== 'speaking' && visualState !== 'thinking' && !streamingReply} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
                       <Square size={15} /> {copy.interrupt}
                     </button>
                     <button onClick={toggleCamera} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
@@ -1541,6 +1550,7 @@ const MVPChinaPage = () => {
                       <button
                         key={mode.id}
                         onClick={() => {
+                          if (!requireLogin('请先登录，再使用记忆采集')) return;
                           setCaptureModeId(mode.id);
                           setMemoryText(prev => prev || mode.prompt);
                         }}
@@ -1569,7 +1579,11 @@ const MVPChinaPage = () => {
                 <textarea
                   className="test-input w-full min-h-[180px] p-3 text-sm resize-none"
                   value={memoryText}
-                  onChange={event => setMemoryText(event.target.value)}
+                  onFocus={() => requireLogin('请先登录，再采集记忆')}
+                  onChange={event => {
+                    if (!session) return;
+                    setMemoryText(event.target.value);
+                  }}
                   placeholder={copy.memoryPlaceholder}
                 />
                 <button onClick={saveMemory} disabled={memoryState === 'working'} className="mt-3 px-4 py-3 rounded-lg bg-blue-300 text-black font-semibold disabled:opacity-55">
