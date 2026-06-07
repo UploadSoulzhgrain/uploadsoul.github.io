@@ -88,6 +88,10 @@ const mvpCopy = {
     visualLibrary: '形象素材',
     noVisualAssets: '还没有添加形象素材',
     setAsMainVisual: '设为当前形象',
+    feedbackAccurate: '准确',
+    feedbackNotLike: '不像',
+    feedbackMissing: '缺少记忆',
+    feedbackThanks: '已记录反馈',
     portraitMode: '照片模式',
     loopVideoMode: '循环视频模式',
     emotionAwareness: '情绪感知',
@@ -141,6 +145,7 @@ const mvpCopy = {
       visualUploadFailed: '形象上传失败',
       visualAssetAdded: '形象素材已添加',
       visualSaved: '数字人形象已保存',
+      feedbackSaved: '反馈已保存',
       visualLocalOnly: '形象已在本地预览，暂未保存到账号',
       voiceMissing: '当前档案还没有准备好声音，请先录音或上传音频',
       noAudio: '暂时没有生成语音，请稍后重试',
@@ -209,6 +214,10 @@ const mvpCopy = {
     visualLibrary: 'Appearance Assets',
     noVisualAssets: 'No appearance assets yet',
     setAsMainVisual: 'Set as current look',
+    feedbackAccurate: 'Accurate',
+    feedbackNotLike: 'Not quite',
+    feedbackMissing: 'Missing memory',
+    feedbackThanks: 'Feedback saved',
     portraitMode: 'Photo mode',
     loopVideoMode: 'Loop video mode',
     emotionAwareness: 'Emotion awareness',
@@ -262,6 +271,7 @@ const mvpCopy = {
       visualUploadFailed: 'Avatar upload failed',
       visualAssetAdded: 'Appearance asset added',
       visualSaved: 'Digital appearance saved',
+      feedbackSaved: 'Feedback saved',
       visualLocalOnly: 'Appearance is available for local preview, but was not saved yet',
       voiceMissing: 'This persona does not have a prepared voice yet. Please record or upload audio first.',
       noAudio: 'No speech was generated. Please try again.',
@@ -381,6 +391,7 @@ const MVPChinaPage = () => {
   const [memoryText, setMemoryText] = useState('');
   const [memoryState, setMemoryState] = useState('idle');
   const [messages, setMessages] = useState([]);
+  const [feedbackByMessage, setFeedbackByMessage] = useState({});
   const [input, setInput] = useState(copy.defaultInput);
   const [chatState, setChatState] = useState('idle');
   const [recording, setRecording] = useState(false);
@@ -483,6 +494,37 @@ const MVPChinaPage = () => {
     }
   }, [profile, visualUrl]);
 
+  const loadProfileAssets = useCallback(async (profileId) => {
+    if (!session || !profileId) return;
+    try {
+      const response = await authedFetch(session, `/api/profile-assets?profile_id=${encodeURIComponent(profileId)}`);
+      const data = await response.json();
+      const assets = data.assets || [];
+      setVoiceSamples(assets.filter(asset => asset.asset_type === 'voice').map(asset => ({
+        id: asset.id,
+        name: asset.file_name || copy.voiceLibrary,
+        size: asset.file_size || 0,
+        url: asset.url,
+        transcript: asset.transcript,
+        saved: true
+      })));
+      setVisualAssets(assets.filter(asset => asset.asset_type === 'image' || asset.asset_type === 'video').map(asset => ({
+        id: asset.id,
+        url: asset.url,
+        type: asset.asset_type === 'video' ? 'video' : 'image',
+        name: asset.file_name || copy.visualLibrary,
+        size: asset.file_size || 0,
+        saved: true
+      })));
+    } catch (error) {
+      console.warn('Asset load skipped:', error.message);
+    }
+  }, [copy.visualLibrary, copy.voiceLibrary, session]);
+
+  useEffect(() => {
+    if (profile?.id) loadProfileAssets(profile.id);
+  }, [loadProfileAssets, profile?.id]);
+
   useEffect(() => () => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (animationRef.current) cancelAnimationFrame(animationRef.current);
@@ -569,6 +611,33 @@ const MVPChinaPage = () => {
     setVoiceFile(file);
     voiceFileRef.current = file;
     toast.success(copy.toasts.sampleAdded);
+    persistProfileAsset({ file, assetType: 'voice', role: source === 'record' ? 'recorded_sample' : 'uploaded_sample', localId: sample.id }).catch(error => {
+      console.warn('Voice asset save skipped:', error.message);
+    });
+  };
+
+  const persistProfileAsset = async ({ file, assetType, role = 'reference', localId = null }) => {
+    if (!session || !profile?.id || !file) return null;
+    const form = new FormData();
+    form.append('profile_id', profile.id);
+    form.append('asset_type', assetType);
+    form.append('role', role);
+    form.append('file', file);
+    const response = await authedFetch(session, '/api/profile-assets', { method: 'POST', body: form });
+    const data = await response.json();
+    const asset = data.asset;
+    if (!asset) return null;
+    if (assetType === 'voice') {
+      setVoiceSamples(prev => prev.map(item => (
+        item.id === localId ? { ...item, id: asset.id, url: asset.url, saved: true } : item
+      )));
+      if (selectedVoiceSampleId === localId) setSelectedVoiceSampleId(asset.id);
+    } else {
+      setVisualAssets(prev => prev.map(item => (
+        item.id === localId ? { ...item, id: asset.id, url: asset.url, saved: true } : item
+      )));
+    }
+    return asset;
   };
 
   const cloneVoice = async (fileOverride = null) => {
@@ -582,6 +651,9 @@ const MVPChinaPage = () => {
       const form = new FormData();
       form.append('profile_id', profile.id);
       form.append('file', fileToClone);
+      if (selectedVoiceSample?.saved && selectedVoiceSample?.id) {
+        form.append('asset_id', selectedVoiceSample.id);
+      }
       const response = await authedFetch(session, '/api/voice/clone', { method: 'POST', body: form });
       const data = await response.json();
       const nextProfile = {
@@ -589,6 +661,16 @@ const MVPChinaPage = () => {
         elevenlabs_voice_id: data.voice_uri || data.profile?.elevenlabs_voice_id || profile?.elevenlabs_voice_id
       };
       setProfile(nextProfile);
+      if (data.asset) {
+        setVoiceSamples(prev => {
+          const withoutAsset = prev.filter(item => item.id !== data.asset.id);
+          return [
+            { id: data.asset.id, url: data.asset.url, name: data.asset.file_name || copy.voiceSample, size: data.asset.file_size, saved: true, primary: true },
+            ...withoutAsset.map(item => ({ ...item, primary: false }))
+          ].slice(0, 12);
+        });
+        setSelectedVoiceSampleId(data.asset.id);
+      }
       setTranscript(data.transcript || '');
       setMemoryText(data.transcript || '');
       toast.success(copy.toasts.voiceDone);
@@ -612,6 +694,8 @@ const MVPChinaPage = () => {
       form.append('profile_id', profile.id);
       form.append('content_type', 'diary');
       form.append('text', `采集入口：${captureMode.title}\n${memoryText.trim()}`);
+      form.append('source_kind', captureModeId ? 'interview' : 'manual');
+      form.append('user_confirmed', 'true');
       const response = await authedFetch(session, '/api/memory/upload', { method: 'POST', body: form });
       await response.json();
       toast.success(copy.toasts.memorySaved);
@@ -677,34 +761,20 @@ const MVPChinaPage = () => {
 
     if (!profile?.id) return;
     try {
-      const signatureResponse = await authedFetch(session, '/api/cloudinary/signature', {
-        method: 'POST',
-        body: JSON.stringify({ folder: `user_content/${user.id}` })
+      const asset = await persistProfileAsset({
+        file,
+        assetType: file.type.startsWith('video') ? 'video' : 'image',
+        role: 'appearance_reference',
+        localId: visualAsset.id
       });
-      const signatureData = await signatureResponse.json();
-      const resourceType = file.type.startsWith('video') ? 'video' : 'image';
-      const form = new FormData();
-      form.append('file', file);
-      form.append('api_key', signatureData.apiKey);
-      form.append('timestamp', signatureData.timestamp.toString());
-      form.append('signature', signatureData.signature);
-      form.append('folder', signatureData.folder);
-      const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${signatureData.cloudName}/${resourceType}/upload`, {
-        method: 'POST',
-        body: form
-      });
-      const uploadData = await uploadResponse.json();
-      if (!uploadResponse.ok) throw new Error(copy.toasts.visualUploadFailed);
+      if (!asset?.url) throw new Error(copy.toasts.visualUploadFailed);
       const patchResponse = await authedFetch(session, '/api/profiles', {
         method: 'PATCH',
-        body: JSON.stringify({ id: profile.id, avatar_url: uploadData.secure_url })
+        body: JSON.stringify({ id: profile.id, avatar_url: asset.url })
       });
       const patchData = await patchResponse.json();
       setProfile(patchData.profile);
-      setVisualUrl(uploadData.secure_url);
-      setVisualAssets(prev => prev.map(item => (
-        item.id === visualAsset.id ? { ...item, url: uploadData.secure_url, saved: true } : item
-      )));
+      setVisualUrl(asset.url);
       toast.success(copy.toasts.visualAssetAdded);
       toast.success(copy.toasts.visualSaved);
     } catch (error) {
@@ -831,7 +901,7 @@ const MVPChinaPage = () => {
     stopSpeaking();
     setInput('');
     const assistantId = `assistant-${Date.now()}`;
-    setMessages(prev => [...prev, { role: 'user', text }, { id: assistantId, role: 'assistant', text: '' }]);
+    setMessages(prev => [...prev, { role: 'user', text }, { id: assistantId, role: 'assistant', text: '', query: text, sources: [] }]);
     setChatState('working');
     setStreamingReply(true);
     setVisualState('thinking');
@@ -877,7 +947,17 @@ const MVPChinaPage = () => {
             )));
             flushSentenceBuffer(nextEmotion, activeProfile, false);
           }
+          if (payload.type === 'sources') {
+            setMessages(prev => prev.map(item => (
+              item.id === assistantId ? { ...item, sources: payload.memories || [] } : item
+            )));
+          }
           if (payload.type === 'done') {
+            setMessages(prev => prev.map(item => (
+              item.id === assistantId
+                ? { ...item, text: payload.fullText || item.text, sources: payload.sources || item.sources || [], emotion: payload.emotion || nextEmotion }
+                : item
+            )));
             flushSentenceBuffer(nextEmotion, activeProfile, true);
           }
           if (payload.type === 'error') throw new Error(payload.error);
@@ -896,6 +976,28 @@ const MVPChinaPage = () => {
     } finally {
       streamAbortRef.current = null;
       setStreamingReply(false);
+    }
+  };
+
+  const submitFeedback = async (message, feedbackType, rating) => {
+    if (!profile?.id || !message?.id || feedbackByMessage[message.id]) return;
+    try {
+      const sourceIds = (message.sources || []).map(source => source?.id || source).filter(Boolean);
+      await authedFetch(session, '/api/memory/feedback', {
+        method: 'POST',
+        body: JSON.stringify({
+          profile_id: profile.id,
+          query: message.query || '',
+          answer: message.text || '',
+          source_fragment_ids: sourceIds,
+          rating,
+          feedback_type: feedbackType
+        })
+      });
+      setFeedbackByMessage(prev => ({ ...prev, [message.id]: feedbackType }));
+      toast.success(copy.toasts.feedbackSaved);
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -1270,7 +1372,22 @@ const MVPChinaPage = () => {
                   )}
                   {messages.map((message, index) => (
                     <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                      <div className={`max-w-[82%] px-4 py-3 rounded-lg text-sm ${message.role === 'user' ? 'bg-amber-300 text-black' : 'bg-white/8 border border-white/10 text-white/82'}`}>{message.text}</div>
+                      <div className={`max-w-[82%] ${message.role === 'user' ? 'items-end' : 'items-start'} flex flex-col gap-2`}>
+                        <div className={`w-full px-4 py-3 rounded-lg text-sm ${message.role === 'user' ? 'bg-amber-300 text-black' : 'bg-white/8 border border-white/10 text-white/82'}`}>{message.text}</div>
+                        {message.role === 'assistant' && message.id && message.text && (
+                          <div className="flex flex-wrap gap-1 text-[11px]">
+                            {feedbackByMessage[message.id] ? (
+                              <span className="px-2 py-1 rounded-md bg-emerald-300/10 text-emerald-200/75">{copy.feedbackThanks}</span>
+                            ) : (
+                              <>
+                                <button onClick={() => submitFeedback(message, 'accurate', 5)} className="px-2 py-1 rounded-md border border-white/10 text-white/45 hover:text-white/80">{copy.feedbackAccurate}</button>
+                                <button onClick={() => submitFeedback(message, 'not_like_person', 2)} className="px-2 py-1 rounded-md border border-white/10 text-white/45 hover:text-white/80">{copy.feedbackNotLike}</button>
+                                <button onClick={() => submitFeedback(message, 'missing_memory', 3)} className="px-2 py-1 rounded-md border border-white/10 text-white/45 hover:text-white/80">{copy.feedbackMissing}</button>
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

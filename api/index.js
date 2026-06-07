@@ -376,6 +376,30 @@ function fallbackAnalysis() {
     };
 }
 
+function estimateMemoryQuality({ contentText = '', contentType = 'text', analysis = {}, sourceKind = 'manual', userConfirmed = false }) {
+    const text = String(contentText || '');
+    const hasPeople = Array.isArray(analysis.people) && analysis.people.length > 0;
+    const hasPlaces = Array.isArray(analysis.places) && analysis.places.length > 0;
+    const hasTopics = Array.isArray(analysis.topics) && analysis.topics.length > 0;
+    const hasDateCue = /(\d{4}年|\d{1,2}月|\d{1,2}日|昨天|今天|去年|小时候|那年|春节|生日|毕业|婚礼)/.test(text);
+    const hasSensoryCue = /(声音|味道|气味|颜色|照片|手|眼神|笑|哭|雨|风|房间|路上|餐桌)/.test(text);
+    const lengthScore = Math.min(1, Math.max(0.15, text.length / 260));
+    const specificityScore = Math.min(1, 0.18 + lengthScore * 0.28 + (hasPeople ? 0.16 : 0) + (hasPlaces ? 0.14 : 0) + (hasDateCue ? 0.14 : 0) + (hasSensoryCue ? 0.1 : 0) + (hasTopics ? 0.08 : 0));
+    const confidenceScore = Math.min(1, 0.52 + (userConfirmed ? 0.2 : 0) + (sourceKind === 'chat' ? 0.08 : 0) + (contentType === 'voice' ? 0.05 : 0) + (contentType === 'image' ? 0.03 : 0) + specificityScore * 0.15);
+    const notes = [
+        hasPeople ? 'people' : '',
+        hasPlaces ? 'places' : '',
+        hasDateCue ? 'time-cue' : '',
+        hasSensoryCue ? 'sensory-cue' : '',
+        userConfirmed ? 'confirmed' : ''
+    ].filter(Boolean);
+    return {
+        specificity_score: Number(specificityScore.toFixed(2)),
+        confidence_score: Number(confidenceScore.toFixed(2)),
+        quality_notes: notes.join(',') || 'basic'
+    };
+}
+
 function fallbackEmotionState() {
     return {
         emotion_label: 'neutral',
@@ -412,6 +436,13 @@ async function persistConversationMemory({ supabaseAdmin, userId, profileId, use
     const emotionLabel = emotionState?.emotion_label || 'neutral';
     const emotionScore = Math.max(0, Math.min(5, Number(emotionState?.intensity ?? 2)));
     const importanceScore = Math.max(0.45, Math.min(0.9, 0.45 + (emotionScore / 5) * 0.35 + (sources?.length ? 0.1 : 0)));
+    const quality = estimateMemoryQuality({
+        contentText,
+        contentType: 'social',
+        analysis: { topics },
+        sourceKind: 'chat',
+        userConfirmed: false
+    });
 
     try {
         const embedding = await embedText(contentText);
@@ -429,6 +460,12 @@ async function persistConversationMemory({ supabaseAdmin, userId, profileId, use
             memory_date: new Date().toISOString(),
             summary: `对话：${userText.slice(0, 24) || assistantText.slice(0, 24)}`,
             parse_status: 'complete',
+            source_kind: 'chat',
+            confidence_score: quality.confidence_score,
+            specificity_score: quality.specificity_score,
+            user_confirmed: false,
+            quality_notes: quality.quality_notes,
+            metadata: { source_count: sources?.length || 0 },
             embedding
         }).select('id').single();
         if (error) throw error;
@@ -959,6 +996,109 @@ async function handleProfiles(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
 }
 
+async function handleProfileAssets(req, res) {
+    const auth = await getAuthedSupabase(req);
+    if (auth.error) return res.status(401).json({ error: auth.error });
+    const { user, supabaseAdmin } = auth;
+
+    if (req.method === 'GET') {
+        const url = new URL(req.url, 'http://localhost');
+        const profileId = url.searchParams.get('profile_id');
+        const assetType = url.searchParams.get('asset_type');
+        if (!profileId) return res.status(400).json({ error: 'profile_id is required' });
+        let query = supabaseAdmin
+            .from('profile_assets')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('profile_id', profileId)
+            .order('created_at', { ascending: false });
+        if (assetType) query = query.eq('asset_type', assetType);
+        const { data, error } = await query;
+        if (error) return res.status(500).json({ error: error.message });
+        return res.status(200).json({ assets: data || [] });
+    }
+
+    if (req.method === 'POST') {
+        try {
+            const [fields, files] = await parseMultipart(req, { maxFileSize: MAX_AUDIO_BYTES });
+            const profileId = fieldValue(fields, 'profile_id');
+            const assetType = fieldValue(fields, 'asset_type');
+            const role = fieldValue(fields, 'role', 'reference');
+            const transcript = fieldValue(fields, 'transcript') || null;
+            const metadataRaw = fieldValue(fields, 'metadata') || '{}';
+            const file = fileValue(files, 'file');
+            if (!profileId || !assetType || !file) return res.status(400).json({ error: 'profile_id, asset_type and file are required' });
+            if (!['voice', 'image', 'video'].includes(assetType)) return res.status(400).json({ error: 'invalid asset_type' });
+            const size = file.size || 0;
+            if (assetType === 'voice' && size > MAX_AUDIO_BYTES) return res.status(413).json({ error: 'Audio must be under 25MB' });
+            if (assetType !== 'voice' && size > MAX_IMAGE_BYTES * 3) return res.status(413).json({ error: 'Visual asset is too large' });
+
+            const { data: profile, error: profileError } = await supabaseAdmin
+                .from('profiles')
+                .select('id,user_id')
+                .eq('id', profileId)
+                .eq('user_id', user.id)
+                .single();
+            if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
+
+            const { cloudinaryService } = await import('./_lib/cloudinary-server.js');
+            const url = await cloudinaryService.uploadMemoryMedia(file.filepath, file.mimetype || 'application/octet-stream');
+            let metadata = {};
+            try { metadata = JSON.parse(metadataRaw || '{}'); } catch { metadata = {}; }
+            const qualityScore = Math.min(1, Math.max(0.25, (size > 200 * 1024 ? 0.65 : 0.45) + (role === 'primary' ? 0.1 : 0)));
+
+            const { data, error } = await supabaseAdmin.from('profile_assets').insert({
+                user_id: user.id,
+                profile_id: profileId,
+                asset_type: assetType,
+                role,
+                url,
+                file_name: file.originalFilename || file.newFilename || 'asset',
+                mime_type: file.mimetype || null,
+                file_size: size,
+                transcript,
+                quality_score: Number(qualityScore.toFixed(2)),
+                is_primary: role === 'primary',
+                metadata
+            }).select('*').single();
+            if (error) return res.status(500).json({ error: error.message });
+            return res.status(200).json({ asset: data });
+        } catch (error) {
+            console.error('[ProfileAssets] Fatal:', error);
+            return res.status(500).json({ error: error.message });
+        }
+    }
+
+    if (req.method === 'PATCH') {
+        const body = await readJsonBody(req);
+        const assetId = body.id;
+        if (!assetId) return res.status(400).json({ error: 'asset id is required' });
+        const patch = {};
+        ['role', 'transcript', 'quality_score', 'is_primary', 'metadata'].forEach(key => {
+            if (Object.prototype.hasOwnProperty.call(body, key)) patch[key] = body[key];
+        });
+        const { data, error } = await supabaseAdmin
+            .from('profile_assets')
+            .update(patch)
+            .eq('id', assetId)
+            .eq('user_id', user.id)
+            .select('*')
+            .single();
+        if (error) return res.status(500).json({ error: error.message });
+        if (body.is_primary && data?.profile_id && data?.url) {
+            if (data.asset_type === 'image' || data.asset_type === 'video') {
+                await supabaseAdmin.from('profiles').update({ avatar_url: data.url }).eq('id', data.profile_id).eq('user_id', user.id);
+            }
+            if (data.asset_type === 'voice') {
+                await supabaseAdmin.from('profiles').update({ voice_sample_url: data.url }).eq('id', data.profile_id).eq('user_id', user.id);
+            }
+        }
+        return res.status(200).json({ asset: data });
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
+}
+
 async function handleMemoryUpload(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
     const auth = await getAuthedSupabase(req);
@@ -980,6 +1120,9 @@ async function handleMemoryUpload(req, res) {
         const profileId = fieldValue(fields, 'profile_id');
         const memoryDate = fieldValue(fields, 'memory_date') || null;
         const textInput = fieldValue(fields, 'text');
+        const sourceKindInput = fieldValue(fields, 'source_kind') || '';
+        const sourceAssetId = fieldValue(fields, 'source_asset_id') || null;
+        const userConfirmed = ['true', '1', true].includes(fieldValue(fields, 'user_confirmed', false));
         const file = fileValue(files, 'file');
 
         if (!profileId) return res.status(400).json({ error: 'profile_id is required' });
@@ -1048,6 +1191,14 @@ async function handleMemoryUpload(req, res) {
             parseStatus = 'pending';
             console.warn('[MemoryUpload] Voyage embedding failed:', error.message);
         }
+        const sourceKind = sourceKindInput || (contentType === 'voice' ? 'voice' : contentType === 'image' ? 'image' : 'manual');
+        const quality = estimateMemoryQuality({
+            contentText,
+            contentType,
+            analysis,
+            sourceKind,
+            userConfirmed
+        });
 
         const { data, error } = await supabaseAdmin.from('memory_fragments').insert({
             user_id: user.id,
@@ -1064,8 +1215,15 @@ async function handleMemoryUpload(req, res) {
             memory_date: memoryDate || new Date().toISOString(),
             summary: analysis.summary || contentText.slice(0, 20),
             parse_status: parseStatus,
+            source_kind: sourceKind,
+            source_asset_id: sourceAssetId,
+            confidence_score: quality.confidence_score,
+            specificity_score: quality.specificity_score,
+            user_confirmed: userConfirmed,
+            quality_notes: quality.quality_notes,
+            metadata: { ingestion: 'memory_upload' },
             embedding
-        }).select('id,content_text,emotion_label,emotion_score,topics,importance_score,summary,original_url,memory_date,parse_status').single();
+        }).select('id,content_text,emotion_label,emotion_score,topics,importance_score,summary,original_url,memory_date,parse_status,confidence_score,specificity_score,user_confirmed,source_kind').single();
 
         if (error) return res.status(500).json({ error: error.message });
         return res.status(200).json({ success: true, fragment: data });
@@ -1084,7 +1242,7 @@ async function handleMemoryFragments(req, res) {
     if (!profileId) return res.status(400).json({ error: 'profile_id is required' });
     const { data, error } = await supabaseAdmin
         .from('memory_fragments')
-        .select('id,content_text,content_type,original_url,emotion_score,emotion_label,people,places,topics,importance_score,memory_date,created_at,summary,parse_status')
+        .select('id,content_text,content_type,original_url,emotion_score,emotion_label,people,places,topics,importance_score,memory_date,created_at,summary,parse_status,source_kind,source_asset_id,confidence_score,specificity_score,user_confirmed,quality_notes')
         .eq('user_id', user.id)
         .eq('profile_id', profileId)
         .order('memory_date', { ascending: false });
@@ -1108,6 +1266,50 @@ async function handleMemorySearch(req, res) {
     });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ fragments: data || [] });
+}
+
+async function handleMemoryFeedback(req, res) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const auth = await getAuthedSupabase(req);
+    if (auth.error) return res.status(401).json({ error: auth.error });
+    const { user, supabaseAdmin } = auth;
+    const {
+        profile_id,
+        conversation_id = null,
+        query = '',
+        answer = '',
+        source_fragment_ids = [],
+        rating = null,
+        feedback_type = 'other',
+        comment = ''
+    } = await readJsonBody(req);
+    if (!profile_id) return res.status(400).json({ error: 'profile_id is required' });
+    const ids = Array.isArray(source_fragment_ids) ? source_fragment_ids.filter(Boolean) : [];
+    const normalizedType = ['accurate', 'wrong', 'not_like_person', 'useful', 'missing_memory', 'other'].includes(feedback_type) ? feedback_type : 'other';
+    const normalizedRating = rating == null ? null : Math.min(5, Math.max(1, Number(rating) || 1));
+
+    const { data, error } = await supabaseAdmin.from('memory_feedback').insert({
+        user_id: user.id,
+        profile_id,
+        conversation_id,
+        query,
+        answer,
+        source_fragment_ids: ids,
+        rating: normalizedRating,
+        feedback_type: normalizedType,
+        comment
+    }).select('*').single();
+    if (error) return res.status(500).json({ error: error.message });
+
+    if (ids.length && (normalizedRating >= 4 || ['accurate', 'useful'].includes(normalizedType))) {
+        await supabaseAdmin
+            .from('memory_fragments')
+            .update({ user_confirmed: true })
+            .eq('user_id', user.id)
+            .eq('profile_id', profile_id)
+            .in('id', ids);
+    }
+    return res.status(200).json({ feedback: data });
 }
 
 async function handleInterviewNext(req, res) {
@@ -1348,6 +1550,7 @@ async function handleVoiceClone(req, res) {
     try {
         const [fields, files] = await parseMultipart(req, { maxFileSize: MAX_AUDIO_BYTES });
         const profileId = fieldValue(fields, 'profile_id');
+        const assetId = fieldValue(fields, 'asset_id') || null;
         const file = fileValue(files, 'file');
         if (!profileId) return res.status(400).json({ error: 'profile_id is required' });
         if (!file) return res.status(400).json({ error: 'voice sample file is required' });
@@ -1372,6 +1575,39 @@ async function handleVoiceClone(req, res) {
             console.warn('[VoiceClone] sample upload skipped:', error.message);
         }
 
+        let asset = null;
+        if (sampleUrl) {
+            const assetPayload = {
+                role: 'voice_sample',
+                url: sampleUrl,
+                file_name: file.originalFilename || file.newFilename || 'voice-sample',
+                mime_type: file.mimetype || null,
+                file_size: file.size || null,
+                transcript,
+                quality_score: 0.75,
+                is_primary: true,
+                metadata: { voice_ready: true }
+            };
+            const assetQuery = assetId
+                ? supabaseAdmin
+                    .from('profile_assets')
+                    .update(assetPayload)
+                    .eq('id', assetId)
+                    .eq('user_id', user.id)
+                    .eq('profile_id', profileId)
+                : supabaseAdmin
+                    .from('profile_assets')
+                    .insert({
+                        user_id: user.id,
+                        profile_id: profileId,
+                        asset_type: 'voice',
+                        ...assetPayload
+                    });
+            const { data: assetData, error: assetError } = await assetQuery.select('*').single();
+            if (assetError) console.warn('[VoiceClone] asset insert skipped:', assetError.message);
+            asset = assetData || null;
+        }
+
         const { data: updated, error: updateError } = await supabaseAdmin
             .from('profiles')
             .update({
@@ -1390,7 +1626,8 @@ async function handleVoiceClone(req, res) {
             profile: updated,
             transcript,
             voice_uri: voiceUri,
-            sample_url: sampleUrl
+            sample_url: sampleUrl,
+            asset
         });
     } catch (error) {
         console.error('[VoiceClone] Fatal:', error);
@@ -1678,9 +1915,11 @@ export default async function handler(req, res) {
     try {
         if (pathname === '/gemini-chat') return await handleGeminiChat(req, res);
         if (pathname === '/profiles') return await handleProfiles(req, res);
+        if (pathname === '/profile-assets') return await handleProfileAssets(req, res);
         if (pathname === '/memory/upload') return await handleMemoryUpload(req, res);
         if (pathname === '/memory/fragments') return await handleMemoryFragments(req, res);
         if (pathname === '/memory/search') return await handleMemorySearch(req, res);
+        if (pathname === '/memory/feedback') return await handleMemoryFeedback(req, res);
         if (pathname === '/memory/interview/next') return await handleInterviewNext(req, res);
         if (pathname === '/memory-chat') return await handleMemoryChat(req, res);
         if (pathname === '/cloudinary/signature') return await handleCloudinarySignature(req, res);

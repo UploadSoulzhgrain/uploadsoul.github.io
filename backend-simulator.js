@@ -11,9 +11,11 @@ const app = express();
 
 const delegatedMvpApiPrefixes = [
     '/api/profiles',
+    '/api/profile-assets',
     '/api/memory/upload',
     '/api/memory/fragments',
     '/api/memory/search',
+    '/api/memory/feedback',
     '/api/memory/interview/next',
     '/api/memory-chat',
     '/api/cloudinary/signature',
