@@ -167,6 +167,7 @@ const MVPChinaPage = () => {
   const [cameraOn, setCameraOn] = useState(false);
   const [listening, setListening] = useState(false);
   const [streamingReply, setStreamingReply] = useState(false);
+  const [phoneMode, setPhoneMode] = useState(false);
   const audioRef = useRef(null);
   const audioContextRef = useRef(null);
   const analyserRef = useRef(null);
@@ -186,6 +187,7 @@ const MVPChinaPage = () => {
   const ttsQueueRef = useRef([]);
   const ttsPlayingRef = useRef(false);
   const sentenceBufferRef = useRef('');
+  const phoneModeRef = useRef(false);
 
   const hasVoice = Boolean(profile?.elevenlabs_voice_id);
   const activeEmotionVisual = emotionVisuals[emotionState.visual_mood] || emotionVisuals[emotionState.emotion_label] || emotionVisuals.neutral;
@@ -229,6 +231,10 @@ const MVPChinaPage = () => {
   useEffect(() => {
     loadOrCreateProfile();
   }, [loadOrCreateProfile]);
+
+  useEffect(() => {
+    phoneModeRef.current = phoneMode;
+  }, [phoneMode]);
 
   useEffect(() => {
     if (profile?.avatar_url && !visualUrl) {
@@ -529,6 +535,9 @@ const MVPChinaPage = () => {
       }
     } finally {
       ttsPlayingRef.current = false;
+      if (phoneModeRef.current && !streamAbortRef.current) {
+        window.setTimeout(() => startListening(true), 350);
+      }
     }
   };
 
@@ -548,9 +557,9 @@ const MVPChinaPage = () => {
     }
   };
 
-  const sendMessage = async () => {
-    if (!profile?.id || !input.trim() || chatState === 'working') return;
-    const text = input.trim();
+  const sendMessage = async (textOverride = null) => {
+    const text = (textOverride || input).trim();
+    if (!profile?.id || !text || chatState === 'working') return;
     stopSpeaking();
     setInput('');
     const assistantId = `assistant-${Date.now()}`;
@@ -670,17 +679,13 @@ const MVPChinaPage = () => {
     }
   };
 
-  const toggleListening = () => {
+  const startListening = (autoSend = false) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error('当前浏览器不支持语音输入');
       return;
     }
-    if (listening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setListening(false);
-      return;
-    }
+    if (listening || streamingReply || visualState === 'speaking') return;
     const recognition = new SpeechRecognition();
     recognition.lang = 'zh-CN';
     recognition.continuous = false;
@@ -693,10 +698,43 @@ const MVPChinaPage = () => {
     };
     recognition.onresult = event => {
       const text = event.results?.[0]?.[0]?.transcript || '';
-      if (text.trim()) setInput(text.trim());
+      if (!text.trim()) return;
+      if (autoSend || phoneModeRef.current) {
+        sendMessage(text.trim());
+      } else {
+        setInput(text.trim());
+      }
     };
     recognitionRef.current = recognition;
     recognition.start();
+  };
+
+  const toggleListening = () => {
+    if (listening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setListening(false);
+      return;
+    }
+    startListening(false);
+  };
+
+  const togglePhoneMode = async () => {
+    const next = !phoneModeRef.current;
+    setPhoneMode(next);
+    phoneModeRef.current = next;
+    if (next) {
+      toast.success('电话模式已开启，说完一句会自动发送');
+      if (!document.fullscreenElement && callShellRef.current) {
+        callShellRef.current.requestFullscreen?.().catch(() => {});
+      }
+      if (!listening && !streamingReply && visualState !== 'speaking') {
+        window.setTimeout(() => startListening(true), 250);
+      }
+    } else {
+      recognitionRef.current?.stop?.();
+      setListening(false);
+      toast('电话模式已关闭');
+    }
   };
 
   return (
@@ -790,6 +828,9 @@ const MVPChinaPage = () => {
                   <div className="flex items-center gap-2">
                     <button onClick={toggleCamera} className={`w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center ${cameraOn ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title="摄像头">
                       <Camera size={16} />
+                    </button>
+                    <button onClick={togglePhoneMode} className={`px-3 h-9 rounded-lg border border-white/10 text-xs font-semibold ${phoneMode ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title="电话模式">
+                      {phoneMode ? '通话中' : '电话模式'}
                     </button>
                     <button onClick={toggleFullscreen} className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center" title="全屏">
                       {callFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
@@ -911,11 +952,15 @@ const MVPChinaPage = () => {
                     <button onClick={toggleCamera} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
                       <Camera size={15} /> {cameraOn ? '关闭摄像头' : '打开摄像头'}
                     </button>
+                    <button onClick={togglePhoneMode} className={`px-4 py-2 rounded-lg border border-white/10 flex items-center gap-2 ${phoneMode ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`}>
+                      {phoneMode ? <MicOff size={15} /> : <Mic size={15} />} {phoneMode ? '挂断电话模式' : '电话模式'}
+                    </button>
                     <button onClick={toggleFullscreen} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
                       {callFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />} {callFullscreen ? '退出全屏' : '全屏通话'}
                     </button>
                   </div>
                   {streamingReply && <div className="text-xs text-emerald-200/70">正在流式生成，数字人会按句子分段开口。</div>}
+                  {phoneMode && !streamingReply && <div className="text-xs text-emerald-200/70">{listening ? '电话模式：正在听你说话，说完会自动发送。' : '电话模式：数字人说完后会自动重新开麦。'}</div>}
                 </div>
               </section>
 
