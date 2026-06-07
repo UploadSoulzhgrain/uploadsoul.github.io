@@ -398,6 +398,48 @@ function cleanTextForSpeech(text = '') {
         .trim();
 }
 
+async function persistConversationMemory({ supabaseAdmin, userId, profileId, userMessage, assistantReply, emotionState, sources = [] }) {
+    const userText = String(userMessage || '').trim();
+    const assistantText = String(assistantReply || '').trim();
+    if (!userId || !profileId || (!userText && !assistantText)) return null;
+
+    const contentText = `对话记忆\n用户：${userText}\n数字人：${assistantText}`;
+    const topics = Array.from(new Set([
+        '对话',
+        '数字人交流',
+        ...(sources || []).flatMap(item => Array.isArray(item.topics) ? item.topics : [])
+    ])).filter(Boolean).slice(0, 5);
+    const emotionLabel = emotionState?.emotion_label || 'neutral';
+    const emotionScore = Math.max(0, Math.min(5, Number(emotionState?.intensity ?? 2)));
+    const importanceScore = Math.max(0.45, Math.min(0.9, 0.45 + (emotionScore / 5) * 0.35 + (sources?.length ? 0.1 : 0)));
+
+    try {
+        const embedding = await embedText(contentText);
+        const { data, error } = await supabaseAdmin.from('memory_fragments').insert({
+            user_id: userId,
+            profile_id: profileId,
+            content_text: contentText,
+            content_type: 'social',
+            emotion_score: emotionScore,
+            emotion_label: emotionLabel,
+            people: [],
+            places: [],
+            topics,
+            importance_score: importanceScore,
+            memory_date: new Date().toISOString(),
+            summary: `对话：${userText.slice(0, 24) || assistantText.slice(0, 24)}`,
+            parse_status: 'complete',
+            embedding
+        }).select('id').single();
+        if (error) throw error;
+        console.log('[ConversationMemory] saved:', { id: data?.id, profileId, topics });
+        return data;
+    } catch (error) {
+        console.warn('[ConversationMemory] skipped:', error.message);
+        return null;
+    }
+}
+
 async function analyzeEmotionalState({ message, memories = [], profile = null }) {
     const memoryBlock = memories
         .slice(0, 5)
@@ -1211,6 +1253,15 @@ ${DIGITAL_VOICE_ROLE_PROMPT}`;
             await supabaseAdmin.from('conversations').insert({ user_id: user.id, profile_id, messages });
         }
         sse({ type: 'done', fullText: answer });
+        await persistConversationMemory({
+            supabaseAdmin,
+            userId: user.id,
+            profileId: profile_id,
+            userMessage: message,
+            assistantReply: answer,
+            emotionState,
+            sources: memories
+        });
         res.end();
     } catch (error) {
         console.error('[MemoryChat] Fatal:', error);
@@ -1495,7 +1546,17 @@ Adjust your language rhythm, warmth, and word choice to match this emotion. If n
         });
         const reply = data.choices?.[0]?.message?.content?.trim() || '我听到了，我们继续聊。';
         console.log('[TestChat] completed:', { ms: Date.now() - startedAt, memories: memories.length, model: MEMORY_LLM_MODEL });
-        return res.status(200).json({ reply, profile, emotion: emotionState, sources: memories });
+        res.status(200).json({ reply, profile, emotion: emotionState, sources: memories });
+        await persistConversationMemory({
+            supabaseAdmin,
+            userId: user.id,
+            profileId: profile_id,
+            userMessage: message,
+            assistantReply: reply,
+            emotionState,
+            sources: memories
+        });
+        return;
     } catch (error) {
         console.error('[TestChat] Fatal:', error);
         return res.status(500).json({ error: error.message });
@@ -1576,6 +1637,15 @@ You are ${profile.display_name || 'UploadSoul digital person'}. Use first person
             });
             console.log('[TestChatStream] completed:', { ms: Date.now() - startedAt, memories: memories.length, model: MEMORY_LLM_MODEL });
             sse({ type: 'done', fullText: answer, profile, emotion: emotionState, sources: memories });
+            await persistConversationMemory({
+                supabaseAdmin,
+                userId: user.id,
+                profileId: profile_id,
+                userMessage: message,
+                assistantReply: answer,
+                emotionState,
+                sources: memories
+            });
             res.end();
         } catch (error) {
             console.error('[TestChatStream] stream failed:', error);

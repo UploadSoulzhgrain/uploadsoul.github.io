@@ -140,6 +140,11 @@ function takeSpeakableSentence(buffer, force = false) {
   return null;
 }
 
+function cloudinaryImageVariant(url, width) {
+  if (!url || !url.includes('/image/upload/')) return url;
+  return url.replace('/image/upload/', `/image/upload/f_auto,q_auto,c_limit,w_${width}/`);
+}
+
 const MVPChinaPage = () => {
   const { user, session } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -837,8 +842,9 @@ const MVPChinaPage = () => {
                     </button>
                   </div>
                 </div>
-                <div className="test-panel overflow-hidden mb-4">
-                  <div className="relative aspect-[16/10] bg-black flex items-center justify-center">
+                <div className={callFullscreen ? 'flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_minmax(340px,420px)] gap-4' : 'contents'}>
+                <div className={`test-panel overflow-hidden ${callFullscreen ? 'min-h-0 h-full flex flex-col mb-0' : 'mb-4'}`}>
+                  <div className={`relative bg-black flex items-center justify-center overflow-hidden ${callFullscreen ? 'flex-1 min-h-[54vh]' : 'aspect-[16/10]'}`}>
                     <div
                       className="absolute inset-0 opacity-40"
                       style={{
@@ -847,12 +853,14 @@ const MVPChinaPage = () => {
                     />
                     {visualUrl ? (
                       visualType === 'video' ? (
-                        <video src={visualUrl} className="relative z-10 w-full h-full object-cover" autoPlay loop muted playsInline />
+                        <video src={visualUrl} className="relative z-10 w-full h-full object-contain bg-black" autoPlay loop muted playsInline />
                       ) : (
                         <img
-                          src={visualUrl}
+                          src={cloudinaryImageVariant(visualUrl, callFullscreen ? 2160 : 1440)}
+                          srcSet={visualUrl.includes('/image/upload/') ? `${cloudinaryImageVariant(visualUrl, 960)} 960w, ${cloudinaryImageVariant(visualUrl, 1440)} 1440w, ${cloudinaryImageVariant(visualUrl, 2160)} 2160w` : undefined}
+                          sizes={callFullscreen ? 'calc(100vw - 460px)' : '(min-width: 1280px) calc(100vw - 520px), 100vw'}
                           alt="digital avatar"
-                          className="relative z-10 w-44 h-44 rounded-full object-cover border border-white/15 shadow-2xl transition-transform duration-150"
+                          className="relative z-10 w-full h-full object-contain transition-transform duration-150"
                           style={{ transform: `scale(${1 + audioLevel * 0.045})` }}
                         />
                       )
@@ -914,7 +922,8 @@ const MVPChinaPage = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                <div className={callFullscreen ? 'min-h-0 flex flex-col test-panel p-4 overflow-hidden' : 'contents'}>
+                <div className={`${callFullscreen ? 'min-h-0' : ''} flex-1 overflow-y-auto space-y-3 pr-1`}>
                   {messages.length === 0 && (
                     <div className="test-panel p-5 text-sm text-white/52">完成声音初始化后，发送一句话。系统会先生成数字人回复，再用刚才克隆的声线播放。</div>
                   )}
@@ -961,6 +970,8 @@ const MVPChinaPage = () => {
                   </div>
                   {streamingReply && <div className="text-xs text-emerald-200/70">正在流式生成，数字人会按句子分段开口。</div>}
                   {phoneMode && !streamingReply && <div className="text-xs text-emerald-200/70">{listening ? '电话模式：正在听你说话，说完会自动发送。' : '电话模式：数字人说完后会自动重新开麦。'}</div>}
+                </div>
+                </div>
                 </div>
               </section>
 
