@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Camera, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, Maximize2, MessageSquare, Mic, MicOff, Minimize2, Play, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
+import { Box, Camera, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, Maximize2, MessageSquare, Mic, MicOff, Minimize2, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
 async function authedFetch(session, url, options = {}) {
@@ -17,38 +18,6 @@ async function authedFetch(session, url, options = {}) {
   return response;
 }
 
-const stepCopy = [
-  ['账号', '登录后创建或读取默认 profile'],
-  ['声音', '上传 3-5 秒微信语音或现场录音'],
-  ['克隆', '转写参考文本并生成 CosyVoice2 音色 URI'],
-  ['记忆', '把文本/语音/照片整理成 memory_fragment'],
-  ['对话', 'LLM 生成回复，再用克隆声音输出']
-];
-
-const captureModes = [
-  {
-    id: 'relationship',
-    title: '关系图谱采集',
-    icon: GitBranch,
-    prompt: '请写下一个对你很重要的人：你们是什么关系？你们之间最常被想起的一件小事是什么？',
-    note: '人物、关系、亲疏、称呼、情感强度'
-  },
-  {
-    id: 'life_stage',
-    title: '人生阶段采集',
-    icon: Landmark,
-    prompt: '请选择一个人生阶段，比如童年、求学、工作、婚恋、迁徙。那段时间最能代表你的一个场景是什么？',
-    note: '童年、求学、工作、婚恋、迁徙、告别'
-  },
-  {
-    id: 'object_photo',
-    title: '物件/照片触发',
-    icon: Box,
-    prompt: '想起一张照片或一个旧物件。它现在在哪里？它让你想起谁、哪一天、什么声音或气味？',
-    note: '照片、旧物、声音、气味、地点线索'
-  }
-];
-
 const defaultEmotionState = {
   emotion_label: 'neutral',
   intensity: 2,
@@ -57,6 +26,179 @@ const defaultEmotionState = {
   tts_prompt: 'Calm and warm',
   visual_mood: 'neutral',
   reason: '等待对话'
+};
+
+const captureModeIcons = {
+  relationship: GitBranch,
+  life_stage: Landmark,
+  object_photo: Box
+};
+
+const mvpCopy = {
+  zh: {
+    moduleLabel: 'UploadSoul 测试模块',
+    title: '数字重生 / 数字永生流程测试舱',
+    subtitle: '这里验证从登录、创建档案、上传短声音样本、采集记忆，到数字人用相似声线自然回应的完整体验。',
+    refreshProfile: '刷新档案',
+    language: '语言',
+    steps: [
+      ['账号', '登录后创建或读取默认档案'],
+      ['声音', '上传 3-5 秒语音或现场录音'],
+      ['声线', '提取声音特征，准备专属声线'],
+      ['记忆', '整理文本、语音、照片中的记忆线索'],
+      ['对话', '数字人结合记忆，用专属声线回应']
+    ],
+    setupFailedTitle: '页面初始化失败',
+    setupFailedHint: '请确认当前账号已登录，并稍后重试。如仍失败，请联系管理员检查服务配置。',
+    profileTitle: '当前档案',
+    initializingProfile: '正在准备档案...',
+    account: '登录账号',
+    profileName: '档案名',
+    voiceStatus: '声音状态',
+    voiceReady: '已准备好',
+    voiceNotReady: '未初始化',
+    voiceTitle: '声音初始化',
+    uploadVoice: '上传语音/短音频',
+    recording: seconds => `录音中 ${seconds}s，点击停止`,
+    recordFive: '现场录 5 秒',
+    audioHint: '建议上传清晰、安静、无背景音乐的短音频。现场录音会自动整理成可用样本。',
+    preparingVoice: '正在准备声线...',
+    generateVoice: '生成专属声音',
+    transcript: '识别结果',
+    chatTitle: '对话与声音体验',
+    camera: '摄像头',
+    phoneMode: '电话模式',
+    inCall: '通话中',
+    fullscreen: '全屏',
+    speaking: '正在用专属声线说话',
+    thinking: '正在结合记忆组织回答',
+    idle: '待机中',
+    you: '你',
+    uploadVisual: '上传照片/短视频',
+    portraitMode: '照片模式',
+    loopVideoMode: '循环视频模式',
+    emotionAwareness: '情绪感知',
+    emptyChat: '完成声音初始化后，发送一句话。数字人会结合已采集的记忆，并用准备好的声线回应。',
+    voiceInput: '语音输入',
+    inputPlaceholder: '输入想说的话...',
+    replayLast: '重播上一条',
+    interrupt: '打断',
+    openCamera: '打开摄像头',
+    closeCamera: '关闭摄像头',
+    hangupPhone: '挂断电话模式',
+    enterPhone: '电话模式',
+    exitFullscreen: '退出全屏',
+    fullscreenCall: '全屏通话',
+    generating: '正在生成回答，数字人会按自然语句分段开口。',
+    phoneListening: '电话模式：正在听你说话，说完会自动发送。',
+    phoneWaiting: '电话模式：数字人说完后会自动重新开麦。',
+    memoryTitle: '记忆采集',
+    interviewTitle: 'AI 访谈开门问题',
+    generatingQuestion: '生成追问中...',
+    askMore: '让 AI 继续追问',
+    memoryPlaceholder: '把刚才的语音内容、聊天记录、日记片段粘贴到这里，保存为记忆线索...',
+    savingMemory: '保存中...',
+    saveMemory: '保存到记忆库',
+    conclusionTitle: '设计结论：',
+    conclusion: '上传声音是能力解锁，不是浏览前置门槛。',
+    immortalityTitle: '数字永生：',
+    immortality: '用户本人上传声音与记忆，形成自我数字分身。',
+    rebirthTitle: '数字重生：',
+    rebirth: '家人上传旧语音、照片、访谈与记忆，形成纪念型数字人。',
+    foundationTitle: '统一体验：',
+    foundation: '两个板块都围绕档案、记忆与声音资产沉淀。',
+    defaultInput: '你能用刚才上传的声音跟我打个招呼吗？',
+    defaultName: '我的数字人',
+    defaultDescription: '用于 UploadSoul 内部测试的默认数字人档案。',
+    captureModes: [
+      { id: 'relationship', title: '关系图谱采集', prompt: '请写下一个对你很重要的人：你们是什么关系？你们之间最常被想起的一件小事是什么？', note: '人物、关系、亲疏、称呼、情感强度' },
+      { id: 'life_stage', title: '人生阶段采集', prompt: '请选择一个人生阶段，比如童年、求学、工作、婚恋、迁徙。那段时间最能代表你的一个场景是什么？', note: '童年、求学、工作、婚恋、迁徙、告别' },
+      { id: 'object_photo', title: '物件/照片触发', prompt: '想起一张照片或一个旧物件。它现在在哪里？它让你想起谁、哪一天、什么声音或气味？', note: '照片、旧物、声音、气味、地点线索' }
+    ],
+    emotions: { joy: '喜悦', sadness: '怀念/低落', anger: '强烈', fear: '不安', surprise: '惊喜', neutral: '平静', warm: '温暖', blue: '安静', red: '强烈', green: '轻快' }
+  },
+  en: {
+    moduleLabel: 'UploadSoul Test Module',
+    title: 'Digital Rebirth / Digital Immortality Test Studio',
+    subtitle: 'Test the full experience: sign in, create a persona, add a short voice sample, collect memories, and let the digital person respond naturally in a familiar voice.',
+    refreshProfile: 'Refresh persona',
+    language: 'Language',
+    steps: [
+      ['Account', 'Create or load your default persona after sign-in'],
+      ['Voice', 'Upload a 3-5 second clip or record live'],
+      ['Voiceprint', 'Prepare a personal speaking voice'],
+      ['Memory', 'Organize memory clues from text, voice, and photos'],
+      ['Chat', 'The digital person responds with memory and voice']
+    ],
+    setupFailedTitle: 'Page setup failed',
+    setupFailedHint: 'Please make sure you are signed in and try again. If it still fails, ask an administrator to check the service settings.',
+    profileTitle: 'Current Persona',
+    initializingProfile: 'Preparing persona...',
+    account: 'Account',
+    profileName: 'Persona name',
+    voiceStatus: 'Voice status',
+    voiceReady: 'Ready',
+    voiceNotReady: 'Not set up',
+    voiceTitle: 'Voice Setup',
+    uploadVoice: 'Upload voice clip',
+    recording: seconds => `Recording ${seconds}s, tap to stop`,
+    recordFive: 'Record 5 seconds',
+    audioHint: 'Use a clear short clip without background music. Live recording will be prepared automatically.',
+    preparingVoice: 'Preparing voice...',
+    generateVoice: 'Prepare personal voice',
+    transcript: 'Recognized text',
+    chatTitle: 'Conversation Experience',
+    camera: 'Camera',
+    phoneMode: 'Call mode',
+    inCall: 'In call',
+    fullscreen: 'Fullscreen',
+    speaking: 'Speaking with the prepared voice',
+    thinking: 'Thinking with collected memories',
+    idle: 'Idle',
+    you: 'You',
+    uploadVisual: 'Upload photo/video',
+    portraitMode: 'Photo mode',
+    loopVideoMode: 'Loop video mode',
+    emotionAwareness: 'Emotion awareness',
+    emptyChat: 'After voice setup, send a message. The digital person will respond with collected memories and the prepared voice.',
+    voiceInput: 'Voice input',
+    inputPlaceholder: 'Type a message...',
+    replayLast: 'Replay last',
+    interrupt: 'Interrupt',
+    openCamera: 'Open camera',
+    closeCamera: 'Close camera',
+    hangupPhone: 'End call mode',
+    enterPhone: 'Call mode',
+    exitFullscreen: 'Exit fullscreen',
+    fullscreenCall: 'Fullscreen call',
+    generating: 'Generating the reply. Speech will start naturally by sentence.',
+    phoneListening: 'Call mode: listening now. Your sentence will be sent automatically.',
+    phoneWaiting: 'Call mode: the microphone will reopen after the reply.',
+    memoryTitle: 'Memory Capture',
+    interviewTitle: 'AI Interview Starter',
+    generatingQuestion: 'Creating follow-up...',
+    askMore: 'Ask another question',
+    memoryPlaceholder: 'Paste voice notes, chats, diary fragments, or memories here...',
+    savingMemory: 'Saving...',
+    saveMemory: 'Save to memory',
+    conclusionTitle: 'Design note:',
+    conclusion: 'Voice upload unlocks the experience, but browsing should not require it first.',
+    immortalityTitle: 'Digital immortality:',
+    immortality: 'A person can add their own voice and memories to form a self-representing digital presence.',
+    rebirthTitle: 'Digital rebirth:',
+    rebirth: 'Family members can add old voice clips, photos, interviews, and memories to create a commemorative presence.',
+    foundationTitle: 'Unified experience:',
+    foundation: 'Both paths build around profile, memory, and voice assets.',
+    defaultInput: 'Can you greet me with the voice I just uploaded?',
+    defaultName: 'My Digital Person',
+    defaultDescription: 'Default UploadSoul test persona.',
+    captureModes: [
+      { id: 'relationship', title: 'Relationship Map', prompt: 'Write about someone important to you. What is your relationship, and what small moment do you remember most often?', note: 'People, relationships, closeness, names, emotional strength' },
+      { id: 'life_stage', title: 'Life Stage', prompt: 'Choose a life stage: childhood, school, work, love, migration, or farewell. What scene best represents that time?', note: 'Childhood, school, work, love, migration, farewells' },
+      { id: 'object_photo', title: 'Object / Photo Trigger', prompt: 'Think of a photo or old object. Where is it now? Who, which day, what sound, or what scent does it bring back?', note: 'Photos, keepsakes, sounds, scents, places' }
+    ],
+    emotions: { joy: 'Joy', sadness: 'Nostalgic', anger: 'Intense', fear: 'Uneasy', surprise: 'Surprised', neutral: 'Calm', warm: 'Warm', blue: 'Quiet', red: 'Intense', green: 'Light' }
+  }
 };
 
 const emotionVisuals = {
@@ -146,7 +288,10 @@ function cloudinaryImageVariant(url, width) {
 }
 
 const MVPChinaPage = () => {
+  const { i18n } = useTranslation();
   const { user, session } = useAuth();
+  const copy = i18n.language?.startsWith('en') ? mvpCopy.en : mvpCopy.zh;
+  const localizedCaptureModes = copy.captureModes.map(mode => ({ ...mode, icon: captureModeIcons[mode.id] }));
   const [profile, setProfile] = useState(null);
   const [booting, setBooting] = useState(true);
   const [setupError, setSetupError] = useState('');
@@ -156,11 +301,11 @@ const MVPChinaPage = () => {
   const [memoryText, setMemoryText] = useState('');
   const [memoryState, setMemoryState] = useState('idle');
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('你能用刚才上传的声音跟我打个招呼吗？');
+  const [input, setInput] = useState(copy.defaultInput);
   const [chatState, setChatState] = useState('idle');
   const [recording, setRecording] = useState(false);
   const [recordSeconds, setRecordSeconds] = useState(0);
-  const [captureMode, setCaptureMode] = useState(captureModes[0]);
+  const [captureModeId, setCaptureModeId] = useState('relationship');
   const [interviewQuestion, setInterviewQuestion] = useState('');
   const [interviewLoading, setInterviewLoading] = useState(false);
   const [visualUrl, setVisualUrl] = useState('');
@@ -196,6 +341,8 @@ const MVPChinaPage = () => {
 
   const hasVoice = Boolean(profile?.elevenlabs_voice_id);
   const activeEmotionVisual = emotionVisuals[emotionState.visual_mood] || emotionVisuals[emotionState.emotion_label] || emotionVisuals.neutral;
+  const activeEmotionLabel = copy.emotions[emotionState.visual_mood] || copy.emotions[emotionState.emotion_label] || copy.emotions.neutral;
+  const captureMode = localizedCaptureModes.find(mode => mode.id === captureModeId) || localizedCaptureModes[0];
   const flowProgress = useMemo(() => {
     let count = 1;
     if (profile) count += 1;
@@ -204,6 +351,12 @@ const MVPChinaPage = () => {
     if (messages.length) count += 1;
     return Math.min(5, count);
   }, [hasVoice, messages.length, profile, voiceFile]);
+
+  useEffect(() => {
+    setInput(prev => (
+      !prev || prev === mvpCopy.zh.defaultInput || prev === mvpCopy.en.defaultInput ? copy.defaultInput : prev
+    ));
+  }, [copy.defaultInput]);
 
   const loadOrCreateProfile = useCallback(async () => {
     if (!session) return;
@@ -219,8 +372,8 @@ const MVPChinaPage = () => {
       const created = await authedFetch(session, '/api/profiles', {
         method: 'POST',
         body: JSON.stringify({
-          display_name: user?.user_metadata?.nickname || user?.email?.split('@')[0] || '我的数字人',
-          description: '用于 UploadSoul 内部测试的默认数字人档案。'
+          display_name: user?.user_metadata?.nickname || user?.email?.split('@')[0] || copy.defaultName,
+          description: copy.defaultDescription
         })
       });
       const createdData = await created.json();
@@ -231,7 +384,7 @@ const MVPChinaPage = () => {
     } finally {
       setBooting(false);
     }
-  }, [session, user]);
+  }, [copy.defaultDescription, copy.defaultName, session, user]);
 
   useEffect(() => {
     loadOrCreateProfile();
@@ -280,13 +433,13 @@ const MVPChinaPage = () => {
           const file = await recordedBlobToWavFile(blob);
           setVoiceFile(file);
           voiceFileRef.current = file;
-          toast.success('录音已转换为 wav，正在生成克隆声音');
+          toast.success(copy.toasts.recordingReady);
           if (profile?.id) {
             cloneVoice(file).catch(() => {});
           }
         } catch (error) {
           console.error('Recorded audio conversion failed:', error);
-          toast.error('录音转 wav 失败，请改用 mp3/wav 文件上传');
+          toast.error(copy.toasts.recordingConvertFailed);
         } finally {
           stream.getTracks().forEach(track => track.stop());
         }
@@ -303,7 +456,7 @@ const MVPChinaPage = () => {
         });
       }, 1000);
     } catch (error) {
-      toast.error(`无法打开麦克风：${error.message}`);
+      toast.error(copy.toasts.micFailed(error.message));
     }
   };
 
@@ -323,7 +476,7 @@ const MVPChinaPage = () => {
   const cloneVoice = async (fileOverride = null) => {
     const fileToClone = fileOverride || voiceFileRef.current;
     if (!profile?.id || !fileToClone) {
-      toast.error('请先选择或录制一段声音样本');
+      toast.error(copy.toasts.chooseVoice);
       return;
     }
     setCloneState('working');
@@ -340,7 +493,7 @@ const MVPChinaPage = () => {
       setProfile(nextProfile);
       setTranscript(data.transcript || '');
       setMemoryText(data.transcript || '');
-      toast.success('声音克隆完成，后续对话将使用该声线');
+      toast.success(copy.toasts.voiceDone);
       setCloneState('done');
       return nextProfile;
     } catch (error) {
@@ -352,7 +505,7 @@ const MVPChinaPage = () => {
 
   const saveMemory = async () => {
     if (!profile?.id || !memoryText.trim()) {
-      toast.error('先输入一段要写入记忆系统的内容');
+      toast.error(copy.toasts.memoryRequired);
       return;
     }
     setMemoryState('working');
@@ -363,7 +516,7 @@ const MVPChinaPage = () => {
       form.append('text', `采集入口：${captureMode.title}\n${memoryText.trim()}`);
       const response = await authedFetch(session, '/api/memory/upload', { method: 'POST', body: form });
       await response.json();
-      toast.success('记忆片段已写入采集层');
+      toast.success(copy.toasts.memorySaved);
       setMemoryState('done');
     } catch (error) {
       toast.error(error.message);
@@ -435,7 +588,7 @@ const MVPChinaPage = () => {
         body: form
       });
       const uploadData = await uploadResponse.json();
-      if (!uploadResponse.ok) throw new Error(uploadData.error?.message || '形象上传失败');
+      if (!uploadResponse.ok) throw new Error(copy.toasts.visualUploadFailed);
       const patchResponse = await authedFetch(session, '/api/profiles', {
         method: 'PATCH',
         body: JSON.stringify({ id: profile.id, avatar_url: uploadData.secure_url })
@@ -443,9 +596,9 @@ const MVPChinaPage = () => {
       const patchData = await patchResponse.json();
       setProfile(patchData.profile);
       setVisualUrl(uploadData.secure_url);
-      toast.success('数字人形象已保存');
+      toast.success(copy.toasts.visualSaved);
     } catch (error) {
-      toast.error(`形象仅本地预览：${error.message}`);
+      toast.error(copy.toasts.visualLocalOnly);
     }
   };
 
@@ -463,7 +616,7 @@ const MVPChinaPage = () => {
       });
       const data = await response.json();
       setInterviewQuestion(data.question);
-      setMemoryText(prev => prev ? `${prev}\n\nAI追问：${data.question}\n我的回答：` : `AI追问：${data.question}\n我的回答：`);
+      setMemoryText(prev => prev ? `${prev}\n\n${copy.interviewTitle}：${data.question}\n${copy.account === 'Account' ? 'My answer' : '我的回答'}：` : `${copy.interviewTitle}：${data.question}\n${copy.account === 'Account' ? 'My answer' : '我的回答'}：`);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -476,13 +629,13 @@ const MVPChinaPage = () => {
     try {
       const activeProfile = profileOverride || profile;
       const voiceUri = activeProfile?.elevenlabs_voice_id;
-      if (!voiceUri) throw new Error('当前档案还没有克隆 voice uri，请先重新生成克隆声音');
+      if (!voiceUri) throw new Error(copy.toasts.voiceMissing);
       const response = await authedFetch(session, '/api/voice/speech', {
         method: 'POST',
         body: JSON.stringify({ profile_id: activeProfile.id, text, emotion, voice_uri: voiceUri })
       });
       const data = await response.json();
-      if (!data.audio) throw new Error('语音接口没有返回音频');
+      if (!data.audio) throw new Error(copy.toasts.noAudio);
       if (audioRef.current) {
         audioRef.current.pause();
       }
@@ -499,7 +652,7 @@ const MVPChinaPage = () => {
       audio.onerror = () => {
         setVisualState('idle');
         setAudioLevel(0);
-        toast.error('浏览器无法解码这段语音，请查看后端日志');
+        toast.error(copy.toasts.audioDecodeFailed);
       };
       const audioContext = monitorAudio(audio);
       if (audioContext?.state === 'suspended') {
@@ -509,7 +662,7 @@ const MVPChinaPage = () => {
     } catch (error) {
       setVisualState('idle');
       setAudioLevel(0);
-      toast.error(`语音播放失败：${error.message}`);
+      toast.error(copy.toasts.audioPlayFailed(error.message));
       throw error;
     }
   };
@@ -575,11 +728,11 @@ const MVPChinaPage = () => {
     try {
       let activeProfile = profile;
       if (!activeProfile?.elevenlabs_voice_id && voiceFileRef.current) {
-        toast('正在先生成克隆声音...');
+        toast(copy.toasts.preparingVoice);
         activeProfile = await cloneVoice(voiceFileRef.current);
       }
       if (!activeProfile?.elevenlabs_voice_id) {
-        throw new Error('当前档案还没有克隆 voice uri，请先录音并等待克隆完成');
+        throw new Error(copy.toasts.voiceMissing);
       }
       const controller = new AbortController();
       streamAbortRef.current = controller;
@@ -625,7 +778,7 @@ const MVPChinaPage = () => {
     } catch (error) {
       if (error.name !== 'AbortError') toast.error(error.message);
       setMessages(prev => prev.map(item => (
-        item.id === assistantId && !item.text ? { ...item, text: `测试失败：${error.message}` } : item
+        item.id === assistantId && !item.text ? { ...item, text: copy.toasts.chatFailed(error.message) } : item
       )));
       setChatState('error');
       setVisualState('idle');
@@ -651,7 +804,7 @@ const MVPChinaPage = () => {
         setCallFullscreen(false);
       }
     } catch (error) {
-      toast.error(`全屏失败：${error.message}`);
+      toast.error(copy.toasts.fullscreenFailed(error.message));
     }
   };
 
@@ -680,26 +833,26 @@ const MVPChinaPage = () => {
         }
       }, 0);
     } catch (error) {
-      toast.error(`无法打开摄像头：${error.message}`);
+      toast.error(copy.toasts.cameraFailed(error.message));
     }
   };
 
   const startListening = (autoSend = false) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      toast.error('当前浏览器不支持语音输入');
+      toast.error(copy.toasts.speechUnsupported);
       return;
     }
     if (listening || streamingReply || visualState === 'speaking') return;
     const recognition = new SpeechRecognition();
-    recognition.lang = 'zh-CN';
+    recognition.lang = copy === mvpCopy.en ? 'en-US' : 'zh-CN';
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.onstart = () => setListening(true);
     recognition.onend = () => setListening(false);
     recognition.onerror = event => {
       setListening(false);
-      toast.error(`语音识别失败：${event.error}`);
+      toast.error(copy.toasts.speechFailed(event.error));
     };
     recognition.onresult = event => {
       const text = event.results?.[0]?.[0]?.transcript || '';
@@ -728,7 +881,7 @@ const MVPChinaPage = () => {
     setPhoneMode(next);
     phoneModeRef.current = next;
     if (next) {
-      toast.success('电话模式已开启，说完一句会自动发送');
+      toast.success(copy.toasts.phoneOn);
       if (!document.fullscreenElement && callShellRef.current) {
         callShellRef.current.requestFullscreen?.().catch(() => {});
       }
@@ -738,7 +891,7 @@ const MVPChinaPage = () => {
     } else {
       recognitionRef.current?.stop?.();
       setListening(false);
-      toast('电话模式已关闭');
+      toast(copy.toasts.phoneOff);
     }
   };
 
@@ -754,17 +907,24 @@ const MVPChinaPage = () => {
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5 mb-8">
             <div>
-              <div className="text-xs uppercase tracking-[0.28em] text-emerald-300/75 mb-3">UploadSoul Test Module</div>
-              <h1 className="text-3xl md:text-4xl font-bold">数字重生 / 数字永生流程测试舱</h1>
-              <p className="text-white/56 mt-3 max-w-3xl">这里验证从注册登录、默认档案、3-5 秒声音样本、CosyVoice2 克隆、记忆采集，到数字人用同一声线回答的完整闭环。</p>
+              <div className="text-xs uppercase tracking-[0.28em] text-emerald-300/75 mb-3">{copy.moduleLabel}</div>
+              <h1 className="text-3xl md:text-4xl font-bold">{copy.title}</h1>
+              <p className="text-white/56 mt-3 max-w-3xl">{copy.subtitle}</p>
             </div>
-            <button onClick={loadOrCreateProfile} className="px-4 py-2 rounded-lg border border-white/10 text-white/75 hover:text-white flex items-center gap-2">
-              <RefreshCw size={16} /> 刷新档案
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 p-1 text-xs">
+                <span className="px-2 text-white/45">{copy.language}</span>
+                <button onClick={() => i18n.changeLanguage('zh-CN')} className={`px-3 py-1.5 rounded-md ${copy === mvpCopy.zh ? 'bg-emerald-300 text-black' : 'text-white/65 hover:text-white'}`}>中文</button>
+                <button onClick={() => i18n.changeLanguage('en')} className={`px-3 py-1.5 rounded-md ${copy === mvpCopy.en ? 'bg-emerald-300 text-black' : 'text-white/65 hover:text-white'}`}>EN</button>
+              </div>
+              <button onClick={loadOrCreateProfile} className="px-4 py-2 rounded-lg border border-white/10 text-white/75 hover:text-white flex items-center gap-2">
+                <RefreshCw size={16} /> {copy.refreshProfile}
+              </button>
+            </div>
           </div>
 
           <section className="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
-            {stepCopy.map((step, index) => (
+            {copy.steps.map((step, index) => (
               <div key={step[0]} className={`test-panel p-4 ${index < flowProgress ? 'border-emerald-300/35' : ''}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-bold mb-3 ${index < flowProgress ? 'bg-emerald-300 text-black' : 'bg-white/10 text-white/45'}`}>{index + 1}</div>
                 <div className="font-semibold">{step[0]}</div>
@@ -775,30 +935,29 @@ const MVPChinaPage = () => {
 
           {setupError && (
             <section className="test-panel p-4 mb-6 border-red-400/30 bg-red-500/8">
-              <div className="font-semibold text-red-200 mb-1">测试页初始化失败</div>
+              <div className="font-semibold text-red-200 mb-1">{copy.setupFailedTitle}</div>
               <div className="text-sm text-white/65">{setupError}</div>
-              <div className="text-xs text-white/42 mt-2">通常是 Supabase SQL 尚未完整执行、profiles 表不存在、RLS/Service Role 配置未完成，或本地 Vite 没有连到 Vercel API。</div>
+              <div className="text-xs text-white/42 mt-2">{copy.setupFailedHint}</div>
             </section>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
             <aside className="space-y-6">
               <section className="test-panel p-5">
-                <div className="flex items-center gap-2 mb-4"><ShieldCheck size={18} className="text-emerald-300" /><h2 className="font-semibold">当前测试档案</h2></div>
+                <div className="flex items-center gap-2 mb-4"><ShieldCheck size={18} className="text-emerald-300" /><h2 className="font-semibold">{copy.profileTitle}</h2></div>
                 {booting ? (
-                  <div className="text-sm text-white/45">正在初始化 profile...</div>
+                  <div className="text-sm text-white/45">{copy.initializingProfile}</div>
                 ) : (
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between gap-4"><span className="text-white/45">登录账号</span><span className="text-right">{user?.email}</span></div>
-                    <div className="flex justify-between gap-4"><span className="text-white/45">档案名</span><span>{profile?.display_name}</span></div>
-                    <div className="flex justify-between gap-4"><span className="text-white/45">声音状态</span><span className={hasVoice ? 'text-emerald-300' : 'text-amber-300'}>{hasVoice ? '已克隆' : '未初始化'}</span></div>
-                    {hasVoice && <div className="text-xs text-white/40 break-all pt-2 border-t border-white/10">{profile.elevenlabs_voice_id}</div>}
+                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.account}</span><span className="text-right">{user?.email}</span></div>
+                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.profileName}</span><span>{profile?.display_name}</span></div>
+                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.voiceStatus}</span><span className={hasVoice ? 'text-emerald-300' : 'text-amber-300'}>{hasVoice ? copy.voiceReady : copy.voiceNotReady}</span></div>
                   </div>
                 )}
               </section>
 
               <section className="test-panel p-5">
-                <div className="flex items-center gap-2 mb-4"><FileAudio size={18} className="text-amber-200" /><h2 className="font-semibold">声音初始化</h2></div>
+                <div className="flex items-center gap-2 mb-4"><FileAudio size={18} className="text-amber-200" /><h2 className="font-semibold">{copy.voiceTitle}</h2></div>
                 <div className="space-y-3">
                   <input
                     ref={fileRef}
@@ -808,17 +967,17 @@ const MVPChinaPage = () => {
                     onChange={event => setVoiceFile(event.target.files?.[0] || null)}
                   />
                   <button onClick={() => fileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-amber-200/40 flex items-center justify-center gap-2">
-                    <Upload size={17} /> 上传微信语音/短音频
+                    <Upload size={17} /> {copy.uploadVoice}
                   </button>
                   <button onClick={recording ? stopRecording : startRecording} className={`w-full px-4 py-3 rounded-lg flex items-center justify-center gap-2 ${recording ? 'bg-red-500 text-white' : 'bg-white/8 border border-white/10'}`}>
-                    <Mic size={17} /> {recording ? `录音中 ${recordSeconds}s，点击停止` : '现场录 5 秒'}
+                    <Mic size={17} /> {recording ? copy.recording(recordSeconds) : copy.recordFive}
                   </button>
                   {voiceFile && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{voiceFile.name} · {(voiceFile.size / 1024 / 1024).toFixed(2)} MB</div>}
-                  <div className="text-[11px] text-white/38 leading-relaxed">正式验证优先上传 mp3 / wav / opus。浏览器现场录音会尽量使用 ogg-opus，部分浏览器可能退回 webm。</div>
+                  <div className="text-[11px] text-white/38 leading-relaxed">{copy.audioHint}</div>
                   <button onClick={cloneVoice} disabled={!voiceFile || cloneState === 'working'} className="w-full px-4 py-3 rounded-lg bg-amber-300 text-black font-semibold disabled:opacity-55">
-                    {cloneState === 'working' ? '转写并克隆中...' : '生成克隆声音'}
+                    {cloneState === 'working' ? copy.preparingVoice : copy.generateVoice}
                   </button>
-                  {transcript && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">转写结果：{transcript}</div>}
+                  {transcript && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{copy.transcript}：{transcript}</div>}
                 </div>
               </section>
             </aside>
@@ -828,16 +987,16 @@ const MVPChinaPage = () => {
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-2">
                     <MessageSquare size={18} className="text-emerald-300" />
-                    <h2 className="font-semibold">对话与声音输出测试</h2>
+                    <h2 className="font-semibold">{copy.chatTitle}</h2>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button onClick={toggleCamera} className={`w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center ${cameraOn ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title="摄像头">
+                    <button onClick={toggleCamera} className={`w-9 h-9 rounded-lg border border-white/10 flex items-center justify-center ${cameraOn ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title={copy.camera}>
                       <Camera size={16} />
                     </button>
-                    <button onClick={togglePhoneMode} className={`px-3 h-9 rounded-lg border border-white/10 text-xs font-semibold ${phoneMode ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title="电话模式">
-                      {phoneMode ? '通话中' : '电话模式'}
+                    <button onClick={togglePhoneMode} className={`px-3 h-9 rounded-lg border border-white/10 text-xs font-semibold ${phoneMode ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`} title={copy.phoneMode}>
+                      {phoneMode ? copy.inCall : copy.phoneMode}
                     </button>
-                    <button onClick={toggleFullscreen} className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center" title="全屏">
+                    <button onClick={toggleFullscreen} className="w-9 h-9 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center" title={copy.fullscreen}>
                       {callFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                     </button>
                   </div>
@@ -885,13 +1044,13 @@ const MVPChinaPage = () => {
                         })}
                       </div>
                       <div className="text-center text-xs text-white/50 mt-2">
-                        {visualState === 'speaking' ? '正在用克隆声线说话' : visualState === 'thinking' ? '正在组织记忆与回答' : '待机中'}
+                        {visualState === 'speaking' ? copy.speaking : visualState === 'thinking' ? copy.thinking : copy.idle}
                       </div>
                     </div>
                     {cameraOn && (
                       <div className="absolute right-4 top-4 z-30 w-32 md:w-44 aspect-[4/3] rounded-lg overflow-hidden border border-white/20 bg-black shadow-xl">
                         <video ref={userVideoRef} className="w-full h-full object-cover scale-x-[-1]" muted playsInline autoPlay />
-                        <div className="absolute left-2 bottom-1 text-[10px] text-white/70">你</div>
+                        <div className="absolute left-2 bottom-1 text-[10px] text-white/70">{copy.you}</div>
                       </div>
                     )}
                   </div>
@@ -904,17 +1063,17 @@ const MVPChinaPage = () => {
                       onChange={event => updateVisual(event.target.files?.[0])}
                     />
                     <button onClick={() => visualFileRef.current?.click()} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
-                      <ImageIcon size={15} /> 上传照片/短视频
+                      <ImageIcon size={15} /> {copy.uploadVisual}
                     </button>
                     <button onClick={() => setVisualType(visualType === 'video' ? 'avatar' : 'video')} className="px-3 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center gap-2 text-sm">
-                      <Video size={15} /> {visualType === 'video' ? '头像模式' : '循环视频模式'}
+                      <Video size={15} /> {visualType === 'video' ? copy.portraitMode : copy.loopVideoMode}
                     </button>
                   </div>
                   <div className="mx-3 mb-3 p-3 rounded-lg border border-white/10 bg-white/5">
                     <div className="flex items-center justify-between gap-3 text-xs">
-                      <span className="text-white/45">情绪感知</span>
+                      <span className="text-white/45">{copy.emotionAwareness}</span>
                       <span className="font-semibold" style={{ color: `rgb(${activeEmotionVisual.rgb})` }}>
-                        {activeEmotionVisual.label} · {emotionState.emotion_label} · {emotionState.intensity}/5
+                        {activeEmotionLabel} · {emotionState.intensity}/5
                       </span>
                     </div>
                     <div className="mt-2 text-xs text-white/50 leading-relaxed">
@@ -925,7 +1084,7 @@ const MVPChinaPage = () => {
                 <div className={callFullscreen ? 'min-h-0 flex flex-col test-panel p-4 overflow-hidden' : 'contents'}>
                 <div className={`${callFullscreen ? 'min-h-0' : ''} flex-1 overflow-y-auto space-y-3 pr-1`}>
                   {messages.length === 0 && (
-                    <div className="test-panel p-5 text-sm text-white/52">完成声音初始化后，发送一句话。系统会先生成数字人回复，再用刚才克隆的声线播放。</div>
+                    <div className="test-panel p-5 text-sm text-white/52">{copy.emptyChat}</div>
                   )}
                   {messages.map((message, index) => (
                     <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -935,7 +1094,7 @@ const MVPChinaPage = () => {
                 </div>
                 <div className="pt-4 border-t border-white/10 space-y-3">
                   <div className="flex gap-2">
-                    <button onClick={toggleListening} className={`w-11 h-11 rounded-lg border border-white/10 flex items-center justify-center ${listening ? 'bg-red-500 text-white' : 'text-white/70 hover:text-white'}`} title="语音输入">
+                    <button onClick={toggleListening} className={`w-11 h-11 rounded-lg border border-white/10 flex items-center justify-center ${listening ? 'bg-red-500 text-white' : 'text-white/70 hover:text-white'}`} title={copy.voiceInput}>
                       {listening ? <MicOff size={17} /> : <Mic size={17} />}
                     </button>
                     <input
@@ -945,7 +1104,7 @@ const MVPChinaPage = () => {
                       onKeyDown={event => {
                         if (event.key === 'Enter') sendMessage();
                       }}
-                      placeholder="输入测试问题..."
+                      placeholder={copy.inputPlaceholder}
                     />
                     <button onClick={streamingReply ? stopSpeaking : sendMessage} disabled={!streamingReply && !input.trim()} className={`w-11 h-11 rounded-lg flex items-center justify-center disabled:opacity-55 ${streamingReply ? 'border border-white/10 text-white/80' : 'bg-emerald-300 text-black'}`}>
                       {streamingReply ? <Square size={15} /> : <Send size={17} />}
@@ -953,39 +1112,39 @@ const MVPChinaPage = () => {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <button onClick={playLastReply} disabled={!messages.some(item => item.role === 'assistant')} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
-                      <Volume2 size={16} /> 重播上一条
+                      <Volume2 size={16} /> {copy.replayLast}
                     </button>
                     <button onClick={stopSpeaking} disabled={visualState !== 'speaking' && visualState !== 'thinking' && !streamingReply} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2 disabled:opacity-45">
-                      <Square size={15} /> 打断
+                      <Square size={15} /> {copy.interrupt}
                     </button>
                     <button onClick={toggleCamera} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
-                      <Camera size={15} /> {cameraOn ? '关闭摄像头' : '打开摄像头'}
+                      <Camera size={15} /> {cameraOn ? copy.closeCamera : copy.openCamera}
                     </button>
                     <button onClick={togglePhoneMode} className={`px-4 py-2 rounded-lg border border-white/10 flex items-center gap-2 ${phoneMode ? 'bg-emerald-300 text-black' : 'text-white/70 hover:text-white'}`}>
-                      {phoneMode ? <MicOff size={15} /> : <Mic size={15} />} {phoneMode ? '挂断电话模式' : '电话模式'}
+                      {phoneMode ? <MicOff size={15} /> : <Mic size={15} />} {phoneMode ? copy.hangupPhone : copy.enterPhone}
                     </button>
                     <button onClick={toggleFullscreen} className="px-4 py-2 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center gap-2">
-                      {callFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />} {callFullscreen ? '退出全屏' : '全屏通话'}
+                      {callFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />} {callFullscreen ? copy.exitFullscreen : copy.fullscreenCall}
                     </button>
                   </div>
-                  {streamingReply && <div className="text-xs text-emerald-200/70">正在流式生成，数字人会按句子分段开口。</div>}
-                  {phoneMode && !streamingReply && <div className="text-xs text-emerald-200/70">{listening ? '电话模式：正在听你说话，说完会自动发送。' : '电话模式：数字人说完后会自动重新开麦。'}</div>}
+                  {streamingReply && <div className="text-xs text-emerald-200/70">{copy.generating}</div>}
+                  {phoneMode && !streamingReply && <div className="text-xs text-emerald-200/70">{listening ? copy.phoneListening : copy.phoneWaiting}</div>}
                 </div>
                 </div>
                 </div>
               </section>
 
               <section className="test-panel p-5 min-h-[640px] flex flex-col">
-                <div className="flex items-center gap-2 mb-4"><Database size={18} className="text-blue-300" /><h2 className="font-semibold">记忆采集测试</h2></div>
+                <div className="flex items-center gap-2 mb-4"><Database size={18} className="text-blue-300" /><h2 className="font-semibold">{copy.memoryTitle}</h2></div>
                 <div className="grid grid-cols-1 gap-2 mb-4">
-                  {captureModes.map(mode => {
+                  {localizedCaptureModes.map(mode => {
                     const Icon = mode.icon;
-                    const active = captureMode.id === mode.id;
+                    const active = captureModeId === mode.id;
                     return (
                       <button
                         key={mode.id}
                         onClick={() => {
-                          setCaptureMode(mode);
+                          setCaptureModeId(mode.id);
                           setMemoryText(prev => prev || mode.prompt);
                         }}
                         className={`text-left p-3 rounded-lg border transition-all ${active ? 'border-emerald-300/45 bg-emerald-300/10' : 'border-white/10 bg-white/5 hover:border-white/20'}`}
@@ -1000,34 +1159,31 @@ const MVPChinaPage = () => {
                   })}
                 </div>
                 <div className="test-panel p-3 mb-3">
-                  <div className="flex items-center gap-2 text-sm font-semibold mb-2"><Sparkles size={16} className="text-emerald-300" />AI 访谈开门问题</div>
+                  <div className="flex items-center gap-2 text-sm font-semibold mb-2"><Sparkles size={16} className="text-emerald-300" />{copy.interviewTitle}</div>
                   <div className="text-xs text-white/50 leading-relaxed">{interviewQuestion || captureMode.prompt}</div>
                   <button
                     onClick={askInterviewQuestion}
                     disabled={!profile?.id || interviewLoading}
                     className="mt-3 px-3 py-2 rounded-lg bg-emerald-300 text-black text-sm font-semibold disabled:opacity-50"
                   >
-                    {interviewLoading ? '生成追问中...' : '让 AI 继续追问'}
+                    {interviewLoading ? copy.generatingQuestion : copy.askMore}
                   </button>
                 </div>
                 <textarea
                   className="test-input w-full min-h-[180px] p-3 text-sm resize-none"
                   value={memoryText}
                   onChange={event => setMemoryText(event.target.value)}
-                  placeholder="把刚才语音转写、微信聊天、日记片段粘贴到这里，写入 memory_fragments..."
+                  placeholder={copy.memoryPlaceholder}
                 />
                 <button onClick={saveMemory} disabled={memoryState === 'working'} className="mt-3 px-4 py-3 rounded-lg bg-blue-300 text-black font-semibold disabled:opacity-55">
-                  {memoryState === 'working' ? '写入中...' : '写入记忆系统'}
+                  {memoryState === 'working' ? copy.savingMemory : copy.saveMemory}
                 </button>
                 <div className="mt-5 space-y-3 text-sm text-white/55">
-                  <div className="test-panel p-3"><span className="text-white/85">设计结论：</span>上传声音是能力解锁，不是浏览前置门槛。</div>
-                  <div className="test-panel p-3"><span className="text-white/85">数字永生：</span>用户本人上传声音与记忆，形成自我数字分身。</div>
-                  <div className="test-panel p-3"><span className="text-white/85">数字重生：</span>家人上传旧语音、照片、访谈与记忆，形成纪念型数字人。</div>
-                  <div className="test-panel p-3"><span className="text-white/85">统一底座：</span>两个板块最终都落到同一套 profile、memory_fragments、voice_uri。</div>
+                  <div className="test-panel p-3"><span className="text-white/85">{copy.conclusionTitle}</span>{copy.conclusion}</div>
+                  <div className="test-panel p-3"><span className="text-white/85">{copy.immortalityTitle}</span>{copy.immortality}</div>
+                  <div className="test-panel p-3"><span className="text-white/85">{copy.rebirthTitle}</span>{copy.rebirth}</div>
+                  <div className="test-panel p-3"><span className="text-white/85">{copy.foundationTitle}</span>{copy.foundation}</div>
                 </div>
-                <button onClick={() => profile?.elevenlabs_voice_id && navigator.clipboard?.writeText(profile.elevenlabs_voice_id)} className="mt-auto px-4 py-2 rounded-lg border border-white/10 text-white/65 hover:text-white flex items-center justify-center gap-2">
-                  <Play size={15} /> 复制当前 voice URI
-                </button>
               </section>
             </main>
           </div>
