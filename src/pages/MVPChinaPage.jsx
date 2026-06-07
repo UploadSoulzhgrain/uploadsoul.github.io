@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Camera, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, Maximize2, MessageSquare, Mic, MicOff, Minimize2, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -389,6 +389,8 @@ function cloudinaryImageVariant(url, width) {
 const MVPChinaPage = () => {
   const { i18n } = useTranslation();
   const { user, session } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const requestedProfileId = searchParams.get('profile_id');
   const requestedPersonaType = searchParams.get('persona_type') || 'test';
@@ -445,6 +447,13 @@ const MVPChinaPage = () => {
   const ttsPlayingRef = useRef(false);
   const sentenceBufferRef = useRef('');
   const phoneModeRef = useRef(false);
+
+  const requireLogin = useCallback((message = '请先登录，再使用这个功能') => {
+    if (session) return true;
+    toast(message);
+    navigate('/login', { state: { from: location } });
+    return false;
+  }, [location, navigate, session]);
 
   const hasVoice = Boolean(profile?.elevenlabs_voice_id);
   const activeEmotionVisual = emotionVisuals[emotionState.visual_mood] || emotionVisuals[emotionState.emotion_label] || emotionVisuals.neutral;
@@ -514,7 +523,10 @@ const MVPChinaPage = () => {
   }, [copy.defaultInput]);
 
   const loadOrCreateProfile = useCallback(async () => {
-    if (!session) return;
+    if (!session) {
+      setBooting(false);
+      return;
+    }
     setBooting(true);
     setSetupError('');
     try {
@@ -603,6 +615,7 @@ const MVPChinaPage = () => {
   }, []);
 
   const startRecording = async () => {
+    if (!requireLogin('请先登录，再录制和生成专属声音')) return;
     if (recording) return;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -665,6 +678,7 @@ const MVPChinaPage = () => {
 
   const addVoiceSample = (file, source = 'upload') => {
     if (!file) return;
+    if (!requireLogin('请先登录，再上传声音素材')) return;
     const sample = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       file,
@@ -708,6 +722,7 @@ const MVPChinaPage = () => {
   };
 
   const cloneVoice = async (fileOverride = null) => {
+    if (!requireLogin('请先登录，再生成专属声音')) return;
     const fileToClone = fileOverride || selectedVoiceSample?.file || voiceFileRef.current;
     if (!profile?.id || !fileToClone) {
       toast.error(copy.toasts.chooseVoice);
@@ -751,6 +766,7 @@ const MVPChinaPage = () => {
   };
 
   const saveMemory = async () => {
+    if (!requireLogin('请先登录，再保存记忆')) return;
     if (!profile?.id || !memoryText.trim()) {
       toast.error(copy.toasts.memoryRequired);
       return;
@@ -814,6 +830,7 @@ const MVPChinaPage = () => {
 
   const updateVisual = async (file) => {
     if (!file) return;
+    if (!requireLogin('请先登录，再保存数字人形象')) return;
     const localUrl = URL.createObjectURL(file);
     setVisualUrl(localUrl);
     setVisualType(file.type.startsWith('video') ? 'video' : 'avatar');
@@ -850,6 +867,7 @@ const MVPChinaPage = () => {
   };
 
   const askInterviewQuestion = async () => {
+    if (!requireLogin('请先登录，再开始 AI 访谈采集')) return;
     if (!profile?.id || interviewLoading) return;
     setInterviewLoading(true);
     try {
@@ -963,6 +981,7 @@ const MVPChinaPage = () => {
   };
 
   const sendMessage = async (textOverride = null) => {
+    if (!requireLogin('请先登录，再和数字人对话')) return;
     const text = (textOverride || input).trim();
     if (!profile?.id || !text || chatState === 'working') return;
     stopSpeaking();
@@ -1096,6 +1115,7 @@ const MVPChinaPage = () => {
   }, []);
 
   const toggleCamera = async () => {
+    if (!requireLogin('请先登录，再打开视频通话体验')) return;
     if (cameraOn) {
       cameraStreamRef.current?.getTracks?.().forEach(track => track.stop());
       cameraStreamRef.current = null;
@@ -1119,6 +1139,7 @@ const MVPChinaPage = () => {
   };
 
   const startListening = (autoSend = false) => {
+    if (!requireLogin('请先登录，再使用语音输入')) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       toast.error(copy.toasts.speechUnsupported);
@@ -1158,6 +1179,7 @@ const MVPChinaPage = () => {
   };
 
   const togglePhoneMode = async () => {
+    if (!requireLogin('请先登录，再进入电话模式')) return;
     const next = !phoneModeRef.current;
     setPhoneMode(next);
     phoneModeRef.current = next;
@@ -1198,7 +1220,7 @@ const MVPChinaPage = () => {
                 <button onClick={() => i18n.changeLanguage('zh-CN')} className={`px-3 py-1.5 rounded-md ${copy === mvpCopy.zh ? 'bg-emerald-300 text-black' : 'text-white/65 hover:text-white'}`}>中文</button>
                 <button onClick={() => i18n.changeLanguage('en')} className={`px-3 py-1.5 rounded-md ${copy === mvpCopy.en ? 'bg-emerald-300 text-black' : 'text-white/65 hover:text-white'}`}>EN</button>
               </div>
-              <button onClick={loadOrCreateProfile} className="px-4 py-2 rounded-lg border border-white/10 text-white/75 hover:text-white flex items-center gap-2">
+              <button onClick={() => (session ? loadOrCreateProfile() : requireLogin('请先登录，再读取你的数字人档案'))} className="px-4 py-2 rounded-lg border border-white/10 text-white/75 hover:text-white flex items-center gap-2">
                 <RefreshCw size={16} /> {copy.refreshProfile}
               </button>
             </div>
@@ -1230,8 +1252,8 @@ const MVPChinaPage = () => {
                   <div className="text-sm text-white/45">{copy.initializingProfile}</div>
                 ) : (
                   <div className="space-y-3 text-sm">
-                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.account}</span><span className="text-right">{user?.email}</span></div>
-                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.profileName}</span><span>{profile?.display_name}</span></div>
+                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.account}</span><span className="text-right">{user?.email || '游客预览'}</span></div>
+                    <div className="flex justify-between gap-4"><span className="text-white/45">{copy.profileName}</span><span>{profile?.display_name || copy.defaultName}</span></div>
                     <div className="flex justify-between gap-4"><span className="text-white/45">{copy.voiceStatus}</span><span className={hasVoice ? 'text-emerald-300' : 'text-amber-300'}>{hasVoice ? copy.voiceReady : copy.voiceNotReady}</span></div>
                   </div>
                 )}

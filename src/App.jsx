@@ -127,13 +127,13 @@ const BusinessRoutes = () => (
     <Route path="baby-resume" element={<BabyResumePage />} />
     <Route path="speak-bar" element={<SpeakBarPage />} />
     <Route path="virtual-love" element={<VirtualLovePage />} />
-    <Route path="virtual-love/manage" element={<ProtectedRoute><DigitalPersonaHubPage type="lover" /></ProtectedRoute>} />
-    <Route path="digital-immortality" element={<ProtectedRoute><DigitalPersonaHubPage type="immortality" /></ProtectedRoute>} />
-    <Route path="digital-immortality/create" element={<ProtectedRoute><DigitalPersonaHubPage type="immortality" /></ProtectedRoute>} />
+    <Route path="virtual-love/manage" element={<DigitalPersonaHubPage type="lover" />} />
+    <Route path="digital-immortality" element={<DigitalPersonaHubPage type="immortality" />} />
+    <Route path="digital-immortality/create" element={<DigitalPersonaHubPage type="immortality" />} />
     <Route path="digital-immortality/assets/:profileId" element={<ProtectedRoute><LegacyAssetWorkspacePage /></ProtectedRoute>} />
     <Route path="shop" element={<ShopPage />} />
-    <Route path="digital-rebirth" element={<ProtectedRoute><DigitalPersonaHubPage type="rebirth" /></ProtectedRoute>} />
-    <Route path="digital-rebirth/historical" element={<ProtectedRoute><DigitalPersonaHubPage type="rebirth" defaultMode="historical_rebirth" /></ProtectedRoute>} />
+    <Route path="digital-rebirth" element={<DigitalPersonaHubPage type="rebirth" />} />
+    <Route path="digital-rebirth/historical" element={<DigitalPersonaHubPage type="rebirth" defaultMode="historical_rebirth" />} />
     <Route path="digital-rebirth/historical/:profileId" element={<ProtectedRoute><HistoricalPersonaWorkspacePage /></ProtectedRoute>} />
     <Route path="digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
     <Route path="digital-rebirth/family-tree" element={<FamilyTreePage />} />
@@ -141,7 +141,7 @@ const BusinessRoutes = () => (
     <Route path="digital-rebirth/history-hall" element={<HistoryHallPage />} />
     <Route path="digital-rebirth/history-dialogue/:id" element={<HistoryDialoguePage />} />
     <Route path="digital-rebirth/history-creator" element={<HistoryCreatorPage />} />
-    <Route path="digital-rebirth/create" element={<ProtectedRoute><DigitalPersonaHubPage type="rebirth" /></ProtectedRoute>} />
+    <Route path="digital-rebirth/create" element={<DigitalPersonaHubPage type="rebirth" />} />
     <Route path="memory-system" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
     <Route path="memories/:profileId" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
     <Route path="chat/:profileId" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
@@ -157,7 +157,7 @@ const BusinessRoutes = () => (
     <Route path="terms" element={<TermsPage />} />
     <Route path="sitemap" element={<SitemapPage />} />
     <Route path="mvp-test" element={<MVPTestPage />} />
-    <Route path="mvp-china" element={<ProtectedRoute><MVPChinaPage /></ProtectedRoute>} />
+    <Route path="mvp-china" element={<MVPChinaPage />} />
     <Route path="digital-world" element={<DigitalWorldPage />} />
     <Route path="our-stories" element={<WarmStoriesPage />} />
     <Route path="founder-column" element={<FounderColumnPage />} />

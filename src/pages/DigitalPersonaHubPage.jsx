@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, BookOpen, Brain, HeartHandshake, Mic, Plus, RefreshCw, ShieldCheck, Sparkles, UserRound } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
@@ -85,6 +85,18 @@ const statusText = {
   archived: '已归档'
 };
 
+function profileMatchesMode(profile, mode, fallbackType) {
+  const personaType = profile.persona_type || fallbackType;
+  const profileMode = profile.metadata?.mode || '';
+  if (mode.id === 'asset_vault') return personaType === 'immortality' && profileMode === 'asset_vault';
+  if (mode.id === 'self_legacy') return personaType === 'immortality' && profileMode !== 'asset_vault';
+  if (mode.id === 'historical_rebirth') return personaType === 'historical';
+  if (mode.id === 'family_rebirth') return personaType === 'rebirth';
+  if (mode.id === 'real_memory_lover') return personaType === 'lover' && profileMode === 'real_memory_lover';
+  if (mode.id === 'ideal_companion') return personaType === 'lover' && profileMode !== 'real_memory_lover';
+  return personaType === (mode.personaType || fallbackType);
+}
+
 function workspacePath(profile, fallbackType = 'immortality') {
   const personaType = profile.persona_type || fallbackType;
   const mode = profile.metadata?.mode;
@@ -103,6 +115,7 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
   const Icon = config.icon;
   const { user, session } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const initialMode = searchParams.get('mode') || defaultMode || config.modes?.[0]?.id || 'default';
   const [profiles, setProfiles] = useState([]);
@@ -116,10 +129,18 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
     description: config.defaultDescription
   });
 
-  const readyCount = useMemo(() => profiles.filter(item => item.elevenlabs_voice_id).length, [profiles]);
+  const visibleProfiles = useMemo(
+    () => profiles.filter(profile => profileMatchesMode(profile, selectedMode, type)),
+    [profiles, selectedMode, type]
+  );
+  const readyCount = useMemo(() => visibleProfiles.filter(item => item.elevenlabs_voice_id).length, [visibleProfiles]);
 
   const loadProfiles = useCallback(async () => {
-    if (!session) return;
+    if (!session) {
+      setProfiles([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const allowedTypes = config.personaTypes || [type];
@@ -148,7 +169,12 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
 
   const createProfile = async event => {
     event.preventDefault();
-    if (!session || creating) return;
+    if (!session) {
+      toast('请先登录，再创建和管理你的数字人档案');
+      navigate('/login', { state: { from: location } });
+      return;
+    }
+    if (creating) return;
     setCreating(true);
     try {
       const personaType = selectedMode.personaType || type;
@@ -173,6 +199,11 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
   };
 
   const openWorkspace = profile => {
+    if (!session) {
+      toast('请先登录，再进入个人工作台');
+      navigate('/login', { state: { from: location } });
+      return;
+    }
     navigate(workspacePath(profile, type));
   };
 
@@ -198,7 +229,7 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
             </div>
             <div className="grid grid-cols-3 gap-3 min-w-[280px]">
               <div className="rounded-lg border border-white/10 bg-black/25 p-4">
-                <div className="text-2xl font-semibold">{profiles.length}</div>
+                <div className="text-2xl font-semibold">{visibleProfiles.length}</div>
                 <div className="text-xs text-white/45 mt-1">档案数</div>
               </div>
               <div className="rounded-lg border border-white/10 bg-black/25 p-4">
@@ -283,8 +314,8 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h2 className="text-xl font-semibold">我的{config.label}档案</h2>
-              <p className="text-sm text-white/45 mt-1">选择一个档案继续采集、测试声音、对话和记忆溯源。</p>
+              <h2 className="text-xl font-semibold">我的{selectedMode.title || config.label}档案</h2>
+              <p className="text-sm text-white/45 mt-1">左侧切换类型后，这里只显示当前类型的数字人档案。</p>
             </div>
             <button onClick={loadProfiles} className="w-10 h-10 rounded-lg border border-white/10 text-white/70 hover:text-white flex items-center justify-center" title="刷新">
               <RefreshCw size={16} />
@@ -293,11 +324,13 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
 
           {loading ? (
             <div className="rounded-lg border border-white/10 bg-white/[0.04] p-8 text-white/45">正在加载档案...</div>
-          ) : profiles.length === 0 ? (
-            <div className="rounded-lg border border-white/10 bg-white/[0.04] p-8 text-white/50">{config.empty}</div>
+          ) : visibleProfiles.length === 0 ? (
+            <div className="rounded-lg border border-white/10 bg-white/[0.04] p-8 text-white/50">
+              还没有{selectedMode.title || config.label}档案。可以先在左侧创建一个。
+            </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {profiles.map(profile => (
+              {visibleProfiles.map(profile => (
                 <article key={profile.id} className="rounded-lg border border-white/10 bg-white/[0.04] overflow-hidden">
                   <div className="aspect-[16/9] bg-black/40 relative overflow-hidden">
                     {profile.avatar_url ? (
