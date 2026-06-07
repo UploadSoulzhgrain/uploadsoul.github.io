@@ -948,10 +948,14 @@ async function handleProfiles(req, res) {
     const { user, supabaseAdmin } = auth;
 
     if (req.method === 'GET') {
-        const { data, error } = await supabaseAdmin
+        const url = new URL(req.url, 'http://localhost');
+        const personaType = url.searchParams.get('persona_type');
+        let query = supabaseAdmin
             .from('profiles')
             .select('*')
-            .eq('user_id', user.id)
+            .eq('user_id', user.id);
+        if (personaType) query = query.eq('persona_type', personaType);
+        const { data, error } = await query
             .order('elevenlabs_voice_id', { ascending: false, nullsFirst: false })
             .order('created_at', { ascending: false });
         if (error) return res.status(500).json({ error: error.message });
@@ -960,14 +964,19 @@ async function handleProfiles(req, res) {
 
     if (req.method === 'POST') {
         const body = await readJsonBody(req);
+        const personaType = ['immortality', 'rebirth', 'historical', 'lover', 'companion', 'test'].includes(body.persona_type) ? body.persona_type : 'immortality';
         const payload = {
             user_id: user.id,
+            persona_type: personaType,
+            relationship: body.relationship || (personaType === 'immortality' ? 'self' : null),
+            status: body.status || 'collecting',
             display_name: body.display_name || user.user_metadata?.nickname || user.email?.split('@')[0] || '我的数字人',
             birth_date: body.birth_date || null,
             description: body.description || '由碎片化记忆逐步生成的数字分身。',
             avatar_url: body.avatar_url || null,
             voice_sample_url: body.voice_sample_url || null,
-            elevenlabs_voice_id: body.elevenlabs_voice_id || null
+            elevenlabs_voice_id: body.elevenlabs_voice_id || null,
+            metadata: body.metadata || {}
         };
         const { data, error } = await supabaseAdmin.from('profiles').insert(payload).select('*').single();
         if (error) return res.status(500).json({ error: error.message });
@@ -979,7 +988,7 @@ async function handleProfiles(req, res) {
         const profileId = body.id || body.profile_id;
         if (!profileId) return res.status(400).json({ error: 'profile id is required' });
         const patch = {};
-        ['display_name', 'description', 'avatar_url', 'voice_sample_url', 'elevenlabs_voice_id'].forEach(key => {
+        ['display_name', 'description', 'avatar_url', 'voice_sample_url', 'elevenlabs_voice_id', 'persona_type', 'relationship', 'status', 'metadata'].forEach(key => {
             if (Object.prototype.hasOwnProperty.call(body, key)) patch[key] = body[key];
         });
         const { data, error } = await supabaseAdmin
@@ -1613,6 +1622,7 @@ async function handleVoiceClone(req, res) {
             .update({
                 voice_sample_url: sampleUrl,
                 elevenlabs_voice_id: voiceUri,
+                status: 'voice_ready',
                 description: '已完成声音样本初始化，可用于数字人对话语音输出。'
             })
             .eq('id', profileId)

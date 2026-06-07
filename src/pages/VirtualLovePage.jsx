@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Brain,
   Sparkles,
@@ -107,6 +108,7 @@ export default function VirtualLovePage() {
 }
 
 function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsageMB, setStorageUsageMB, uploadMode, setUploadMode }) {
+  const navigate = useNavigate();
   const [uploadProgress, setUploadProgress] = useState(null);
   const [selectedTraits, setSelectedTraits] = useState(['热情奔放']);
 
@@ -283,18 +285,15 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
           </div>
           <div className="mt-auto p-6 md:p-8 pt-0">
             <button
-              onClick={() => {
-                if (storageUsageMB > 0) {
-                  onSelectSoulmate('female');
-                } else {
-                  toast.error('请先上传记忆碎片以启动分身');
-                }
-              }}
+              onClick={() => navigate('/virtual-love/manage?mode=real_memory_lover')}
               className="w-full py-4 bg-primary text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm md:text-base"
             >
-              <span>开启初始化同步</span>
+              <span>创建真实记忆恋人</span>
               <Zap className="group-hover:rotate-12 transition-transform" size={20} fill="currentColor" />
             </button>
+            <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-500 leading-relaxed text-center">
+              进入私密档案工作台，采集真实声音、形象、聊天记录与共同记忆。
+            </p>
           </div>
         </div>
 
@@ -392,13 +391,22 @@ function HubScreen({ onSelectSoulmate, toggleTheme, isDarkMode, user, storageUsa
             </div>
           </div>
           <div className="mt-auto p-6 md:p-8 pt-0">
-            <button
-              onClick={() => onSelectSoulmate('female', 'linwei')}
-              className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm md:text-base"
-            >
-              <span>召唤数字生命</span>
-              <Activity className="group-hover:scale-125 transition-transform" size={20} />
-            </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => onSelectSoulmate('female', 'linwei')}
+                className="w-full py-4 bg-accent-blue text-white font-black uppercase tracking-widest rounded-2xl hover:brightness-110 transition-all flex items-center justify-center gap-3 group text-sm"
+              >
+                <span>立即体验</span>
+                <Activity className="group-hover:scale-125 transition-transform" size={20} />
+              </button>
+              <button
+                onClick={() => navigate('/virtual-love/manage?mode=ideal_companion')}
+                className="w-full py-4 bg-white/10 border border-white/10 text-slate-100 font-black uppercase tracking-widest rounded-2xl hover:bg-white/15 transition-all flex items-center justify-center gap-3 group text-sm"
+              >
+                <span>创建档案</span>
+                <PlusCircle className="group-hover:rotate-12 transition-transform" size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </div>

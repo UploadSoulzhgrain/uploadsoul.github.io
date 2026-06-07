@@ -16,14 +16,14 @@ import AIChatPage from './pages/AIChatPage'
 import PetPage from './pages/PetPage'
 import DigitalHumanPage from './pages/DigitalHumanPage'
 import ShopPage from './pages/ShopPage'
-import DigitalRebirthPage from './pages/DigitalRebirthPage'
-import CreateDigitalHumanPage from './pages/CreateDigitalHumanPage'
 import VirtualLovePage from './pages/VirtualLovePage'
 import DigitalHumanExperiencePage from './pages/DigitalHumanExperiencePage'
 import MVPTestPage from './pages/MVPTestPage'
 import MVPChinaPage from './pages/MVPChinaPage'
 import WarmStoriesPage from './pages/WarmStoriesPage'
-import DigitalImmortalityPage from './pages/DigitalImmortalityPage'
+import DigitalPersonaHubPage from './pages/DigitalPersonaHubPage'
+import LegacyAssetWorkspacePage from './pages/LegacyAssetWorkspacePage'
+import HistoricalPersonaWorkspacePage from './pages/HistoricalPersonaWorkspacePage'
 import AboutPage from './pages/AboutPage'
 import TeamPage from './pages/TeamPage'
 import ContactPage from './pages/ContactPage'
@@ -38,7 +38,6 @@ import FamilyGalaxyPage from './pages/FamilyGalaxyPage'
 import HistoryHallPage from './pages/HistoryHallPage'
 import HistoryDialoguePage from './pages/HistoryDialoguePage'
 import HistoryCreatorPage from './pages/HistoryCreatorPage'
-import MemoryWorkshopPage from './pages/MemoryWorkshopPage'
 import MemorySystemPage from './pages/MemorySystemPage'
 import DigitalWorldPage from './pages/DigitalWorldPage'
 import NotFoundPage from './pages/NotFoundPage'
@@ -128,17 +127,21 @@ const BusinessRoutes = () => (
     <Route path="baby-resume" element={<BabyResumePage />} />
     <Route path="speak-bar" element={<SpeakBarPage />} />
     <Route path="virtual-love" element={<VirtualLovePage />} />
-    <Route path="digital-immortality" element={<DigitalImmortalityPage />} />
-    <Route path="digital-immortality/create" element={<CreateDigitalHumanPage />} />
+    <Route path="virtual-love/manage" element={<ProtectedRoute><DigitalPersonaHubPage type="lover" /></ProtectedRoute>} />
+    <Route path="digital-immortality" element={<ProtectedRoute><DigitalPersonaHubPage type="immortality" /></ProtectedRoute>} />
+    <Route path="digital-immortality/create" element={<ProtectedRoute><DigitalPersonaHubPage type="immortality" /></ProtectedRoute>} />
+    <Route path="digital-immortality/assets/:profileId" element={<ProtectedRoute><LegacyAssetWorkspacePage /></ProtectedRoute>} />
     <Route path="shop" element={<ShopPage />} />
-    <Route path="digital-rebirth" element={<DigitalRebirthPage />} />
+    <Route path="digital-rebirth" element={<ProtectedRoute><DigitalPersonaHubPage type="rebirth" /></ProtectedRoute>} />
+    <Route path="digital-rebirth/historical" element={<ProtectedRoute><DigitalPersonaHubPage type="rebirth" defaultMode="historical_rebirth" /></ProtectedRoute>} />
+    <Route path="digital-rebirth/historical/:profileId" element={<ProtectedRoute><HistoricalPersonaWorkspacePage /></ProtectedRoute>} />
     <Route path="digital-rebirth/reunion-space" element={<ReunionSpacePage />} />
     <Route path="digital-rebirth/family-tree" element={<FamilyTreePage />} />
     <Route path="digital-rebirth/family-galaxy" element={<FamilyGalaxyPage />} />
     <Route path="digital-rebirth/history-hall" element={<HistoryHallPage />} />
     <Route path="digital-rebirth/history-dialogue/:id" element={<HistoryDialoguePage />} />
     <Route path="digital-rebirth/history-creator" element={<HistoryCreatorPage />} />
-    <Route path="digital-rebirth/create" element={<MemoryWorkshopPage />} />
+    <Route path="digital-rebirth/create" element={<ProtectedRoute><DigitalPersonaHubPage type="rebirth" /></ProtectedRoute>} />
     <Route path="memory-system" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
     <Route path="memories/:profileId" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />
     <Route path="chat/:profileId" element={<ProtectedRoute><MemorySystemPage /></ProtectedRoute>} />

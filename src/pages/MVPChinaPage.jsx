@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Box, Camera, Database, FileAudio, GitBranch, Image as ImageIcon, Landmark, Maximize2, MessageSquare, Mic, MicOff, Minimize2, RefreshCw, Send, ShieldCheck, Sparkles, Square, Upload, Video, Volume2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -388,6 +389,9 @@ function cloudinaryImageVariant(url, width) {
 const MVPChinaPage = () => {
   const { i18n } = useTranslation();
   const { user, session } = useAuth();
+  const [searchParams] = useSearchParams();
+  const requestedProfileId = searchParams.get('profile_id');
+  const requestedPersonaType = searchParams.get('persona_type') || 'test';
   const copy = i18n.language?.startsWith('en') ? mvpCopy.en : mvpCopy.zh;
   const localizedCaptureModes = copy.captureModes.map(mode => ({ ...mode, icon: captureModeIcons[mode.id] }));
   const [profile, setProfile] = useState(null);
@@ -514,15 +518,20 @@ const MVPChinaPage = () => {
     setBooting(true);
     setSetupError('');
     try {
-      const response = await authedFetch(session, '/api/profiles');
+      const response = await authedFetch(session, requestedProfileId ? '/api/profiles' : `/api/profiles?persona_type=${encodeURIComponent(requestedPersonaType)}`);
       const data = await response.json();
-      if (data.profiles?.[0]) {
-        setProfile(data.profiles[0]);
+      const selectedProfile = requestedProfileId
+        ? data.profiles?.find(item => item.id === requestedProfileId)
+        : data.profiles?.[0];
+      if (selectedProfile) {
+        setProfile(selectedProfile);
         return;
       }
       const created = await authedFetch(session, '/api/profiles', {
         method: 'POST',
         body: JSON.stringify({
+          persona_type: requestedPersonaType,
+          relationship: requestedPersonaType === 'immortality' ? 'self' : '',
           display_name: user?.user_metadata?.nickname || user?.email?.split('@')[0] || copy.defaultName,
           description: copy.defaultDescription
         })
@@ -535,7 +544,7 @@ const MVPChinaPage = () => {
     } finally {
       setBooting(false);
     }
-  }, [copy.defaultDescription, copy.defaultName, session, user]);
+  }, [copy.defaultDescription, copy.defaultName, requestedPersonaType, requestedProfileId, session, user]);
 
   useEffect(() => {
     loadOrCreateProfile();

@@ -3,16 +3,51 @@ create extension if not exists vector;
 create table if not exists profiles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid references auth.users(id) on delete cascade,
+  persona_type text default 'immortality'
+    check (persona_type in ('immortality','rebirth','historical','lover','companion','test')),
+  relationship text,
+  status text default 'collecting'
+    check (status in ('collecting','voice_ready','active','archived')),
   display_name text,
   birth_date date,
   description text,
   avatar_url text,
   voice_sample_url text,
   elevenlabs_voice_id text,
+  metadata jsonb default '{}'::jsonb,
   created_at timestamptz default now()
 );
 
 alter table profiles enable row level security;
+
+alter table profiles add column if not exists persona_type text default 'immortality'
+  check (persona_type in ('immortality','rebirth','historical','lover','companion','test'));
+alter table profiles add column if not exists relationship text;
+alter table profiles add column if not exists status text default 'collecting'
+  check (status in ('collecting','voice_ready','active','archived'));
+alter table profiles add column if not exists metadata jsonb default '{}'::jsonb;
+
+create index if not exists profiles_user_type_created_idx
+on profiles (user_id, persona_type, created_at desc);
+
+do $profiles_persona_type_check$
+declare
+  constraint_name text;
+begin
+  for constraint_name in
+    select conname
+    from pg_constraint
+    where conrelid = 'profiles'::regclass
+      and contype = 'c'
+      and pg_get_constraintdef(oid) like '%persona_type%'
+  loop
+    execute format('alter table profiles drop constraint if exists %I', constraint_name);
+  end loop;
+
+  alter table profiles add constraint profiles_persona_type_check
+    check (persona_type in ('immortality','rebirth','historical','lover','companion','test'));
+end;
+$profiles_persona_type_check$;
 
 create table if not exists memory_fragments (
   id uuid primary key default gen_random_uuid(),
