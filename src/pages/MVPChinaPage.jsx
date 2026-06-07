@@ -59,6 +59,13 @@ const mvpCopy = {
     voiceNotReady: '未初始化',
     voiceTitle: '声音初始化',
     uploadVoice: '上传语音/短音频',
+    addVoiceSample: '添加声音素材',
+    voiceLibrary: '声音素材库',
+    voiceLibraryHint: '多条素材会帮助后续更稳定地还原说话习惯。当前阶段会优先采用你选中的清晰样本。',
+    noVoiceSamples: '还没有添加声音素材',
+    selected: '当前采用',
+    useThisVoice: '采用这条声音',
+    updateWithSelected: '用选中素材更新声音',
     recording: seconds => `录音中 ${seconds}s，点击停止`,
     recordFive: '现场录 5 秒',
     audioHint: '建议上传清晰、安静、无背景音乐的短音频。现场录音会自动整理成可用样本。',
@@ -75,6 +82,12 @@ const mvpCopy = {
     idle: '待机中',
     you: '你',
     uploadVisual: '上传照片/短视频',
+    visualCaptureTitle: '形象采集',
+    visualCaptureHint: '先采集照片和短视频素材。现在用于展示，后续有算力后可继续生成更完整的形象。',
+    visualChecklist: ['正脸清晰照', '左右侧脸', '自然表情', '3-10 秒短视频'],
+    visualLibrary: '形象素材',
+    noVisualAssets: '还没有添加形象素材',
+    setAsMainVisual: '设为当前形象',
     portraitMode: '照片模式',
     loopVideoMode: '循环视频模式',
     emotionAwareness: '情绪感知',
@@ -115,7 +128,33 @@ const mvpCopy = {
       { id: 'life_stage', title: '人生阶段采集', prompt: '请选择一个人生阶段，比如童年、求学、工作、婚恋、迁徙。那段时间最能代表你的一个场景是什么？', note: '童年、求学、工作、婚恋、迁徙、告别' },
       { id: 'object_photo', title: '物件/照片触发', prompt: '想起一张照片或一个旧物件。它现在在哪里？它让你想起谁、哪一天、什么声音或气味？', note: '照片、旧物、声音、气味、地点线索' }
     ],
-    emotions: { joy: '喜悦', sadness: '怀念/低落', anger: '强烈', fear: '不安', surprise: '惊喜', neutral: '平静', warm: '温暖', blue: '安静', red: '强烈', green: '轻快' }
+    emotions: { joy: '喜悦', sadness: '怀念/低落', anger: '强烈', fear: '不安', surprise: '惊喜', neutral: '平静', warm: '温暖', blue: '安静', red: '强烈', green: '轻快' },
+    toasts: {
+      recordingReady: '录音已整理完成，正在准备专属声音',
+      recordingConvertFailed: '录音整理失败，请改用清晰的音频文件上传',
+      micFailed: message => `无法打开麦克风：${message}`,
+      chooseVoice: '请先选择或录制一段声音样本',
+      sampleAdded: '声音素材已添加',
+      voiceDone: '声音已准备好，后续对话将使用这条声线',
+      memoryRequired: '先输入一段要保存的记忆内容',
+      memorySaved: '记忆已保存',
+      visualUploadFailed: '形象上传失败',
+      visualAssetAdded: '形象素材已添加',
+      visualSaved: '数字人形象已保存',
+      visualLocalOnly: '形象已在本地预览，暂未保存到账号',
+      voiceMissing: '当前档案还没有准备好声音，请先录音或上传音频',
+      noAudio: '暂时没有生成语音，请稍后重试',
+      audioDecodeFailed: '浏览器暂时无法播放这段语音，请稍后重试',
+      audioPlayFailed: message => `语音播放失败：${message}`,
+      preparingVoice: '正在先准备专属声音...',
+      chatFailed: message => `体验失败：${message}`,
+      fullscreenFailed: message => `全屏失败：${message}`,
+      cameraFailed: message => `无法打开摄像头：${message}`,
+      speechUnsupported: '当前浏览器不支持语音输入',
+      speechFailed: error => `语音识别失败：${error}`,
+      phoneOn: '电话模式已开启，说完一句会自动发送',
+      phoneOff: '电话模式已关闭'
+    }
   },
   en: {
     moduleLabel: 'UploadSoul Test Module',
@@ -141,6 +180,13 @@ const mvpCopy = {
     voiceNotReady: 'Not set up',
     voiceTitle: 'Voice Setup',
     uploadVoice: 'Upload voice clip',
+    addVoiceSample: 'Add voice sample',
+    voiceLibrary: 'Voice Library',
+    voiceLibraryHint: 'More samples help preserve speaking habits over time. For now, the selected clear sample is used first.',
+    noVoiceSamples: 'No voice samples yet',
+    selected: 'Selected',
+    useThisVoice: 'Use this voice',
+    updateWithSelected: 'Update voice with selected sample',
     recording: seconds => `Recording ${seconds}s, tap to stop`,
     recordFive: 'Record 5 seconds',
     audioHint: 'Use a clear short clip without background music. Live recording will be prepared automatically.',
@@ -157,6 +203,12 @@ const mvpCopy = {
     idle: 'Idle',
     you: 'You',
     uploadVisual: 'Upload photo/video',
+    visualCaptureTitle: 'Appearance Capture',
+    visualCaptureHint: 'Collect photos and short videos now. They are used for the current display and can support fuller generation later.',
+    visualChecklist: ['Clear front photo', 'Left and right profile', 'Natural expressions', '3-10 second short video'],
+    visualLibrary: 'Appearance Assets',
+    noVisualAssets: 'No appearance assets yet',
+    setAsMainVisual: 'Set as current look',
     portraitMode: 'Photo mode',
     loopVideoMode: 'Loop video mode',
     emotionAwareness: 'Emotion awareness',
@@ -197,7 +249,33 @@ const mvpCopy = {
       { id: 'life_stage', title: 'Life Stage', prompt: 'Choose a life stage: childhood, school, work, love, migration, or farewell. What scene best represents that time?', note: 'Childhood, school, work, love, migration, farewells' },
       { id: 'object_photo', title: 'Object / Photo Trigger', prompt: 'Think of a photo or old object. Where is it now? Who, which day, what sound, or what scent does it bring back?', note: 'Photos, keepsakes, sounds, scents, places' }
     ],
-    emotions: { joy: 'Joy', sadness: 'Nostalgic', anger: 'Intense', fear: 'Uneasy', surprise: 'Surprised', neutral: 'Calm', warm: 'Warm', blue: 'Quiet', red: 'Intense', green: 'Light' }
+    emotions: { joy: 'Joy', sadness: 'Nostalgic', anger: 'Intense', fear: 'Uneasy', surprise: 'Surprised', neutral: 'Calm', warm: 'Warm', blue: 'Quiet', red: 'Intense', green: 'Light' },
+    toasts: {
+      recordingReady: 'Recording is ready. Preparing the personal voice.',
+      recordingConvertFailed: 'Recording preparation failed. Please upload a clear audio file.',
+      micFailed: message => `Cannot open microphone: ${message}`,
+      chooseVoice: 'Please choose or record a voice sample first',
+      sampleAdded: 'Voice sample added',
+      voiceDone: 'Voice is ready. Future replies will use it.',
+      memoryRequired: 'Please enter a memory before saving',
+      memorySaved: 'Memory saved',
+      visualUploadFailed: 'Avatar upload failed',
+      visualAssetAdded: 'Appearance asset added',
+      visualSaved: 'Digital appearance saved',
+      visualLocalOnly: 'Appearance is available for local preview, but was not saved yet',
+      voiceMissing: 'This persona does not have a prepared voice yet. Please record or upload audio first.',
+      noAudio: 'No speech was generated. Please try again.',
+      audioDecodeFailed: 'The browser cannot play this audio right now. Please try again.',
+      audioPlayFailed: message => `Speech playback failed: ${message}`,
+      preparingVoice: 'Preparing your personal voice first...',
+      chatFailed: message => `Test failed: ${message}`,
+      fullscreenFailed: message => `Fullscreen failed: ${message}`,
+      cameraFailed: message => `Cannot open camera: ${message}`,
+      speechUnsupported: 'This browser does not support voice input',
+      speechFailed: error => `Voice recognition failed: ${error}`,
+      phoneOn: 'Call mode is on. A sentence will send automatically.',
+      phoneOff: 'Call mode is off'
+    }
   }
 };
 
@@ -296,6 +374,8 @@ const MVPChinaPage = () => {
   const [booting, setBooting] = useState(true);
   const [setupError, setSetupError] = useState('');
   const [voiceFile, setVoiceFile] = useState(null);
+  const [voiceSamples, setVoiceSamples] = useState([]);
+  const [selectedVoiceSampleId, setSelectedVoiceSampleId] = useState('');
   const [cloneState, setCloneState] = useState('idle');
   const [transcript, setTranscript] = useState('');
   const [memoryText, setMemoryText] = useState('');
@@ -310,6 +390,7 @@ const MVPChinaPage = () => {
   const [interviewLoading, setInterviewLoading] = useState(false);
   const [visualUrl, setVisualUrl] = useState('');
   const [visualType, setVisualType] = useState('avatar');
+  const [visualAssets, setVisualAssets] = useState([]);
   const [visualState, setVisualState] = useState('idle');
   const [audioLevel, setAudioLevel] = useState(0);
   const [emotionState, setEmotionState] = useState(defaultEmotionState);
@@ -343,6 +424,7 @@ const MVPChinaPage = () => {
   const activeEmotionVisual = emotionVisuals[emotionState.visual_mood] || emotionVisuals[emotionState.emotion_label] || emotionVisuals.neutral;
   const activeEmotionLabel = copy.emotions[emotionState.visual_mood] || copy.emotions[emotionState.emotion_label] || copy.emotions.neutral;
   const captureMode = localizedCaptureModes.find(mode => mode.id === captureModeId) || localizedCaptureModes[0];
+  const selectedVoiceSample = voiceSamples.find(sample => sample.id === selectedVoiceSampleId);
   const flowProgress = useMemo(() => {
     let count = 1;
     if (profile) count += 1;
@@ -431,8 +513,7 @@ const MVPChinaPage = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         try {
           const file = await recordedBlobToWavFile(blob);
-          setVoiceFile(file);
-          voiceFileRef.current = file;
+          addVoiceSample(file, 'record');
           toast.success(copy.toasts.recordingReady);
           if (profile?.id) {
             cloneVoice(file).catch(() => {});
@@ -473,8 +554,25 @@ const MVPChinaPage = () => {
     voiceFileRef.current = voiceFile;
   }, [voiceFile]);
 
+  const addVoiceSample = (file, source = 'upload') => {
+    if (!file) return;
+    const sample = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      file,
+      source,
+      name: file.name,
+      size: file.size,
+      createdAt: new Date().toISOString()
+    };
+    setVoiceSamples(prev => [sample, ...prev].slice(0, 8));
+    setSelectedVoiceSampleId(sample.id);
+    setVoiceFile(file);
+    voiceFileRef.current = file;
+    toast.success(copy.toasts.sampleAdded);
+  };
+
   const cloneVoice = async (fileOverride = null) => {
-    const fileToClone = fileOverride || voiceFileRef.current;
+    const fileToClone = fileOverride || selectedVoiceSample?.file || voiceFileRef.current;
     if (!profile?.id || !fileToClone) {
       toast.error(copy.toasts.chooseVoice);
       return;
@@ -568,6 +666,14 @@ const MVPChinaPage = () => {
     const localUrl = URL.createObjectURL(file);
     setVisualUrl(localUrl);
     setVisualType(file.type.startsWith('video') ? 'video' : 'avatar');
+    const visualAsset = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      url: localUrl,
+      type: file.type.startsWith('video') ? 'video' : 'image',
+      name: file.name,
+      size: file.size
+    };
+    setVisualAssets(prev => [visualAsset, ...prev].slice(0, 12));
 
     if (!profile?.id) return;
     try {
@@ -596,6 +702,10 @@ const MVPChinaPage = () => {
       const patchData = await patchResponse.json();
       setProfile(patchData.profile);
       setVisualUrl(uploadData.secure_url);
+      setVisualAssets(prev => prev.map(item => (
+        item.id === visualAsset.id ? { ...item, url: uploadData.secure_url, saved: true } : item
+      )));
+      toast.success(copy.toasts.visualAssetAdded);
       toast.success(copy.toasts.visualSaved);
     } catch (error) {
       toast.error(copy.toasts.visualLocalOnly);
@@ -964,20 +1074,92 @@ const MVPChinaPage = () => {
                     className="hidden"
                     type="file"
                     accept="audio/*,.mp3,.wav,.opus,.ogg"
-                    onChange={event => setVoiceFile(event.target.files?.[0] || null)}
+                    onChange={event => addVoiceSample(event.target.files?.[0], 'upload')}
                   />
                   <button onClick={() => fileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-amber-200/40 flex items-center justify-center gap-2">
-                    <Upload size={17} /> {copy.uploadVoice}
+                    <Upload size={17} /> {copy.addVoiceSample}
                   </button>
                   <button onClick={recording ? stopRecording : startRecording} className={`w-full px-4 py-3 rounded-lg flex items-center justify-center gap-2 ${recording ? 'bg-red-500 text-white' : 'bg-white/8 border border-white/10'}`}>
                     <Mic size={17} /> {recording ? copy.recording(recordSeconds) : copy.recordFive}
                   </button>
                   {voiceFile && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{voiceFile.name} · {(voiceFile.size / 1024 / 1024).toFixed(2)} MB</div>}
                   <div className="text-[11px] text-white/38 leading-relaxed">{copy.audioHint}</div>
-                  <button onClick={cloneVoice} disabled={!voiceFile || cloneState === 'working'} className="w-full px-4 py-3 rounded-lg bg-amber-300 text-black font-semibold disabled:opacity-55">
-                    {cloneState === 'working' ? copy.preparingVoice : copy.generateVoice}
+                  <button onClick={() => cloneVoice(selectedVoiceSample?.file)} disabled={(!selectedVoiceSample && !voiceFile) || cloneState === 'working'} className="w-full px-4 py-3 rounded-lg bg-amber-300 text-black font-semibold disabled:opacity-55">
+                    {cloneState === 'working' ? copy.preparingVoice : copy.updateWithSelected}
                   </button>
                   {transcript && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{copy.transcript}：{transcript}</div>}
+                  <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-sm font-semibold text-white/85">{copy.voiceLibrary}</div>
+                      <div className="text-xs text-white/40">{voiceSamples.length}/8</div>
+                    </div>
+                    <div className="text-[11px] text-white/38 leading-relaxed mt-1">{copy.voiceLibraryHint}</div>
+                    <div className="mt-3 space-y-2">
+                      {voiceSamples.length === 0 ? (
+                        <div className="text-xs text-white/38">{copy.noVoiceSamples}</div>
+                      ) : voiceSamples.map(sample => {
+                        const active = selectedVoiceSampleId === sample.id;
+                        return (
+                          <button
+                            key={sample.id}
+                            onClick={() => {
+                              setSelectedVoiceSampleId(sample.id);
+                              setVoiceFile(sample.file);
+                              voiceFileRef.current = sample.file;
+                            }}
+                            className={`w-full text-left rounded-lg border p-2 text-xs transition-all ${active ? 'border-amber-300/60 bg-amber-300/10' : 'border-white/10 bg-black/10 hover:border-white/20'}`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="truncate text-white/75">{sample.name}</span>
+                              {active && <span className="shrink-0 text-amber-200">{copy.selected}</span>}
+                            </div>
+                            <div className="mt-1 text-white/35">{(sample.size / 1024 / 1024).toFixed(2)} MB</div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              <section className="test-panel p-5">
+                <div className="flex items-center gap-2 mb-4"><ImageIcon size={18} className="text-blue-200" /><h2 className="font-semibold">{copy.visualCaptureTitle}</h2></div>
+                <div className="text-xs text-white/45 leading-relaxed mb-3">{copy.visualCaptureHint}</div>
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  {copy.visualChecklist.map(item => (
+                    <div key={item} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs text-white/60">{item}</div>
+                  ))}
+                </div>
+                <button onClick={() => visualFileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-blue-200/40 flex items-center justify-center gap-2 text-sm">
+                  <Upload size={16} /> {copy.uploadVisual}
+                </button>
+                <div className="mt-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-sm font-semibold text-white/85">{copy.visualLibrary}</div>
+                    <div className="text-xs text-white/40">{visualAssets.length}/12</div>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    {visualAssets.length === 0 ? (
+                      <div className="col-span-2 text-xs text-white/38">{copy.noVisualAssets}</div>
+                    ) : visualAssets.map(asset => (
+                      <button
+                        key={asset.id}
+                        onClick={() => {
+                          setVisualUrl(asset.url);
+                          setVisualType(asset.type === 'video' ? 'video' : 'avatar');
+                        }}
+                        className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/10 bg-black text-left"
+                        title={copy.setAsMainVisual}
+                      >
+                        {asset.type === 'video' ? (
+                          <video src={asset.url} className="w-full h-full object-cover" muted playsInline />
+                        ) : (
+                          <img src={asset.url} alt="" className="w-full h-full object-cover" />
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 bg-black/65 px-2 py-1 text-[10px] text-white/75 truncate">{asset.name}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </section>
             </aside>
