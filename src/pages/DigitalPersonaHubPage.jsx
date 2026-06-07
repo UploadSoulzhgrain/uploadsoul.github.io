@@ -208,7 +208,7 @@ const DigitalPersonaHubPage = ({ type = 'immortality', defaultMode = '' }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070a0f] text-white">
+    <div className="min-h-screen bg-tech-mesh text-white">
       <div className={`border-b border-white/10 bg-gradient-to-br ${config.accent}`}>
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">

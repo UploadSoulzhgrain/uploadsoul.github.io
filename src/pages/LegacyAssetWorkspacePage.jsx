@@ -79,7 +79,7 @@ const LegacyAssetWorkspacePage = () => {
   const openCollector = () => navigate(`/mvp-china?persona_type=immortality&profile_id=${profileId}`);
 
   return (
-    <div className="min-h-screen bg-[#07100d] text-white">
+    <div className="min-h-screen bg-tech-mesh text-white">
       <header className="border-b border-white/10 bg-gradient-to-br from-emerald-300/18 via-cyan-300/8 to-transparent">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-10">
           <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">

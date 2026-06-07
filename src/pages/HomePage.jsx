@@ -13,9 +13,26 @@ const HomePage = () => {
   const { navigate, l } = useLocalizedNavigate();
   const location = useLocation();
 
+  const publicBrowsePaths = [
+    '/companion',
+    '/virtual-pet',
+    '/virtual-love',
+    '/digital-immortality',
+    '/digital-rebirth',
+    '/mvp-china',
+    '/mvp-test',
+    '/shop',
+    '/vr',
+    '/all-in-one',
+    '/digital-world',
+    '/start-experience',
+    '/digital-human-experience'
+  ];
+
   const handleAction = (path) => {
     const localizedPath = l(path);
-    if (user) {
+    const canBrowse = publicBrowsePaths.some(item => path === item || path.startsWith(`${item}/`));
+    if (user || canBrowse) {
       navigate(path);
     } else {
       navigate('/login', { state: { from: { pathname: localizedPath } } });
@@ -57,7 +74,7 @@ const HomePage = () => {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5" />
         </svg>
       ),
-      link: '/pet',
+      link: '/virtual-pet',
       image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=1000'
     },
     {

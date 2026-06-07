@@ -12,9 +12,12 @@ const Footer = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
+  const publicBrowsePaths = ['/companion', '/digital-immortality', '/digital-rebirth', '/vr', '/all-in-one', '/shop'];
+
   const handleProtectedNav = (path) => {
     const localizedPath = l(path);
-    if (user) {
+    const canBrowse = publicBrowsePaths.some(item => path === item || path.startsWith(`${item}/`));
+    if (user || canBrowse) {
       navigate(localizedPath);
     } else {
       navigate(l('/login'), { state: { from: { pathname: localizedPath } } });

@@ -13,6 +13,25 @@ const Header = () => {
   const { user, signOut } = useAuth();
   const { navigate, l } = useLocalizedNavigate();
 
+  const publicBrowsePaths = [
+    '/',
+    '/companion',
+    '/virtual-pet',
+    '/virtual-love',
+    '/digital-immortality',
+    '/digital-rebirth',
+    '/shop',
+    '/vr',
+    '/all-in-one',
+    '/mvp-china',
+    '/mvp-test',
+    '/digital-world',
+    '/start-experience',
+    '/digital-human-experience',
+    '/baby-resume',
+    '/speak-bar'
+  ];
+
   const navItems = [
     { to: '/companion', label: t('header.companion', '情感陪伴') },
     { to: '/virtual-pet', label: t('header.pet', '虚拟宠物') },
@@ -35,7 +54,8 @@ const Header = () => {
 
   const handleNav = (path) => {
     const localizedPath = l(path);
-    if (user || path === '/') {
+    const canBrowse = publicBrowsePaths.some(item => path === item || path.startsWith(`${item}/`));
+    if (user || canBrowse) {
       navigate(path);
     } else {
       // 保存来源路径，以便登录后跳转回来
