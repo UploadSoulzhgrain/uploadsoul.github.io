@@ -5,6 +5,25 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 
+const PUBLIC_SERVICE_ERROR = '服务暂时不可用，请稍后再试。';
+const INTERNAL_ERROR_PATTERNS = [
+  /SILICON\s*_?FLOW/i,
+  /SILICONFLOW/i,
+  /API[_\s-]?KEY/i,
+  /CosyVoice/i,
+  /Claude/i,
+  /Anthropic/i,
+  /Voyage/i,
+  /OpenAI/i
+];
+
+function publicErrorMessage(message, fallback = PUBLIC_SERVICE_ERROR) {
+  const text = String(message || '');
+  if (!text) return fallback;
+  if (text === 'SERVICE_CONFIGURATION_MISSING') return fallback;
+  return INTERNAL_ERROR_PATTERNS.some(pattern => pattern.test(text)) ? fallback : text;
+}
+
 async function authedFetch(session, url, options = {}) {
   const headers = {
     ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
@@ -14,7 +33,7 @@ async function authedFetch(session, url, options = {}) {
   const response = await fetch(url, { ...options, headers });
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
-    throw new Error(data.error || `请求失败: ${response.status}`);
+    throw new Error(publicErrorMessage(data.error || `请求失败: ${response.status}`));
   }
   return response;
 }
@@ -551,8 +570,9 @@ const MVPChinaPage = () => {
       const createdData = await created.json();
       setProfile(createdData.profile);
     } catch (error) {
-      setSetupError(error.message);
-      toast.error(error.message);
+      const message = publicErrorMessage(error.message);
+      setSetupError(message);
+      toast.error(message);
     } finally {
       setBooting(false);
     }
@@ -759,7 +779,7 @@ const MVPChinaPage = () => {
       setCloneState('done');
       return nextProfile;
     } catch (error) {
-      toast.error(error.message);
+      toast.error(publicErrorMessage(error.message));
       setCloneState('error');
       throw error;
     }
@@ -784,7 +804,7 @@ const MVPChinaPage = () => {
       toast.success(copy.toasts.memorySaved);
       setMemoryState('done');
     } catch (error) {
-      toast.error(error.message);
+      toast.error(publicErrorMessage(error.message));
       setMemoryState('error');
     }
   };
@@ -831,6 +851,8 @@ const MVPChinaPage = () => {
   const updateVisual = async (file) => {
     if (!file) return;
     if (!requireLogin('请先登录，再保存数字人形象')) return;
+    const previousVisualUrl = visualUrl;
+    const previousVisualType = visualType;
     const localUrl = URL.createObjectURL(file);
     setVisualUrl(localUrl);
     setVisualType(file.type.startsWith('video') ? 'video' : 'avatar');
@@ -839,12 +861,13 @@ const MVPChinaPage = () => {
       url: localUrl,
       type: file.type.startsWith('video') ? 'video' : 'image',
       name: file.name,
-      size: file.size
+      size: file.size,
+      saved: false
     };
     setVisualAssets(prev => [visualAsset, ...prev].slice(0, 12));
 
-    if (!profile?.id) return;
     try {
+      if (!profile?.id) throw new Error(copy.toasts.visualUploadFailed);
       const asset = await persistProfileAsset({
         file,
         assetType: file.type.startsWith('video') ? 'video' : 'image',
@@ -857,12 +880,17 @@ const MVPChinaPage = () => {
         body: JSON.stringify({ id: profile.id, avatar_url: asset.url })
       });
       const patchData = await patchResponse.json();
-      setProfile(patchData.profile);
+      setProfile(patchData.profile || { ...profile, avatar_url: asset.url });
       setVisualUrl(asset.url);
+      URL.revokeObjectURL(localUrl);
       toast.success(copy.toasts.visualAssetAdded);
       toast.success(copy.toasts.visualSaved);
     } catch (error) {
-      toast.error(copy.toasts.visualLocalOnly);
+      setVisualAssets(prev => prev.filter(item => item.id !== visualAsset.id));
+      setVisualUrl(previousVisualUrl || '');
+      setVisualType(previousVisualType || 'avatar');
+      URL.revokeObjectURL(localUrl);
+      toast.error(publicErrorMessage(error.message, copy.toasts.visualUploadFailed));
     }
   };
 
@@ -883,7 +911,7 @@ const MVPChinaPage = () => {
       setInterviewQuestion(data.question);
       setMemoryText(prev => prev ? `${prev}\n\n${copy.interviewTitle}：${data.question}\n${copy.account === 'Account' ? 'My answer' : '我的回答'}：` : `${copy.interviewTitle}：${data.question}\n${copy.account === 'Account' ? 'My answer' : '我的回答'}：`);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(publicErrorMessage(error.message));
     } finally {
       setInterviewLoading(false);
     }
@@ -927,7 +955,7 @@ const MVPChinaPage = () => {
     } catch (error) {
       setVisualState('idle');
       setAudioLevel(0);
-      toast.error(copy.toasts.audioPlayFailed(error.message));
+      toast.error(copy.toasts.audioPlayFailed(publicErrorMessage(error.message)));
       throw error;
     }
   };
@@ -1054,9 +1082,9 @@ const MVPChinaPage = () => {
       flushSentenceBuffer(nextEmotion, activeProfile, true);
       setChatState('done');
     } catch (error) {
-      if (error.name !== 'AbortError') toast.error(error.message);
+      if (error.name !== 'AbortError') toast.error(publicErrorMessage(error.message));
       setMessages(prev => prev.map(item => (
-        item.id === assistantId && !item.text ? { ...item, text: copy.toasts.chatFailed(error.message) } : item
+        item.id === assistantId && !item.text ? { ...item, text: copy.toasts.chatFailed(publicErrorMessage(error.message)) } : item
       )));
       setChatState('error');
       setVisualState('idle');
@@ -1086,7 +1114,7 @@ const MVPChinaPage = () => {
       setFeedbackByMessage(prev => ({ ...prev, [message.id]: feedbackType }));
       toast.success(copy.toasts.feedbackSaved);
     } catch (error) {
-      toast.error(error.message);
+      toast.error(publicErrorMessage(error.message));
     }
   };
 

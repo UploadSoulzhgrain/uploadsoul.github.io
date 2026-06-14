@@ -98,6 +98,29 @@ function fileValue(files, key) {
     return Array.isArray(files[key]) ? files[key][0] : files[key];
 }
 
+const INTERNAL_ERROR_PATTERNS = [
+    /SILICON\s*_?FLOW/i,
+    /SILICONFLOW/i,
+    /API[_\s-]?KEY/i,
+    /CosyVoice/i,
+    /Claude/i,
+    /Anthropic/i,
+    /Voyage/i,
+    /OpenAI/i
+];
+
+function serviceConfigError() {
+    return new Error('SERVICE_CONFIGURATION_MISSING');
+}
+
+function publicErrorMessage(error, fallback = '服务暂时不可用，请稍后再试。') {
+    const message = String(error?.message || '');
+    if (!message) return fallback;
+    if (message === 'SERVICE_CONFIGURATION_MISSING') return '服务暂时不可用，请稍后再试。';
+    if (INTERNAL_ERROR_PATTERNS.some(pattern => pattern.test(message))) return fallback;
+    return message;
+}
+
 async function embedText(input) {
     if (!process.env.VOYAGE_API_KEY) throw new Error('VOYAGE_API_KEY missing');
     const response = await fetch('https://api.voyageai.com/v1/embeddings', {
@@ -137,7 +160,7 @@ async function callClaudeJson(prompt) {
 }
 
 async function callSiliconFlowChat({ messages, model, temperature = 0.2, maxTokens = 700, stream = false }) {
-    if (!SILICONFLOW_API_KEY) throw new Error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY missing');
+    if (!SILICONFLOW_API_KEY) throw serviceConfigError();
     const response = await fetch(`${SILICONFLOW_API_BASE}/chat/completions`, {
         method: 'POST',
         headers: {
@@ -214,7 +237,7 @@ async function describeImageWithClaude(file) {
 }
 
 async function describeImageWithSiliconFlow(file) {
-    if (!SILICONFLOW_API_KEY) throw new Error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY missing');
+    if (!SILICONFLOW_API_KEY) throw serviceConfigError();
     const mediaType = file.mimetype || 'image/jpeg';
     const base64 = fs.readFileSync(file.filepath).toString('base64');
     const data = await callSiliconFlowChat({
@@ -252,7 +275,7 @@ async function describeImage(file) {
 
 async function transcribeAudio(file) {
     if (STT_PROVIDER === 'siliconflow') {
-        if (!SILICONFLOW_API_KEY) throw new Error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY missing');
+        if (!SILICONFLOW_API_KEY) throw serviceConfigError();
         const form = new FormData();
         const buffer = fs.readFileSync(file.filepath);
         const blob = new Blob([buffer], { type: file.mimetype || 'audio/mpeg' });
@@ -264,7 +287,7 @@ async function transcribeAudio(file) {
             body: form
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data?.error?.message || data?.message || 'SiliconFlow transcription failed');
+        if (!response.ok) throw new Error(data?.error?.message || data?.message || 'Voice transcription failed');
         return data.text || data.result || data.transcription;
     }
 
@@ -603,7 +626,7 @@ async function handleChat(req, res) {
 
         res.status(200).json({ reply: result.choices[0].message.content });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: publicErrorMessage(error) });
     }
 }
 
@@ -906,7 +929,7 @@ async function handleGeminiChat(req, res) {
 
             let reply = '';
             try {
-                if (!sfKey) throw new Error("SiliconFlow API key missing");
+                if (!sfKey) throw serviceConfigError();
                 // 1. SiliconFlow - DeepSeek-V3
                 console.log("[GeminiChat] Trying SiliconFlow: DeepSeek-V3");
                 reply = await tryOpenAIFormat("https://api.siliconflow.cn/v1/chat/completions", sfKey, "deepseek-ai/DeepSeek-V3");
@@ -927,7 +950,7 @@ async function handleGeminiChat(req, res) {
                         return res.status(200).json({ reply, engine: 'groq' });
                     } catch (groqErr) {
                         console.warn("[GeminiChat] Groq also failed:", groqErr.message);
-                        throw new Error("网络访问受限，所有的海外节点（Gemini/Groq/SiliconFlow）均连接失败。");
+                        throw new Error("服务暂时不可用，请稍后再试。");
                     }
                 }
             }
@@ -958,7 +981,7 @@ async function handleProfiles(req, res) {
         const { data, error } = await query
             .order('elevenlabs_voice_id', { ascending: false, nullsFirst: false })
             .order('created_at', { ascending: false });
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) return res.status(500).json({ error: publicErrorMessage(error) });
         return res.status(200).json({ profiles: data || [] });
     }
 
@@ -979,7 +1002,7 @@ async function handleProfiles(req, res) {
             metadata: body.metadata || {}
         };
         const { data, error } = await supabaseAdmin.from('profiles').insert(payload).select('*').single();
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) return res.status(500).json({ error: publicErrorMessage(error) });
         return res.status(200).json({ profile: data });
     }
 
@@ -998,7 +1021,7 @@ async function handleProfiles(req, res) {
             .eq('user_id', user.id)
             .select('*')
             .single();
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) return res.status(500).json({ error: publicErrorMessage(error) });
         return res.status(200).json({ profile: data });
     }
 
@@ -1023,7 +1046,7 @@ async function handleProfileAssets(req, res) {
             .order('created_at', { ascending: false });
         if (assetType) query = query.eq('asset_type', assetType);
         const { data, error } = await query;
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) return res.status(500).json({ error: publicErrorMessage(error) });
         return res.status(200).json({ assets: data || [] });
     }
 
@@ -1070,11 +1093,11 @@ async function handleProfileAssets(req, res) {
                 is_primary: role === 'primary',
                 metadata
             }).select('*').single();
-            if (error) return res.status(500).json({ error: error.message });
+            if (error) return res.status(500).json({ error: publicErrorMessage(error) });
             return res.status(200).json({ asset: data });
         } catch (error) {
             console.error('[ProfileAssets] Fatal:', error);
-            return res.status(500).json({ error: error.message });
+            return res.status(500).json({ error: publicErrorMessage(error) });
         }
     }
 
@@ -1093,7 +1116,7 @@ async function handleProfileAssets(req, res) {
             .eq('user_id', user.id)
             .select('*')
             .single();
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) return res.status(500).json({ error: publicErrorMessage(error) });
         if (body.is_primary && data?.profile_id && data?.url) {
             if (data.asset_type === 'image' || data.asset_type === 'video') {
                 await supabaseAdmin.from('profiles').update({ avatar_url: data.url }).eq('id', data.profile_id).eq('user_id', user.id);
@@ -1234,11 +1257,11 @@ async function handleMemoryUpload(req, res) {
             embedding
         }).select('id,content_text,emotion_label,emotion_score,topics,importance_score,summary,original_url,memory_date,parse_status,confidence_score,specificity_score,user_confirmed,source_kind').single();
 
-        if (error) return res.status(500).json({ error: error.message });
+        if (error) return res.status(500).json({ error: publicErrorMessage(error) });
         return res.status(200).json({ success: true, fragment: data });
     } catch (error) {
         console.error('[MemoryUpload] Fatal:', error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: publicErrorMessage(error) });
     }
 }
 
@@ -1255,7 +1278,7 @@ async function handleMemoryFragments(req, res) {
         .eq('user_id', user.id)
         .eq('profile_id', profileId)
         .order('memory_date', { ascending: false });
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: publicErrorMessage(error) });
     return res.status(200).json({ fragments: data || [] });
 }
 
@@ -1273,7 +1296,7 @@ async function handleMemorySearch(req, res) {
         match_user_id: user.id,
         match_count: Math.min(20, Number(limit) || 5)
     });
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: publicErrorMessage(error) });
     return res.status(200).json({ fragments: data || [] });
 }
 
@@ -1308,7 +1331,7 @@ async function handleMemoryFeedback(req, res) {
         feedback_type: normalizedType,
         comment
     }).select('*').single();
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: publicErrorMessage(error) });
 
     if (ids.length && (normalizedRating >= 4 || ['accurate', 'useful'].includes(normalizedType))) {
         await supabaseAdmin
@@ -1387,7 +1410,7 @@ ${historyBlock || '暂无'}`);
         });
     } catch (error) {
         console.error('[InterviewNext] Fatal:', error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: publicErrorMessage(error) });
     }
 }
 
@@ -1476,7 +1499,7 @@ ${DIGITAL_VOICE_ROLE_PROMPT}`;
         res.end();
     } catch (error) {
         console.error('[MemoryChat] Fatal:', error);
-        sse({ type: 'error', error: error.message });
+        sse({ type: 'error', error: publicErrorMessage(error) });
         res.end();
     }
 }
@@ -1513,7 +1536,7 @@ async function handleCloudinarySignature(req, res) {
 }
 
 async function cloneVoiceWithSiliconFlow(file, transcript, userId) {
-    if (!SILICONFLOW_API_KEY) throw new Error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY missing');
+    if (!SILICONFLOW_API_KEY) throw serviceConfigError();
     const form = new FormData();
     const buffer = fs.readFileSync(file.filepath);
     const mimeType = file.mimetype || 'audio/mpeg';
@@ -1539,14 +1562,14 @@ async function cloneVoiceWithSiliconFlow(file, transcript, userId) {
         body: form
     });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data?.error?.message || data?.message || 'CosyVoice2 clone failed');
+    if (!response.ok) throw new Error(data?.error?.message || data?.message || 'Voice preparation failed');
     console.log('[VoiceClone] SiliconFlow response:', {
         keys: Object.keys(data || {}),
         dataKeys: data?.data ? Object.keys(data.data) : [],
         uri: data.uri || data.data?.uri || data.voice || data.data?.voice
     });
     const uri = data.uri || data.data?.uri || data.voice || data.data?.voice || data.voice_uri || data.data?.voice_uri;
-    if (!uri) throw new Error('CosyVoice2 did not return a voice uri');
+    if (!uri) throw new Error('Voice preparation did not return a voice id');
     return uri;
 }
 
@@ -1641,7 +1664,7 @@ async function handleVoiceClone(req, res) {
         });
     } catch (error) {
         console.error('[VoiceClone] Fatal:', error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: publicErrorMessage(error) });
     }
 }
 
@@ -1671,7 +1694,7 @@ async function handleVoiceSpeech(req, res) {
         if (!voice) {
             return res.status(400).json({ error: 'No cloned voice uri found for this profile. Please clone a voice sample first.' });
         }
-        if (!SILICONFLOW_API_KEY) throw new Error('SILICONFLOW_API_KEY or SILICON_FLOW_API_KEY missing');
+        if (!SILICONFLOW_API_KEY) throw serviceConfigError();
         const speechText = cleanTextForSpeech(text);
         if (!speechText) return res.status(400).json({ error: 'speech text is empty after cleanup' });
 
@@ -1715,7 +1738,7 @@ async function handleVoiceSpeech(req, res) {
         });
     } catch (error) {
         console.error('[VoiceSpeech] Fatal:', error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: publicErrorMessage(error) });
     }
 }
 
@@ -1806,7 +1829,7 @@ Adjust your language rhythm, warmth, and word choice to match this emotion. If n
         return;
     } catch (error) {
         console.error('[TestChat] Fatal:', error);
-        return res.status(500).json({ error: error.message });
+        return res.status(500).json({ error: publicErrorMessage(error) });
     }
 }
 
@@ -1896,12 +1919,12 @@ You are ${profile.display_name || 'UploadSoul digital person'}. Use first person
             res.end();
         } catch (error) {
             console.error('[TestChatStream] stream failed:', error);
-            sse({ type: 'error', error: error.message });
+            sse({ type: 'error', error: publicErrorMessage(error) });
             res.end();
         }
     } catch (error) {
         console.error('[TestChatStream] Fatal:', error);
-        if (!res.headersSent) return res.status(500).json({ error: error.message });
+        if (!res.headersSent) return res.status(500).json({ error: publicErrorMessage(error) });
         res.end();
     }
 }

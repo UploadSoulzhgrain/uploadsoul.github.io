@@ -31,7 +31,7 @@ app.use((req, res, next) => {
             .then(({ default: vercelApiHandler }) => vercelApiHandler(req, res))
             .catch(error => {
                 console.error('[MVP API delegate] failed:', error);
-                if (!res.headersSent) res.status(500).json({ error: error.message });
+                if (!res.headersSent) res.status(500).json({ error: '服务暂时不可用，请稍后再试。' });
             });
     }
     return next();
