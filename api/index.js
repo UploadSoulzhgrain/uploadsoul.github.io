@@ -501,6 +501,7 @@ async function persistConversationMemory({ supabaseAdmin, userId, profileId, use
 }
 
 async function analyzeEmotionalState({ message, memories = [], profile = null }) {
+    const personalityBlock = formatPersonalityPrompt(profile);
     const memoryBlock = memories
         .slice(0, 5)
         .map(item => `[${item.emotion_label || 'neutral'} 强度${item.emotion_score ?? '-'}] ${item.content_text || item.summary || ''}`)
@@ -521,6 +522,8 @@ async function analyzeEmotionalState({ message, memories = [], profile = null })
 
 档案：${profile?.display_name || '未命名'}
 用户输入：${message}
+
+${personalityBlock ? `人格层：\n${personalityBlock}\n` : ''}
 
 唤起的记忆：
 ${memoryBlock || '暂无'}`);
@@ -576,6 +579,216 @@ function estimateEmotionState({ message = '', memories = [] }) {
         visual_mood: visualMood,
         reason: memories.length ? '基于相关记忆' : '基于当前语气'
     };
+}
+
+function normalizeTextArray(value, limit = 6) {
+    if (!Array.isArray(value)) return [];
+    return value.map(item => String(item || '').trim()).filter(Boolean).slice(0, limit);
+}
+
+function getPersonalityModel(profile = {}) {
+    const model = profile?.metadata?.personality_model;
+    return model && typeof model === 'object' ? model : null;
+}
+
+function formatPersonalityPrompt(profile = {}) {
+    const model = getPersonalityModel(profile);
+    if (!model) return '';
+    const values = normalizeTextArray(model.core_values).join('、') || '暂无稳定判断';
+    const decisions = normalizeTextArray(model.decision_preferences).join('、') || '暂无稳定判断';
+    const stress = normalizeTextArray(model.stress_response_patterns).join('、') || '暂无稳定判断';
+    const sensitive = normalizeTextArray(model.sensitive_topics).join('、') || '暂无稳定判断';
+    const style = normalizeTextArray(model.communication_style).join('、') || '自然、简短、真诚';
+    const voice = model.voice_emotion_profile || {};
+    const proactive = normalizeTextArray(model.proactive_rules, 8).join('、') || '在纪念日、沉默期和触景生情时主动唤起记忆';
+    return `Personality growth layer:
+- core_values: ${values}
+- decision_preferences: ${decisions}
+- stress_response_patterns: ${stress}
+- sensitive_topics: ${sensitive}
+- communication_style: ${style}
+- voice_emotion_profile: fatigue=${voice.fatigue || 'slower and softer'}, excitement=${voice.excitement || 'slightly faster'}, hesitation=${voice.hesitation || 'short pauses'}, sensitive_pause=${voice.sensitive_pause || 'pause before painful topics'}
+- proactive_rules: ${proactive}
+
+When answering, let these stable patterns shape word choice, rhythm, hesitation, warmth, and what you choose to mention. Do not state these labels to the user.`;
+}
+
+function fallbackPersonalityModel({ profile = {}, fragments = [], feedback = [] }) {
+    const topicCounts = new Map();
+    const emotionCounts = new Map();
+    fragments.forEach(fragment => {
+        (fragment.topics || []).forEach(topic => topicCounts.set(topic, (topicCounts.get(topic) || 0) + 1));
+        if (fragment.emotion_label) emotionCounts.set(fragment.emotion_label, (emotionCounts.get(fragment.emotion_label) || 0) + 1);
+    });
+    const topTopics = [...topicCounts.entries()].sort((a, b) => b[1] - a[1]).map(([topic]) => topic).slice(0, 5);
+    const topEmotion = [...emotionCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || 'neutral';
+    const notLikeCount = feedback.filter(item => item.feedback_type === 'not_like_person').length;
+    return {
+        version: 'personality-v1',
+        confidence: Math.min(0.82, 0.25 + fragments.length * 0.025 + Math.max(0, feedback.length - notLikeCount) * 0.02),
+        summary: `${profile.display_name || '这个档案'}的人格层仍在生长，当前主要由${fragments.length}条记忆推断。`,
+        core_values: topTopics.length ? topTopics.map(topic => `重视${topic}`) : ['重视真实关系', '重视被理解', '珍惜具体记忆'],
+        decision_preferences: ['倾向从关系和长期影响出发', '需要具体情境后再做判断', '不喜欢凭空下结论'],
+        stress_response_patterns: topEmotion === 'anger'
+            ? ['压力下容易变得直接', '需要先被认真听见']
+            : topEmotion === 'sadness'
+                ? ['压力下容易沉默或怀旧', '需要温和陪伴和时间']
+                : ['压力下先稳定情绪', '倾向慢慢说明原因'],
+        sensitive_topics: topTopics.slice(0, 4),
+        communication_style: ['短句自然', '先回应情绪', '用具体记忆而不是空泛安慰'],
+        emotional_reaction_patterns: [`高频情绪线索：${topEmotion}`, '被触发时优先回到具体场景'],
+        voice_emotion_profile: {
+            fatigue: 'lower energy, slower speed, shorter sentences',
+            excitement: 'slightly faster, warmer, more upward intonation',
+            hesitation: 'short pause before uncertain memories',
+            sensitive_pause: 'slow down before regret, separation, loss, and family topics'
+        },
+        proactive_rules: ['纪念日主动提醒', '长时间沉默后轻声问候', '看到照片/地点/物件时触发相关回忆', '高情绪记忆可作为碎金记忆轻触发'],
+        updated_at: new Date().toISOString(),
+        evidence_count: fragments.length
+    };
+}
+
+async function derivePersonalityModel({ profile = {}, fragments = [], feedback = [] }) {
+    const fallback = fallbackPersonalityModel({ profile, fragments, feedback });
+    const evidence = fragments.slice(0, 40).map((item, index) => {
+        const topics = Array.isArray(item.topics) ? item.topics.join('/') : '';
+        return `${index + 1}. [${item.emotion_label || 'neutral'} ${item.emotion_score ?? '-'}] ${item.summary || item.content_text || ''} topics=${topics}`;
+    }).join('\n');
+    const feedbackBlock = feedback.slice(0, 20).map(item => `- ${item.feedback_type || 'other'} rating=${item.rating || '-'} query=${item.query || ''}`).join('\n');
+    try {
+        const data = await callMemoryLLMJson(`你是 UploadSoul 的人格蒸馏引擎。请从碎片化记忆、对话反馈中提取稳定人格层，不要编造具体人生事实。
+
+目标：把长期记忆上升为人格模型，包括价值观、决策偏好、压力反应、敏感话题、情绪反应、表达习惯、声音情绪控制和主动触发规则。
+
+返回严格 JSON，不要额外文字：
+{
+  "summary": "一句话人格摘要，40字以内",
+  "confidence": 0-1,
+  "core_values": ["价值观，最多6条"],
+  "decision_preferences": ["决策偏好，最多6条"],
+  "stress_response_patterns": ["压力反应，最多6条"],
+  "sensitive_topics": ["敏感话题，最多6条"],
+  "communication_style": ["表达习惯，最多6条"],
+  "emotional_reaction_patterns": ["情绪反应模式，最多6条"],
+  "voice_emotion_profile": {
+    "fatigue": "疲惫时声音表现",
+    "excitement": "兴奋时声音表现",
+    "hesitation": "犹豫时声音表现",
+    "sensitive_pause": "遇到敏感话题时的停顿方式"
+  },
+  "proactive_rules": ["主动触发规则，最多8条"]
+}
+
+档案：${profile.display_name || '未命名'}
+描述：${profile.description || ''}
+
+记忆证据：
+${evidence || '暂无'}
+
+用户反馈：
+${feedbackBlock || '暂无'}`);
+        return {
+            ...fallback,
+            ...data,
+            confidence: Math.max(0, Math.min(1, Number(data.confidence ?? fallback.confidence))),
+            core_values: normalizeTextArray(data.core_values, 6),
+            decision_preferences: normalizeTextArray(data.decision_preferences, 6),
+            stress_response_patterns: normalizeTextArray(data.stress_response_patterns, 6),
+            sensitive_topics: normalizeTextArray(data.sensitive_topics, 6),
+            communication_style: normalizeTextArray(data.communication_style, 6),
+            emotional_reaction_patterns: normalizeTextArray(data.emotional_reaction_patterns, 6),
+            proactive_rules: normalizeTextArray(data.proactive_rules, 8),
+            voice_emotion_profile: data.voice_emotion_profile || fallback.voice_emotion_profile,
+            version: 'personality-v1',
+            updated_at: new Date().toISOString(),
+            evidence_count: fragments.length
+        };
+    } catch (error) {
+        console.warn('[PersonalityModel] fallback:', error.message);
+        return fallback;
+    }
+}
+
+function buildProactiveSuggestions({ fragments = [], conversations = [] }) {
+    const now = new Date();
+    const suggestions = [];
+    const seen = new Set();
+    const addSuggestion = (item) => {
+        const key = `${item.trigger_type}:${item.source_fragment_id || item.title}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        suggestions.push({ id: crypto.randomUUID?.() || `${Date.now()}-${suggestions.length}`, ...item });
+    };
+
+    fragments.forEach(fragment => {
+        if (!fragment.memory_date) return;
+        const date = new Date(fragment.memory_date);
+        if (Number.isNaN(date.getTime())) return;
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let currentYearDate = new Date(now.getFullYear(), date.getMonth(), date.getDate());
+        if (currentYearDate < today) currentYearDate = new Date(now.getFullYear() + 1, date.getMonth(), date.getDate());
+        const days = Math.round((currentYearDate - today) / 86400000);
+        if (days >= 0 && days <= 14) {
+            addSuggestion({
+                trigger_type: 'anniversary',
+                title: days === 0 ? '今天有一条纪念日记忆' : `${days}天后有一条纪念日记忆`,
+                message: `可以轻轻提起：“我刚刚想起${fragment.summary || String(fragment.content_text || '').slice(0, 24)}。”`,
+                source_fragment_id: fragment.id,
+                scheduled_for: currentYearDate.toISOString()
+            });
+        }
+    });
+
+    const lastConversation = conversations[0];
+    if (!lastConversation?.updated_at) {
+        addSuggestion({
+            trigger_type: 'silence',
+            title: '还没有开始稳定对话',
+            message: '可以主动发起一次低压力问候，引导用户补充一段近况或旧记忆。'
+        });
+    } else {
+        const silentDays = Math.floor((now - new Date(lastConversation.updated_at)) / 86400000);
+        if (silentDays >= 7) {
+            addSuggestion({
+                trigger_type: 'silence',
+                title: `已经沉默 ${silentDays} 天`,
+                message: '适合发一条很轻的问候，不追问，不施压，只打开一个入口。'
+            });
+        }
+    }
+
+    fragments
+        .filter(item => Number(item.emotion_score || 0) >= 3.5)
+        .slice(0, 3)
+        .forEach(fragment => addSuggestion({
+            trigger_type: 'emotion',
+            title: `高情绪记忆：${fragment.emotion_label || 'memory'}`,
+            message: `相近情绪出现时，可轻触发：“我想起那次${fragment.summary || String(fragment.content_text || '').slice(0, 22)}。”`,
+            source_fragment_id: fragment.id
+        }));
+
+    fragments
+        .filter(item => item.source_kind === 'image' || (item.topics || []).some(topic => /照片|物件|地点|家|房|海|雨|声音|味道/.test(String(topic))))
+        .slice(0, 3)
+        .forEach(fragment => addSuggestion({
+            trigger_type: 'sensory_cue',
+            title: '触景生情线索',
+            message: `看到相似照片、地点或物件时，可触发：${fragment.summary || String(fragment.content_text || '').slice(0, 30)}`,
+            source_fragment_id: fragment.id
+        }));
+
+    fragments
+        .filter(item => Number(item.specificity_score || 0) >= 0.65 && Number(item.importance_score || 0.5) < 0.75)
+        .slice(0, 3)
+        .forEach(fragment => addSuggestion({
+            trigger_type: 'golden_fragment',
+            title: '碎金记忆',
+            message: `这类小细节很像真人会突然想起的片段：${fragment.summary || String(fragment.content_text || '').slice(0, 32)}`,
+            source_fragment_id: fragment.id
+        }));
+
+    return suggestions.slice(0, 10);
 }
 
 // ──────────────────────────────────────────────
@@ -1344,6 +1557,94 @@ async function handleMemoryFeedback(req, res) {
     return res.status(200).json({ feedback: data });
 }
 
+async function handlePersonalityModel(req, res) {
+    const auth = await getAuthedSupabase(req);
+    if (auth.error) return res.status(401).json({ error: auth.error });
+    const { user, supabaseAdmin } = auth;
+
+    try {
+        const url = new URL(req.url, 'http://localhost');
+        const body = req.method === 'POST' ? await readJsonBody(req) : {};
+        const profileId = req.method === 'POST' ? body.profile_id : url.searchParams.get('profile_id');
+        if (!profileId) return res.status(400).json({ error: 'profile_id is required' });
+
+        const { data: profile, error: profileError } = await supabaseAdmin
+            .from('profiles')
+            .select('*')
+            .eq('id', profileId)
+            .eq('user_id', user.id)
+            .single();
+        if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
+
+        const { data: fragments = [], error: fragmentsError } = await supabaseAdmin
+            .from('memory_fragments')
+            .select('id,content_text,summary,topics,emotion_label,emotion_score,importance_score,specificity_score,confidence_score,source_kind,memory_date,created_at')
+            .eq('profile_id', profileId)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(120);
+        if (fragmentsError) return res.status(500).json({ error: publicErrorMessage(fragmentsError) });
+
+        const { data: feedbackData = [] } = await supabaseAdmin
+            .from('memory_feedback')
+            .select('feedback_type,rating,query,answer,created_at')
+            .eq('profile_id', profileId)
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(60);
+        const feedback = Array.isArray(feedbackData) ? feedbackData : [];
+
+        const { data: conversationData = [] } = await supabaseAdmin
+            .from('conversations')
+            .select('id,updated_at,created_at')
+            .eq('profile_id', profileId)
+            .eq('user_id', user.id)
+            .order('updated_at', { ascending: false })
+            .limit(20);
+        const conversations = Array.isArray(conversationData) ? conversationData : [];
+
+        if (req.method === 'GET') {
+            const personality = getPersonalityModel(profile) || fallbackPersonalityModel({ profile, fragments, feedback });
+            return res.status(200).json({
+                personality,
+                suggestions: buildProactiveSuggestions({ fragments, conversations }),
+                stats: {
+                    memories: fragments.length,
+                    feedback: feedback.length,
+                    conversations: conversations.length
+                }
+            });
+        }
+
+        if (req.method === 'POST') {
+            const personality = await derivePersonalityModel({ profile, fragments, feedback });
+            const metadata = {
+                ...(profile.metadata || {}),
+                personality_model: personality,
+                personality_updated_at: new Date().toISOString()
+            };
+            const { data: updated, error: updateError } = await supabaseAdmin
+                .from('profiles')
+                .update({ metadata })
+                .eq('id', profileId)
+                .eq('user_id', user.id)
+                .select('*')
+                .single();
+            if (updateError) return res.status(500).json({ error: publicErrorMessage(updateError) });
+            return res.status(200).json({
+                profile: updated,
+                personality,
+                suggestions: buildProactiveSuggestions({ fragments, conversations })
+            });
+        }
+
+        return res.status(405).json({ error: 'Method not allowed' });
+    } catch (error) {
+        console.error('[PersonalityModel] Fatal:', error);
+        return res.status(500).json({ error: publicErrorMessage(error) });
+    }
+}
+
 async function handleInterviewNext(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
     const auth = await getAuthedSupabase(req);
@@ -1438,6 +1739,7 @@ async function handleMemoryChat(req, res, bodyOverride = null) {
     if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
 
     const emotionState = await analyzeEmotionalState({ message, memories, profile });
+    const personalityPrompt = formatPersonalityPrompt(profile);
     const memoryBlock = memories.map(item => `[${item.emotion_label || 'neutral'}] ${item.content_text}`).join('\n');
     const systemPrompt = `你现在是${profile.display_name || '这个数字人'}。以下是关于你的真实记忆片段，请完全基于这些记忆来回答，用第一人称，保持这个人的语气和表达习惯。如果记忆中没有相关信息，说"我不太记得了"而不是编造。
 
@@ -1456,6 +1758,8 @@ Emotion state for this turn:
 
 Adjust your language rhythm, warmth, and word choice to match this emotion. Keep the answer grounded in the retrieved memories.`;
     const finalSystemPrompt = `${effectiveSystemPrompt}
+
+${personalityPrompt ? `${personalityPrompt}\n` : ''}
 
 ${NATURAL_CHAT_STYLE_PROMPT}
 
@@ -1780,6 +2084,7 @@ async function handleTestChat(req, res) {
         const memoryBlock = memories
             .map(item => `[${item.emotion_label || 'neutral'}] ${item.content_text || item.summary || ''}`)
             .join('\n');
+        const personalityPrompt = formatPersonalityPrompt(profile);
 
         const data = await callSiliconFlowChat({
             model: MEMORY_LLM_MODEL,
@@ -1797,7 +2102,9 @@ Emotion state:
 - tone: ${emotionState.tone}
 - speaking_style: ${emotionState.speaking_style}
 
-Adjust your language rhythm, warmth, and word choice to match this emotion. If no relevant memory exists, admit uncertainty instead of inventing details.`
+Adjust your language rhythm, warmth, and word choice to match this emotion. If no relevant memory exists, admit uncertainty instead of inventing details.
+
+${personalityPrompt || ''}`
                 },
                 {
                     role: 'system',
@@ -1876,6 +2183,7 @@ async function handleTestChatStream(req, res) {
         const memoryBlock = memories
             .map(item => `[${item.emotion_label || 'neutral'}] ${item.content_text || item.summary || ''}`)
             .join('\n');
+        const personalityPrompt = formatPersonalityPrompt(profile);
         const systemPrompt = `Retrieved memories:
 ${memoryBlock || 'None'}
 
@@ -1886,6 +2194,8 @@ Emotion state:
 - speaking_style: ${emotionState.speaking_style}
 
 Adjust your language rhythm, warmth, and word choice to match this emotion. If no relevant memory exists, admit uncertainty instead of inventing details.
+
+${personalityPrompt ? `${personalityPrompt}\n` : ''}
 
 ${NATURAL_CHAT_STYLE_PROMPT}
 
@@ -1953,6 +2263,7 @@ export default async function handler(req, res) {
         if (pathname === '/memory/fragments') return await handleMemoryFragments(req, res);
         if (pathname === '/memory/search') return await handleMemorySearch(req, res);
         if (pathname === '/memory/feedback') return await handleMemoryFeedback(req, res);
+        if (pathname === '/personality/model') return await handlePersonalityModel(req, res);
         if (pathname === '/memory/interview/next') return await handleInterviewNext(req, res);
         if (pathname === '/memory-chat') return await handleMemoryChat(req, res);
         if (pathname === '/cloudinary/signature') return await handleCloudinarySignature(req, res);

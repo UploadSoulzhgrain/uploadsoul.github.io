@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Upload, Send, Image, Mic, FileText, Search, MessageCircle, Database, ChevronRight, Sparkles, Square } from 'lucide-react';
+import { Upload, Send, Image, Mic, FileText, Search, MessageCircle, Database, ChevronRight, Sparkles, Square, Brain, Bell, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -67,6 +67,9 @@ const MemorySystemPage = () => {
   const [chatMessages, setChatMessages] = useState([]);
   const [sources, setSources] = useState([]);
   const [currentEmotion, setCurrentEmotion] = useState(defaultEmotionState);
+  const [personality, setPersonality] = useState(null);
+  const [proactiveSuggestions, setProactiveSuggestions] = useState([]);
+  const [personalityLoading, setPersonalityLoading] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [interviewMessages, setInterviewMessages] = useState([]);
   const [interviewAnswer, setInterviewAnswer] = useState('');
@@ -107,13 +110,24 @@ const MemorySystemPage = () => {
     setFragments(data.fragments || []);
   }, [activeProfileId, session]);
 
+  const loadPersonality = useCallback(async (id = activeProfileId) => {
+    if (!session || !id) return;
+    const response = await authedFetch(session, `/api/personality/model?profile_id=${id}`);
+    const data = await response.json();
+    setPersonality(data.personality || null);
+    setProactiveSuggestions(data.suggestions || []);
+  }, [activeProfileId, session]);
+
   useEffect(() => {
     let mounted = true;
     async function boot() {
       try {
         setLoading(true);
         const selected = await ensureProfile();
-        if (mounted && selected?.id) await loadFragments(selected.id);
+        if (mounted && selected?.id) await Promise.all([
+          loadFragments(selected.id),
+          loadPersonality(selected.id)
+        ]);
       } catch (error) {
         toast.error(error.message);
       } finally {
@@ -122,7 +136,7 @@ const MemorySystemPage = () => {
     }
     boot();
     return () => { mounted = false; };
-  }, [ensureProfile, loadFragments]);
+  }, [ensureProfile, loadFragments, loadPersonality]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -137,6 +151,26 @@ const MemorySystemPage = () => {
     });
     return { count: fragments.length, people: people.size, topics: topics.size };
   }, [fragments]);
+
+  const derivePersonality = async () => {
+    if (!activeProfileId || personalityLoading) return;
+    try {
+      setPersonalityLoading(true);
+      const response = await authedFetch(session, '/api/personality/model', {
+        method: 'POST',
+        body: JSON.stringify({ profile_id: activeProfileId })
+      });
+      const data = await response.json();
+      setPersonality(data.personality || null);
+      setProactiveSuggestions(data.suggestions || []);
+      if (data.profile) setProfile(data.profile);
+      toast.success('人格成长层已更新');
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setPersonalityLoading(false);
+    }
+  };
 
   const uploadMemory = async () => {
     if (!activeProfileId) return;
@@ -161,7 +195,10 @@ const MemorySystemPage = () => {
       setUploadText('');
       setMemoryDate('');
       if (fileRef.current) fileRef.current.value = '';
-      await loadFragments(activeProfileId);
+      await Promise.all([
+        loadFragments(activeProfileId),
+        loadPersonality(activeProfileId)
+      ]);
     } catch (error) {
       toast.error(error.message);
     } finally {
@@ -215,6 +252,9 @@ const MemorySystemPage = () => {
     } catch (error) {
       if (error.name !== 'AbortError') toast.error(error.message);
     } finally {
+      if (!controller.signal.aborted) {
+        loadPersonality(activeProfileId).catch(() => {});
+      }
       chatAbortRef.current = null;
       setStreaming(false);
     }
@@ -264,7 +304,10 @@ const MemorySystemPage = () => {
       form.append('text', `AI访谈问题：${lastQuestion}\n回答：${answer}`);
       await authedFetch(session, '/api/memory/upload', { method: 'POST', body: form });
       toast.success('访谈回答已保存为记忆片段');
-      await loadFragments(activeProfileId);
+      await Promise.all([
+        loadFragments(activeProfileId),
+        loadPersonality(activeProfileId)
+      ]);
       await askInterviewQuestion(nextHistory);
     } catch (error) {
       toast.error(error.message);
@@ -321,6 +364,80 @@ const MemorySystemPage = () => {
                   <div className="memory-panel p-3"><div className="text-xl font-bold">{stats.people}</div><div className="text-xs text-white/45">人物</div></div>
                   <div className="memory-panel p-3"><div className="text-xl font-bold">{stats.topics}</div><div className="text-xs text-white/45">主题</div></div>
                 </div>
+              </section>
+
+              <section className="memory-panel p-5">
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Brain size={18} className="text-sky-200" />
+                    <h2 className="font-semibold">人格成长层</h2>
+                  </div>
+                  <button
+                    onClick={derivePersonality}
+                    disabled={personalityLoading}
+                    className="w-9 h-9 rounded-lg border border-white/10 text-white/60 hover:text-white disabled:opacity-50 flex items-center justify-center"
+                    title="重新蒸馏人格"
+                  >
+                    <RefreshCw size={15} className={personalityLoading ? 'animate-spin' : ''} />
+                  </button>
+                </div>
+
+                {personality ? (
+                  <div className="space-y-4">
+                    <div className="rounded-lg border border-sky-200/15 bg-sky-300/10 p-3">
+                      <div className="text-sm text-white/78 leading-relaxed">{personality.summary}</div>
+                      <div className="mt-2 flex flex-wrap gap-2 text-[11px] text-white/45">
+                        <span>可信度 {Math.round(Number(personality.confidence || 0) * 100)}%</span>
+                        <span>证据 {personality.evidence_count || 0} 条</span>
+                      </div>
+                    </div>
+
+                    {[
+                      ['价值观', personality.core_values],
+                      ['决策偏好', personality.decision_preferences],
+                      ['压力反应', personality.stress_response_patterns],
+                      ['敏感话题', personality.sensitive_topics],
+                      ['表达习惯', personality.communication_style]
+                    ].map(([label, values]) => (
+                      <div key={label}>
+                        <div className="text-xs text-white/42 mb-2">{label}</div>
+                        <div className="flex flex-wrap gap-2">
+                          {(values?.length ? values : ['继续采集中']).slice(0, 4).map(item => (
+                            <span key={item} className="memory-chip px-2 py-1 text-xs text-white/64">{item}</span>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-sm text-white/52 leading-relaxed">
+                    还没有稳定人格画像。先积累几条记忆，或点击右上角让系统从现有片段里生成第一版。
+                  </div>
+                )}
+
+                {proactiveSuggestions.length > 0 && (
+                  <div className="mt-5 border-t border-white/10 pt-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Bell size={15} className="text-amber-200" />
+                      <div className="text-sm font-semibold">主动触发建议</div>
+                    </div>
+                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
+                      {proactiveSuggestions.slice(0, 5).map(suggestion => (
+                        <button
+                          key={suggestion.id}
+                          onClick={() => setChatInput(suggestion.message)}
+                          className="w-full text-left rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 p-3"
+                        >
+                          <div className="flex items-center justify-between gap-3 text-xs">
+                            <span className="text-white/78">{suggestion.title}</span>
+                            <span className="text-white/35">{suggestion.trigger_type}</span>
+                          </div>
+                          <div className="text-xs text-white/48 mt-2 line-clamp-2">{suggestion.message}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </section>
 
               <section className="memory-panel p-5">
