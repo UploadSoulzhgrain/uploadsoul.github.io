@@ -10,6 +10,12 @@ import { createClient } from '@supabase/supabase-js';
 import formidable from 'formidable';
 import fs from 'fs';
 import crypto from 'crypto';
+import dotenv from 'dotenv';
+import os from 'os';
+import path from 'path';
+
+dotenv.config({ path: '.env.local' });
+dotenv.config();
 
 // ──────────────────────────────────────────────
 // Helpers
@@ -298,6 +304,27 @@ async function transcribeAudio(file) {
         language: 'zh'
     });
     return transcription.text;
+}
+
+async function downloadRemoteAssetAsFile(asset) {
+    if (!asset?.url) return null;
+    const response = await fetch(asset.url);
+    if (!response.ok) throw new Error(`Saved voice sample download failed: ${response.status}`);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    if (!buffer.length) throw new Error('Saved voice sample is empty');
+    const contentType = response.headers.get('content-type') || asset.mime_type || 'audio/mpeg';
+    const extFromName = String(asset.file_name || '').match(/\.(wav|mp3|pcm|opus|ogg|webm|m4a)$/i)?.[1];
+    const ext = extFromName || (contentType.includes('wav') ? 'wav' : contentType.includes('opus') ? 'opus' : contentType.includes('ogg') ? 'opus' : contentType.includes('webm') ? 'opus' : 'mp3');
+    const filePath = path.join(os.tmpdir(), `uploadsoul-voice-${asset.id || Date.now()}.${ext}`);
+    fs.writeFileSync(filePath, buffer);
+    return {
+        filepath: filePath,
+        mimetype: contentType,
+        originalFilename: asset.file_name || `saved-voice.${ext}`,
+        newFilename: path.basename(filePath),
+        size: buffer.length
+    };
 }
 
 async function streamSiliconFlowAnswer({ systemPrompt, message, onToken }) {
@@ -1286,8 +1313,14 @@ async function handleProfileAssets(req, res) {
                 .single();
             if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
 
-            const { cloudinaryService } = await import('./_lib/cloudinary-server.js');
-            const url = await cloudinaryService.uploadMemoryMedia(file.filepath, file.mimetype || 'application/octet-stream');
+            let url = null;
+            try {
+                const { cloudinaryService } = await import('./_lib/cloudinary-server.js');
+                url = await cloudinaryService.uploadMemoryMedia(file.filepath, file.mimetype || 'application/octet-stream');
+            } catch (error) {
+                console.warn('[ProfileAssets] media upload failed:', error.message);
+                if (assetType !== 'voice') throw error;
+            }
             let metadata = {};
             try { metadata = JSON.parse(metadataRaw || '{}'); } catch { metadata = {}; }
             const qualityScore = Math.min(1, Math.max(0.25, (size > 200 * 1024 ? 0.65 : 0.45) + (role === 'primary' ? 0.1 : 0)));
@@ -1304,7 +1337,7 @@ async function handleProfileAssets(req, res) {
                 transcript,
                 quality_score: Number(qualityScore.toFixed(2)),
                 is_primary: role === 'primary',
-                metadata
+                metadata: { ...metadata, upload_status: url ? 'uploaded' : 'pending_remote_upload' }
             }).select('*').single();
             if (error) return res.status(500).json({ error: publicErrorMessage(error) });
             return res.status(200).json({ asset: data });
@@ -1877,6 +1910,28 @@ async function cloneVoiceWithSiliconFlow(file, transcript, userId) {
     return uri;
 }
 
+async function handleSpeechTranscribe(req, res) {
+    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+    const auth = await getAuthedSupabase(req);
+    if (auth.error) return res.status(401).json({ error: auth.error });
+
+    try {
+        const [fields, files] = await parseMultipart(req, { maxFileSize: MAX_AUDIO_BYTES });
+        const file = fileValue(files, 'file');
+        const language = fieldValue(fields, 'language', 'zh');
+        if (!file) return res.status(400).json({ error: 'audio file is required' });
+        if ((file.size || 0) > MAX_AUDIO_BYTES) return res.status(413).json({ error: 'Audio must be under 25MB' });
+
+        file.originalFilename = file.originalFilename || (language === 'en' ? 'speech.wav' : 'speech-zh.wav');
+        file.mimetype = file.mimetype || 'audio/wav';
+        const text = await transcribeAudio(file);
+        return res.status(200).json({ text: text || '' });
+    } catch (error) {
+        console.error('[SpeechTranscribe] Fatal:', error);
+        return res.status(500).json({ error: publicErrorMessage(error) });
+    }
+}
+
 async function handleVoiceClone(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
     const auth = await getAuthedSupabase(req);
@@ -1887,10 +1942,8 @@ async function handleVoiceClone(req, res) {
         const [fields, files] = await parseMultipart(req, { maxFileSize: MAX_AUDIO_BYTES });
         const profileId = fieldValue(fields, 'profile_id');
         const assetId = fieldValue(fields, 'asset_id') || null;
-        const file = fileValue(files, 'file');
+        let file = fileValue(files, 'file');
         if (!profileId) return res.status(400).json({ error: 'profile_id is required' });
-        if (!file) return res.status(400).json({ error: 'voice sample file is required' });
-        if ((file.size || 0) > MAX_AUDIO_BYTES) return res.status(413).json({ error: 'Audio must be under 25MB' });
 
         const { data: profile, error: profileError } = await supabaseAdmin
             .from('profiles')
@@ -1899,6 +1952,27 @@ async function handleVoiceClone(req, res) {
             .eq('user_id', user.id)
             .single();
         if (profileError || !profile) return res.status(404).json({ error: 'Profile not found' });
+
+        let savedAsset = null;
+        if (assetId) {
+            const { data: assetData, error: assetLookupError } = await supabaseAdmin
+                .from('profile_assets')
+                .select('*')
+                .eq('id', assetId)
+                .eq('user_id', user.id)
+                .eq('profile_id', profileId)
+                .eq('asset_type', 'voice')
+                .single();
+            if (assetLookupError) console.warn('[VoiceClone] saved asset lookup skipped:', assetLookupError.message);
+            savedAsset = assetData || null;
+        }
+
+        if (!file && savedAsset?.url) {
+            file = await downloadRemoteAssetAsFile(savedAsset);
+        }
+
+        if (!file) return res.status(400).json({ error: 'voice sample file is required' });
+        if ((file.size || 0) > MAX_AUDIO_BYTES) return res.status(413).json({ error: 'Audio must be under 25MB' });
 
         const transcript = await transcribeAudio(file);
         const voiceUri = await cloneVoiceWithSiliconFlow(file, transcript, user.id);
@@ -1911,47 +1985,46 @@ async function handleVoiceClone(req, res) {
             console.warn('[VoiceClone] sample upload skipped:', error.message);
         }
 
-        let asset = null;
-        if (sampleUrl) {
-            const assetPayload = {
-                role: 'voice_sample',
-                url: sampleUrl,
-                file_name: file.originalFilename || file.newFilename || 'voice-sample',
-                mime_type: file.mimetype || null,
-                file_size: file.size || null,
-                transcript,
-                quality_score: 0.75,
-                is_primary: true,
-                metadata: { voice_ready: true }
-            };
-            const assetQuery = assetId
-                ? supabaseAdmin
-                    .from('profile_assets')
-                    .update(assetPayload)
-                    .eq('id', assetId)
-                    .eq('user_id', user.id)
-                    .eq('profile_id', profileId)
-                : supabaseAdmin
-                    .from('profile_assets')
-                    .insert({
-                        user_id: user.id,
-                        profile_id: profileId,
-                        asset_type: 'voice',
-                        ...assetPayload
-                    });
-            const { data: assetData, error: assetError } = await assetQuery.select('*').single();
-            if (assetError) console.warn('[VoiceClone] asset insert skipped:', assetError.message);
-            asset = assetData || null;
-        }
+        const assetPayload = {
+            role: 'voice_sample',
+            file_name: file.originalFilename || file.newFilename || 'voice-sample',
+            mime_type: file.mimetype || null,
+            file_size: file.size || null,
+            transcript,
+            quality_score: 0.75,
+            is_primary: true,
+            metadata: { voice_ready: true, voice_uri: voiceUri, upload_status: sampleUrl ? 'uploaded' : 'pending_remote_upload' }
+        };
+        if (sampleUrl) assetPayload.url = sampleUrl;
+        const assetQuery = assetId
+            ? supabaseAdmin
+                .from('profile_assets')
+                .update(assetPayload)
+                .eq('id', assetId)
+                .eq('user_id', user.id)
+                .eq('profile_id', profileId)
+            : supabaseAdmin
+                .from('profile_assets')
+                .insert({
+                    user_id: user.id,
+                    profile_id: profileId,
+                    asset_type: 'voice',
+                    ...assetPayload
+                });
+        const { data: assetData, error: assetError } = await assetQuery.select('*').single();
+        if (assetError) console.warn('[VoiceClone] asset insert skipped:', assetError.message);
+        const asset = assetData || null;
+
+        const profilePatch = {
+            elevenlabs_voice_id: voiceUri,
+            status: 'voice_ready',
+            description: '已完成声音样本初始化，可用于数字人对话语音输出。'
+        };
+        if (sampleUrl) profilePatch.voice_sample_url = sampleUrl;
 
         const { data: updated, error: updateError } = await supabaseAdmin
             .from('profiles')
-            .update({
-                voice_sample_url: sampleUrl,
-                elevenlabs_voice_id: voiceUri,
-                status: 'voice_ready',
-                description: '已完成声音样本初始化，可用于数字人对话语音输出。'
-            })
+            .update(profilePatch)
             .eq('id', profileId)
             .eq('user_id', user.id)
             .select('*')
@@ -2267,6 +2340,7 @@ export default async function handler(req, res) {
         if (pathname === '/memory/interview/next') return await handleInterviewNext(req, res);
         if (pathname === '/memory-chat') return await handleMemoryChat(req, res);
         if (pathname === '/cloudinary/signature') return await handleCloudinarySignature(req, res);
+        if (pathname === '/speech/transcribe') return await handleSpeechTranscribe(req, res);
         if (pathname === '/voice/clone') return await handleVoiceClone(req, res);
         if (pathname === '/voice/speech') return await handleVoiceSpeech(req, res);
         if (pathname === '/test-chat-stream') return await handleTestChatStream(req, res);
@@ -2282,7 +2356,13 @@ export default async function handler(req, res) {
                     hasSpeechKey: !!process.env.AZURE_SPEECH_KEY,
                     hasOpenAIKey: !!process.env.AZURE_OPENAI_KEY,
                     hasHeygenKey: !!process.env.HEYGEN_API_KEY,
-                    hasVolcAK: !!process.env.VOLC_AK
+                    hasVolcAK: !!process.env.VOLC_AK,
+                    hasSupabaseUrl: !!(process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL),
+                    hasSupabaseAnonKey: !!(process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY),
+                    hasSupabaseServiceKey: !!(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY),
+                    hasCloudinary: !!(process.env.CLOUDINARY_URL || (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET)),
+                    hasSiliconFlow: !!(process.env.SILICONFLOW_API_KEY || process.env.SILICON_FLOW_API_KEY),
+                    hasVoyage: !!process.env.VOYAGE_API_KEY
                 }
             });
         }

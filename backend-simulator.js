@@ -17,12 +17,15 @@ const delegatedMvpApiPrefixes = [
     '/api/memory/search',
     '/api/memory/feedback',
     '/api/memory/interview/next',
+    '/api/personality/model',
     '/api/memory-chat',
     '/api/cloudinary/signature',
+    '/api/speech/transcribe',
     '/api/voice/clone',
     '/api/voice/speech',
     '/api/test-chat-stream',
-    '/api/test-chat'
+    '/api/test-chat',
+    '/api/diagnose'
 ];
 
 app.use((req, res, next) => {

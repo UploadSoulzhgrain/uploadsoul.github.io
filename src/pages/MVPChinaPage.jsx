@@ -164,6 +164,8 @@ const mvpCopy = {
       micFailed: message => `无法打开麦克风：${message}`,
       chooseVoice: '请先选择或录制一段声音样本',
       sampleAdded: '声音素材已添加',
+      sampleSaveFailed: '声音素材未能保存到账户，本次仅本地可用',
+      speechFallback: '浏览器识别不稳定，已切换为录音识别，请说完后再点一次麦克风',
       voiceDone: '声音已准备好，后续对话将使用这条声线',
       memoryRequired: '先输入一段要保存的记忆内容',
       memorySaved: '记忆已保存',
@@ -295,6 +297,8 @@ const mvpCopy = {
       micFailed: message => `Cannot open microphone: ${message}`,
       chooseVoice: 'Please choose or record a voice sample first',
       sampleAdded: 'Voice sample added',
+      sampleSaveFailed: 'The voice sample was not saved to your account and is only available locally',
+      speechFallback: 'Browser recognition is unstable. Switched to recorded recognition; tap the mic again when finished',
       voiceDone: 'Voice is ready. Future replies will use it.',
       memoryRequired: 'Please enter a memory before saving',
       memorySaved: 'Memory saved',
@@ -454,6 +458,11 @@ const MVPChinaPage = () => {
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
+  const voiceInputRecorderRef = useRef(null);
+  const voiceInputChunksRef = useRef([]);
+  const voiceInputTimerRef = useRef(null);
+  const listeningModeRef = useRef('');
+  const listeningAutoSendRef = useRef(false);
   const fileRef = useRef(null);
   const visualFileRef = useRef(null);
   const voiceFileRef = useRef(null);
@@ -599,15 +608,18 @@ const MVPChinaPage = () => {
       const response = await authedFetch(session, `/api/profile-assets?profile_id=${encodeURIComponent(profileId)}`);
       const data = await response.json();
       const assets = data.assets || [];
-      setVoiceSamples(assets.filter(asset => asset.asset_type === 'voice').map(asset => ({
+      const voices = assets.filter(asset => asset.asset_type === 'voice').map(asset => ({
         id: asset.id,
         name: asset.file_name || copy.voiceLibrary,
         size: asset.file_size || 0,
         url: asset.url,
         transcript: asset.transcript,
+        primary: Boolean(asset.is_primary),
         saved: true
-      })));
-      setVisualAssets(assets.filter(asset => asset.asset_type === 'image' || asset.asset_type === 'video').map(asset => ({
+      }));
+      setVoiceSamples(voices);
+      setSelectedVoiceSampleId(prev => (prev && voices.some(asset => asset.id === prev) ? prev : (voices.find(asset => asset.primary)?.id || voices[0]?.id || '')));
+      setVisualAssets(assets.filter(asset => asset.url && (asset.asset_type === 'image' || asset.asset_type === 'video')).map(asset => ({
         id: asset.id,
         url: asset.url,
         type: asset.asset_type === 'video' ? 'video' : 'image',
@@ -626,10 +638,12 @@ const MVPChinaPage = () => {
 
   useEffect(() => () => {
     if (timerRef.current) clearInterval(timerRef.current);
+    if (voiceInputTimerRef.current) clearTimeout(voiceInputTimerRef.current);
     if (animationRef.current) cancelAnimationFrame(animationRef.current);
     streamAbortRef.current?.abort();
     audioContextRef.current?.close?.();
     recorderRef.current?.stream?.getTracks?.().forEach(track => track.stop());
+    voiceInputRecorderRef.current?.stream?.getTracks?.().forEach(track => track.stop());
     cameraStreamRef.current?.getTracks?.().forEach(track => track.stop());
     recognitionRef.current?.stop?.();
   }, []);
@@ -655,10 +669,10 @@ const MVPChinaPage = () => {
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || 'audio/webm' });
         try {
           const file = await recordedBlobToWavFile(blob);
-          addVoiceSample(file, 'record');
+          const savedSample = await addVoiceSample(file, 'record');
           toast.success(copy.toasts.recordingReady);
           if (profile?.id) {
-            cloneVoice(file).catch(() => {});
+            cloneVoice(file, savedSample?.id).catch(() => {});
           }
         } catch (error) {
           console.error('Recorded audio conversion failed:', error);
@@ -696,9 +710,9 @@ const MVPChinaPage = () => {
     voiceFileRef.current = voiceFile;
   }, [voiceFile]);
 
-  const addVoiceSample = (file, source = 'upload') => {
-    if (!file) return;
-    if (!requireLogin('请先登录，再上传声音素材')) return;
+  const addVoiceSample = async (file, source = 'upload') => {
+    if (!file) return null;
+    if (!requireLogin('请先登录，再上传声音素材')) return null;
     const sample = {
       id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       file,
@@ -712,9 +726,14 @@ const MVPChinaPage = () => {
     setVoiceFile(file);
     voiceFileRef.current = file;
     toast.success(copy.toasts.sampleAdded);
-    persistProfileAsset({ file, assetType: 'voice', role: source === 'record' ? 'recorded_sample' : 'uploaded_sample', localId: sample.id }).catch(error => {
+    try {
+      const asset = await persistProfileAsset({ file, assetType: 'voice', role: source === 'record' ? 'recorded_sample' : 'uploaded_sample', localId: sample.id });
+      return asset ? { ...sample, id: asset.id, url: asset.url, saved: true } : sample;
+    } catch (error) {
       console.warn('Voice asset save skipped:', error.message);
-    });
+      toast.error(copy.toasts.sampleSaveFailed);
+      return sample;
+    }
   };
 
   const persistProfileAsset = async ({ file, assetType, role = 'reference', localId = null }) => {
@@ -732,7 +751,7 @@ const MVPChinaPage = () => {
       setVoiceSamples(prev => prev.map(item => (
         item.id === localId ? { ...item, id: asset.id, url: asset.url, saved: true } : item
       )));
-      if (selectedVoiceSampleId === localId) setSelectedVoiceSampleId(asset.id);
+      setSelectedVoiceSampleId(prev => (prev === localId ? asset.id : prev));
     } else {
       setVisualAssets(prev => prev.map(item => (
         item.id === localId ? { ...item, id: asset.id, url: asset.url, saved: true } : item
@@ -741,10 +760,11 @@ const MVPChinaPage = () => {
     return asset;
   };
 
-  const cloneVoice = async (fileOverride = null) => {
+  const cloneVoice = async (fileOverride = null, assetIdOverride = null) => {
     if (!requireLogin('请先登录，再生成专属声音')) return;
     const fileToClone = fileOverride || selectedVoiceSample?.file || voiceFileRef.current;
-    if (!profile?.id || !fileToClone) {
+    const assetId = assetIdOverride || (selectedVoiceSample?.saved && selectedVoiceSample?.id ? selectedVoiceSample.id : '');
+    if (!profile?.id || (!fileToClone && !assetId)) {
       toast.error(copy.toasts.chooseVoice);
       return;
     }
@@ -752,9 +772,9 @@ const MVPChinaPage = () => {
     try {
       const form = new FormData();
       form.append('profile_id', profile.id);
-      form.append('file', fileToClone);
-      if (selectedVoiceSample?.saved && selectedVoiceSample?.id) {
-        form.append('asset_id', selectedVoiceSample.id);
+      if (fileToClone) form.append('file', fileToClone);
+      if (assetId) {
+        form.append('asset_id', assetId);
       }
       const response = await authedFetch(session, '/api/voice/clone', { method: 'POST', body: form });
       const data = await response.json();
@@ -1010,7 +1030,7 @@ const MVPChinaPage = () => {
 
   const sendMessage = async (textOverride = null) => {
     if (!requireLogin('请先登录，再和数字人对话')) return;
-    const text = (textOverride || input).trim();
+    const text = (typeof textOverride === 'string' ? textOverride : input).trim();
     if (!profile?.id || !text || chatState === 'working') return;
     stopSpeaking();
     setInput('');
@@ -1021,9 +1041,10 @@ const MVPChinaPage = () => {
     setVisualState('thinking');
     try {
       let activeProfile = profile;
-      if (!activeProfile?.elevenlabs_voice_id && voiceFileRef.current) {
+      const savedVoiceAssetId = selectedVoiceSample?.saved ? selectedVoiceSample.id : null;
+      if (!activeProfile?.elevenlabs_voice_id && (voiceFileRef.current || savedVoiceAssetId)) {
         toast(copy.toasts.preparingVoice);
-        activeProfile = await cloneVoice(voiceFileRef.current);
+        activeProfile = await cloneVoice(voiceFileRef.current, savedVoiceAssetId);
       }
       if (!activeProfile?.elevenlabs_voice_id) {
         throw new Error(copy.toasts.voiceMissing);
@@ -1169,23 +1190,100 @@ const MVPChinaPage = () => {
     }
   };
 
+  const stopBackendListening = () => {
+    if (voiceInputTimerRef.current) clearTimeout(voiceInputTimerRef.current);
+    voiceInputTimerRef.current = null;
+    const recorder = voiceInputRecorderRef.current;
+    if (recorder?.state === 'recording') {
+      recorder.stop();
+    } else {
+      setListening(false);
+      listeningModeRef.current = '';
+    }
+  };
+
+  const startBackendListening = async (autoSend = false) => {
+    if (!requireLogin('请先登录，再使用语音输入')) return;
+    if (listening || streamingReply || visualState === 'speaking') return;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const preferredMimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+          ? 'audio/ogg;codecs=opus'
+          : '';
+      const recorder = new MediaRecorder(stream, preferredMimeType ? { mimeType: preferredMimeType } : undefined);
+      voiceInputRecorderRef.current = recorder;
+      voiceInputChunksRef.current = [];
+      listeningModeRef.current = 'backend';
+      listeningAutoSendRef.current = autoSend;
+      recorder.ondataavailable = event => {
+        if (event.data.size) voiceInputChunksRef.current.push(event.data);
+      };
+      recorder.onstop = async () => {
+        setListening(false);
+        listeningModeRef.current = '';
+        if (voiceInputTimerRef.current) clearTimeout(voiceInputTimerRef.current);
+        voiceInputTimerRef.current = null;
+        stream.getTracks().forEach(track => track.stop());
+        try {
+          const blob = new Blob(voiceInputChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
+          if (blob.size < 512) return;
+          const wavFile = await recordedBlobToWavFile(blob);
+          const form = new FormData();
+          form.append('file', wavFile);
+          form.append('language', copy === mvpCopy.en ? 'en' : 'zh');
+          const response = await authedFetch(session, '/api/speech/transcribe', { method: 'POST', body: form });
+          const data = await response.json();
+          const text = (data.text || '').trim();
+          if (!text) throw new Error(copy.toasts.speechFailed('empty'));
+          if (listeningAutoSendRef.current || phoneModeRef.current) {
+            sendMessage(text);
+          } else {
+            setInput(text);
+          }
+        } catch (error) {
+          toast.error(copy.toasts.speechFailed(publicErrorMessage(error.message)));
+        }
+      };
+      recorder.start();
+      setListening(true);
+      voiceInputTimerRef.current = window.setTimeout(() => stopBackendListening(), 6500);
+    } catch (error) {
+      setListening(false);
+      listeningModeRef.current = '';
+      toast.error(copy.toasts.speechFailed(publicErrorMessage(error.message)));
+    }
+  };
+
   const startListening = (autoSend = false) => {
     if (!requireLogin('请先登录，再使用语音输入')) return;
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      toast.error(copy.toasts.speechUnsupported);
+      toast(copy.toasts.speechFallback);
+      startBackendListening(autoSend);
       return;
     }
     if (listening || streamingReply || visualState === 'speaking') return;
     const recognition = new SpeechRecognition();
+    listeningModeRef.current = 'browser';
     recognition.lang = copy === mvpCopy.en ? 'en-US' : 'zh-CN';
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.onstart = () => setListening(true);
-    recognition.onend = () => setListening(false);
+    recognition.onend = () => {
+      setListening(false);
+      if (listeningModeRef.current === 'browser') listeningModeRef.current = '';
+    };
     recognition.onerror = event => {
       setListening(false);
-      toast.error(copy.toasts.speechFailed(event.error));
+      listeningModeRef.current = '';
+      if (['network', 'no-speech', 'audio-capture', 'service-not-allowed'].includes(event.error)) {
+        toast(copy.toasts.speechFallback);
+        window.setTimeout(() => startBackendListening(autoSend), 120);
+      } else {
+        toast.error(copy.toasts.speechFailed(event.error));
+      }
     };
     recognition.onresult = event => {
       const text = event.results?.[0]?.[0]?.transcript || '';
@@ -1201,6 +1299,10 @@ const MVPChinaPage = () => {
   };
 
   const toggleListening = () => {
+    if (listening && listeningModeRef.current === 'backend') {
+      stopBackendListening();
+      return;
+    }
     if (listening && recognitionRef.current) {
       recognitionRef.current.stop();
       setListening(false);
@@ -1224,6 +1326,7 @@ const MVPChinaPage = () => {
       }
     } else {
       recognitionRef.current?.stop?.();
+      stopBackendListening();
       setListening(false);
       toast(copy.toasts.phoneOff);
     }
@@ -1298,7 +1401,10 @@ const MVPChinaPage = () => {
                     className="hidden"
                     type="file"
                     accept="audio/*,.mp3,.wav,.opus,.ogg"
-                    onChange={event => addVoiceSample(event.target.files?.[0], 'upload')}
+                    onChange={event => {
+                      addVoiceSample(event.target.files?.[0], 'upload');
+                      event.target.value = '';
+                    }}
                   />
                   <button onClick={() => requireLogin('请先登录，再上传声音素材') && fileRef.current?.click()} className="w-full px-4 py-3 rounded-lg border border-white/10 hover:border-amber-200/40 flex items-center justify-center gap-2">
                     <Upload size={17} /> {copy.addVoiceSample}
@@ -1308,7 +1414,7 @@ const MVPChinaPage = () => {
                   </button>
                   {voiceFile && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{voiceFile.name} · {(voiceFile.size / 1024 / 1024).toFixed(2)} MB</div>}
                   <div className="text-[11px] text-white/38 leading-relaxed">{copy.audioHint}</div>
-                  <button onClick={() => cloneVoice(selectedVoiceSample?.file)} disabled={(!selectedVoiceSample && !voiceFile) || cloneState === 'working'} className="w-full px-4 py-3 rounded-lg bg-amber-300 text-black font-semibold disabled:opacity-55">
+                  <button onClick={() => cloneVoice(selectedVoiceSample?.file, selectedVoiceSample?.saved ? selectedVoiceSample.id : null)} disabled={(!selectedVoiceSample && !voiceFile) || cloneState === 'working'} className="w-full px-4 py-3 rounded-lg bg-amber-300 text-black font-semibold disabled:opacity-55">
                     {cloneState === 'working' ? copy.preparingVoice : copy.updateWithSelected}
                   </button>
                   {transcript && <div className="text-xs text-white/55 border border-white/10 rounded-lg p-3">{copy.transcript}：{transcript}</div>}
@@ -1538,7 +1644,7 @@ const MVPChinaPage = () => {
                       }}
                       placeholder={copy.inputPlaceholder}
                     />
-                    <button onClick={streamingReply ? stopSpeaking : sendMessage} disabled={!streamingReply && !input.trim()} className={`w-11 h-11 rounded-lg flex items-center justify-center disabled:opacity-55 ${streamingReply ? 'border border-white/10 text-white/80' : 'bg-emerald-300 text-black'}`}>
+                    <button onClick={() => (streamingReply ? stopSpeaking() : sendMessage())} disabled={!streamingReply && !input.trim()} className={`w-11 h-11 rounded-lg flex items-center justify-center disabled:opacity-55 ${streamingReply ? 'border border-white/10 text-white/80' : 'bg-emerald-300 text-black'}`}>
                       {streamingReply ? <Square size={15} /> : <Send size={17} />}
                     </button>
                   </div>
